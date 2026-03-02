@@ -10,6 +10,9 @@ This is an alternative fork of [UIInfoSuite2](https://github.com/Annosz/UIInfoSu
 - Show bundle items indicator on Traveling Merchant icon when the merchant has items needed for bundles
 - Show quest count under journal icon
 
+### Bug fixes from upstream
+- Fix mushroom log and mossy seed effect ranges ([Annosz/UIInfoSuite2#641](https://github.com/Annosz/UIInfoSuite2/pull/641))
+
 ---
 
 # UI Info Suite 2

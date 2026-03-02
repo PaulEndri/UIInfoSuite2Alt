@@ -4,6 +4,8 @@ This is an alternative fork of [UIInfoSuite2](https://github.com/Annosz/UIInfoSu
 
 ## Changes from the original
 
+Most new features can be toggled on/off in the mod's in-game options menu.
+
 ### New features
 - Show bookseller icon when he is visiting town
 - Show mastery experience bar and XP gains when all skills are at level 10

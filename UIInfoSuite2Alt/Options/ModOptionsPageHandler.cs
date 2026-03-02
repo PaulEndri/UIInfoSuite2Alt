@@ -90,6 +90,7 @@ internal class ModOptionsPageHandler : IDisposable
     var showRobinBuildingStatusIcon = new ShowRobinBuildingStatusIcon(helper);
     var showSeasonalBerry = new ShowSeasonalBerry(helper);
     var showTodaysGift = new ShowTodaysGifts(helper);
+    var showQuestCount = new ShowQuestCount(helper);
 
     _elementsToDispose = new List<IDisposable>
     {
@@ -110,7 +111,8 @@ internal class ModOptionsPageHandler : IDisposable
       showToolUpgradeStatus,
       showRobinBuildingStatusIcon,
       showSeasonalBerry,
-      showTodaysGift
+      showTodaysGift,
+      showQuestCount
     };
 
     var whichOption = 1;
@@ -408,6 +410,15 @@ internal class ModOptionsPageHandler : IDisposable
         showTodaysGift.ToggleOption,
         () => options.ShowTodaysGifts,
         v => options.ShowTodaysGifts = v
+      )
+    );
+    _optionsElements.Add(
+      new ModOptionsCheckbox(
+        _helper.SafeGetString(nameof(options.ShowQuestCount)),
+        whichOption++,
+        showQuestCount.ToggleOption,
+        () => options.ShowQuestCount,
+        v => options.ShowQuestCount = v
       )
     );
   }

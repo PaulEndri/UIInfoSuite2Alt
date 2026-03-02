@@ -1,29 +1,54 @@
-﻿# UI Info Suite 2 Alternative
+﻿<p align="center">
+  <img src=".github/assets/ui-info-suite-2-alternative-logo.png" alt="UI Info Suite 2 Alternative">
+</p>
 
-This is an alternative fork of [UIInfoSuite2](https://github.com/Annosz/UIInfoSuite2) with additional features and bug fixes.
+<p align="center">
+  This is an alternative fork of <a href="https://github.com/Annosz/UIInfoSuite2">UIInfoSuite2</a> with additional features and bug fixes.
+</p>
 
-## Changes from the original
+<p align="center">
+  <a style="font-size: 36px;" href="https://github.com/dazuki/UIInfoSuite2Alt/releases/latest"><strong>Download Latest Release</strong></a>
+</p>
 
-Most new features can be toggled on/off in the mod's in-game options menu.
+![New features](.github/assets/new-features.png)
+- **2.3.8**
+  - Show bookseller icon when he is visiting town
+  - Show mastery experience bar and XP gains when all skills are at level 10
+  - Show bundle items indicator on Traveling Merchant icon when the merchant has items needed for bundles
+  - Show quest count under journal icon
+  - Show recipe item as Queen of Sauce icon with mini TV overlay
 
-### New features
-- Show bookseller icon when he is visiting town
-- Show mastery experience bar and XP gains when all skills are at level 10
-- Show bundle items indicator on Traveling Merchant icon when the merchant has items needed for bundles
-- Show quest count under journal icon
-- Show recipe item as Queen of Sauce icon with mini TV overlay
+> Most new features can be toggled on/off in the mod's in-game options menu.
 
-### Issues resolved from upstream
-- Fix CC bundle tooltips showing after Joja route or CC completion ([Annosz/UIInfoSuite2#572](https://github.com/Annosz/UIInfoSuite2/issues/572)) [@littlerat07](https://github.com/littlerat07)
-- Fix Ginger and Spring Onion displaying as "Unknown crop" ([Annosz/UIInfoSuite2#660](https://github.com/Annosz/UIInfoSuite2/issues/660)) [@FiveMountain](https://github.com/FiveMountain)
-- Fix fruit tree drop parsing for DAY_OF_WEEK and non-day conditions (e.g. LOCATION_IS_OUTDOORS)
+![Issues resolved from upstream](.github/assets/issues-resolved-from-upstream.png)
+- **2.3.8**
+  - Fix fruit tree drop parsing for DAY_OF_WEEK and non-day conditions (e.g. LOCATION_IS_OUTDOORS)
+  - Fix CC bundle tooltips showing after Joja route or CC completion ([Annosz/UIInfoSuite2#572](https://github.com/Annosz/UIInfoSuite2/issues/572)) [@littlerat07](https://github.com/littlerat07)
+  - Fix Ginger and Spring Onion displaying as "Unknown crop" ([Annosz/UIInfoSuite2#660](https://github.com/Annosz/UIInfoSuite2/issues/660)) [@FiveMountain](https://github.com/FiveMountain)
 
-### Pull requests from upstream
-- Fix mushroom log and mossy seed effect ranges ([Annosz/UIInfoSuite2#641](https://github.com/Annosz/UIInfoSuite2/pull/641)) [@Disassembler0](https://github.com/Disassembler0)
+![Pull requests from upstream](.github/assets/pull-requests-from-upstream.png)
+- **2.3.8**
+  - Fix mushroom log and mossy seed effect ranges ([Annosz/UIInfoSuite2#641](https://github.com/Annosz/UIInfoSuite2/pull/641)) [@Disassembler0](https://github.com/Disassembler0)
 
 ---
 
-> **Note:** Everything below is the original README from [UIInfoSuite2](https://github.com/Annosz/UIInfoSuite2).
+> **Note:** All links above are for this fork, except issue/PR references and usernames in the "Issues resolved" and "Pull requests" sections which link to the upstream repo. Everything below is the original README and links from [UIInfoSuite2](https://github.com/Annosz/UIInfoSuite2).
+
+---
+
+# If you are here to install the mod
+
+## We're on Nexus again!!
+Big thank you to the Nexus support staff for clearing us to be back on the NexusMods site under the UIInfoSuite name!
+
+**[Download Here](https://www.nexusmods.com/stardewvalley/mods/7098)**
+
+### GitHub Download
+**Go to the [Releases page](https://github.com/Annosz/UIInfoSuite2/releases) on the side, where you can always find the latest release. Download the UIInfoSuite2.zip file and copy it's content to the mod folder.**
+![image](https://user-images.githubusercontent.com/10620868/145580465-5dc6cd97-e4da-4830-a639-8f3fb94a1001.png)
+_Do **NOT** download the Source code (zip) or Source code (tar.gz). Also, do **NOT**  use the green Code > Download ZIP button on the main page. These methods will only give you the source code but you will not be able to run the mod and use it with Stardew Valley!_
+
+**If you like the mod, you can help the development by [gifting me a coffee](https://www.buymeacoffee.com/Annosz). Actually, as I'm from a corrupt Eastern European country, this is worth more like a whole dinner for me - any donation is much appreciated.**
 
 # UI Info Suite 2
 _Ongoing maintenance for the original UI Info Suite mod for Stardew Valley._
@@ -61,24 +86,42 @@ Compatibility is assured with:
 - Level Extender by DevinLematty (probably?)
 - Better Farm Animal Variety by Paritee
 
-# Current collaborators for UIInfoSuite2Alt
+# Current collaborators
 <table>
 <tr>
     <td align="center">
-        <a href="https://github.com/dazuki">
-            <img src="https://avatars.githubusercontent.com/u/17151651" width="100;" alt="dazuki"/>
+        <a href="https://github.com/Annosz">
+            <img src="https://avatars.githubusercontent.com/u/10620868?v=4" width="100;" alt="Annosz"/>
         </a>
         <br />
-        <sub><b>dazuki</b></sub>
+        <sub><b>Ádám Tóth</b></sub>
         <br />
-        <a href="https://github.com/dazuki/UIInfoSuite2Alt/commits?author=dazuki" title="Code">💻</a></td>
+        <a href="https://github.com/Annosz/UIInfoSuite2/commits?author=Annosz" title="Code">💻</a> <a href="https://github.com/Annosz/UIInfoSuite2/pulls?q=is%3Apr+reviewed-by%3AAnnosz" title="Reviewed Pull Requests">👀</a></td>
+    </td>
+    <td align="center">
+        <a href="https://github.com/drewhoener">
+            <img src="https://avatars.githubusercontent.com/u/6218989?v=4" width="100;" alt="drewhoener"/>
+        </a>
+        <br />
+        <sub><b>Drew Hoener</b></sub>
+        <br />
+        <a href="https://github.com/Annosz/UIInfoSuite2/commits?author=drewhoener" title="Code">💻</a> <a href="https://github.com/Annosz/UIInfoSuite2/pulls?q=is%3Apr+reviewed-by%3Adrewhoener" title="Reviewed Pull Requests">👀</a></td>
+    </td>
+    <td align="center">
+        <a href="https://github.com/tqdv">
+            <img src="https://avatars.githubusercontent.com/u/11901480?v=4" width="100;" alt="tqdv"/>
+        </a>
+        <br />
+        <sub><b>Tilwa Qendov</b></sub>
+        <br />
+        <a href="https://github.com/Annosz/UIInfoSuite2/commits?author=tqdv" title="Code">💻</a> <a href="https://github.com/Annosz/UIInfoSuite2/pulls?q=is%3Apr+reviewed-by%3Atqdv" title="Reviewed Pull Requests">👀</a></td>
     </td></tr>
 </table>
 
 ## All contributors
 
-<a href="https://github.com/dazuki/UIInfoSuite2Alt/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=dazuki/UIInfoSuite2Alt" />
+<a href="https://github.com/Annosz/UIInfoSuite2/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=Annosz/UIInfoSuite2" />
 </a>
 
 # Translating UI Info Suite 2
@@ -92,21 +135,21 @@ on the wiki for help contributing translations.
 
 locale      | status
 ----------- | :----------------
-default     | [✓](UIInfoSuite2Alt/i18n/default.json)
-Chinese     | [✓](UIInfoSuite2Alt/i18n/zh.json)
-French      | [↻](UIInfoSuite2Alt/i18n/fr.json)
-German      | [✓](UIInfoSuite2Alt/i18n/de.json)
-Hungarian   | [↻](UIInfoSuite2Alt/i18n/hu.json)
-Italian     | [✓](UIInfoSuite2Alt/i18n/it.json)
-Japanese    | [✓](UIInfoSuite2Alt/i18n/ja.json)
-Korean      | [↻](UIInfoSuite2Alt/i18n/ko.json)
-[Polish]    | [✓](UIInfoSuite2Alt/i18n/pl.json)
-Portuguese  | [✓](UIInfoSuite2Alt/i18n/pt.json)
-Russian     | [✓](UIInfoSuite2Alt/i18n/ru.json)
-Spanish     | [↻](UIInfoSuite2Alt/i18n/es.json)
-[Thai]      | [✓](UIInfoSuite2Alt/i18n/th.json)
-Turkish     | [✓](UIInfoSuite2Alt/i18n/tr.json)
-[Ukrainian] | [✓](UIInfoSuite2Alt/i18n/uk.json)
+default     | [✓](UIInfoSuite2/i18n/default.json)
+Chinese     | [✓](UIInfoSuite2/i18n/zh.json)
+French      | [↻](UIInfoSuite2/i18n/fr.json)
+German      | [✓](UIInfoSuite2/i18n/de.json)
+Hungarian   | [↻](UIInfoSuite2/i18n/hu.json)
+Italian     | [✓](UIInfoSuite2/i18n/it.json)
+Japanese    | [✓](UIInfoSuite2/i18n/ja.json)
+Korean      | [↻](UIInfoSuite2/i18n/ko.json)
+[Polish]    | [✓](UIInfoSuite2/i18n/pl.json)
+Portuguese  | [✓](UIInfoSuite2/i18n/pt.json)
+Russian     | [✓](UIInfoSuite2/i18n/ru.json)
+Spanish     | [↻](UIInfoSuite2/i18n/es.json)
+[Thai]      | [✓](UIInfoSuite2/i18n/th.json)
+Turkish     | [✓](UIInfoSuite2/i18n/tr.json)
+[Ukrainian] | [✓](UIInfoSuite2/i18n/uk.json)
 
 [Polish]: https://www.nexusmods.com/stardewvalley/mods/3616
 [Thai]: https://www.nexusmods.com/stardewvalley/mods/7052

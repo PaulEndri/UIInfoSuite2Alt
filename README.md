@@ -6,6 +6,11 @@
   This is an alternative fork of <a href="https://github.com/Annosz/UIInfoSuite2">UIInfoSuite2</a> with additional features and bug fixes.
 </p>
 
+<p>
+  <h3><strong>Why Alternative?</strong></h3>
+  Development on the upstream repo has slowed down significantly, leaving many issues and feature requests unaddressed. This fork was created out of love for the original mod, with the goal of continuing to improve and maintain it. I also wanted to add features I personally felt were missing, and figured others would find them useful too.
+</p>
+
 <h2 align="center">
   <a href="https://github.com/dazuki/UIInfoSuite2Alt/releases/latest"><strong>Download Latest Release</strong></a>
 </h2>

@@ -1,0 +1,64 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "[0-9]*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "6.0.x"
+
+      - name: Create csproj.local for CI
+        run: |
+          mkdir -p /tmp/stardew
+          cat > UIInfoSuite2Alt/UIInfoSuite2Alt.csproj.local << 'EOF'
+          <Project>
+            <PropertyGroup>
+              <GamePath>/tmp/stardew</GamePath>
+            </PropertyGroup>
+          </Project>
+          EOF
+
+      - name: Build
+        run: dotnet build -c Release
+
+      - name: Generate release notes
+        id: notes
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          PREV_TAG=$(git tag --sort=-v:refname | grep -A1 "^${TAG}$" | tail -1)
+          if [ -z "$PREV_TAG" ] || [ "$PREV_TAG" = "$TAG" ]; then
+            RANGE="$TAG"
+          else
+            RANGE="${PREV_TAG}..${TAG}"
+          fi
+          {
+            echo 'NOTES<<EOF'
+            git log "$RANGE" --pretty=format:"- %s (%h)" --no-merges
+            echo ''
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Rename artifact
+        run: cp UIInfoSuite2Alt/bin/Release/*/UIInfoSuite2Alt*.zip "UIInfoSuite2Alt-${GITHUB_REF_NAME}.zip"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ github.ref_name }}
+          body: ${{ steps.notes.outputs.NOTES }}
+          files: UIInfoSuite2Alt-*.zip

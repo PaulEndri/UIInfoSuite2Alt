@@ -16,7 +16,7 @@ namespace UIInfoSuite2Alt.UIElements;
 
 internal class ShowItemEffectRanges : IDisposable
 {
-#region Properties
+  #region Properties
   private readonly PerScreen<List<Point>> _effectiveAreaCurrent = new(() => new List<Point>());
   private readonly PerScreen<HashSet<Point>> _effectiveAreaOther = new(() => new HashSet<Point>());
   private readonly PerScreen<HashSet<Point>> _effectiveAreaIntersection = new(() => new HashSet<Point>());
@@ -30,10 +30,10 @@ internal class ShowItemEffectRanges : IDisposable
 
   private bool ButtonShowOneRange { get; set; }
   private bool ButtonShowAllRanges { get; set; }
-#endregion
+  #endregion
 
 
-#region Lifecycle
+  #region Lifecycle
   public ShowItemEffectRanges(IModHelper helper)
   {
     _helper = helper;
@@ -73,10 +73,10 @@ internal class ShowItemEffectRanges : IDisposable
   {
     ShowBombRange = showBombRange;
   }
-#endregion
+  #endregion
 
 
-#region Event subscriptions
+  #region Event subscriptions
   private void OnUpdateTicked(object? sender, UpdateTickedEventArgs e)
   {
     if (!e.IsMultipleOf(4))
@@ -189,10 +189,10 @@ internal class ShowItemEffectRanges : IDisposable
       }
     }
   }
-#endregion
+  #endregion
 
 
-#region Logic
+  #region Logic
   private void UpdateEffectiveArea()
   {
     int[][] arrayToUse;
@@ -500,7 +500,7 @@ internal class ShowItemEffectRanges : IDisposable
     _effectiveAreaOther.Value = _effectiveAreaOther.Value.Union(temp.Value).ToHashSet();
   }
 
-#region Distance map
+  #region Distance map
   private enum ObjectsWithDistance
   {
     JunimoHut,
@@ -543,9 +543,9 @@ internal class ShowItemEffectRanges : IDisposable
       case ObjectsWithDistance.PrismaticSprinkler:
         return GetCircularMask(3.69, Math.Sqrt(18), false);
       case ObjectsWithDistance.MushroomLog:
-        return GetCircularMask(100, maxDisplaySquareRadius: 7);
+        return GetCircularMask(100, maxDisplaySquareRadius: 3);
       case ObjectsWithDistance.MossySeed:
-        return GetCircularMask(100, maxDisplaySquareRadius: 5);
+        return GetCircularMask(100, maxDisplaySquareRadius: 2);
       case ObjectsWithDistance.CherryBomb:
         return GetCircularMask(3.39);
       case ObjectsWithDistance.Bomb:
@@ -609,6 +609,6 @@ internal class ShowItemEffectRanges : IDisposable
   {
     return Math.Sqrt((radius - i) * (radius - i) + (radius - j) * (radius - j));
   }
-#endregion
-#endregion
+  #endregion
+  #endregion
 }

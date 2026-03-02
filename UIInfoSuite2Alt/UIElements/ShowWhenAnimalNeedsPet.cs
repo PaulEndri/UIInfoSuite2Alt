@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Netcode;
@@ -217,7 +216,7 @@ internal class ShowWhenAnimalNeedsPet : IDisposable
     foreach (NPC? character in Game1.currentLocation.characters)
     {
       if (character is not Pet pet ||
-          pet.lastPetDay.Values.Any(day => day == Game1.Date.TotalDays) ||
+          PetWasPettedToday(pet) ||
           (pet.friendshipTowardFarmer.Value >= 1000 && HideOnMaxFriendship))
       {
         continue;
@@ -241,6 +240,19 @@ internal class ShowWhenAnimalNeedsPet : IDisposable
         1f
       );
     }
+  }
+
+  private static bool PetWasPettedToday(Pet pet)
+  {
+    int today = Game1.Date.TotalDays;
+    foreach (int day in pet.lastPetDay.Values)
+    {
+      if (day == today)
+      {
+        return true;
+      }
+    }
+    return false;
   }
 
   private Vector2 GetPetPositionAboveAnimal(Character animal)

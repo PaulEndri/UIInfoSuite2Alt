@@ -108,6 +108,7 @@ internal class ShowBirthdayIcon : IDisposable
       if (friendship != null && friendship.GiftsToday > 0)
       {
         npcs.RemoveAt(i);
+        _birthdayIcons.Value.Clear();
       }
     }
   }
@@ -158,19 +159,40 @@ internal class ShowBirthdayIcon : IDisposable
     return null;
   }
 
+  private static readonly Rectangle BirthdayBackgroundSource = new(228, 409, 16, 16);
+
   private void DrawBirthdayIcon()
   {
-    _birthdayIcons.Value.Clear();
-    foreach (NPC npc in _birthdayNPCs.Value)
+    List<NPC> npcs = _birthdayNPCs.Value;
+    List<ClickableTextureComponent> icons = _birthdayIcons.Value;
+    var scale = 2.9f;
+
+    // Rebuild icon list only when NPC count changes
+    if (icons.Count != npcs.Count)
     {
-      Rectangle headShot = npc.GetHeadShot();
+      icons.Clear();
+      foreach (NPC npc in npcs)
+      {
+        icons.Add(new ClickableTextureComponent(
+          npc.Name,
+          Rectangle.Empty,
+          null,
+          npc.Name,
+          npc.Sprite.Texture,
+          npc.GetHeadShot(),
+          2f
+        ));
+      }
+    }
+
+    for (int i = 0; i < npcs.Count; i++)
+    {
       Point iconPosition = IconHandler.Handler.GetNewIconPosition();
-      var scale = 2.9f;
 
       Game1.spriteBatch.Draw(
         Game1.mouseCursors,
         new Vector2(iconPosition.X, iconPosition.Y),
-        new Rectangle(228, 409, 16, 16),
+        BirthdayBackgroundSource,
         Color.White,
         0.0f,
         Vector2.Zero,
@@ -179,18 +201,10 @@ internal class ShowBirthdayIcon : IDisposable
         1f
       );
 
-      var birthdayIcon = new ClickableTextureComponent(
-        npc.Name,
-        new Rectangle(iconPosition.X - 7, iconPosition.Y - 2, (int)(16.0 * scale), (int)(16.0 * scale)),
-        null,
-        npc.Name,
-        npc.Sprite.Texture,
-        headShot,
-        2f
-      );
-
-      birthdayIcon.draw(Game1.spriteBatch);
-      _birthdayIcons.Value.Add(birthdayIcon);
+      // Update bounds and headshot for existing component
+      icons[i].bounds = new Rectangle(iconPosition.X - 7, iconPosition.Y - 2, (int)(16.0 * scale), (int)(16.0 * scale));
+      icons[i].sourceRect = npcs[i].GetHeadShot();
+      icons[i].draw(Game1.spriteBatch);
     }
   }
 

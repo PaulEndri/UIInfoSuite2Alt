@@ -382,10 +382,13 @@ internal class LocationOfTownsfolk : IDisposable
 
   private static void DrawQuestsForNPC(NPC character, int x, int y)
   {
-    foreach (Quest? quest in Game1.player.questLog.Where(
-               q => q.accepted.Value && q.dailyQuest.Value && !q.completed.Value
-             ))
+    foreach (Quest? quest in Game1.player.questLog)
     {
+      if (!quest.accepted.Value || !quest.dailyQuest.Value || quest.completed.Value)
+      {
+        continue;
+      }
+
       if ((quest is ItemDeliveryQuest idq && idq.target.Value == character.Name) ||
           (quest is SlayMonsterQuest smq && smq.target.Value == character.Name) ||
           (quest is FishingQuest fq && fq.target.Value == character.Name) ||

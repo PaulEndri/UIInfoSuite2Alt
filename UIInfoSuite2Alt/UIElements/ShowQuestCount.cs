@@ -12,6 +12,7 @@ internal class ShowQuestCount : IDisposable
 {
   #region Properties
   private const float DigitScale = 3f;
+  private static readonly Rectangle BgSourceRect = new(432, 439, 9, 9);
   private readonly IModHelper _helper;
   #endregion
 
@@ -78,14 +79,13 @@ internal class ShowQuestCount : IDisposable
     GetPositionAndSize(bounds, questCount, out float centerX, out float y, out int bgWidth, out int bgHeight);
 
     // Draw background
-    var bgSource = new Rectangle(432, 439, 9, 9);
     var bgDest = new Rectangle(
       (int)(centerX - bgWidth / 2f),
       (int)(y - bgHeight / 2f) + 3,
       bgWidth,
       bgHeight
     );
-    Game1.spriteBatch.Draw(Game1.mouseCursors, bgDest, bgSource, Color.White);
+    Game1.spriteBatch.Draw(Game1.mouseCursors, bgDest, BgSourceRect, Color.White);
 
     // Draw number centered on background
     int digitStringWidth = Utility.getWidthOfTinyDigitString(questCount, DigitScale);

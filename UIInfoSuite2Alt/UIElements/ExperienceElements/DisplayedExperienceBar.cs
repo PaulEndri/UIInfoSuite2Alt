@@ -120,20 +120,11 @@ public class DisplayedExperienceBar
 
   private static bool IsMouseOverExperienceBar(float leftSide, int boxWidth)
   {
-    return GetExperienceBarTextureComponent(leftSide, boxWidth).containsPoint(Game1.getMouseX(), Game1.getMouseY());
-  }
-
-  private static ClickableTextureComponent GetExperienceBarTextureComponent(float leftSide, int boxWidth)
-  {
-    return new ClickableTextureComponent(
-      "",
-      new Rectangle((int)leftSide - 36, Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Bottom - 80, boxWidth + 20, 100),
-      "",
-      "",
-      Game1.mouseCursors,
-      new Rectangle(0, 0, 0, 0),
-      Game1.pixelZoom
-    );
+    int mouseX = Game1.getMouseX();
+    int mouseY = Game1.getMouseY();
+    int x = (int)leftSide - 36;
+    int y = Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Bottom - 80;
+    return mouseX >= x && mouseX < x + boxWidth + 20 && mouseY >= y && mouseY < y + 100;
   }
   #endregion
 }

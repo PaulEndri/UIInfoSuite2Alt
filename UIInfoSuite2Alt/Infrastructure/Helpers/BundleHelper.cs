@@ -55,7 +55,12 @@ internal static class BundleHelper
       return null;
     }
 
+    // No bundles to track if player chose Joja route or already completed all bundles
     var communityCenter = Game1.RequireLocation<CommunityCenter>("CommunityCenter");
+    if (Game1.MasterPlayer.mailReceived.Contains("JojaMember") || communityCenter.areAllAreasComplete())
+    {
+      return null;
+    }
 
     BundleIngredientsCache bundlesIngredientsInfo;
     try

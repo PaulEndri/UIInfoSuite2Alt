@@ -8,23 +8,31 @@ namespace UIInfoSuite2Alt.UIElements.ExperienceElements;
 
 public class DisplayedExperienceBar
 {
-  private const int MaxBarWidth = 175;
+  private const int DefaultBoxWidth = 240;
+  private const int WideBoxWidth = 310;
+  private const int DefaultMaxBarWidth = 175;
+  private const int WideMaxBarWidth = 245;
 
   public void Draw(
     Color experienceFillColor,
     Rectangle experienceIconPosition,
     int experienceEarnedThisLevel,
     int experienceDifferenceBetweenLevels,
-    int currentLevel
+    int currentLevel,
+    Texture2D? iconTexture = null,
+    bool isWide = false,
+    float iconScale = 2.9f
   )
   {
-    int barWidth = GetBarWidth(experienceEarnedThisLevel, experienceDifferenceBetweenLevels);
+    int maxBarWidth = isWide ? WideMaxBarWidth : DefaultMaxBarWidth;
+    int boxWidth = isWide ? WideBoxWidth : DefaultBoxWidth;
+    int barWidth = GetBarWidth(experienceEarnedThisLevel, experienceDifferenceBetweenLevels, maxBarWidth);
     float leftSide = GetExperienceBarLeftSide();
 
     Game1.drawDialogueBox(
       (int)leftSide,
       Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Bottom - 160,
-      240,
+      boxWidth,
       160,
       false,
       true
@@ -59,7 +67,7 @@ public class DisplayedExperienceBar
       experienceFillColor
     );
 
-    if (IsMouseOverExperienceBar(leftSide))
+    if (IsMouseOverExperienceBar(leftSide, boxWidth))
     {
       Game1.drawWithBorder(
         experienceEarnedThisLevel + "/" + experienceDifferenceBetweenLevels,
@@ -71,13 +79,13 @@ public class DisplayedExperienceBar
     else
     {
       Game1.spriteBatch.Draw(
-        Game1.mouseCursors,
+        iconTexture ?? Game1.mouseCursors,
         new Vector2(leftSide + 54, Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Bottom - 62),
         experienceIconPosition,
         Color.White,
         0,
         Vector2.Zero,
-        2.9f,
+        iconScale,
         SpriteEffects.None,
         0.85f
       );
@@ -91,10 +99,10 @@ public class DisplayedExperienceBar
     }
   }
 
-#region Static helpers
-  private static int GetBarWidth(int experienceEarnedThisLevel, int experienceDifferenceBetweenLevels)
+  #region Static helpers
+  private static int GetBarWidth(int experienceEarnedThisLevel, int experienceDifferenceBetweenLevels, int maxBarWidth)
   {
-    return (int)((double)experienceEarnedThisLevel / experienceDifferenceBetweenLevels * MaxBarWidth);
+    return (int)((double)experienceEarnedThisLevel / experienceDifferenceBetweenLevels * maxBarWidth);
   }
 
   private static float GetExperienceBarLeftSide()
@@ -110,16 +118,16 @@ public class DisplayedExperienceBar
     return leftSide;
   }
 
-  private static bool IsMouseOverExperienceBar(float leftSide)
+  private static bool IsMouseOverExperienceBar(float leftSide, int boxWidth)
   {
-    return GetExperienceBarTextureComponent(leftSide).containsPoint(Game1.getMouseX(), Game1.getMouseY());
+    return GetExperienceBarTextureComponent(leftSide, boxWidth).containsPoint(Game1.getMouseX(), Game1.getMouseY());
   }
 
-  private static ClickableTextureComponent GetExperienceBarTextureComponent(float leftSide)
+  private static ClickableTextureComponent GetExperienceBarTextureComponent(float leftSide, int boxWidth)
   {
     return new ClickableTextureComponent(
       "",
-      new Rectangle((int)leftSide - 36, Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Bottom - 80, 260, 100),
+      new Rectangle((int)leftSide - 36, Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Bottom - 80, boxWidth + 20, 100),
       "",
       "",
       Game1.mouseCursors,
@@ -127,5 +135,5 @@ public class DisplayedExperienceBar
       Game1.pixelZoom
     );
   }
-#endregion
+  #endregion
 }

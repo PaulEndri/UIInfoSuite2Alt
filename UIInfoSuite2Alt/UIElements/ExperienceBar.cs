@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewModdingAPI.Enums;
@@ -6,6 +6,8 @@ using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Tools;
+using Microsoft.Xna.Framework.Graphics;
+using StardewValley.Menus;
 using UIInfoSuite2Alt.Compatibility;
 using UIInfoSuite2Alt.Infrastructure;
 using UIInfoSuite2Alt.UIElements.ExperienceElements;
@@ -14,7 +16,7 @@ namespace UIInfoSuite2Alt.UIElements;
 
 public partial class ExperienceBar
 {
-#region Properties
+  #region Properties
   private readonly PerScreen<Item> _previousItem = new();
   private readonly PerScreen<int[]> _currentExperience = new(() => new int[5]);
   private readonly PerScreen<int[]> _currentLevelExtenderExperience = new(() => new int[5]);
@@ -56,6 +58,12 @@ public partial class ExperienceBar
     { SkillType.Luck, new Color(232, 223, 42, 0.63f) }
   };
 
+  private readonly PerScreen<int> _previousMasteryExperience = new();
+  private readonly PerScreen<bool> _isMasteryActive = new();
+
+  private static readonly Color MasteryFillColor = new(60 / 255f, 180 / 255f, 80 / 255f, 0.63f);
+  private static readonly Rectangle MasteryIconRectangle = new(0, 340, 15, 16);
+
   private readonly PerScreen<Rectangle> _experienceIconRectangle = new(() => SkillIconRectangles[SkillType.Farming]);
 
   private readonly PerScreen<Rectangle> _levelUpIconRectangle = new(() => SkillIconRectangles[SkillType.Farming]);
@@ -68,9 +76,9 @@ public partial class ExperienceBar
 
   private readonly IModHelper _helper;
   private readonly ILevelExtender? _levelExtenderApi;
-#endregion Properties
+  #endregion Properties
 
-#region Lifecycle
+  #region Lifecycle
   public ExperienceBar(IModHelper helper)
   {
     _helper = helper;
@@ -141,9 +149,9 @@ public partial class ExperienceBar
   {
     ToggleOption(ExperienceBarEnabled, ExperienceBarFadeoutEnabled, ExperienceGainTextEnabled, levelUpAnimationEnabled);
   }
-#endregion Lifecycle
+  #endregion Lifecycle
 
-#region Event subscriptions
+  #region Event subscriptions
   private void OnSaveLoaded(object? sender, SaveLoadedEventArgs e)
   {
     InitializeExperiencePoints();
@@ -246,13 +254,16 @@ public partial class ExperienceBar
         _experienceIconRectangle.Value,
         _experienceEarnedThisLevel.Value,
         _experienceRequiredToLevel.Value - _experienceFromPreviousLevels.Value,
-        _currentSkillLevel.Value
+        _currentSkillLevel.Value,
+        _isMasteryActive.Value ? Game1.mouseCursors_1_6 : null,
+        _isMasteryActive.Value,
+        _isMasteryActive.Value ? 1.8f : 2.9f
       );
     }
   }
-#endregion Event subscriptions
+  #endregion Event subscriptions
 
-#region Logic
+  #region Logic
   private void InitializeExperiencePoints()
   {
     for (var i = 0; i < _currentExperience.Value.Length; ++i)
@@ -267,6 +278,8 @@ public partial class ExperienceBar
         _currentLevelExtenderExperience.Value[i] = _levelExtenderApi.CurrentXP()[i];
       }
     }
+
+    _previousMasteryExperience.Value = (int)Game1.stats.Get("MasteryExp");
   }
 
   private bool TryGetCurrentLevelIndexFromSkillChange(out int currentLevelIndex)
@@ -320,16 +333,45 @@ public partial class ExperienceBar
                                          _experienceFromPreviousLevels.Value;
     }
 
+    // Mastery experience bar when skill is maxed and all skills are at level 10
+    _isMasteryActive.Value = false;
+    if (_experienceRequiredToLevel.Value <= 0 && _currentSkillLevel.Value >= 10 && IsMasteryUnlocked())
+    {
+      int currentMasteryLevel = MasteryTrackerMenu.getCurrentMasteryLevel();
+      if (currentMasteryLevel < 5)
+      {
+        _isMasteryActive.Value = true;
+        _experienceIconRectangle.Value = MasteryIconRectangle;
+        _experienceFillColor.Value = MasteryFillColor;
+        _experienceFromPreviousLevels.Value = MasteryTrackerMenu.getMasteryExpNeededForLevel(currentMasteryLevel);
+        _experienceRequiredToLevel.Value = MasteryTrackerMenu.getMasteryExpNeededForLevel(currentMasteryLevel + 1);
+        _experienceEarnedThisLevel.Value =
+          (int)Game1.stats.Get("MasteryExp") - _experienceFromPreviousLevels.Value;
+        _currentSkillLevel.Value = currentMasteryLevel;
+      }
+    }
+
     if (displayExperience)
     {
       if (ExperienceGainTextEnabled && _experienceRequiredToLevel.Value > 0)
       {
-        int currentExperienceToUse = Game1.player.experiencePoints[currentLevelIndex];
-        int previousExperienceToUse = _currentExperience.Value[currentLevelIndex];
-        if (_levelExtenderApi != null && _currentSkillLevel.Value > 9)
+        int currentExperienceToUse;
+        int previousExperienceToUse;
+
+        if (_isMasteryActive.Value)
+        {
+          currentExperienceToUse = (int)Game1.stats.Get("MasteryExp");
+          previousExperienceToUse = _previousMasteryExperience.Value;
+        }
+        else if (_levelExtenderApi != null && _currentSkillLevel.Value > 9)
         {
           currentExperienceToUse = _levelExtenderApi.CurrentXP()[currentLevelIndex];
           previousExperienceToUse = _currentLevelExtenderExperience.Value[currentLevelIndex];
+        }
+        else
+        {
+          currentExperienceToUse = Game1.player.experiencePoints[currentLevelIndex];
+          previousExperienceToUse = _currentExperience.Value[currentLevelIndex];
         }
 
         int experienceGain = currentExperienceToUse - previousExperienceToUse;
@@ -348,7 +390,21 @@ public partial class ExperienceBar
       {
         _currentLevelExtenderExperience.Value[currentLevelIndex] = _levelExtenderApi.CurrentXP()[currentLevelIndex];
       }
+
+      if (_isMasteryActive.Value)
+      {
+        _previousMasteryExperience.Value = (int)Game1.stats.Get("MasteryExp");
+      }
     }
+  }
+
+  private static bool IsMasteryUnlocked()
+  {
+    return Game1.player.farmingLevel.Value >= 10
+        && Game1.player.fishingLevel.Value >= 10
+        && Game1.player.foragingLevel.Value >= 10
+        && Game1.player.miningLevel.Value >= 10
+        && Game1.player.combatLevel.Value >= 10;
   }
 
   private static int GetExperienceRequiredToLevel(int currentLevel)
@@ -368,5 +424,5 @@ public partial class ExperienceBar
       _ => -1
     };
   }
-#endregion Logic
+  #endregion Logic
 }

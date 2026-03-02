@@ -1,31 +1,39 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
+using StardewValley.Internal;
 using StardewValley.Locations;
 using StardewValley.Menus;
 using StardewValley.Objects;
 using UIInfoSuite2Alt.Infrastructure;
+using UIInfoSuite2Alt.Infrastructure.Helpers;
 
 namespace UIInfoSuite2Alt.UIElements;
 
 public class ShowTravelingMerchant : IDisposable
 {
-#region Properties
+  #region Properties
   private bool _travelingMerchantIsHere;
   private bool _travelingMerchantIsVisited;
+  private bool _merchantHasBundleItems;
+  private readonly List<string> _bundleItemNames = new();
   private ClickableTextureComponent _travelingMerchantIcon = null!;
 
   private bool Enabled { get; set; }
   private bool HideWhenVisited { get; set; }
+  private bool ShowBundleIcon { get; set; }
+  private bool ShowBundleItemNames { get; set; }
 
   private readonly IModHelper _helper;
-#endregion
+  #endregion
 
 
-#region Lifecycle
+  #region Lifecycle
   public ShowTravelingMerchant(IModHelper helper)
   {
     _helper = helper;
@@ -60,10 +68,22 @@ public class ShowTravelingMerchant : IDisposable
     HideWhenVisited = hideWhenVisited;
     ToggleOption(Enabled);
   }
-#endregion
+
+  public void ToggleShowBundleIconOption(bool showBundleIcon)
+  {
+    ShowBundleIcon = showBundleIcon;
+    ToggleOption(Enabled);
+  }
+
+  public void ToggleShowBundleItemNamesOption(bool showBundleItemNames)
+  {
+    ShowBundleItemNames = showBundleItemNames;
+    ToggleOption(Enabled);
+  }
+  #endregion
 
 
-#region Event subscriptions
+  #region Event subscriptions
   private void OnDayStarted(object? sender, EventArgs e)
   {
     UpdateTravelingMerchant();
@@ -74,6 +94,8 @@ public class ShowTravelingMerchant : IDisposable
     if (e.NewMenu is ShopMenu menu && menu.forSale.Any(s => !(s is Hat)) && Game1.currentLocation.Name == "Forest")
     {
       _travelingMerchantIsVisited = true;
+      _merchantHasBundleItems = false;
+      _bundleItemNames.Clear();
     }
   }
 
@@ -90,6 +112,22 @@ public class ShowTravelingMerchant : IDisposable
         2f
       );
       _travelingMerchantIcon.draw(Game1.spriteBatch);
+
+      // Draw bundle overlay icon at bottom-right corner
+      if (_merchantHasBundleItems && ShowBundleIcon)
+      {
+        Game1.spriteBatch.Draw(
+          Game1.mouseCursors,
+          new Vector2(iconPosition.X + 18, iconPosition.Y + 18),
+          new Rectangle(331, 374, 15, 14),
+          Color.White,
+          0f,
+          Vector2.Zero,
+          1.6f,
+          SpriteEffects.None,
+          1f
+        );
+      }
     }
   }
 
@@ -99,22 +137,69 @@ public class ShowTravelingMerchant : IDisposable
     if (ShouldDrawIcon() && (_travelingMerchantIcon?.containsPoint(Game1.getMouseX(), Game1.getMouseY()) ?? false))
     {
       string hoverText = I18n.TravelingMerchantIsInTown();
+
+      if (_merchantHasBundleItems && ShowBundleIcon)
+      {
+        hoverText += "\n" + I18n.TravelingMerchantHasBundleItem();
+
+        if (ShowBundleItemNames && _bundleItemNames.Count > 0)
+        {
+          hoverText += "\n" + string.Join(", ", _bundleItemNames);
+        }
+      }
+
       IClickableMenu.drawHoverText(Game1.spriteBatch, hoverText, Game1.dialogueFont);
     }
   }
-#endregion
+  #endregion
 
 
-#region Logic
+  #region Logic
   private void UpdateTravelingMerchant()
   {
     _travelingMerchantIsHere = ((Forest)Game1.getLocationFromName(nameof(Forest))).ShouldTravelingMerchantVisitToday();
     _travelingMerchantIsVisited = false;
+    _merchantHasBundleItems = false;
+    _bundleItemNames.Clear();
+
+    if (_travelingMerchantIsHere)
+    {
+      CheckMerchantForBundleItems();
+    }
+
+    // // DEBUG: Force bundle indicator for testing (remove before release)
+    // _merchantHasBundleItems = true;
+    // _bundleItemNames.Clear();
+    // _bundleItemNames.Add("Caviar");
+  }
+
+  private void CheckMerchantForBundleItems()
+  {
+    try
+    {
+      Dictionary<ISalable, ItemStockInformation> stock = ShopBuilder.GetShopStock("Traveler");
+      _bundleItemNames.Clear();
+
+      foreach (ISalable salable in stock.Keys)
+      {
+        if (salable is Item item && BundleHelper.GetBundleItemIfNotDonated(item) != null)
+        {
+          _bundleItemNames.Add(item.DisplayName);
+        }
+      }
+
+      _merchantHasBundleItems = _bundleItemNames.Count > 0;
+    }
+    catch (Exception e)
+    {
+      ModEntry.MonitorObject.Log("Failed to check merchant stock for bundle items: " + e.Message, LogLevel.Warn);
+      _merchantHasBundleItems = false;
+    }
   }
 
   private bool ShouldDrawIcon()
   {
     return _travelingMerchantIsHere && (!_travelingMerchantIsVisited || !HideWhenVisited);
   }
-#endregion
+  #endregion
 }

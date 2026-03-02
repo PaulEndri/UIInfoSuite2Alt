@@ -28,6 +28,9 @@ internal record ModOptions
   public bool ShowWhenNewRecipesAreAvailable { get; set; } = true;
   public bool ShowToolUpgradeStatus { get; set; } = true;
   public bool HideMerchantWhenVisited { get; set; } = false;
+  public bool ShowMerchantBundleIcon { get; set; } = false;
+  public bool ShowMerchantBundleItemNames { get; set; } = false;
+  public bool HideBooksellerWhenVisited { get; set; } = false;
   public bool ShowExactValue { get; set; } = false;
   public bool ShowRobinBuildingStatusIcon { get; set; } = true;
   public bool ShowSeasonalBerry { get; set; } = true;

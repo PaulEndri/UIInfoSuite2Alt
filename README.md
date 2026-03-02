@@ -1,16 +1,15 @@
-# If you are here to install the mod
+﻿# UIInfoSuite2Alt
 
-## We're on Nexus again!!
-Big thank you to the Nexus support staff for clearing us to be back on the NexusMods site under the UIInfoSuite name!
+This is an alternative fork of [UIInfoSuite2](https://github.com/Annosz/UIInfoSuite2) with additional features and bug fixes.
 
-**[Download Here](https://www.nexusmods.com/stardewvalley/mods/7098)**
+## Changes from the original
 
-### GitHub Download
-**Go to the [Releases page](https://github.com/Annosz/UIInfoSuite2/releases) on the side, where you can always find the latest release. Download the UIInfoSuite2.zip file and copy it's content to the mod folder.**
-![image](https://user-images.githubusercontent.com/10620868/145580465-5dc6cd97-e4da-4830-a639-8f3fb94a1001.png)
-_Do **NOT** download the Source code (zip) or Source code (tar.gz). Also, do **NOT**  use the green Code > Download ZIP button on the main page. These methods will only give you the source code but you will not be able to run the mod and use it with Stardew Valley!_
+### New features
+- Show bookseller icon when he is visiting town
+- Show mastery experience bar and XP gains when all skills are at level 10
+- Show bundle items indicator on Traveling Merchant icon when the merchant has items needed for bundles
 
-**If you like the mod, you can help the development by [gifting me a coffee](https://www.buymeacoffee.com/Annosz). Actually, as I'm from a corrupt Eastern European country, this is worth more like a whole dinner for me - any donation is much appreciated.**
+---
 
 # UI Info Suite 2
 _Ongoing maintenance for the original UI Info Suite mod for Stardew Valley._
@@ -48,42 +47,24 @@ Compatibility is assured with:
 - Level Extender by DevinLematty (probably?)
 - Better Farm Animal Variety by Paritee
 
-# Current collaborators
+# Current collaborators for UIInfoSuite2Alt
 <table>
 <tr>
     <td align="center">
-        <a href="https://github.com/Annosz">
-            <img src="https://avatars.githubusercontent.com/u/10620868?v=4" width="100;" alt="Annosz"/>
+        <a href="https://github.com/dazuki">
+            <img src="https://avatars.githubusercontent.com/u/17151651" width="100;" alt="dazuki"/>
         </a>
         <br />
-        <sub><b>Ádám Tóth</b></sub>
+        <sub><b>dazuki</b></sub>
         <br />
-        <a href="https://github.com/Annosz/UIInfoSuite2/commits?author=Annosz" title="Code">💻</a> <a href="https://github.com/Annosz/UIInfoSuite2/pulls?q=is%3Apr+reviewed-by%3AAnnosz" title="Reviewed Pull Requests">👀</a></td>
-    </td>
-    <td align="center">
-        <a href="https://github.com/drewhoener">
-            <img src="https://avatars.githubusercontent.com/u/6218989?v=4" width="100;" alt="drewhoener"/>
-        </a>
-        <br />
-        <sub><b>Drew Hoener</b></sub>
-        <br />
-        <a href="https://github.com/Annosz/UIInfoSuite2/commits?author=drewhoener" title="Code">💻</a> <a href="https://github.com/Annosz/UIInfoSuite2/pulls?q=is%3Apr+reviewed-by%3Adrewhoener" title="Reviewed Pull Requests">👀</a></td>
-    </td>
-    <td align="center">
-        <a href="https://github.com/tqdv">
-            <img src="https://avatars.githubusercontent.com/u/11901480?v=4" width="100;" alt="tqdv"/>
-        </a>
-        <br />
-        <sub><b>Tilwa Qendov</b></sub>
-        <br />
-        <a href="https://github.com/Annosz/UIInfoSuite2/commits?author=tqdv" title="Code">💻</a> <a href="https://github.com/Annosz/UIInfoSuite2/pulls?q=is%3Apr+reviewed-by%3Atqdv" title="Reviewed Pull Requests">👀</a></td>
+        <a href="https://github.com/dazuki/UIInfoSuite2Alt/commits?author=dazuki" title="Code">💻</a></td>
     </td></tr>
 </table>
 
 ## All contributors
 
-<a href="https://github.com/Annosz/UIInfoSuite2/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=Annosz/UIInfoSuite2" />
+<a href="https://github.com/dazuki/UIInfoSuite2Alt/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=dazuki/UIInfoSuite2Alt" />
 </a>
 
 # Translating UI Info Suite 2

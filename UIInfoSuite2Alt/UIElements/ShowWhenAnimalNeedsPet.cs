@@ -43,14 +43,12 @@ internal class ShowWhenAnimalNeedsPet : IDisposable
   {
     Enabled = showWhenAnimalNeedsPet;
 
-    _helper.Events.Player.Warped -= OnWarped;
     _helper.Events.Display.RenderingHud -= OnRenderingHud_DrawAnimalHasProduct;
     _helper.Events.Display.RenderingHud -= OnRenderingHud_DrawNeedsPetTooltip;
     _helper.Events.GameLoop.UpdateTicked -= UpdateTicked;
 
     if (showWhenAnimalNeedsPet)
     {
-      _helper.Events.Player.Warped += OnWarped;
       _helper.Events.Display.RenderingHud += OnRenderingHud_DrawAnimalHasProduct;
       _helper.Events.Display.RenderingHud += OnRenderingHud_DrawNeedsPetTooltip;
       _helper.Events.GameLoop.UpdateTicked += UpdateTicked;
@@ -66,8 +64,6 @@ internal class ShowWhenAnimalNeedsPet : IDisposable
 
 
 #region Event subscriptions
-  private void OnWarped(object? sender, WarpedEventArgs e) { }
-
   private void OnRenderingHud_DrawNeedsPetTooltip(object? sender, RenderingHudEventArgs e)
   {
     if (UIElementUtils.IsRenderingNormally() &&

@@ -14,18 +14,6 @@ internal static class StringExtensions
     return result;
   }
 
-  public static int SafeParseInt64(this string s)
-  {
-    var result = 0;
-
-    if (!string.IsNullOrWhiteSpace(s))
-    {
-      int.TryParse(s, out result);
-    }
-
-    return result;
-  }
-
   public static bool SafeParseBool(this string s)
   {
     var result = false;

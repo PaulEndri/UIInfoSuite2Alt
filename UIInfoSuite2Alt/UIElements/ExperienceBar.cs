@@ -103,7 +103,6 @@ public partial class ExperienceBar
 
     _helper.Events.GameLoop.UpdateTicked -= OnUpdateTicked_UpdateExperience;
     _helper.Events.Player.LevelChanged -= OnLevelChanged;
-    _helper.Events.GameLoop.UpdateTicked -= OnUpdateTicked_UpdateExperience;
 
     ExperienceBarEnabled = experienceBarEnabled;
     ExperienceBarFadeoutEnabled = experienceBarFadeoutEnabled;

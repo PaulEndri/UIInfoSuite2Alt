@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
+using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
 using StardewValley.Menus;
 using StardewValley.Objects;
@@ -28,8 +29,8 @@ internal class ShowQueenOfSauceIcon : IDisposable
   private CraftingRecipe? _todaysRecipe;
 
   private readonly PerScreen<bool> _drawQueenOfSauceIcon = new();
+  private bool _showRecipeItemIcon;
 
-  //private bool _drawDishOfDayIcon = false;
   private readonly PerScreen<ClickableTextureComponent> _icon = new();
 
   private readonly IModHelper _helper;
@@ -66,6 +67,11 @@ internal class ShowQueenOfSauceIcon : IDisposable
       _helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
     }
   }
+
+  public void ToggleShowRecipeItemIcon(bool showRecipeItemIcon)
+  {
+    _showRecipeItemIcon = showRecipeItemIcon;
+  }
 #endregion
 
 #region Event subscriptions
@@ -91,17 +97,49 @@ internal class ShowQueenOfSauceIcon : IDisposable
   {
     if (UIElementUtils.IsRenderingNormally())
     {
-      if (_drawQueenOfSauceIcon.Value)
+      if (_drawQueenOfSauceIcon.Value && _todaysRecipe != null)
       {
         Point iconPosition = IconHandler.Handler.GetNewIconPosition();
 
-        _icon.Value = new ClickableTextureComponent(
-          new Rectangle(iconPosition.X, iconPosition.Y, 40, 40),
-          Game1.mouseCursors,
-          new Rectangle(609, 361, 28, 28),
-          1.3f
-        );
-        _icon.Value.draw(Game1.spriteBatch);
+        if (_showRecipeItemIcon)
+        {
+          // Draw the recipe's food item as the main icon
+          var itemData = _todaysRecipe.GetItemData(useFirst: true);
+          Texture2D itemTexture = itemData.GetTexture();
+          Rectangle itemSourceRect = itemData.GetSourceRect();
+
+          _icon.Value = new ClickableTextureComponent(
+            new Rectangle(iconPosition.X, iconPosition.Y, 40, 40),
+            itemTexture,
+            itemSourceRect,
+            2.5f
+          );
+          _icon.Value.draw(Game1.spriteBatch);
+
+          // Draw Queen of Sauce TV icon as mini overlay (bottom-right)
+          Game1.spriteBatch.Draw(
+            Game1.mouseCursors,
+            new Vector2(iconPosition.X + 18, iconPosition.Y + 18),
+            new Rectangle(609, 361, 28, 28),
+            Color.White,
+            0f,
+            Vector2.Zero,
+            0.8f,
+            SpriteEffects.None,
+            1f
+          );
+        }
+        else
+        {
+          // Draw classic Queen of Sauce TV icon only
+          _icon.Value = new ClickableTextureComponent(
+            new Rectangle(iconPosition.X, iconPosition.Y, 40, 40),
+            Game1.mouseCursors,
+            new Rectangle(609, 361, 28, 28),
+            1.3f
+          );
+          _icon.Value.draw(Game1.spriteBatch);
+        }
       }
     }
   }

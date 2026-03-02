@@ -26,6 +26,7 @@ internal record ModOptions
   public bool ShowHarvestPricesInShop { get; set; } = true;
   public bool DisplayCalendarAndBillboard { get; set; } = true;
   public bool ShowWhenNewRecipesAreAvailable { get; set; } = true;
+  public bool ShowRecipeItemIcon { get; set; } = true;
   public bool ShowToolUpgradeStatus { get; set; } = true;
   public bool HideMerchantWhenVisited { get; set; } = false;
   public bool ShowMerchantBundleIcon { get; set; } = false;

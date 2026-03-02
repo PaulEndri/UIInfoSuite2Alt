@@ -11,6 +11,7 @@ Most new features can be toggled on/off in the mod's in-game options menu.
 - Show mastery experience bar and XP gains when all skills are at level 10
 - Show bundle items indicator on Traveling Merchant icon when the merchant has items needed for bundles
 - Show quest count under journal icon
+- Show recipe item as Queen of Sauce icon with mini TV overlay
 
 ### Bug fixes from upstream
 - Fix mushroom log and mossy seed effect ranges ([Annosz/UIInfoSuite2#641](https://github.com/Annosz/UIInfoSuite2/pull/641))

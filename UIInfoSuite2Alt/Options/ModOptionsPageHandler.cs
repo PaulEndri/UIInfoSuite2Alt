@@ -116,7 +116,7 @@ internal class ModOptionsPageHandler : IDisposable
     };
 
     var whichOption = 1;
-    _optionsElements.Add(new ModOptionsElement($"UI Info Suite 2 {GetVersionString(helper)}"));
+    _optionsElements.Add(new ModOptionsElement($"UI Info Suite 2 Alt. {GetVersionString(helper)}"));
 
     var luckIcon = new ModOptionsCheckbox(
       _helper.SafeGetString(nameof(options.ShowLuckIcon)),
@@ -358,13 +358,22 @@ internal class ModOptionsPageHandler : IDisposable
         v => options.ShowHarvestPricesInShop = v
       )
     );
+    var queenOfSauceCheckbox = new ModOptionsCheckbox(
+      _helper.SafeGetString(nameof(options.ShowWhenNewRecipesAreAvailable)),
+      whichOption++,
+      showQueenOfSauceIcon.ToggleOption,
+      () => options.ShowWhenNewRecipesAreAvailable,
+      v => options.ShowWhenNewRecipesAreAvailable = v
+    );
+    _optionsElements.Add(queenOfSauceCheckbox);
     _optionsElements.Add(
       new ModOptionsCheckbox(
-        _helper.SafeGetString(nameof(options.ShowWhenNewRecipesAreAvailable)),
+        _helper.SafeGetString(nameof(options.ShowRecipeItemIcon)),
         whichOption++,
-        showQueenOfSauceIcon.ToggleOption,
-        () => options.ShowWhenNewRecipesAreAvailable,
-        v => options.ShowWhenNewRecipesAreAvailable = v
+        showQueenOfSauceIcon.ToggleShowRecipeItemIcon,
+        () => options.ShowRecipeItemIcon,
+        v => options.ShowRecipeItemIcon = v,
+        queenOfSauceCheckbox
       )
     );
     _optionsElements.Add(
@@ -591,10 +600,13 @@ internal class ModOptionsPageHandler : IDisposable
           optionsTabName,
           "ui2_mod_options"
         ) // Placeholder label that shouldn't be displayed
-        {
-          // The exit page tab ID is 12347
-          myID = 12348, leftNeighborID = 12347, tryDefaultIfNoDownNeighborExists = true, fullyImmutable = true
-        };
+      {
+        // The exit page tab ID is 12347
+        myID = 12348,
+        leftNeighborID = 12347,
+        tryDefaultIfNoDownNeighborExists = true,
+        fullyImmutable = true
+      };
 
       // Do not add our tab to GameMenu.tabs because GameMenu.draw will draw the menu tab incorrectly
       // when our page is the current tab.

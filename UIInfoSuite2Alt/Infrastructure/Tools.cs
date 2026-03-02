@@ -233,35 +233,47 @@ public static class Tools
     }
 
     string queryStr = parsedGameStateQuery.Query[0];
-    if (!"day_of_month".Equals(queryStr, StringComparison.OrdinalIgnoreCase))
+    if ("day_of_month".Equals(queryStr, StringComparison.OrdinalIgnoreCase))
+    {
+      for (var i = 1; i < parsedGameStateQuery.Query.Length; i++)
+      {
+        string dayStr = parsedGameStateQuery.Query[i];
+        if ("even".Equals(dayStr, StringComparison.OrdinalIgnoreCase))
+        {
+          days.AddRange(Enumerable.Range(1, 28).Where(x => x % 2 == 0));
+        }
+        else if ("odd".Equals(dayStr, StringComparison.OrdinalIgnoreCase))
+        {
+          days.AddRange(Enumerable.Range(1, 28).Where(x => x % 2 != 0));
+        }
+        else if (int.TryParse(dayStr, out int parsedInt))
+        {
+          days.Add(parsedInt);
+        }
+      }
+    }
+    else if ("day_of_week".Equals(queryStr, StringComparison.OrdinalIgnoreCase))
+    {
+      // Convert day-of-week names to all matching days in a 28-day month
+      // SDV: dayOfMonth % 7 gives DayOfWeek (Sun=0, Mon=1, ..., Sat=6)
+      for (var i = 1; i < parsedGameStateQuery.Query.Length; i++)
+      {
+        if (WorldDate.TryGetDayOfWeekFor(parsedGameStateQuery.Query[i], out DayOfWeek dayOfWeek))
+        {
+          int dow = (int)dayOfWeek;
+          for (int day = 1; day <= 28; day++)
+          {
+            if (day % 7 == dow)
+            {
+              days.Add(day);
+            }
+          }
+        }
+      }
+    }
+    else
     {
       return days;
-    }
-
-    for (var i = 1; i < parsedGameStateQuery.Query.Length; i++)
-    {
-      string dayStr = parsedGameStateQuery.Query[i];
-      if ("even".Equals(dayStr, StringComparison.OrdinalIgnoreCase))
-      {
-        days.AddRange(Enumerable.Range(1, 28).Where(x => x % 2 == 0));
-        continue;
-      }
-
-      if ("odd".Equals(dayStr, StringComparison.OrdinalIgnoreCase))
-      {
-        days.AddRange(Enumerable.Range(1, 28).Where(x => x % 2 != 0));
-        continue;
-      }
-
-      try
-      {
-        int parsedInt = int.Parse(dayStr);
-        days.Add(parsedInt);
-      }
-      catch (Exception)
-      {
-        // ignored
-      }
     }
 
     return parsedGameStateQuery.Negated ? Enumerable.Range(1, 28).Where(x => !days.Contains(x)).ToHashSet() : days;

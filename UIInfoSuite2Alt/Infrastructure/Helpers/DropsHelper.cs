@@ -56,6 +56,10 @@ public static class DropsHelper
 
     if (crop.indexOfHarvest.Value is null)
     {
+      ModEntry.MonitorObject.LogOnce(
+        $"Crop has no harvest item ID (seed: {crop.netSeedIndex.Value}, forage: {crop.forageCrop.Value}). Displaying as 'Unknown Crop'.",
+        LogLevel.Warn
+      );
       return "Unknown Crop";
     }
 
@@ -117,15 +121,19 @@ public static class DropsHelper
 
       if (!nextDay.HasValue)
       {
-        if (!lastDay.HasValue)
+        if (!lastDay.HasValue && !string.IsNullOrEmpty(dropInfo.Condition))
         {
+          // Condition has no day-based queries (e.g. LOCATION_IS_OUTDOORS) — treat as "any day" for now
           ModEntry.MonitorObject.Log(
-            $"Couldn't parse the next day the {displayName} will drop {dropInfo.ItemId}. Condition: {dropInfo.Condition}. Please report this error.",
-            LogLevel.Error
+            $"No day-based condition found for {displayName} drop {dropInfo.ItemId}, assuming any day. Condition: {dropInfo.Condition}",
+            LogLevel.Warn
           );
+          nextDay = Game1.dayOfMonth + (includeToday ? 0 : 1);
         }
-
-        continue;
+        else
+        {
+          continue;
+        }
       }
 
       ParsedItemData? itemData = ItemRegistry.GetData(dropInfo.ItemId);

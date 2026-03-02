@@ -42,18 +42,29 @@ public static class DropsHelper
 
   public static string GetCropHarvestName(Crop crop)
   {
+    // Forage crops (Spring Onion, Ginger) don't set indexOfHarvest — map forage type to item ID
+    if (crop.forageCrop.Value)
+    {
+      string forageCropItemId = crop.whichForageCrop.Value switch
+      {
+        "1" => "399", // Spring Onion
+        "2" => "829", // Ginger
+        _ => crop.whichForageCrop.Value
+      };
+      return GetOrCacheCropName(forageCropItemId);
+    }
+
     if (crop.indexOfHarvest.Value is null)
     {
       return "Unknown Crop";
     }
 
-    // If you look at Crop.cs in the decompiled sources, it seems that there's a special case for spring onions - that's what the =="1" is about.
     string itemId = crop.isWildSeedCrop() ? crop.whichForageCrop.Value : crop.indexOfHarvest.Value;
-    if (crop.whichForageCrop.Value == "1")
-    {
-      itemId = "399";
-    }
+    return GetOrCacheCropName(itemId);
+  }
 
+  private static string GetOrCacheCropName(string itemId)
+  {
     if (CropNamesCache.TryGetValue(itemId, out string? harvestName))
     {
       return harvestName;

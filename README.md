@@ -6,9 +6,9 @@
   This is an alternative fork of <a href="https://github.com/Annosz/UIInfoSuite2">UIInfoSuite2</a> with additional features and bug fixes.
 </p>
 
-<p align="center">
-  <a style="font-size: 36px;" href="https://github.com/dazuki/UIInfoSuite2Alt/releases/latest"><strong>Download Latest Release</strong></a>
-</p>
+<h2 align="center">
+  <a href="https://github.com/dazuki/UIInfoSuite2Alt/releases/latest"><strong>Download Latest Release</strong></a>
+</h2>
 
 ![New features](.github/assets/new-features.png)
 - **2.3.8**

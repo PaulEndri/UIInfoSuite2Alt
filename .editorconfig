@@ -71,6 +71,9 @@ dotnet_style_qualification_for_method = false:suggestion
 dotnet_style_qualification_for_property = false:suggestion
 dotnet_style_require_accessibility_modifiers = for_non_interface_members:suggestion
 
+# Suppress IDE1006 naming style warnings
+dotnet_diagnostic.IDE1006.severity = none
+
 # ReSharper properties
 resharper_align_linq_query = true
 resharper_align_multiline_argument = true

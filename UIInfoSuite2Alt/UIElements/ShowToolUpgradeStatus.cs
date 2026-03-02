@@ -14,7 +14,7 @@ namespace UIInfoSuite2Alt.UIElements;
 
 internal class ShowToolUpgradeStatus : IDisposable
 {
-#region Logic
+  #region Logic
   private void UpdateToolInfo()
   {
     Tool toolBeingUpgraded = _toolBeingUpgraded.Value = Game1.player.toolBeingUpgraded.Value;
@@ -56,9 +56,9 @@ internal class ShowToolUpgradeStatus : IDisposable
       _hoverText.Value = string.Format(I18n.ToolIsFinishedBeingUpgraded(), toolBeingUpgraded.DisplayName);
     }
   }
-#endregion
+  #endregion
 
-#region Properties
+  #region Properties
   private readonly PerScreen<string> _hoverText = new();
   private readonly PerScreen<Tool?> _toolBeingUpgraded = new();
 
@@ -75,10 +75,10 @@ internal class ShowToolUpgradeStatus : IDisposable
   );
 
   private readonly IModHelper _helper;
-#endregion
+  #endregion
 
 
-#region Life cycle
+  #region Life cycle
   public ShowToolUpgradeStatus(IModHelper helper)
   {
     _helper = helper;
@@ -106,10 +106,10 @@ internal class ShowToolUpgradeStatus : IDisposable
       _helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
     }
   }
-#endregion
+  #endregion
 
 
-#region Event subscriptions
+  #region Event subscriptions
   private void OnUpdateTicked(object? sender, UpdateTickedEventArgs e)
   {
     if (e.IsOneSecond && _toolBeingUpgraded.Value != Game1.player.toolBeingUpgraded.Value)
@@ -145,5 +145,5 @@ internal class ShowToolUpgradeStatus : IDisposable
       IClickableMenu.drawHoverText(Game1.spriteBatch, _hoverText.Value, Game1.dialogueFont);
     }
   }
-#endregion
+  #endregion
 }

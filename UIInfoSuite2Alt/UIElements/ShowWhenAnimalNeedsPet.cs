@@ -17,7 +17,7 @@ namespace UIInfoSuite2Alt.UIElements;
 
 internal class ShowWhenAnimalNeedsPet : IDisposable
 {
-#region Properties
+  #region Properties
   private readonly PerScreen<float> _yMovementPerDraw = new();
   private readonly PerScreen<float> _alpha = new();
 
@@ -25,10 +25,10 @@ internal class ShowWhenAnimalNeedsPet : IDisposable
   private bool HideOnMaxFriendship { get; set; }
 
   private readonly IModHelper _helper;
-#endregion
+  #endregion
 
 
-#region Lifecycle
+  #region Lifecycle
   public ShowWhenAnimalNeedsPet(IModHelper helper)
   {
     _helper = helper;
@@ -60,10 +60,10 @@ internal class ShowWhenAnimalNeedsPet : IDisposable
     HideOnMaxFriendship = hideOnMaxFriendship;
     ToggleOption(Enabled);
   }
-#endregion
+  #endregion
 
 
-#region Event subscriptions
+  #region Event subscriptions
   private void OnRenderingHud_DrawNeedsPetTooltip(object? sender, RenderingHudEventArgs e)
   {
     if (UIElementUtils.IsRenderingNormally() &&
@@ -98,9 +98,9 @@ internal class ShowWhenAnimalNeedsPet : IDisposable
     _yMovementPerDraw.Value = -6f + 6f * sine;
     _alpha.Value = 0.8f + 0.2f * sine;
   }
-#endregion
+  #endregion
 
-#region Logic
+  #region Logic
   private void DrawAnimalHasProduct()
   {
     NetLongDictionary<FarmAnimal, NetRef<FarmAnimal>>? animalsInCurrentLocation = GetAnimalsInCurrentLocation();
@@ -270,5 +270,5 @@ internal class ShowWhenAnimalNeedsPet : IDisposable
 
     return animals;
   }
-#endregion
+  #endregion
 }

@@ -13,8 +13,11 @@ Most new features can be toggled on/off in the mod's in-game options menu.
 - Show quest count under journal icon
 - Show recipe item as Queen of Sauce icon with mini TV overlay
 
-### Bug fixes from upstream
-- Fix mushroom log and mossy seed effect ranges ([Annosz/UIInfoSuite2#641](https://github.com/Annosz/UIInfoSuite2/pull/641))
+### Issues resolved from upstream
+- None yet...
+
+### Pull requests from upstream
+- Fix mushroom log and mossy seed effect ranges ([Annosz/UIInfoSuite2#641](https://github.com/Annosz/UIInfoSuite2/pull/641)) [@Disassembler0]
 
 ---
 

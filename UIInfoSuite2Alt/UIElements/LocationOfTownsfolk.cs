@@ -18,7 +18,7 @@ namespace UIInfoSuite2Alt.UIElements;
 
 internal class LocationOfTownsfolk : IDisposable
 {
-#region Properties
+  #region Properties
   private SocialPage _socialPage = null!;
   private readonly List<string> _friendNames = new();
   private readonly List<NPC> _townsfolk = new();
@@ -29,9 +29,9 @@ internal class LocationOfTownsfolk : IDisposable
 
   private const int SocialPanelWidth = 190;
   private const int SocialPanelXOffset = 160;
-#endregion
+  #endregion
 
-#region Lifecycle
+  #region Lifecycle
   public LocationOfTownsfolk(IModHelper helper, ModOptions options)
   {
     _helper = helper;
@@ -61,9 +61,9 @@ internal class LocationOfTownsfolk : IDisposable
   {
     ToggleShowNPCLocationsOnMap(false);
   }
-#endregion
+  #endregion
 
-#region Event subscriptions
+  #region Event subscriptions
   private void OnMenuChanged(object? sender, MenuChangedEventArgs e)
   {
     InitializeProperties();
@@ -124,9 +124,9 @@ internal class LocationOfTownsfolk : IDisposable
       }
     }
   }
-#endregion
+  #endregion
 
-#region Logic
+  #region Logic
   private void InitializeProperties()
   {
     if (Game1.activeClickableMenu is GameMenu gameMenu)
@@ -449,5 +449,5 @@ internal class LocationOfTownsfolk : IDisposable
       Game1.textColor
     );
   }
-#endregion
+  #endregion
 }

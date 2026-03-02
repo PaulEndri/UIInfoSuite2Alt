@@ -5,6 +5,6 @@
   "Description": "Adds useful information to the user interface. Alternative fork based on Annosz's UI Info Suite 2.",
   "UniqueID": "DazUki.UIInfoSuite2Alt",
   "EntryDll": "UIInfoSuite2Alt.dll",
-  "MinimumApiVersion": "4.0.5",
-  "UpdateKeys": []
+  "MinimumApiVersion": "4.1.10",
+  "UpdateKeys": ["GitHub:dazuki/UIInfoSuite2Alt"]
 }

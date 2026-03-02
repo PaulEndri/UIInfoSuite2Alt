@@ -25,7 +25,7 @@ public class ModEntry : Mod
 
   public static IMonitor MonitorObject { get; private set; } = null!;
 
-#region Entry
+  #region Entry
   public override void Entry(IModHelper helper)
   {
     I18n.Init(helper.Translation);
@@ -43,9 +43,9 @@ public class ModEntry : Mod
 
     IconHandler.Handler.IsQuestLogPermanent = helper.ModRegistry.IsLoaded("MolsonCAD.DeluxeJournal");
   }
-#endregion
+  #endregion
 
-#region Generic mod config menu
+  #region Generic mod config menu
   private void OnGameLaunched(object? sender, GameLaunchedEventArgs e)
   {
     SoundHelper.Instance.Initialize(Helper);
@@ -112,9 +112,9 @@ public class ModEntry : Mod
       setValue: value => _modConfig.ShowAllRange = value
       );
   }
-#endregion
+  #endregion
 
-#region Event subscriptions
+  #region Event subscriptions
   private void OnReturnedToTitle(object? sender, ReturnedToTitleEventArgs e)
   {
     // Unload if the main player quits.
@@ -185,5 +185,5 @@ public class ModEntry : Mod
       }
     }
   }
-#endregion
+  #endregion
 }

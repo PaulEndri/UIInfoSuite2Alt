@@ -8,22 +8,22 @@ namespace UIInfoSuite2Alt.UIElements;
 
 internal class ShowAccurateHearts : IDisposable
 {
-#region Properties
+  #region Properties
   private SocialPage? _socialPage;
   private readonly IModEvents _events;
 
-    // @formatter:off
-    private readonly int[][] _numArray =
-    {
+  // @formatter:off
+  private readonly int[][] _numArray =
+  {
       new[] { 1, 1, 0, 1, 1 },
       new[] { 1, 1, 1, 1, 1 },
       new[] { 0, 1, 1, 1, 0 },
       new[] { 0, 0, 1, 0, 0 }
     };
   // @formatter:on
-#endregion
+  #endregion
 
-#region Lifecycle
+  #region Lifecycle
   public ShowAccurateHearts(IModEvents events)
   {
     _events = events;
@@ -45,9 +45,9 @@ internal class ShowAccurateHearts : IDisposable
       _events.Display.RenderedActiveMenu += OnRenderedActiveMenu;
     }
   }
-#endregion
+  #endregion
 
-#region Event subscriptions
+  #region Event subscriptions
   private void OnRenderedActiveMenu(object? sender, RenderedActiveMenuEventArgs e)
   {
     if (_socialPage == null)
@@ -69,9 +69,9 @@ internal class ShowAccurateHearts : IDisposable
   {
     GetSocialPage();
   }
-#endregion
+  #endregion
 
-#region Logic
+  #region Logic
   private void GetSocialPage()
   {
     if (Game1.activeClickableMenu is GameMenu gameMenu)
@@ -149,5 +149,5 @@ internal class ShowAccurateHearts : IDisposable
       }
     }
   }
-#endregion
+  #endregion
 }

@@ -14,7 +14,7 @@ namespace UIInfoSuite2Alt.UIElements;
 
 internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
 {
-#region Properties
+  #region Properties
   private readonly PerScreen<ClickableTextureComponent> _showBillboardButton = new(
     () => new ClickableTextureComponent(
       new Rectangle(0, 0, 99, 60),
@@ -28,9 +28,9 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
 
   private readonly PerScreen<Item?> _hoverItem = new();
   private readonly PerScreen<Item?> _heldItem = new();
-#endregion
+  #endregion
 
-#region Lifecycle
+  #region Lifecycle
   public ShowCalendarAndBillboardOnGameMenuButton(IModHelper helper)
   {
     _helper = helper;
@@ -56,10 +56,10 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
       _helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
     }
   }
-#endregion
+  #endregion
 
 
-#region Event subscriptions
+  #region Event subscriptions
   private void OnUpdateTicked(object? sender, EventArgs e)
   {
     // Get hovered and hold item
@@ -100,10 +100,10 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
       DrawBillboard();
     }
   }
-#endregion
+  #endregion
 
 
-#region Logic
+  #region Logic
   private void DrawBillboard()
   {
     ClickableTextureComponent billboardButton = _showBillboardButton.Value;
@@ -150,5 +150,5 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
       );
     }
   }
-#endregion
+  #endregion
 }

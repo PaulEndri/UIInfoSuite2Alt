@@ -7,7 +7,7 @@ namespace UIInfoSuite2Alt.Infrastructure.Extensions;
 
 public static class ObjectExtensions
 {
-#region Properties
+  #region Properties
   private static readonly Dictionary<string, int> NpcHeadShotSize = new()
   {
     { "Piere", 9 },
@@ -45,7 +45,7 @@ public static class ObjectExtensions
     { "Clint", 10 },
     { "Willy", 10 }
   };
-#endregion
+  #endregion
 
   public static Rectangle GetHeadShot(this NPC npc)
   {

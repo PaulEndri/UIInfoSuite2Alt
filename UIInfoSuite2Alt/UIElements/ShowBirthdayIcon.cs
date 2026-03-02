@@ -14,7 +14,7 @@ namespace UIInfoSuite2Alt.UIElements;
 
 internal class ShowBirthdayIcon : IDisposable
 {
-#region Properties
+  #region Properties
   private readonly PerScreen<List<NPC>> _birthdayNPCs = new(() => new List<NPC>());
 
   private readonly PerScreen<List<ClickableTextureComponent>> _birthdayIcons =
@@ -23,10 +23,10 @@ internal class ShowBirthdayIcon : IDisposable
   private bool Enabled { get; set; }
   private bool HideBirthdayIfFullFriendShip { get; set; }
   private readonly IModHelper _helper;
-#endregion
+  #endregion
 
 
-#region Life cycle
+  #region Life cycle
   public ShowBirthdayIcon(IModHelper helper)
   {
     _helper = helper;
@@ -61,10 +61,10 @@ internal class ShowBirthdayIcon : IDisposable
     HideBirthdayIfFullFriendShip = hideBirthdayIfFullFriendShip;
     ToggleOption(Enabled);
   }
-#endregion
+  #endregion
 
 
-#region Event subscriptions
+  #region Event subscriptions
   private void OnUpdateTicked(object? sender, UpdateTickedEventArgs e)
   {
     if (e.IsOneSecond)
@@ -94,10 +94,10 @@ internal class ShowBirthdayIcon : IDisposable
       DrawHoverText();
     }
   }
-#endregion
+  #endregion
 
 
-#region Logic
+  #region Logic
   private void CheckForGiftGiven()
   {
     List<NPC> npcs = _birthdayNPCs.Value;
@@ -230,5 +230,5 @@ internal class ShowBirthdayIcon : IDisposable
       }
     }
   }
-#endregion
+  #endregion
 }

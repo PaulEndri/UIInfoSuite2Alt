@@ -11,7 +11,7 @@ namespace UIInfoSuite2Alt.UIElements;
 
 internal class LuckOfDay : IDisposable
 {
-#region Properties
+  #region Properties
   private readonly PerScreen<string> _hoverText = new(() => string.Empty);
   private readonly PerScreen<Color> _color = new(() => new Color(Color.White.ToVector4()));
 
@@ -38,9 +38,9 @@ internal class LuckOfDay : IDisposable
   private static readonly Color Luck4Color = new(255, 255, 255, 255);
   private static readonly Color Luck5Color = new(255, 155, 155, 255);
   private static readonly Color Luck6Color = new(165, 165, 165, 204);
-#endregion
+  #endregion
 
-#region Lifecycle
+  #region Lifecycle
   public LuckOfDay(IModHelper helper)
   {
     _helper = helper;
@@ -75,9 +75,9 @@ internal class LuckOfDay : IDisposable
     ShowExactValue = showExactValue;
     ToggleOption(Enabled);
   }
-#endregion
+  #endregion
 
-#region Event subscriptions
+  #region Event subscriptions
   private void OnUpdateTicked(object? sender, UpdateTickedEventArgs e)
   {
     CalculateLuck(e);
@@ -105,9 +105,9 @@ internal class LuckOfDay : IDisposable
       _icon.Value.draw(Game1.spriteBatch, _color.Value, 1f);
     }
   }
-#endregion
+  #endregion
 
-#region Logic
+  #region Logic
   private void CalculateLuck(UpdateTickedEventArgs e)
   {
     if (e.IsMultipleOf(30)) // half second
@@ -178,5 +178,5 @@ internal class LuckOfDay : IDisposable
       Game1.pixelZoom
     );
   }
-#endregion
+  #endregion
 }

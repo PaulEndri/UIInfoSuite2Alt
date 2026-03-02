@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
@@ -26,6 +27,7 @@ internal class ShowItemHoverInformation : IDisposable
 
   private readonly IModHelper _helper;
 
+  private readonly Dictionary<int, Color?> _bundleColorCache = new();
   private readonly PerScreen<Item?> _hoverItem = new();
   private readonly ClickableTextureComponent _museumIcon;
 
@@ -105,7 +107,6 @@ internal class ShowItemHoverInformation : IDisposable
   /// <param name="e">The event arguments.</param>
   private void OnRenderedHud(object? sender, RenderedHudEventArgs e)
   {
-    // ModEntry.MonitorObject.Log(Game1.player.currentLocation.Name);
     if (Game1.activeClickableMenu == null)
     {
       DrawAdvancedTooltip(e.SpriteBatch);
@@ -163,8 +164,11 @@ internal class ShowItemHoverInformation : IDisposable
         {
           requiredBundleName = bundleDisplayData.Name;
 
-          // TODO cache these colors so we're not doing it every time
-          bundleColor = BundleHelper.GetRealColorFromIndex(bundleDisplayData.Id)?.Desaturate(0.35f);
+          if (!_bundleColorCache.TryGetValue(bundleDisplayData.Id, out bundleColor))
+          {
+            bundleColor = BundleHelper.GetRealColorFromIndex(bundleDisplayData.Id)?.Desaturate(0.35f);
+            _bundleColorCache[bundleDisplayData.Id] = bundleColor;
+          }
         }
       }
 

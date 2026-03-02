@@ -13,7 +13,7 @@ namespace UIInfoSuite2Alt.UIElements;
 
 internal class ShowRobinBuildingStatusIcon : IDisposable
 {
-#region Properties
+  #region Properties
   private bool _IsBuildingInProgress;
   private Rectangle? _buildingIconSpriteLocation;
   private string _hoverText = "";
@@ -21,9 +21,9 @@ internal class ShowRobinBuildingStatusIcon : IDisposable
   private Texture2D _robinIconSheet = null!;
 
   private readonly IModHelper _helper;
-#endregion
+  #endregion
 
-#region Lifecycle
+  #region Lifecycle
   public ShowRobinBuildingStatusIcon(IModHelper helper)
   {
     _helper = helper;
@@ -51,9 +51,9 @@ internal class ShowRobinBuildingStatusIcon : IDisposable
       _helper.Events.GameLoop.OneSecondUpdateTicked += OnTickInRobinHouse;
     }
   }
-#endregion
+  #endregion
 
-#region Event subscriptions
+  #region Event subscriptions
   public void OnTickInRobinHouse(object? sender, OneSecondUpdateTickedEventArgs e)
   {
     if (Game1.currentLocation?.Name != "ScienceHouse")
@@ -95,9 +95,9 @@ internal class ShowRobinBuildingStatusIcon : IDisposable
       IClickableMenu.drawHoverText(Game1.spriteBatch, _hoverText, Game1.dialogueFont);
     }
   }
-#endregion
+  #endregion
 
-#region Logic
+  #region Logic
   private bool GetRobinMessage(out string hoverText)
   {
     int remainingDays = Game1.player.daysUntilHouseUpgrade.Value;
@@ -160,5 +160,5 @@ internal class ShowRobinBuildingStatusIcon : IDisposable
     _buildingIconSpriteLocation =
       new Rectangle(0, 195 + 1, 15, 15 - 1); // 1px edits for better alignment with other icons
   }
-#endregion
+  #endregion
 }

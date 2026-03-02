@@ -23,7 +23,7 @@ internal class ShowQueenOfSauceIcon : IDisposable
     }
   }
 
-#region Properties
+  #region Properties
   private readonly Dictionary<string, string> _recipesByDescription = new();
   private Dictionary<string, string> _recipes = new();
   private CraftingRecipe? _todaysRecipe;
@@ -34,9 +34,9 @@ internal class ShowQueenOfSauceIcon : IDisposable
   private readonly PerScreen<ClickableTextureComponent> _icon = new();
 
   private readonly IModHelper _helper;
-#endregion
+  #endregion
 
-#region Life cycle
+  #region Life cycle
   public ShowQueenOfSauceIcon(IModHelper helper)
   {
     _helper = helper;
@@ -72,9 +72,9 @@ internal class ShowQueenOfSauceIcon : IDisposable
   {
     _showRecipeItemIcon = showRecipeItemIcon;
   }
-#endregion
+  #endregion
 
-#region Event subscriptions
+  #region Event subscriptions
   private void OnDayStarted(object? sender, DayStartedEventArgs e)
   {
     CheckForNewRecipe();
@@ -157,9 +157,9 @@ internal class ShowQueenOfSauceIcon : IDisposable
       );
     }
   }
-#endregion
+  #endregion
 
-#region Logic
+  #region Logic
   private void LoadRecipes()
   {
     if (_recipes.Count == 0)
@@ -192,5 +192,5 @@ internal class ShowQueenOfSauceIcon : IDisposable
                                   Game1.stats.DaysPlayed > 5 &&
                                   !Game1.player.knowsRecipe(_todaysRecipe.name);
   }
-#endregion
+  #endregion
 }

@@ -10,7 +10,7 @@ namespace UIInfoSuite2Alt.UIElements;
 
 internal class ShowSeasonalBerry : IDisposable
 {
-#region Logic
+  #region Logic
   private void UpdateBerryForDay()
   {
     string? season = Game1.currentSeason;
@@ -37,9 +37,9 @@ internal class ShowSeasonalBerry : IDisposable
         break;
     }
   }
-#endregion
+  #endregion
 
-#region Properties
+  #region Properties
   private Rectangle? _berrySpriteLocation;
   private float _spriteScale = 8 / 3f;
   private string _hoverText = "";
@@ -49,9 +49,9 @@ internal class ShowSeasonalBerry : IDisposable
 
   private bool Enabled { get; set; }
   private bool ShowHazelnut { get; set; }
-#endregion
+  #endregion
 
-#region Lifecycle
+  #region Lifecycle
   public ShowSeasonalBerry(IModHelper helper)
   {
     _helper = helper;
@@ -86,9 +86,9 @@ internal class ShowSeasonalBerry : IDisposable
     ShowHazelnut = showHazelnut;
     ToggleOption(Enabled);
   }
-#endregion
+  #endregion
 
-#region Event subscriptions
+  #region Event subscriptions
   private void OnDayStarted(object? sender, DayStartedEventArgs e)
   {
     UpdateBerryForDay();
@@ -122,5 +122,5 @@ internal class ShowSeasonalBerry : IDisposable
       IClickableMenu.drawHoverText(Game1.spriteBatch, _hoverText, Game1.dialogueFont);
     }
   }
-#endregion
+  #endregion
 }

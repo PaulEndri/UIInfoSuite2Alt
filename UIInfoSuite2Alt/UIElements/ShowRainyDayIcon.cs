@@ -12,7 +12,7 @@ namespace UIInfoSuite2Alt.UIElements;
 
 internal class ShowRainyDayIcon : IDisposable
 {
-#region Properties
+  #region Properties
   private class LocationWeather
   {
     internal bool IsRainyTomorrow { get; set; }
@@ -30,9 +30,9 @@ internal class ShowRainyDayIcon : IDisposable
   private const int WeatherSheetHeight = 18;
 
   private readonly IModHelper _helper;
-#endregion
+  #endregion
 
-#region Lifecycle
+  #region Lifecycle
   public ShowRainyDayIcon(IModHelper helper)
   {
     _helper = helper;
@@ -56,9 +56,9 @@ internal class ShowRainyDayIcon : IDisposable
       _helper.Events.Display.RenderedHud += OnRenderedHud;
     }
   }
-#endregion
+  #endregion
 
-#region Event subscriptions
+  #region Event subscriptions
   private void OnRenderingHud(object? sender, RenderingHudEventArgs e)
   {
     GetWeatherIconSpriteLocation();
@@ -113,9 +113,9 @@ internal class ShowRainyDayIcon : IDisposable
       IClickableMenu.drawHoverText(Game1.spriteBatch, weather.HoverText, Game1.dialogueFont);
     }
   }
-#endregion
+  #endregion
 
-#region Logic
+  #region Logic
   private static bool HasVisitedIsland()
   {
     return Game1.MasterPlayer.mailReceived.Contains("willyBoatFixed");
@@ -289,5 +289,5 @@ internal class ShowRainyDayIcon : IDisposable
         break;
     }
   }
-#endregion
+  #endregion
 }

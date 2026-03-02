@@ -10,12 +10,12 @@ namespace UIInfoSuite2Alt.UIElements;
 
 internal class ShowTodaysGifts : IDisposable
 {
-#region Properties
+  #region Properties
   private SocialPage? _socialPage;
   private readonly IModHelper _helper;
-#endregion
+  #endregion
 
-#region Lifecycle
+  #region Lifecycle
   public ShowTodaysGifts(IModHelper helper)
   {
     _helper = helper;
@@ -37,9 +37,9 @@ internal class ShowTodaysGifts : IDisposable
       _helper.Events.Display.RenderedActiveMenu += OnRenderedActiveMenu;
     }
   }
-#endregion
+  #endregion
 
-#region Event subscriptions
+  #region Event subscriptions
   private void OnRenderedActiveMenu(object? sender, RenderedActiveMenuEventArgs e)
   {
     if (_socialPage == null)
@@ -61,9 +61,9 @@ internal class ShowTodaysGifts : IDisposable
   {
     GetSocialPage();
   }
-#endregion
+  #endregion
 
-#region Logic
+  #region Logic
   private void GetSocialPage()
   {
     if (Game1.activeClickableMenu is not GameMenu gameMenu)
@@ -115,5 +115,5 @@ internal class ShowTodaysGifts : IDisposable
       }
     }
   }
-#endregion
+  #endregion
 }

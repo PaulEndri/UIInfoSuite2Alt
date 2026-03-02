@@ -8,6 +8,7 @@ This is an alternative fork of [UIInfoSuite2](https://github.com/Annosz/UIInfoSu
 - Show bookseller icon when he is visiting town
 - Show mastery experience bar and XP gains when all skills are at level 10
 - Show bundle items indicator on Traveling Merchant icon when the merchant has items needed for bundles
+- Show quest count under journal icon
 
 ---
 

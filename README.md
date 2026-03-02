@@ -1,4 +1,4 @@
-﻿# UIInfoSuite2Alt
+﻿# UI Info Suite 2 Alternative
 
 This is an alternative fork of [UIInfoSuite2](https://github.com/Annosz/UIInfoSuite2) with additional features and bug fixes.
 
@@ -14,6 +14,8 @@ This is an alternative fork of [UIInfoSuite2](https://github.com/Annosz/UIInfoSu
 - Fix mushroom log and mossy seed effect ranges ([Annosz/UIInfoSuite2#641](https://github.com/Annosz/UIInfoSuite2/pull/641))
 
 ---
+
+> **Note:** Everything below is the original README from [UIInfoSuite2](https://github.com/Annosz/UIInfoSuite2).
 
 # UI Info Suite 2
 _Ongoing maintenance for the original UI Info Suite mod for Stardew Valley._

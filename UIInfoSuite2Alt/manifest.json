@@ -6,5 +6,5 @@
   "UniqueID": "DazUki.UIInfoSuite2Alt",
   "EntryDll": "UIInfoSuite2Alt.dll",
   "MinimumApiVersion": "4.1.10",
-  "UpdateKeys": ["GitHub:dazuki/UIInfoSuite2Alt"]
+  "UpdateKeys": ["Nexus:43127", "GitHub:dazuki/UIInfoSuite2Alt"]
 }

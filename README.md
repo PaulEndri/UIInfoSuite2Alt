@@ -12,7 +12,9 @@
 
 <p>
   <h3><strong>Why Alternative?</strong></h3>
-  Development on the upstream repo has slowed down significantly, leaving many issues and feature requests unaddressed. This fork was created out of love for the original mod, with the goal of continuing to improve and maintain it. I also wanted to add features I personally felt were missing, and figured others would find them useful too.
+  Since upstream development has slowed, this fork aims to keep the mod alive by fixing outstanding issues and adding features that felt missing. All credit for the mod goes to them.
+  <br><br>
+  Thanks to <a href="https://github.com/Annosz">Annosz</a>, <a href="https://github.com/tqdv">tqdv</a>, <a href="https://github.com/drewhoener">drewhoener</a>, <a href="https://github.com/cdaragorn">cdaragorn</a>, and all the contributors who built and maintained UIInfoSuite over the years. Their work made this mod what it is today.
 </p>
 
 <h2 align="center">

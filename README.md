@@ -3,6 +3,10 @@
 </p>
 
 <p align="center">
+  <img src=".github/assets/showcase-animation.webp" alt="Showcase">
+</p>
+
+<p align="center">
   This is an alternative fork of <a href="https://github.com/Annosz/UIInfoSuite2">UIInfoSuite2</a> with additional features and bug fixes.
 </p>
 

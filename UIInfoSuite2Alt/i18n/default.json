@@ -65,6 +65,7 @@
   "SnowNextDay": "There will be snow tomorrow",
   "IslandRainNextDay": "There will be rain on the island tomorrow",
   "IslandThunderstormNextDay": "There will be a thunderstorm on the island tomorrow",
+  "CustomWeatherNextDay": "Tomorrow's weather: {{weatherName}}",
   "DaysUntilToolIsUpgraded": "{0} day(s) until {1} is finished being upgraded",
   "ToolIsFinishedBeingUpgraded": "{0} is finished!",
   "NpcBirthday": "{0}'s birthday",

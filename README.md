@@ -22,6 +22,8 @@
 </h2>
 
 ![New features](.github/assets/new-features.png)
+- **2.4.1+**
+  - Cloudy Skies framework compatibility: weather icon now supports custom weather from mods like Weather Wonders
 - **2.4.0+**
   - Show icon if there's a Festival/Event tomorrow or today
   - Option added to require watching TV daily to make Luck/Weather icon visible

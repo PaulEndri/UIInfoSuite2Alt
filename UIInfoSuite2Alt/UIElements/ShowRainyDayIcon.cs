@@ -1,11 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Menus;
+using UIInfoSuite2Alt.Compatibility;
 using UIInfoSuite2Alt.Infrastructure;
 
 namespace UIInfoSuite2Alt.UIElements;
@@ -19,6 +22,7 @@ internal class ShowRainyDayIcon : IDisposable
     internal Rectangle? SpriteLocation { get; set; }
     internal string HoverText { get; set; } = "";
     internal ClickableTextureComponent? IconComponent { get; set; }
+    internal Texture2D? CustomTexture { get; set; }
   }
 
   private readonly LocationWeather _valleyWeather = new();
@@ -28,6 +32,9 @@ internal class ShowRainyDayIcon : IDisposable
   private Color[] _weatherIconColors = null!;
   private const int WeatherSheetWidth = 15 * 4 + 18 * 3;
   private const int WeatherSheetHeight = 18;
+
+  private readonly Dictionary<string, Texture2D> _customWeatherTextureCache = new();
+  private Texture2D _weatherBorderTexture = null!;
 
   private bool _requireTv;
   private readonly IModHelper _helper;
@@ -44,6 +51,7 @@ internal class ShowRainyDayIcon : IDisposable
   {
     ToggleOption(false);
     _iconSheet.Dispose();
+    _weatherBorderTexture.Dispose();
   }
 
   public void ToggleRequireTvOption(bool requireTv)
@@ -107,13 +115,21 @@ internal class ShowRainyDayIcon : IDisposable
 
     // Draw icon
     Point iconPosition = IconHandler.Handler.GetNewIconPosition();
-    weather.IconComponent = new ClickableTextureComponent(
-      new Rectangle(iconPosition.X, iconPosition.Y, 40, 40),
-      _iconSheet,
-      weather.SpriteLocation.Value,
-      8 / 3f
-    );
-    weather.IconComponent.draw(Game1.spriteBatch);
+    var bounds = new Rectangle(iconPosition.X, iconPosition.Y, 40, 40);
+
+    if (weather.CustomTexture != null)
+    {
+      // Draw weatherbox border at 40x40, then custom icon at 34x34 inset by 3px
+      Game1.spriteBatch.Draw(_weatherBorderTexture, bounds, Color.White);
+      var iconRect = new Rectangle(bounds.X + 3, bounds.Y + 3, 34, 34);
+      Game1.spriteBatch.Draw(weather.CustomTexture, iconRect, weather.SpriteLocation.Value, Color.White);
+      weather.IconComponent = new ClickableTextureComponent(bounds, weather.CustomTexture, weather.SpriteLocation.Value, 1f);
+    }
+    else
+    {
+      weather.IconComponent = new ClickableTextureComponent(bounds, _iconSheet, weather.SpriteLocation.Value, 8 / 3f);
+      weather.IconComponent.draw(Game1.spriteBatch);
+    }
   }
 
   private static void RenderWeatherHoverText(LocationWeather weather)
@@ -160,10 +176,11 @@ internal class ShowRainyDayIcon : IDisposable
     // Setup Texture sheet as a copy, so as not to disturb existing sprites
     _iconSheet = new Texture2D(Game1.graphics.GraphicsDevice, WeatherSheetWidth, WeatherSheetHeight);
     _weatherIconColors = new Color[WeatherSheetWidth * WeatherSheetHeight];
-    Texture2D weatherBorderTexture = Texture2D.FromFile(
+    _weatherBorderTexture = Texture2D.FromFile(
       Game1.graphics.GraphicsDevice,
       Path.Combine(_helper.DirectoryPath, "assets", "weatherbox.png")
     );
+    Texture2D weatherBorderTexture = _weatherBorderTexture;
     var weatherBorderColors = new Color[15 * 15];
     var cursorColors = new Color[Game1.mouseCursors.Width * Game1.mouseCursors.Height];
     var cursorColors_1_6 = new Color[Game1.mouseCursors_1_6.Width * Game1.mouseCursors_1_6.Height];
@@ -235,7 +252,10 @@ internal class ShowRainyDayIcon : IDisposable
 
   private void SetValleyWeatherSprite()
   {
-    switch (GetWeatherForTomorrow())
+    string weatherId = GetWeatherForTomorrow();
+    _valleyWeather.CustomTexture = null;
+
+    switch (weatherId)
     {
       case Game1.weather_sunny:
       case Game1.weather_debris:
@@ -269,14 +289,17 @@ internal class ShowRainyDayIcon : IDisposable
         break;
 
       default:
-        _valleyWeather.IsRainyTomorrow = false;
+        TrySetCustomWeather(_valleyWeather, weatherId);
         break;
     }
   }
 
   private void SetIslandWeatherSprite()
   {
-    switch (GetIslandWeatherForTomorrow())
+    string weatherId = GetIslandWeatherForTomorrow();
+    _islandWeather.CustomTexture = null;
+
+    switch (weatherId)
     {
       case Game1.weather_rain:
         _islandWeather.IsRainyTomorrow = true;
@@ -297,9 +320,48 @@ internal class ShowRainyDayIcon : IDisposable
         break;
 
       default:
-        _islandWeather.IsRainyTomorrow = false;
+        TrySetCustomWeather(_islandWeather, weatherId);
         break;
     }
+  }
+
+  private void TrySetCustomWeather(LocationWeather weather, string weatherId)
+  {
+    if (!ApiManager.GetApi(ModCompat.CloudySkies, out ICloudySkiesApi? api))
+    {
+      weather.IsRainyTomorrow = false;
+      return;
+    }
+
+    IWeatherData? data = api.GetAllCustomWeather().FirstOrDefault(w => w.Id == weatherId);
+    if (data == null || string.IsNullOrEmpty(data.IconTexture))
+    {
+      weather.IsRainyTomorrow = false;
+      return;
+    }
+
+    if (!_customWeatherTextureCache.TryGetValue(data.IconTexture, out Texture2D? texture))
+    {
+      try
+      {
+        texture = _helper.GameContent.Load<Texture2D>(data.IconTexture);
+        _customWeatherTextureCache[data.IconTexture] = texture;
+      }
+      catch (Exception ex)
+      {
+        ModEntry.MonitorObject.Log(
+          $"Failed to load weather icon texture '{data.IconTexture}' for weather '{weatherId}': {ex.Message}",
+          LogLevel.Warn
+        );
+        weather.IsRainyTomorrow = false;
+        return;
+      }
+    }
+
+    weather.IsRainyTomorrow = true;
+    weather.CustomTexture = texture;
+    weather.SpriteLocation = new Rectangle(data.IconSource.X, data.IconSource.Y, 12, 8);
+    weather.HoverText = I18n.CustomWeatherNextDay(weatherName: data.DisplayName);
   }
   #endregion
 }

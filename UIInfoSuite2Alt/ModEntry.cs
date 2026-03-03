@@ -57,6 +57,7 @@ public class ModEntry : Mod
     // get Generic Mod Config Menu's API (if it's installed)
     var configMenu = ApiManager.TryRegisterApi<IGenericModConfigMenuApi>(Helper, ModCompat.Gmcm, "1.6.0");
     ApiManager.TryRegisterApi<ICustomBushApi>(Helper, ModCompat.CustomBush, "1.2.1", true);
+    ApiManager.TryRegisterApi<ICloudySkiesApi>(Helper, ModCompat.CloudySkies);
 
     if (configMenu is null)
     {

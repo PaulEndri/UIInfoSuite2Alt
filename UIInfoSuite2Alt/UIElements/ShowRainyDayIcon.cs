@@ -29,6 +29,7 @@ internal class ShowRainyDayIcon : IDisposable
   private const int WeatherSheetWidth = 15 * 4 + 18 * 3;
   private const int WeatherSheetHeight = 18;
 
+  private bool _requireTv;
   private readonly IModHelper _helper;
   #endregion
 
@@ -43,6 +44,11 @@ internal class ShowRainyDayIcon : IDisposable
   {
     ToggleOption(false);
     _iconSheet.Dispose();
+  }
+
+  public void ToggleRequireTvOption(bool requireTv)
+  {
+    _requireTv = requireTv;
   }
 
   public void ToggleOption(bool showRainyDay)
@@ -63,7 +69,8 @@ internal class ShowRainyDayIcon : IDisposable
   {
     GetWeatherIconSpriteLocation();
 
-    if (!UIElementUtils.IsRenderingNormally())
+    if (!UIElementUtils.IsRenderingNormally()
+        || (_requireTv && !TvChannelWatcher.HasWatchedWeather.Value))
     {
       return;
     }
@@ -77,6 +84,11 @@ internal class ShowRainyDayIcon : IDisposable
 
   private void OnRenderedHud(object? sender, RenderedHudEventArgs e)
   {
+    if (_requireTv && !TvChannelWatcher.HasWatchedWeather.Value)
+    {
+      return;
+    }
+
     // Show text on hover
     RenderWeatherHoverText(_valleyWeather);
     if (HasVisitedIsland())

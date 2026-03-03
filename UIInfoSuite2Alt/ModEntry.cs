@@ -6,6 +6,7 @@ using StardewValley.Menus;
 using UIInfoSuite2Alt.AdditionalFeatures;
 using UIInfoSuite2Alt.Compatibility;
 using UIInfoSuite2Alt.Compatibility.CustomBush;
+using HarmonyLib;
 using UIInfoSuite2Alt.Infrastructure;
 using UIInfoSuite2Alt.Options;
 
@@ -31,6 +32,9 @@ public class ModEntry : Mod
     I18n.Init(helper.Translation);
     Reflection = helper.Reflection;
     MonitorObject = Monitor;
+
+    var harmony = new Harmony(ModManifest.UniqueID);
+    TvChannelWatcher.Initialize(harmony, helper);
 
     _skipIntro = new SkipIntro(helper.Events);
     _modConfig = Helper.ReadConfig<ModConfig>();

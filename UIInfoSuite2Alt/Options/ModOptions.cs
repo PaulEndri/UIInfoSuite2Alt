@@ -32,6 +32,8 @@ internal record ModOptions
   public bool ShowMerchantBundleItemNames { get; set; } = false;
   public bool HideBooksellerWhenVisited { get; set; } = false;
   public bool ShowExactValue { get; set; } = false;
+  public bool RequireTvForLuck { get; set; } = false;
+  public bool RequireTvForWeather { get; set; } = false;
   public bool ShowRobinBuildingStatusIcon { get; set; } = true;
   public bool ShowSeasonalBerry { get; set; } = true;
   public bool ShowSeasonalBerryHazelnut { get; set; } = false;

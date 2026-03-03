@@ -138,6 +138,16 @@ internal class ModOptionsPageHandler : IDisposable
     );
     _optionsElements.Add(
       new ModOptionsCheckbox(
+        _helper.SafeGetString(nameof(options.RequireTvForLuck)),
+        whichOption++,
+        luckOfDay.ToggleRequireTvOption,
+        () => options.RequireTvForLuck,
+        v => options.RequireTvForLuck = v,
+        luckIcon
+      )
+    );
+    _optionsElements.Add(
+      new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(options.ShowLevelUpAnimation)),
         whichOption++,
         experienceBar.ToggleLevelUpAnimation,
@@ -340,13 +350,22 @@ internal class ModOptionsPageHandler : IDisposable
         booksellerIcon
       )
     );
+    var rainyDayIcon = new ModOptionsCheckbox(
+      _helper.SafeGetString(nameof(options.ShowRainyDay)),
+      whichOption++,
+      showRainyDayIcon.ToggleOption,
+      () => options.ShowRainyDay,
+      v => options.ShowRainyDay = v
+    );
+    _optionsElements.Add(rainyDayIcon);
     _optionsElements.Add(
       new ModOptionsCheckbox(
-        _helper.SafeGetString(nameof(options.ShowRainyDay)),
+        _helper.SafeGetString(nameof(options.RequireTvForWeather)),
         whichOption++,
-        showRainyDayIcon.ToggleOption,
-        () => options.ShowRainyDay,
-        v => options.ShowRainyDay = v
+        showRainyDayIcon.ToggleRequireTvOption,
+        () => options.RequireTvForWeather,
+        v => options.RequireTvForWeather = v,
+        rainyDayIcon
       )
     );
     _optionsElements.Add(
@@ -867,9 +886,16 @@ internal class ModOptionsPageHandler : IDisposable
 
   private void DrawButton(GameMenu gameMenu)
   {
-    ModOptionsPageButton button = _modOptionsPageButton.Value!;
+    ModOptionsPageButton? button = _modOptionsPageButton.Value;
+
+    if (button == null || _modOptionsTabPageNumber.Value == null)
+    {
+      return;
+    }
+
     button.yPositionOnScreen = gameMenu.yPositionOnScreen +
                                (gameMenu.currentTab == _modOptionsTabPageNumber.Value ? 24 : 16);
+
     button.draw(Game1.spriteBatch);
   }
 

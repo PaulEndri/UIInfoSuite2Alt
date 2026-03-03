@@ -31,6 +31,7 @@ internal class LuckOfDay : IDisposable
 
   private bool Enabled { get; set; }
   private bool ShowExactValue { get; set; }
+  private bool RequireTv { get; set; }
 
   private static readonly Color Luck1Color = new(87, 255, 106, 255);
   private static readonly Color Luck2Color = new(148, 255, 210, 255);
@@ -75,6 +76,12 @@ internal class LuckOfDay : IDisposable
     ShowExactValue = showExactValue;
     ToggleOption(Enabled);
   }
+
+  public void ToggleRequireTvOption(bool requireTv)
+  {
+    RequireTv = requireTv;
+    ToggleOption(Enabled);
+  }
   #endregion
 
   #region Event subscriptions
@@ -86,7 +93,8 @@ internal class LuckOfDay : IDisposable
   private void OnRenderedHud(object? sender, RenderedHudEventArgs e)
   {
     // draw hover text
-    if (_icon.Value.containsPoint(Game1.getMouseX(), Game1.getMouseY()))
+    if ((!RequireTv || TvChannelWatcher.HasWatchedFortune.Value)
+        && _icon.Value.containsPoint(Game1.getMouseX(), Game1.getMouseY()))
     {
       IClickableMenu.drawHoverText(Game1.spriteBatch, _hoverText.Value, Game1.dialogueFont);
     }
@@ -95,7 +103,7 @@ internal class LuckOfDay : IDisposable
   private void OnRenderingHud(object? sender, RenderingHudEventArgs e)
   {
     // draw dice icon
-    if (UIElementUtils.IsRenderingNormally())
+    if (UIElementUtils.IsRenderingNormally() && (!RequireTv || TvChannelWatcher.HasWatchedFortune.Value))
     {
       Point iconPosition = IconHandler.Handler.GetNewIconPosition();
       ClickableTextureComponent icon = _icon.Value;

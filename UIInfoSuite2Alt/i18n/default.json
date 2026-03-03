@@ -10,6 +10,8 @@
   "Keybinds.OpenCalendarKeybind.Tooltip": "Opens the calendar tab.",
   "Keybinds.OpenQuestBoardKeybind.DisplayedName": "Open quest board keybind",
   "Keybinds.OpenQuestBoardKeybind.Tooltip": "Opens the quest board.",
+  "Keybinds.OpenModOptionsKeybind.DisplayedName": "Open mod options keybind",
+  "Keybinds.OpenModOptionsKeybind.Tooltip": "Opens the UI Info Suite options page directly.",
   "Keybinds.Subtitle.ShowRange.displayedName": "Show item effect ranges",
   "Keybinds.Subtitle.ShowRange.Tooltip": "Such: scarecrow, sprinkler, Junimo Hut, bee house, mushroom log and mossy seed.",
   "Keybinds.ShowOneRange.DisplayedName": "Show current item range",

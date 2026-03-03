@@ -16,7 +16,7 @@
 </h2>
 
 ![New features](.github/assets/new-features.png)
-- **2.3.8**
+- **2.3.8+**
   - Show bookseller icon when he is visiting town
   - Show mastery experience bar and XP gains when all skills are at level 10
   - Show bundle items indicator on Traveling Merchant icon when the merchant has items needed for bundles
@@ -26,13 +26,13 @@
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
 ![Issues resolved from upstream](.github/assets/issues-resolved-from-upstream.png)
-- **2.3.8**
+- **2.3.8+**
   - Fix fruit tree drop parsing for DAY_OF_WEEK and non-day conditions (e.g. LOCATION_IS_OUTDOORS)
   - Fix CC bundle tooltips showing after Joja route or CC completion ([Annosz/UIInfoSuite2#572](https://github.com/Annosz/UIInfoSuite2/issues/572)) [@littlerat07](https://github.com/littlerat07)
   - Fix Ginger and Spring Onion displaying as "Unknown crop" ([Annosz/UIInfoSuite2#660](https://github.com/Annosz/UIInfoSuite2/issues/660)) [@FiveMountain](https://github.com/FiveMountain)
 
 ![Pull requests from upstream](.github/assets/pull-requests-from-upstream.png)
-- **2.3.8**
+- **2.3.8+**
   - Fix mushroom log and mossy seed effect ranges ([Annosz/UIInfoSuite2#641](https://github.com/Annosz/UIInfoSuite2/pull/641)) [@Disassembler0](https://github.com/Disassembler0)
 
 ---

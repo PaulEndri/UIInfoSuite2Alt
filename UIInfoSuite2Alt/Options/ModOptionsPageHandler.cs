@@ -50,26 +50,24 @@ internal class ModOptionsPageHandler : IDisposable
 
   private readonly List<ModOptionsElement> _optionsElements = new();
   private readonly PerScreen<ModOptionsPageState?> _savedPageState = new();
-  private readonly bool _showPersonalConfigButton;
+  private bool ShowPersonalConfigButton => ModEntry._modConfig.ShowOptionsTabInMenu;
 
   private bool _addOurTabBeforeTick;
+  private readonly PerScreen<bool> _switchToOurTabNextTick = new();
   private bool _windowResizing;
 
-  public ModOptionsPageHandler(IModHelper helper, ModOptions options, bool showPersonalConfigButton)
+  public ModOptionsPageHandler(IModHelper helper, ModOptions options)
   {
-    if (showPersonalConfigButton)
-    {
-      helper.Events.Input.ButtonPressed += OnButtonPressed;
-      helper.Events.GameLoop.UpdateTicking += OnUpdateTicking;
-      helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
-      helper.Events.Display.RenderingActiveMenu += OnRenderingMenu;
-      helper.Events.Display.RenderedActiveMenu += OnRenderedMenu;
-      GameRunner.instance.Window.ClientSizeChanged += OnWindowClientSizeChanged;
-      helper.Events.Display.WindowResized += OnWindowResized;
-    }
+    helper.Events.Input.ButtonPressed += OnButtonPressed;
+    helper.Events.Input.ButtonsChanged += OnButtonsChanged;
+    helper.Events.GameLoop.UpdateTicking += OnUpdateTicking;
+    helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
+    helper.Events.Display.RenderingActiveMenu += OnRenderingMenu;
+    helper.Events.Display.RenderedActiveMenu += OnRenderedMenu;
+    GameRunner.instance.Window.ClientSizeChanged += OnWindowClientSizeChanged;
+    helper.Events.Display.WindowResized += OnWindowResized;
 
     _helper = helper;
-    _showPersonalConfigButton = showPersonalConfigButton;
 
     var luckOfDay = new LuckOfDay(helper);
     var showBirthdayIcon = new ShowBirthdayIcon(helper);
@@ -441,6 +439,7 @@ internal class ModOptionsPageHandler : IDisposable
     }
 
     _helper.Events.Input.ButtonPressed -= OnButtonPressed;
+    _helper.Events.Input.ButtonsChanged -= OnButtonsChanged;
     _helper.Events.GameLoop.UpdateTicking -= OnUpdateTicking;
     _helper.Events.GameLoop.UpdateTicked -= OnUpdateTicked;
     _helper.Events.Display.RenderingActiveMenu -= OnRenderingMenu;
@@ -451,6 +450,11 @@ internal class ModOptionsPageHandler : IDisposable
 
   private void OnButtonPressed(object? sender, ButtonPressedEventArgs e)
   {
+    if (!ShowPersonalConfigButton)
+    {
+      return;
+    }
+
     if (Game1.activeClickableMenu is GameMenu gameMenu)
     {
       // Handle right trigger to switch to our mod options page
@@ -488,6 +492,32 @@ internal class ModOptionsPageHandler : IDisposable
           }
         }
       }
+    }
+  }
+
+  private void OnButtonsChanged(object? sender, ButtonsChangedEventArgs e)
+  {
+    KeybindList keybind = ModEntry._modConfig.OpenModOptionsKeybind;
+    if (!keybind.JustPressed())
+    {
+      return;
+    }
+
+    _helper.Input.SuppressActiveKeybinds(keybind);
+
+    if (Game1.activeClickableMenu is GameMenu gameMenu)
+    {
+      // Already in GameMenu — switch to our tab
+      if (_modOptionsTabPageNumber.Value != null && gameMenu.readyToClose())
+      {
+        ChangeToOurTab(gameMenu);
+      }
+    }
+    else if (Context.IsPlayerFree)
+    {
+      // Open GameMenu and defer tab switch to next tick (page not yet added)
+      Game1.activeClickableMenu = new GameMenu();
+      _switchToOurTabNextTick.Value = true;
     }
   }
 
@@ -533,6 +563,17 @@ internal class ModOptionsPageHandler : IDisposable
     {
       EarlyOnMenuChanged(_lastMenu.Value, Game1.activeClickableMenu);
       _lastMenu.Value = Game1.activeClickableMenu;
+      gameMenu = Game1.activeClickableMenu as GameMenu;
+    }
+
+    // Deferred tab switch after opening GameMenu via keybind
+    if (_switchToOurTabNextTick.Value)
+    {
+      _switchToOurTabNextTick.Value = false;
+      if (gameMenu != null && _modOptionsTabPageNumber.Value != null)
+      {
+        ChangeToOurTab(gameMenu);
+      }
     }
 
     if (_lastMenuTab.Value != gameMenu?.currentTab)
@@ -572,7 +613,7 @@ internal class ModOptionsPageHandler : IDisposable
         _modOptionsPage.Value = new ModOptionsPage(_optionsElements, _helper.Events);
       }
 
-      if (_modOptionsPageButton.Value == null)
+      if (ShowPersonalConfigButton && _modOptionsPageButton.Value == null)
       {
         _modOptionsPageButton.Value = new ModOptionsPageButton();
         _modOptionsPageButton.Value.xPositionOnScreen = GetButtonXPosition(newGameMenu);
@@ -631,7 +672,7 @@ internal class ModOptionsPageHandler : IDisposable
   {
     if (gameMenu != null)
     {
-      if (_modOptionsTab.Value != null)
+      if (ShowPersonalConfigButton && _modOptionsTab.Value != null)
       {
         // Update the downNeighborID for our tab
         // Based on GameMenu.setTabNeighborsForCurrentPage
@@ -655,6 +696,11 @@ internal class ModOptionsPageHandler : IDisposable
 
   private void OnRenderingMenu(object? sender, RenderingActiveMenuEventArgs e)
   {
+    if (!ShowPersonalConfigButton)
+    {
+      return;
+    }
+
     if (Game1.activeClickableMenu is GameMenu gameMenu && gameMenu.GetChildMenu() == null)
     {
       // Draw our tab icon behind the menu even if it is dimmed by the menu's transparent background,
@@ -665,6 +711,11 @@ internal class ModOptionsPageHandler : IDisposable
 
   private void OnRenderedMenu(object? sender, RenderedActiveMenuEventArgs e)
   {
+    if (!ShowPersonalConfigButton)
+    {
+      return;
+    }
+
     if (Game1.activeClickableMenu is not GameMenu gameMenu ||
         gameMenu.currentTab == GameMenu.mapTab ||
         gameMenu.GetChildMenu() != null ||

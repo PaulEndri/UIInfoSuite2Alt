@@ -91,6 +91,13 @@ public class ModEntry : Mod
       getValue: () => _modConfig.OpenQuestBoardKeybind,
       setValue: value => _modConfig.OpenQuestBoardKeybind = value
     );
+    configMenu.AddKeybindList(
+      ModManifest,
+      name: () => I18n.Keybinds_OpenModOptionsKeybind_DisplayedName(),
+      tooltip: () => I18n.Keybinds_OpenModOptionsKeybind_Tooltip(),
+      getValue: () => _modConfig.OpenModOptionsKeybind,
+      setValue: value => _modConfig.OpenModOptionsKeybind = value
+    );
     // Show item effect ranges
     configMenu.AddSectionTitle(
       ModManifest,
@@ -139,7 +146,7 @@ public class ModEntry : Mod
                   new ModOptions();
 
     _modOptionsPageHandler?.Dispose();
-    _modOptionsPageHandler = new ModOptionsPageHandler(Helper, _modOptions, _modConfig.ShowOptionsTabInMenu);
+    _modOptionsPageHandler = new ModOptionsPageHandler(Helper, _modOptions);
   }
 
   private void OnSaved(object? sender, EventArgs e)

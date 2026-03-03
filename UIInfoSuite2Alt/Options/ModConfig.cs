@@ -11,4 +11,5 @@ public class ModConfig
   public KeybindList OpenQuestBoardKeybind { get; set; } = KeybindList.ForSingle(SButton.H);
   public KeybindList ShowOneRange { get; set; } = KeybindList.ForSingle(SButton.LeftControl);
   public KeybindList ShowAllRange { get; set; } = KeybindList.Parse("LeftControl + LeftAlt");
+  public KeybindList OpenModOptionsKeybind { get; set; } = KeybindList.ForSingle(SButton.F8);
 }

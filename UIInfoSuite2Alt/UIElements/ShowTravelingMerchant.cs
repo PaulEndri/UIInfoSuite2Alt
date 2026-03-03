@@ -23,6 +23,8 @@ public class ShowTravelingMerchant : IDisposable
   private bool _merchantHasBundleItems;
   private readonly List<string> _bundleItemNames = new();
   private ClickableTextureComponent _travelingMerchantIcon = null!;
+  private int _bundlePulseTimer;
+  private int _bundlePulseDelay;
 
   private bool Enabled { get; set; }
   private bool HideWhenVisited { get; set; }
@@ -51,6 +53,7 @@ public class ShowTravelingMerchant : IDisposable
     _helper.Events.Display.RenderingHud -= OnRenderingHud;
     _helper.Events.Display.RenderedHud -= OnRenderedHud;
     _helper.Events.GameLoop.DayStarted -= OnDayStarted;
+    _helper.Events.GameLoop.UpdateTicked -= OnUpdateTicked;
     _helper.Events.Display.MenuChanged -= OnMenuChanged;
 
     if (showTravelingMerchant)
@@ -59,6 +62,7 @@ public class ShowTravelingMerchant : IDisposable
       _helper.Events.Display.RenderingHud += OnRenderingHud;
       _helper.Events.Display.RenderedHud += OnRenderedHud;
       _helper.Events.GameLoop.DayStarted += OnDayStarted;
+      _helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
       _helper.Events.Display.MenuChanged += OnMenuChanged;
     }
   }
@@ -99,6 +103,30 @@ public class ShowTravelingMerchant : IDisposable
     }
   }
 
+  private void OnUpdateTicked(object? sender, UpdateTickedEventArgs e)
+  {
+    if (!_merchantHasBundleItems || !ShowBundleIcon)
+    {
+      return;
+    }
+
+    int elapsed = (int)Game1.currentGameTime.ElapsedGameTime.TotalMilliseconds;
+
+    if (_bundlePulseTimer > 0)
+    {
+      _bundlePulseTimer -= elapsed;
+    }
+    else if (_bundlePulseDelay > 0)
+    {
+      _bundlePulseDelay -= elapsed;
+    }
+    else
+    {
+      _bundlePulseTimer = 1000;
+      _bundlePulseDelay = 3000;
+    }
+  }
+
   private void OnRenderingHud(object? sender, RenderingHudEventArgs e)
   {
     // Draw icon
@@ -113,17 +141,31 @@ public class ShowTravelingMerchant : IDisposable
       );
       _travelingMerchantIcon.draw(Game1.spriteBatch);
 
-      // Draw bundle overlay icon at bottom-right corner
+      // Draw bundle overlay icon with pulse animation
       if (_merchantHasBundleItems && ShowBundleIcon)
       {
+        float baseScale = 1.6f;
+        float scale = baseScale;
+        Vector2 shake = Vector2.Zero;
+
+        if (_bundlePulseTimer > 0)
+        {
+          float pulseScale = 1f / (Math.Max(300f, Math.Abs(_bundlePulseTimer % 1000 - 500)) / 500f);
+          scale = baseScale * pulseScale;
+          if (pulseScale > 1f)
+          {
+            shake = new Vector2(Game1.random.Next(-1, 2), Game1.random.Next(-1, 2));
+          }
+        }
+
         Game1.spriteBatch.Draw(
           Game1.mouseCursors,
-          new Vector2(iconPosition.X + 18, iconPosition.Y + 18),
-          new Rectangle(331, 374, 15, 14),
+          new Vector2(iconPosition.X + 27 + 2.5f * baseScale, iconPosition.Y + 11 + 7f * baseScale) + shake,
+          new Rectangle(403, 496, 5, 14),
           Color.White,
           0f,
-          Vector2.Zero,
-          1.6f,
+          new Vector2(2.5f, 7f),
+          scale,
           SpriteEffects.None,
           1f
         );

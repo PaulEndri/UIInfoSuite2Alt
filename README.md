@@ -20,6 +20,8 @@
 </h2>
 
 ![New features](.github/assets/new-features.png)
+- **2.3.9+**
+  - Add hotkey to open mod options menu directly (Default: F8)
 - **2.3.8+**
   - Show bookseller icon when he is visiting town
   - Show mastery experience bar and XP gains when all skills are at level 10

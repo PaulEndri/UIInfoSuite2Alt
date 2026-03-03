@@ -125,6 +125,9 @@
   "ShowSeasonalBerry": "Show seasonal forageables",
   "ShowSeasonalBerryHazelnut": "Show hazelnuts on trees",
   "ShowQuestCount": "Show quest count under journal icon",
+  "ShowFestivalIcon": "Show festival reminder",
+  "FestivalToday": "Today: {0}",
+  "FestivalTomorrow": "Tomorrow: {0}",
   //Others
   "LevelUp": "Level Up",
   "TrackOnMap": "Track on map"

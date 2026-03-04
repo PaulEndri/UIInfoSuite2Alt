@@ -10,6 +10,7 @@ using StardewValley;
 using StardewValley.Menus;
 using StardewValley.Quests;
 using StardewValley.WorldMaps;
+using UIInfoSuite2Alt.Compatibility;
 using UIInfoSuite2Alt.Infrastructure;
 using UIInfoSuite2Alt.Infrastructure.Extensions;
 using UIInfoSuite2Alt.Options;
@@ -80,7 +81,7 @@ internal class LocationOfTownsfolk : IDisposable
 
   private void OnRenderedActiveMenu_DrawSocialPageOptions(object? sender, RenderedActiveMenuEventArgs e)
   {
-    if (Game1.activeClickableMenu is GameMenu gameMenu && gameMenu.currentTab == GameMenu.socialTab)
+    if (GameMenuHelper.IsTab(Game1.activeClickableMenu, GameMenu.socialTab))
     {
       DrawSocialPageOptions();
     }
@@ -88,9 +89,9 @@ internal class LocationOfTownsfolk : IDisposable
 
   private void OnRenderedActiveMenu_DrawNPCLocationsOnMap(object? sender, RenderedActiveMenuEventArgs e)
   {
-    if (Game1.activeClickableMenu is GameMenu gameMenu && gameMenu.currentTab == GameMenu.mapTab)
+    if (GameMenuHelper.IsTab(Game1.activeClickableMenu, GameMenu.mapTab))
     {
-      DrawNPCLocationsOnMap(gameMenu);
+      DrawNPCLocationsOnMap();
     }
   }
 
@@ -129,20 +130,17 @@ internal class LocationOfTownsfolk : IDisposable
   #region Logic
   private void InitializeProperties()
   {
-    if (Game1.activeClickableMenu is GameMenu gameMenu)
+    IClickableMenu? menu = Game1.activeClickableMenu;
+    if (GameMenuHelper.IsGameMenu(menu))
     {
       _friendNames.Clear();
-      foreach (IClickableMenu? menu in gameMenu.pages)
+      SocialPage? socialPage = GameMenuHelper.FindPage<SocialPage>(menu);
+      if (socialPage != null)
       {
-        if (menu is SocialPage socialPage)
+        _socialPage = socialPage;
+        foreach (SocialPage.SocialEntry? SocialEntries in socialPage.SocialEntries)
         {
-          _socialPage = socialPage;
-          foreach (SocialPage.SocialEntry? SocialEntries in socialPage.SocialEntries)
-          {
-            _friendNames.Add(SocialEntries.InternalName);
-          }
-
-          break;
+          _friendNames.Add(SocialEntries.InternalName);
         }
       }
 
@@ -266,7 +264,7 @@ internal class LocationOfTownsfolk : IDisposable
     }
   }
 
-  private void DrawNPCLocationsOnMap(GameMenu gameMenu)
+  private void DrawNPCLocationsOnMap()
   {
     var namesToShow = new List<string>();
     foreach (NPC character in _townsfolk)
@@ -293,8 +291,10 @@ internal class LocationOfTownsfolk : IDisposable
     //The cursor needs to show up in front of the character faces
     Tools.DrawMouseCursor();
 
-    string? hoverText = ((MapPage)gameMenu.pages[gameMenu.currentTab]).hoverText;
-    IClickableMenu.drawHoverText(Game1.spriteBatch, hoverText, Game1.smallFont);
+    if (GameMenuHelper.GetCurrentPage(Game1.activeClickableMenu) is MapPage mapPage)
+    {
+      IClickableMenu.drawHoverText(Game1.spriteBatch, mapPage.hoverText, Game1.smallFont);
+    }
   }
 
   private static void DrawNPC(NPC character, List<string> namesToShow)

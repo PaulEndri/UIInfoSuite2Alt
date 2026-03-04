@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Menus;
+using UIInfoSuite2Alt.Compatibility;
 
 namespace UIInfoSuite2Alt.UIElements;
 
@@ -56,12 +57,16 @@ internal class ShowAccurateHearts : IDisposable
       return;
     }
 
-    if (Game1.activeClickableMenu is GameMenu gameMenu && gameMenu.currentTab == 2)
+    IClickableMenu? menu = Game1.activeClickableMenu;
+    if (GameMenuHelper.IsTab(menu, GameMenu.socialTab))
     {
       DrawHeartFills();
 
-      string hoverText = gameMenu.hoverText;
-      IClickableMenu.drawHoverText(Game1.spriteBatch, hoverText, Game1.smallFont);
+      string hoverText = GameMenuHelper.GetHoverText(menu);
+      if (!string.IsNullOrEmpty(hoverText))
+      {
+        IClickableMenu.drawHoverText(Game1.spriteBatch, hoverText, Game1.smallFont);
+      }
     }
   }
 
@@ -74,15 +79,13 @@ internal class ShowAccurateHearts : IDisposable
   #region Logic
   private void GetSocialPage()
   {
-    if (Game1.activeClickableMenu is GameMenu gameMenu)
+    IClickableMenu? menu = Game1.activeClickableMenu;
+    if (GameMenuHelper.IsGameMenu(menu))
     {
-      foreach (IClickableMenu? menu in gameMenu.pages)
+      SocialPage? page = GameMenuHelper.FindPage<SocialPage>(menu);
+      if (page != null)
       {
-        if (menu is SocialPage page)
-        {
-          _socialPage = page;
-          break;
-        }
+        _socialPage = page;
       }
     }
   }

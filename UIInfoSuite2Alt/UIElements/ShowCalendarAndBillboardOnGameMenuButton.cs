@@ -8,6 +8,7 @@ using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Menus;
+using UIInfoSuite2Alt.Compatibility;
 using UIInfoSuite2Alt.Infrastructure;
 
 namespace UIInfoSuite2Alt.UIElements;
@@ -64,14 +65,14 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
   {
     // Get hovered and hold item
     _hoverItem.Value = Tools.GetHoveredItem();
-    if (Game1.activeClickableMenu is not GameMenu gameMenu)
+    IClickableMenu? menu = Game1.activeClickableMenu;
+    if (!GameMenuHelper.IsGameMenu(menu))
     {
       return;
     }
 
-    List<IClickableMenu> menuList = gameMenu.pages;
-
-    if (menuList[0] is InventoryPage)
+    if (GameMenuHelper.IsTab(menu, GameMenu.inventoryTab) &&
+        GameMenuHelper.GetCurrentPage(menu) is InventoryPage)
     {
       _heldItem.Value = Game1.player.CursorSlotItem;
     }
@@ -91,11 +92,11 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
 
   private void OnRenderedActiveMenu(object? sender, EventArgs e)
   {
+    IClickableMenu? activeMenu = Game1.activeClickableMenu;
     if (_hoverItem.Value == null &&
-        Game1.activeClickableMenu is GameMenu gameMenu &&
-        gameMenu.currentTab == 0 &&
+        GameMenuHelper.IsTab(activeMenu, GameMenu.inventoryTab) &&
         _heldItem.Value == null &&
-        gameMenu.GetChildMenu() == null)
+        GameMenuHelper.GetChildMenu(activeMenu) == null)
     {
       DrawBillboard();
     }
@@ -131,8 +132,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
 
   private void ActivateBillboard()
   {
-    if (Game1.activeClickableMenu is GameMenu gameMenu &&
-        gameMenu.currentTab == 0 &&
+    if (GameMenuHelper.IsTab(Game1.activeClickableMenu, GameMenu.inventoryTab) &&
         _heldItem.Value == null &&
         _showBillboardButton.Value.containsPoint(
           (int)Utility.ModifyCoordinateForUIScale(Game1.getMouseX()),

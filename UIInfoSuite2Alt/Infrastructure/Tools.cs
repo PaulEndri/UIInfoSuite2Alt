@@ -9,6 +9,7 @@ using StardewValley.GameData.Crops;
 using StardewValley.GameData.FruitTrees;
 using StardewValley.Menus;
 using StardewValley.TerrainFeatures;
+using UIInfoSuite2Alt.Compatibility;
 using StardewValley.WorldMaps;
 using SObject = StardewValley.Object;
 
@@ -96,7 +97,7 @@ public static class Tools
       hoverItem = Game1.onScreenMenus.OfType<Toolbar>().Select(tb => tb.hoverItem).FirstOrDefault(hi => hi is not null);
     }
 
-    if (Game1.activeClickableMenu is GameMenu gameMenu && gameMenu.GetCurrentPage() is InventoryPage inventory)
+    if (GameMenuHelper.GetCurrentPage(Game1.activeClickableMenu) is InventoryPage inventory)
     {
       hoverItem = inventory.hoveredItem;
     }

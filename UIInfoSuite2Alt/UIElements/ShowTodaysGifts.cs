@@ -5,6 +5,7 @@ using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Menus;
+using UIInfoSuite2Alt.Compatibility;
 
 namespace UIInfoSuite2Alt.UIElements;
 
@@ -48,12 +49,16 @@ internal class ShowTodaysGifts : IDisposable
       return;
     }
 
-    if (Game1.activeClickableMenu is GameMenu gameMenu && gameMenu.currentTab == GameMenu.socialTab)
+    IClickableMenu? menu = Game1.activeClickableMenu;
+    if (GameMenuHelper.IsTab(menu, GameMenu.socialTab))
     {
       DrawTodaysGifts();
 
-      string hoverText = gameMenu.hoverText;
-      IClickableMenu.drawHoverText(Game1.spriteBatch, hoverText, Game1.smallFont);
+      string hoverText = GameMenuHelper.GetHoverText(menu);
+      if (!string.IsNullOrEmpty(hoverText))
+      {
+        IClickableMenu.drawHoverText(Game1.spriteBatch, hoverText, Game1.smallFont);
+      }
     }
   }
 
@@ -66,20 +71,16 @@ internal class ShowTodaysGifts : IDisposable
   #region Logic
   private void GetSocialPage()
   {
-    if (Game1.activeClickableMenu is not GameMenu gameMenu)
+    IClickableMenu? menu = Game1.activeClickableMenu;
+    if (!GameMenuHelper.IsGameMenu(menu))
     {
       return;
     }
 
-    foreach (IClickableMenu? menu in gameMenu.pages)
+    SocialPage? page = GameMenuHelper.FindPage<SocialPage>(menu);
+    if (page != null)
     {
-      if (menu is not SocialPage page)
-      {
-        continue;
-      }
-
       _socialPage = page;
-      break;
     }
   }
 

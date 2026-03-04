@@ -320,7 +320,7 @@ internal class ShowRainyDayIcon : IDisposable
         break;
 
       default:
-        TrySetCustomWeather(_islandWeather, weatherId);
+        _islandWeather.IsRainyTomorrow = false;
         break;
     }
   }

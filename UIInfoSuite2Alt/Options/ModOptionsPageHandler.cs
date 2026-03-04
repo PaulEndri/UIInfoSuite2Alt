@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.Xna.Framework;
@@ -7,6 +7,7 @@ using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Menus;
+using UIInfoSuite2Alt.Compatibility;
 using UIInfoSuite2Alt.Infrastructure;
 using UIInfoSuite2Alt.Infrastructure.Extensions;
 using UIInfoSuite2Alt.UIElements;
@@ -16,6 +17,7 @@ namespace UIInfoSuite2Alt.Options;
 /// <summary>
 ///   A mix between working around <see cref="GameMenu" /> to add our mod options page,
 ///   and loading the UI elements with their logic.
+///   Supports both vanilla GameMenu and Better Game Menu.
 /// </summary>
 internal class ModOptionsPageHandler : IDisposable
 {
@@ -23,19 +25,23 @@ internal class ModOptionsPageHandler : IDisposable
   private const int downNeighborInInventory = 10;
   private const string optionsTabName = "uiinfosuite2";
 
-  // For the map page workaround
+  // BGM tab order: after Options (160), before Exit (200)
+  private const int bgmTabOrder = 170;
+
+  // For the map page workaround (vanilla only)
   private readonly PerScreen<bool> _changeToOurTabAfterTick = new();
   private readonly List<IDisposable> _elementsToDispose;
 
   private readonly IModHelper _helper;
+  private readonly bool _hasBgm;
 
-  // For the window resize workaround
+  // For the window resize workaround (vanilla only)
   private readonly List<int> _instancesWithOptionsPageOpen = new();
   private readonly PerScreen<IClickableMenu?> _lastMenu = new();
 
   private readonly PerScreen<int?> _lastMenuTab = new();
 
-  /// <summary>The mod options page added to <see cref="GameMenu.pages" />.</summary>
+  /// <summary>The mod options page added to <see cref="GameMenu.pages" /> (vanilla only).</summary>
   private readonly PerScreen<ModOptionsPage?> _modOptionsPage = new();
 
   private readonly PerScreen<ModOptionsPageButton?> _modOptionsPageButton = new();
@@ -43,6 +49,7 @@ internal class ModOptionsPageHandler : IDisposable
   /// <summary>
   ///   The clickable component for the mod options tab used by gamepad navigation.
   ///   <para>We don't add it to <see cref="GameMenu.tabs" /> because it messes up the game's logic.</para>
+  ///   <para>Vanilla only — BGM manages its own tab UI.</para>
   /// </summary>
   private readonly PerScreen<ClickableComponent?> _modOptionsTab = new();
 
@@ -58,16 +65,25 @@ internal class ModOptionsPageHandler : IDisposable
 
   public ModOptionsPageHandler(IModHelper helper, ModOptions options)
   {
-    helper.Events.Input.ButtonPressed += OnButtonPressed;
-    helper.Events.Input.ButtonsChanged += OnButtonsChanged;
-    helper.Events.GameLoop.UpdateTicking += OnUpdateTicking;
-    helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
-    helper.Events.Display.RenderingActiveMenu += OnRenderingMenu;
-    helper.Events.Display.RenderedActiveMenu += OnRenderedMenu;
-    GameRunner.instance.Window.ClientSizeChanged += OnWindowClientSizeChanged;
-    helper.Events.Display.WindowResized += OnWindowResized;
-
     _helper = helper;
+    _hasBgm = GameMenuHelper.HasBetterGameMenu;
+
+    helper.Events.Input.ButtonsChanged += OnButtonsChanged;
+
+    if (_hasBgm)
+    {
+      // BGM handles tab UI, rendering, resize, etc. natively — minimal event wiring needed
+    }
+    else
+    {
+      helper.Events.Input.ButtonPressed += OnButtonPressed;
+      helper.Events.GameLoop.UpdateTicking += OnUpdateTicking;
+      helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
+      helper.Events.Display.RenderingActiveMenu += OnRenderingMenu;
+      helper.Events.Display.RenderedActiveMenu += OnRenderedMenu;
+      GameRunner.instance.Window.ClientSizeChanged += OnWindowClientSizeChanged;
+      helper.Events.Display.WindowResized += OnWindowResized;
+    }
 
     var luckOfDay = new LuckOfDay(helper);
     var showBirthdayIcon = new ShowBirthdayIcon(helper);
@@ -458,6 +474,11 @@ internal class ModOptionsPageHandler : IDisposable
         v => options.ShowFestivalIcon = v
       )
     );
+
+    if (_hasBgm)
+    {
+      RegisterBgmTab();
+    }
   }
 
 
@@ -468,15 +489,86 @@ internal class ModOptionsPageHandler : IDisposable
       item.Dispose();
     }
 
-    _helper.Events.Input.ButtonPressed -= OnButtonPressed;
     _helper.Events.Input.ButtonsChanged -= OnButtonsChanged;
-    _helper.Events.GameLoop.UpdateTicking -= OnUpdateTicking;
-    _helper.Events.GameLoop.UpdateTicked -= OnUpdateTicked;
-    _helper.Events.Display.RenderingActiveMenu -= OnRenderingMenu;
-    _helper.Events.Display.RenderedActiveMenu -= OnRenderedMenu;
-    GameRunner.instance.Window.ClientSizeChanged -= OnWindowClientSizeChanged;
-    _helper.Events.Display.WindowResized -= OnWindowResized;
+
+    if (_hasBgm)
+    {
+      DisposeBgm();
+    }
+    else
+    {
+      _helper.Events.Input.ButtonPressed -= OnButtonPressed;
+      _helper.Events.GameLoop.UpdateTicking -= OnUpdateTicking;
+      _helper.Events.GameLoop.UpdateTicked -= OnUpdateTicked;
+      _helper.Events.Display.RenderingActiveMenu -= OnRenderingMenu;
+      _helper.Events.Display.RenderedActiveMenu -= OnRenderedMenu;
+      GameRunner.instance.Window.ClientSizeChanged -= OnWindowClientSizeChanged;
+      _helper.Events.Display.WindowResized -= OnWindowResized;
+    }
   }
+
+  #region Better Game Menu integration
+
+  private void RegisterBgmTab()
+  {
+    if (!ApiManager.GetApi<IBetterGameMenuApi>(ModCompat.BetterGameMenu, out IBetterGameMenuApi? bgmApi))
+    {
+      return;
+    }
+
+    // Register our tab with BGM — icon uses the same sprites as ModOptionsPageButton
+    IBetterGameMenuApi.DrawDelegate iconDraw = bgmApi.CreateDraw(
+      Game1.mouseCursors,
+      new Rectangle(32, 672, 16, 16),
+      scale: 2f
+    );
+
+    bgmApi.RegisterTab(
+      id: optionsTabName,
+      order: bgmTabOrder,
+      getDisplayName: () => I18n.OptionsTabTooltip(),
+      getIcon: () => (iconDraw, true),
+      priority: 0,
+      getPageInstance: menu => new ModOptionsPage(_optionsElements, _helper.Events, menu),
+      getTabVisible: () => ShowPersonalConfigButton
+    );
+
+    // Right-click context menu: open GMCM settings if available
+    bgmApi.OnTabContextMenu(OnBgmTabContextMenu);
+  }
+
+  private void OnBgmTabContextMenu(ITabContextMenuEvent evt)
+  {
+    if (evt.Tab != optionsTabName)
+    {
+      return;
+    }
+
+    if (ApiManager.GetApi<IGenericModConfigMenuApi>(ModCompat.Gmcm, out IGenericModConfigMenuApi? gmcm))
+    {
+      IModInfo? modInfo = _helper.ModRegistry.Get(_helper.ModRegistry.ModID);
+      if (modInfo != null)
+      {
+        evt.Entries.Add(evt.CreateEntry(
+          I18n.OpenSettings(),
+          () => gmcm.OpenModMenu(modInfo.Manifest)
+        ));
+      }
+    }
+  }
+
+  private void DisposeBgm()
+  {
+    if (ApiManager.GetApi<IBetterGameMenuApi>(ModCompat.BetterGameMenu, out IBetterGameMenuApi? bgmApi))
+    {
+      bgmApi.UnregisterImplementation(optionsTabName);
+      bgmApi.OffTabContextMenu(OnBgmTabContextMenu);
+    }
+  }
+
+  #endregion
+
+  #region Vanilla GameMenu support
 
   private void OnButtonPressed(object? sender, ButtonPressedEventArgs e)
   {
@@ -525,6 +617,8 @@ internal class ModOptionsPageHandler : IDisposable
     }
   }
 
+  #endregion
+
   private void OnButtonsChanged(object? sender, ButtonsChangedEventArgs e)
   {
     KeybindList keybind = ModEntry._modConfig.OpenModOptionsKeybind;
@@ -535,6 +629,40 @@ internal class ModOptionsPageHandler : IDisposable
 
     _helper.Input.SuppressActiveKeybinds(keybind);
 
+    if (_hasBgm)
+    {
+      OnButtonsChanged_Bgm();
+    }
+    else
+    {
+      OnButtonsChanged_Vanilla();
+    }
+  }
+
+  private void OnButtonsChanged_Bgm()
+  {
+    if (!ApiManager.GetApi<IBetterGameMenuApi>(ModCompat.BetterGameMenu, out IBetterGameMenuApi? bgmApi))
+    {
+      return;
+    }
+
+    IClickableMenu? menu = Game1.activeClickableMenu;
+    IBetterGameMenu? bgmMenu = menu != null ? bgmApi.AsMenu(menu) : null;
+
+    if (bgmMenu != null)
+    {
+      // Already in BGM — switch to our tab
+      bgmMenu.TryChangeTab(optionsTabName);
+    }
+    else if (Context.IsPlayerFree)
+    {
+      // Open BGM to our tab
+      Game1.activeClickableMenu = bgmApi.CreateMenu(optionsTabName);
+    }
+  }
+
+  private void OnButtonsChanged_Vanilla()
+  {
     if (Game1.activeClickableMenu is GameMenu gameMenu)
     {
       // Already in GameMenu — switch to our tab
@@ -550,6 +678,8 @@ internal class ModOptionsPageHandler : IDisposable
       _switchToOurTabNextTick.Value = true;
     }
   }
+
+  #region Vanilla-only event handlers
 
   private void OnUpdateTicking(object? sender, EventArgs e)
   {
@@ -898,6 +1028,8 @@ internal class ModOptionsPageHandler : IDisposable
 
     button.draw(Game1.spriteBatch);
   }
+
+  #endregion
 
   /// <summary>
   ///   Tries hard to return a version string for the mod like "v2.2.9"

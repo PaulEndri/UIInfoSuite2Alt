@@ -10,6 +10,7 @@ public static class ModCompat
   public const string Gmcm = "spacechase0.GenericModConfigMenu";
   public const string CloudySkies = "leclair.cloudyskies";
   public const string DeluxeJournal = "MolsonCAD.DeluxeJournal";
+  public const string BetterGameMenu = "leclair.bettergamemenu";
 }
 
 public static class ApiManager

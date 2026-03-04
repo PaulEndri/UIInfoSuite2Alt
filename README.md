@@ -22,6 +22,8 @@
 </h2>
 
 ![New features](.github/assets/new-features.png)
+- **2.4.2+**
+  - Better Game Menu compatibility ([Annosz/UIInfoSuite2#648](https://github.com/Annosz/UIInfoSuite2/pull/648)) [@KhloeLeclair](https://github.com/KhloeLeclair)
 - **2.4.1+**
   - Cloudy Skies framework compatibility: weather icon now supports custom weather from mods like [Weather Wonders](https://www.nexusmods.com/stardewvalley/mods/23868)
 - **2.4.0+**

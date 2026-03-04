@@ -116,6 +116,7 @@ internal class ShowBirthdayIcon : IDisposable
   private void CheckForBirthday()
   {
     _birthdayNPCs.Value.Clear();
+    _birthdayIcons.Value.Clear();
     foreach (GameLocation? location in Game1.locations)
     {
       foreach (NPC? character in location.characters)

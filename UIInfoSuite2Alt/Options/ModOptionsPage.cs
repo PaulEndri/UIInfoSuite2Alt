@@ -34,11 +34,14 @@ public class ModOptionsPage : IClickableMenu
   private int _optionsSlotHeld = -1;
   private Rectangle _scrollBarRunner;
 
-  public ModOptionsPage(List<ModOptionsElement> options, IModEvents events) : base(
-    Game1.activeClickableMenu.xPositionOnScreen,
-    Game1.activeClickableMenu.yPositionOnScreen + 10,
+  public ModOptionsPage(List<ModOptionsElement> options, IModEvents events)
+    : this(options, events, Game1.activeClickableMenu) { }
+
+  public ModOptionsPage(List<ModOptionsElement> options, IModEvents events, IClickableMenu parentMenu) : base(
+    parentMenu.xPositionOnScreen,
+    parentMenu.yPositionOnScreen + 10,
     Width,
-    Game1.activeClickableMenu.height
+    parentMenu.height
   )
   {
     _options = options;

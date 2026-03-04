@@ -1,6 +1,7 @@
 ﻿{
   // GUI - Game Menu
   "OptionsTabTooltip": "UI Info Suite 2 Options",
+  "OpenSettings": "Open Settings",
   // some config options
   "Bool.ShowOptionsTabInMenu.DisplayedName": "Show options in in-game menu",
   "Bool.ShowOptionsTabInMenu.Tooltip": "Enables an extra tab in the in-game menu where you can configure every options for this mod.",

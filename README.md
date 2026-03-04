@@ -39,6 +39,8 @@
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
 ![Issues resolved from upstream](.github/assets/issues-resolved-from-upstream.png)
+- **2.4.1+**
+  - Add Cloudy Skies API compatibility for custom weather support ([Annosz/UIInfoSuite2#659](https://github.com/Annosz/UIInfoSuite2/issues/659)) [@toffi3](https://github.com/toffi3)
 - **2.3.8+**
   - Fix fruit tree drop parsing for DAY_OF_WEEK and non-day conditions (e.g. LOCATION_IS_OUTDOORS)
   - Fix CC bundle tooltips showing after Joja route or CC completion ([Annosz/UIInfoSuite2#572](https://github.com/Annosz/UIInfoSuite2/issues/572)) [@littlerat07](https://github.com/littlerat07)

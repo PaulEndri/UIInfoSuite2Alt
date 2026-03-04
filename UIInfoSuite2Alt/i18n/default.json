@@ -88,6 +88,12 @@
   "LuckStatus4": "The spirits feel absolutely neutral today",
   "LuckStatus5": "Luck will not be on your side today",
   "LuckStatus6": "Maybe you should stay home today...",
+  //Settings - Section headers
+  "Section.HudIcons": "HUD Icons",
+  "Section.FarmAndField": "Farm & Field",
+  "Section.ExperienceAndSkills": "Experience & Skills",
+  "Section.ItemsAndShopping": "Items & Shopping",
+  "Section.NpcAndSocial": "NPC & Social",
   //Settings - General
   "ShowLevelUpAnimation": "Show level up animation",
   "ShowExperienceBar": "Show experience bar",

@@ -52,6 +52,17 @@
 - **2.3.8+**
   - Fix mushroom log and mossy seed effect ranges ([Annosz/UIInfoSuite2#641](https://github.com/Annosz/UIInfoSuite2/pull/641)) [@Disassembler0](https://github.com/Disassembler0)
 
+![Added Mod Compatibility](.github/assets/added-mod-compatibility.png)
+- [Better Game Menu](https://www.nexusmods.com/stardewvalley/mods/12667) by KhloeLeclair
+- [Cloudy Skies](https://www.nexusmods.com/stardewvalley/mods/23868) by KhloeLeclair
+- [Custom Bush](https://www.nexusmods.com/stardewvalley/mods/20619) by furyx639
+- [Deluxe Journal](https://www.nexusmods.com/stardewvalley/mods/11436) by MolsonCAD
+- [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098) by spacechase0
+- [NPC Map Locations](https://www.nexusmods.com/stardewvalley/mods/239) by Bouhm
+- [Bigger Backpack](https://www.nexusmods.com/stardewvalley/mods/1845) by spacechase0
+- [Level Extender](https://www.nexusmods.com/stardewvalley/mods/1471) by DevinLematty
+- [Better Farm Animal Variety](https://www.nexusmods.com/stardewvalley/mods/3273) by Paritee
+
 ---
 
 > **Note:** All links above are for this fork, except issue/PR references and usernames in the "Issues resolved" and "Pull requests" sections which link to the upstream repo. Everything below is the original README and links from [UIInfoSuite2](https://github.com/Annosz/UIInfoSuite2).

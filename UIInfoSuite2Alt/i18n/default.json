@@ -104,8 +104,8 @@
   "HideAnimalPetOnMaxFriendship": "Hide on max friendship",
   "ShowCropAndBarrelTooltip": "Show crop and barrel times",
   "ShowItemEffectRanges": "Show scarecrow and sprinkler range",
-  "ButtonControlShow": "Press leftctrl to show current item range, while pressing leftalt to show all item range",
-  "ShowBombRange": "Show the bomb destroying Range",
+  "ButtonControlShow": "Hold LCtrl to show current item range\nHold LCtrl+LAlt to show all item range",
+  "ShowBombRange": "Show the bomb destroying range",
   "ShowExtraItemInformation": "Show item hover information",
   "ShowHarvestPricesInShop": "Show shop harvest prices",
   //Settings - Tabs info

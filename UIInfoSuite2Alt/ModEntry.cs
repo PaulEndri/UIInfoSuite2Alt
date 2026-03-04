@@ -9,6 +9,7 @@ using UIInfoSuite2Alt.Compatibility.CustomBush;
 using HarmonyLib;
 using UIInfoSuite2Alt.Infrastructure;
 using UIInfoSuite2Alt.Options;
+using UIInfoSuite2Alt.UIElements;
 
 namespace UIInfoSuite2Alt;
 
@@ -35,6 +36,7 @@ public class ModEntry : Mod
 
     var harmony = new Harmony(ModManifest.UniqueID);
     TvChannelWatcher.Initialize(harmony, helper);
+    ShowFishOnCatch.Initialize(harmony);
 
     _skipIntro = new SkipIntro(helper.Events);
     _modConfig = Helper.ReadConfig<ModConfig>();

@@ -41,5 +41,7 @@ internal record ModOptions
   public bool HideBirthdayIfFullFriendShip { get; set; } = true;
   public bool ShowQuestCount { get; set; } = true;
   public bool ShowFestivalIcon { get; set; } = true;
+  public bool ShowFishOnCatch { get; set; } = false;
+  public bool ShowFishQualityStar { get; set; } = true;
   public Dictionary<string, bool> ShowLocationOfFriends { get; set; } = new();
 }

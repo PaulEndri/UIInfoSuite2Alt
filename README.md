@@ -22,6 +22,9 @@
 </h2>
 
 ![New features](.github/assets/new-features.png)
+- **2.4.3+**
+  - Always show fish identity when reeling in (Sonar Bobber effect without the item)
+  - Optional quality star overlay on the fish icon with real-time perfect catch bonus
 - **2.4.2+**
   - Better Game Menu compatibility ([Annosz/UIInfoSuite2#648](https://github.com/Annosz/UIInfoSuite2/pull/648)) [@KhloeLeclair](https://github.com/KhloeLeclair)
 - **2.4.1+**
@@ -53,15 +56,15 @@
   - Fix mushroom log and mossy seed effect ranges ([Annosz/UIInfoSuite2#641](https://github.com/Annosz/UIInfoSuite2/pull/641)) [@Disassembler0](https://github.com/Disassembler0)
 
 ![Added Mod Compatibility](.github/assets/added-mod-compatibility.png)
-- [Better Game Menu](https://www.nexusmods.com/stardewvalley/mods/12667) by SiTheGreat1
-- [Cloudy Skies](https://www.nexusmods.com/stardewvalley/mods/23868) by Kanadeyoru
-- [Custom Bush](https://www.nexusmods.com/stardewvalley/mods/20619) by LeFauxMatt
-- [Deluxe Journal](https://www.nexusmods.com/stardewvalley/mods/11436) by Molson
-- [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098) by spacechase0
-- [NPC Map Locations](https://www.nexusmods.com/stardewvalley/mods/239) by Bouhm and Pathoschild
-- [Bigger Backpack](https://www.nexusmods.com/stardewvalley/mods/1845) by spacechase0
-- [Level Extender](https://www.nexusmods.com/stardewvalley/mods/1471) by unidarkshin and f1r3w477
-- [Better Farm Animal Variety](https://www.nexusmods.com/stardewvalley/mods/3273) by Paritee
+- [Better Game Menu](https://www.nexusmods.com/stardewvalley/mods/12667)
+- [Cloudy Skies](https://www.nexusmods.com/stardewvalley/mods/23868)
+- [Custom Bush](https://www.nexusmods.com/stardewvalley/mods/20619)
+- [Deluxe Journal](https://www.nexusmods.com/stardewvalley/mods/11436)
+- [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098)
+- [NPC Map Locations](https://www.nexusmods.com/stardewvalley/mods/239)
+- [Bigger Backpack](https://www.nexusmods.com/stardewvalley/mods/1845)
+- [Level Extender](https://www.nexusmods.com/stardewvalley/mods/1471)
+- [Better Farm Animal Variety](https://www.nexusmods.com/stardewvalley/mods/3273)
 
 ---
 

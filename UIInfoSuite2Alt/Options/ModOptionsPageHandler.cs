@@ -106,6 +106,7 @@ internal class ModOptionsPageHandler : IDisposable
     var showTodaysGift = new ShowTodaysGifts(helper);
     var showQuestCount = new ShowQuestCount(helper);
     var showFestivalIcon = new ShowFestivalIcon(helper);
+    var showFishOnCatch = new ShowFishOnCatch();
 
     _elementsToDispose = new List<IDisposable>
     {
@@ -128,7 +129,8 @@ internal class ModOptionsPageHandler : IDisposable
       showSeasonalBerry,
       showTodaysGift,
       showQuestCount,
-      showFestivalIcon
+      showFestivalIcon,
+      showFishOnCatch
     };
 
     var whichOption = 1;
@@ -472,6 +474,24 @@ internal class ModOptionsPageHandler : IDisposable
         showFestivalIcon.ToggleOption,
         () => options.ShowFestivalIcon,
         v => options.ShowFestivalIcon = v
+      )
+    );
+    var fishOnCatchIcon = new ModOptionsCheckbox(
+      _helper.SafeGetString(nameof(options.ShowFishOnCatch)),
+      whichOption++,
+      showFishOnCatch.ToggleOption,
+      () => options.ShowFishOnCatch,
+      v => options.ShowFishOnCatch = v
+    );
+    _optionsElements.Add(fishOnCatchIcon);
+    _optionsElements.Add(
+      new ModOptionsCheckbox(
+        _helper.SafeGetString(nameof(options.ShowFishQualityStar)),
+        whichOption++,
+        showFishOnCatch.ToggleQualityStarOption,
+        () => options.ShowFishQualityStar,
+        v => options.ShowFishQualityStar = v,
+        fishOnCatchIcon
       )
     );
 

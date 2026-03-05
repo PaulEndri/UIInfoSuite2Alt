@@ -28,6 +28,7 @@
 - **v2.4.4**
   - Split calendar and billboard into two separate icons using game item sprites (more Content Patcher friendly)
   - Fix duplicate birthday icons appearing in multiplayer
+  - Fix bundle item detection not including the Missing Bundle (Abandoned JojaMart)
 - **v2.4.3**
   - Always show fish identity when reeling in (Sonar Bobber effect without the item)
   - Optional quality star overlay on the fish icon with real-time perfect catch bonus

@@ -55,9 +55,16 @@ internal static class BundleHelper
       return null;
     }
 
-    // No bundles to track if player chose Joja route or already completed all bundles
+    // No bundles to track if player chose Joja route
     var communityCenter = Game1.RequireLocation<CommunityCenter>("CommunityCenter");
-    if (Game1.MasterPlayer.mailReceived.Contains("JojaMember") || communityCenter.areAllAreasComplete())
+    if (Game1.MasterPlayer.mailReceived.Contains("JojaMember"))
+    {
+      return null;
+    }
+
+    // No bundles to track if CC is complete and Missing Bundle (Abandoned JojaMart) is also done
+    bool missingBundleDone = Game1.MasterPlayer.mailReceived.Contains("ccMovieTheater");
+    if (communityCenter.areAllAreasComplete() && missingBundleDone)
     {
       return null;
     }

@@ -117,11 +117,12 @@ internal class ShowBirthdayIcon : IDisposable
   {
     _birthdayNPCs.Value.Clear();
     _birthdayIcons.Value.Clear();
+    HashSet<string> seen = new();
     foreach (GameLocation? location in Game1.locations)
     {
       foreach (NPC? character in location.characters)
       {
-        if (character.isBirthday())
+        if (character.isBirthday() && seen.Add(character.Name))
         {
           Friendship? friendship = GetFriendshipWithNPC(character.Name);
           if (friendship != null)

@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
 using StardewValley;
+using StardewValley.ItemTypeDefinitions;
 using StardewValley.Menus;
 using UIInfoSuite2Alt.Compatibility;
 using UIInfoSuite2Alt.Infrastructure;
@@ -16,14 +15,11 @@ namespace UIInfoSuite2Alt.UIElements;
 internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
 {
   #region Properties
-  private readonly PerScreen<ClickableTextureComponent> _showBillboardButton = new(
-    () => new ClickableTextureComponent(
-      new Rectangle(0, 0, 99, 60),
-      Game1.content.Load<Texture2D>(Path.Combine("Maps", "summer_town")),
-      new Rectangle(122, 291, 35, 20),
-      3f
-    )
-  );
+  private const int IconSpacing = 8;
+  private const int DrawSize = 32;
+
+  private readonly PerScreen<Rectangle> _calendarBounds = new(() => Rectangle.Empty);
+  private readonly PerScreen<Rectangle> _questBounds = new(() => Rectangle.Empty);
 
   private readonly IModHelper _helper;
 
@@ -107,48 +103,66 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
   #region Logic
   private void DrawBillboard()
   {
-    ClickableTextureComponent billboardButton = _showBillboardButton.Value;
-    billboardButton.bounds.X = Game1.activeClickableMenu.xPositionOnScreen + Game1.activeClickableMenu.width - 160;
-    billboardButton.bounds.Y = Game1.activeClickableMenu.yPositionOnScreen +
-                               Game1.activeClickableMenu.height -
-                               // For compatiblity with BiggerBackpack mod
-                               (_helper.ModRegistry.IsLoaded("spacechase0.BiggerBackpack") ? 230 : 300);
+    IClickableMenu menu = Game1.activeClickableMenu;
+    int baseX = menu.xPositionOnScreen + menu.width - 120;
+    int baseY = menu.yPositionOnScreen + menu.height -
+                // For compatiblity with BiggerBackpack mod
+                (_helper.ModRegistry.IsLoaded("spacechase0.BiggerBackpack") ? 230 : 300);
 
-    _showBillboardButton.Value = billboardButton;
-    _showBillboardButton.Value.draw(Game1.spriteBatch);
+    SpriteBatch b = Game1.spriteBatch;
 
-    // Draw the mouse again to display it over the billboard
-    Game1.activeClickableMenu.drawMouse(Game1.spriteBatch);
+    // Calendar icon — furniture sprite is 16x32, draw at 2x scale (32x64), shifted up
+    ParsedItemData calendarData = ItemRegistry.GetDataOrErrorItem("(F)1402");
+    Rectangle calendarSrc = calendarData.GetSourceRect();
+    Rectangle calendarDest = new(baseX, baseY - 28, calendarSrc.Width * 2, calendarSrc.Height * 2);
+    _calendarBounds.Value = new Rectangle(baseX, baseY - 6, DrawSize, DrawSize);
+    b.Draw(calendarData.GetTexture(), calendarDest, calendarSrc, Color.White);
 
-    if (_showBillboardButton.Value.containsPoint(Game1.getMouseX(), Game1.getMouseY()))
+    // Quest/billboard icon — 16x16 object sprite drawn at 2x scale (32x32)
+    Rectangle questDest = new(baseX + DrawSize + IconSpacing, baseY - 6, DrawSize, DrawSize);
+    _questBounds.Value = questDest;
+    b.Draw(Game1.objectSpriteSheet, questDest, new Rectangle(144, 592, 16, 16), Color.White);
+
+    // Draw the mouse again to display it over the icons
+    menu.drawMouse(b);
+
+    int mouseX = Game1.getMouseX();
+    int mouseY = Game1.getMouseY();
+    if (calendarDest.Contains(mouseX, mouseY))
     {
-      string hoverText = Game1.getMouseX() <
-                         _showBillboardButton.Value.bounds.X + _showBillboardButton.Value.bounds.Width / 2
-        ? I18n.Calendar()
-        : I18n.Billboard();
-      IClickableMenu.drawHoverText(Game1.spriteBatch, hoverText, Game1.dialogueFont);
+      IClickableMenu.drawHoverText(b, I18n.Calendar(), Game1.dialogueFont);
+    }
+    else if (questDest.Contains(mouseX, mouseY))
+    {
+      IClickableMenu.drawHoverText(b, I18n.Billboard(), Game1.dialogueFont);
     }
   }
 
   private void ActivateBillboard()
   {
-    if (GameMenuHelper.IsTab(Game1.activeClickableMenu, GameMenu.inventoryTab) &&
-        _heldItem.Value == null &&
-        _showBillboardButton.Value.containsPoint(
-          (int)Utility.ModifyCoordinateForUIScale(Game1.getMouseX()),
-          (int)Utility.ModifyCoordinateForUIScale(Game1.getMouseY())
-        ))
+    if (!GameMenuHelper.IsTab(Game1.activeClickableMenu, GameMenu.inventoryTab) ||
+        _heldItem.Value != null)
     {
-      if (Game1.questOfTheDay != null && string.IsNullOrEmpty(Game1.questOfTheDay.currentObjective))
-      {
-        Game1.questOfTheDay.currentObjective = "wat?";
-      }
-
-      Game1.activeClickableMenu = new Billboard(
-        !(Utility.ModifyCoordinateForUIScale(Game1.getMouseX()) <
-          _showBillboardButton.Value.bounds.X + _showBillboardButton.Value.bounds.Width / 2)
-      );
+      return;
     }
+
+    int mouseX = (int)Utility.ModifyCoordinateForUIScale(Game1.getMouseX());
+    int mouseY = (int)Utility.ModifyCoordinateForUIScale(Game1.getMouseY());
+
+    bool isCalendar = _calendarBounds.Value.Contains(mouseX, mouseY);
+    bool isQuest = _questBounds.Value.Contains(mouseX, mouseY);
+
+    if (!isCalendar && !isQuest)
+    {
+      return;
+    }
+
+    if (Game1.questOfTheDay != null && string.IsNullOrEmpty(Game1.questOfTheDay.currentObjective))
+    {
+      Game1.questOfTheDay.currentObjective = "wat?";
+    }
+
+    Game1.activeClickableMenu = new Billboard(dailyQuest: isQuest);
   }
   #endregion
 }

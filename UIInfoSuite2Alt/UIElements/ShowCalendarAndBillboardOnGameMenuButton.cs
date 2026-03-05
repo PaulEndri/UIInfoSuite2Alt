@@ -89,8 +89,8 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
   private void OnRenderedActiveMenu(object? sender, EventArgs e)
   {
     IClickableMenu? activeMenu = Game1.activeClickableMenu;
-    if (_hoverItem.Value == null &&
-        GameMenuHelper.IsTab(activeMenu, GameMenu.inventoryTab) &&
+
+    if (GameMenuHelper.IsTab(activeMenu, GameMenu.inventoryTab) &&
         _heldItem.Value == null &&
         GameMenuHelper.GetChildMenu(activeMenu) == null)
     {
@@ -104,30 +104,40 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
   private void DrawBillboard()
   {
     IClickableMenu menu = Game1.activeClickableMenu;
+    if (menu == null) return;
+
     int baseX = menu.xPositionOnScreen + menu.width - 120;
     int baseY = menu.yPositionOnScreen + menu.height -
-                // For compatiblity with BiggerBackpack mod
                 (_helper.ModRegistry.IsLoaded("spacechase0.BiggerBackpack") ? 230 : 300);
 
     SpriteBatch b = Game1.spriteBatch;
+    int mouseX = Game1.getMouseX();
+    int mouseY = Game1.getMouseY();
 
-    // Calendar icon — furniture sprite is 16x32, draw at 2x scale (32x64), shifted up
     ParsedItemData calendarData = ItemRegistry.GetDataOrErrorItem("(F)1402");
     Rectangle calendarSrc = calendarData.GetSourceRect();
     Rectangle calendarDest = new(baseX, baseY - 28, calendarSrc.Width * 2, calendarSrc.Height * 2);
-    _calendarBounds.Value = new Rectangle(baseX, baseY - 6, DrawSize, DrawSize);
-    b.Draw(calendarData.GetTexture(), calendarDest, calendarSrc, Color.White);
-
-    // Quest/billboard icon — 16x16 object sprite drawn at 2x scale (32x32)
     Rectangle questDest = new(baseX + DrawSize + IconSpacing, baseY - 6, DrawSize, DrawSize);
+
+    _calendarBounds.Value = new Rectangle(baseX, baseY - 6, DrawSize, DrawSize);
     _questBounds.Value = questDest;
+
+    b.Draw(calendarData.GetTexture(), calendarDest, calendarSrc, Color.White);
     b.Draw(Game1.objectSpriteSheet, questDest, new Rectangle(144, 592, 16, 16), Color.White);
 
-    // Draw the mouse again to display it over the icons
+    if (_hoverItem.Value != null)
+    {
+      IClickableMenu.drawToolTip(
+          b,
+          _hoverItem.Value.getDescription(),
+          _hoverItem.Value.DisplayName,
+          _hoverItem.Value,
+          _heldItem.Value != null
+      );
+    }
+
     menu.drawMouse(b);
 
-    int mouseX = Game1.getMouseX();
-    int mouseY = Game1.getMouseY();
     if (calendarDest.Contains(mouseX, mouseY))
     {
       IClickableMenu.drawHoverText(b, I18n.Calendar(), Game1.dialogueFont);

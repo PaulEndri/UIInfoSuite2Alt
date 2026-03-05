@@ -2,7 +2,6 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
-using StardewValley.Menus;
 
 namespace UIInfoSuite2Alt.UIElements.ExperienceElements;
 
@@ -69,18 +68,31 @@ public class DisplayedExperienceBar
 
     if (IsMouseOverExperienceBar(leftSide, boxWidth))
     {
-      Game1.drawWithBorder(
-        experienceEarnedThisLevel + "/" + experienceDifferenceBetweenLevels,
-        Color.Black,
-        Color.Black,
-        new Vector2(leftSide + 33, Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Bottom - 70)
+      Vector2 pos = new Vector2(leftSide + 36, Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Bottom - 62);
+
+      string text = experienceEarnedThisLevel + "/" + experienceDifferenceBetweenLevels;
+
+      // Shadow
+      Game1.spriteBatch.DrawString(
+          Game1.smallFont,
+          text,
+          pos + new Vector2(1f, 1f),
+          Color.Black * 0.4f
+      );
+
+      // Text
+      Game1.spriteBatch.DrawString(
+          Game1.smallFont,
+          text,
+          pos,
+          new Color(28, 28, 28, 255)
       );
     }
     else
     {
       Game1.spriteBatch.Draw(
         iconTexture ?? Game1.mouseCursors,
-        new Vector2(leftSide + 54, Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Bottom - 62),
+        new Vector2(leftSide + 58, Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Bottom - 62),
         experienceIconPosition,
         Color.White,
         0,
@@ -90,11 +102,23 @@ public class DisplayedExperienceBar
         0.85f
       );
 
-      Game1.drawWithBorder(
-        currentLevel.ToString(),
-        Color.Black * 0.6f,
-        Color.Black,
-        new Vector2(leftSide + 33, Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Bottom - 70)
+      Vector2 levelPos = new Vector2(leftSide + 36, Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Bottom - 62);
+      string levelText = currentLevel.ToString();
+
+      // Shadow
+      Game1.spriteBatch.DrawString(
+          Game1.smallFont,
+          levelText,
+          levelPos + new Vector2(1f, 1f),
+          Color.Black * 0.4f
+      );
+
+      // Text
+      Game1.spriteBatch.DrawString(
+          Game1.smallFont,
+          levelText,
+          levelPos,
+          new Color(28, 28, 28, 255)
       );
     }
   }

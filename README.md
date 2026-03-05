@@ -21,41 +21,37 @@
   <a href="https://github.com/dazuki/UIInfoSuite2Alt/releases/latest"><strong>Download Latest Release</strong></a>
 </h2>
 
-![New features](.github/assets/new-features.png)
-- **2.4.3+**
+![New features](.github/assets/patch-notes.png)
+
+> Most new features can be toggled on/off in the mod's in-game options menu.
+
+- **v2.4.3**
   - Always show fish identity when reeling in (Sonar Bobber effect without the item)
   - Optional quality star overlay on the fish icon with real-time perfect catch bonus
-- **2.4.2+**
+- **v2.4.2**
   - Better Game Menu compatibility ([Annosz/UIInfoSuite2#648](https://github.com/Annosz/UIInfoSuite2/pull/648)) [@KhloeLeclair](https://github.com/KhloeLeclair)
-- **2.4.1+**
-  - Cloudy Skies framework compatibility: weather icon now supports custom weather from mods like [Weather Wonders](https://www.nexusmods.com/stardewvalley/mods/23868)
-- **2.4.0+**
+- **v2.4.1**
+  - Cloudy Skies framework compatibility: weather icon now supports custom weather from mods like [Weather Wonders](https://www.nexusmods.com/stardewvalley/mods/23868) ([Annosz/UIInfoSuite2#659](https://github.com/Annosz/UIInfoSuite2/issues/659)) [@toffi3](https://github.com/toffi3)
+- **v2.4.0**
   - Show icon if there's a Festival/Event tomorrow or today
   - Option added to require watching TV daily to make Luck/Weather icon visible
-- **2.3.9+**
+- **v2.3.9**
   - Add hotkey to open mod options menu directly (Default: F8)
-- **2.3.8+**
+- **v2.3.8**
   - Show bookseller icon when he is visiting town
   - Show mastery experience bar and XP gains when all skills are at level 10
   - Show bundle items indicator on Traveling Merchant icon when the merchant has items needed for bundles
   - Show quest count under journal icon
   - Show recipe item as Queen of Sauce icon with mini TV overlay
-
-> Most new features can be toggled on/off in the mod's in-game options menu.
-
-![Issues resolved from upstream](.github/assets/issues-resolved-from-upstream.png)
-- **2.4.1+**
-  - Add Cloudy Skies API compatibility for custom weather support ([Annosz/UIInfoSuite2#659](https://github.com/Annosz/UIInfoSuite2/issues/659)) [@toffi3](https://github.com/toffi3)
-- **2.3.8+**
   - Fix fruit tree drop parsing for DAY_OF_WEEK and non-day conditions (e.g. LOCATION_IS_OUTDOORS)
   - Fix CC bundle tooltips showing after Joja route or CC completion ([Annosz/UIInfoSuite2#572](https://github.com/Annosz/UIInfoSuite2/issues/572)) [@littlerat07](https://github.com/littlerat07)
   - Fix Ginger and Spring Onion displaying as "Unknown crop" ([Annosz/UIInfoSuite2#660](https://github.com/Annosz/UIInfoSuite2/issues/660)) [@FiveMountain](https://github.com/FiveMountain)
-
-![Pull requests from upstream](.github/assets/pull-requests-from-upstream.png)
-- **2.3.8+**
   - Fix mushroom log and mossy seed effect ranges ([Annosz/UIInfoSuite2#641](https://github.com/Annosz/UIInfoSuite2/pull/641)) [@Disassembler0](https://github.com/Disassembler0)
 
 ![Added Mod Compatibility](.github/assets/added-mod-compatibility.png)
+
+All mods listed here are **optional** and not required for UI Info Suite 2 Alternative.
+
 - [Better Game Menu](https://www.nexusmods.com/stardewvalley/mods/12667)
 - [Cloudy Skies](https://www.nexusmods.com/stardewvalley/mods/23868)
 - [Custom Bush](https://www.nexusmods.com/stardewvalley/mods/20619)

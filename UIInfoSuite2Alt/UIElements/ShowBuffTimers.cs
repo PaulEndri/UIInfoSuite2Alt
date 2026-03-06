@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -19,6 +19,9 @@ internal class ShowBuffTimers : IDisposable
   private static readonly Color ShadowColor = Color.Black * 0.35f;
   private static readonly Color DigitColor = Color.White * 0.8f;
   private static readonly Color DotColor = Color.White * 0.8f;
+  private static readonly Color FadeColor = new(255, 75, 75, 255);
+  private static readonly Color FadingDigitColor = FadeColor * 0.9f;
+  private static readonly Color FadingDotColor = FadeColor * 0.9f;
 
   private readonly IModHelper _helper;
 
@@ -78,34 +81,43 @@ internal class ShowBuffTimers : IDisposable
       float x = icon.bounds.X + icon.bounds.Width / 2f - totalWidth / 2f;
       float y = icon.bounds.Y + icon.bounds.Height + 2;
 
-      DrawTimer(b, minutes, seconds, new Vector2(x, y));
+      float alpha = buff.displayAlphaTimer > 0f
+        ? (float)(Math.Cos(buff.displayAlphaTimer / 100f) + 3.0) / 4f
+        : 1f;
+
+      bool isFading = buff.displayAlphaTimer > 0f;
+
+      DrawTimer(b, minutes, seconds, new Vector2(x, y), alpha, isFading);
     }
   }
 
   /// <summary>Draws a timer as "M:SS" using the game's tiny digit sprites with a colon separator.</summary>
-  private static void DrawTimer(SpriteBatch b, int minutes, int seconds, Vector2 position)
+  private static void DrawTimer(SpriteBatch b, int minutes, int seconds, Vector2 position, float alpha, bool isFading)
   {
     float xOffset = 0;
     int scaledDigitStep = (int)(DigitWidth * DigitScale) - 1;
+    Color digitColor = (isFading ? FadingDigitColor : DigitColor) * alpha;
+    Color dotColor = (isFading ? FadingDotColor : DotColor) * alpha;
+    Color shadowColor = ShadowColor * alpha;
 
     // Draw minutes
-    DrawTinyDigits(b, minutes, position, ref xOffset, scaledDigitStep);
+    DrawTinyDigits(b, minutes, position, ref xOffset, scaledDigitStep, digitColor, shadowColor);
 
     // Draw colon (two dots) with padding
     xOffset += ColonPadding;
-    DrawColon(b, position, xOffset);
+    DrawColon(b, position, xOffset, dotColor, shadowColor);
     xOffset += ColonDotGap + ColonPadding;
 
     // Draw seconds (always 2 digits)
-    DrawTinyDigit(b, seconds / 10, position, ref xOffset, scaledDigitStep);
-    DrawTinyDigit(b, seconds % 10, position, ref xOffset, scaledDigitStep);
+    DrawTinyDigit(b, seconds / 10, position, ref xOffset, scaledDigitStep, digitColor, shadowColor);
+    DrawTinyDigit(b, seconds % 10, position, ref xOffset, scaledDigitStep, digitColor, shadowColor);
   }
 
-  private static void DrawTinyDigits(SpriteBatch b, int number, Vector2 position, ref float xOffset, int step)
+  private static void DrawTinyDigits(SpriteBatch b, int number, Vector2 position, ref float xOffset, int step, Color digitColor, Color shadowColor)
   {
     if (number == 0)
     {
-      DrawTinyDigit(b, 0, position, ref xOffset, step);
+      DrawTinyDigit(b, 0, position, ref xOffset, step, digitColor, shadowColor);
       return;
     }
 
@@ -118,12 +130,12 @@ internal class ShowBuffTimers : IDisposable
     for (int i = 0; i < digitCount; i++)
     {
       int digit = number / divisor % 10;
-      DrawTinyDigit(b, digit, position, ref xOffset, step);
+      DrawTinyDigit(b, digit, position, ref xOffset, step, digitColor, shadowColor);
       divisor /= 10;
     }
   }
 
-  private static void DrawTinyDigit(SpriteBatch b, int digit, Vector2 position, ref float xOffset, int step)
+  private static void DrawTinyDigit(SpriteBatch b, int digit, Vector2 position, ref float xOffset, int step, Color digitColor, Color shadowColor)
   {
     var sourceRect = new Rectangle(368 + digit * DigitWidth, 56, DigitWidth, DigitHeight);
 
@@ -132,7 +144,7 @@ internal class ShowBuffTimers : IDisposable
       Game1.mouseCursors,
       position + new Vector2(xOffset + 1, 1),
       sourceRect,
-      ShadowColor,
+      shadowColor,
       0f, Vector2.Zero, DigitScale, SpriteEffects.None, 0.99f
     );
 
@@ -141,14 +153,14 @@ internal class ShowBuffTimers : IDisposable
       Game1.mouseCursors,
       position + new Vector2(xOffset, 0f),
       sourceRect,
-      DigitColor,
+      digitColor,
       0f, Vector2.Zero, DigitScale, SpriteEffects.None, 1f
     );
 
     xOffset += step;
   }
 
-  private static void DrawColon(SpriteBatch b, Vector2 position, float xOffset)
+  private static void DrawColon(SpriteBatch b, Vector2 position, float xOffset, Color dotColor, Color shadowColor)
   {
     float dotSize = DigitScale;
     float scaledHeight = DigitHeight * DigitScale;
@@ -160,12 +172,12 @@ internal class ShowBuffTimers : IDisposable
     var lowerPos = new Vector2(dotX, position.Y + scaledHeight * 0.6f);
 
     // Shadow
-    DrawDot(b, upperPos + Vector2.One, dotSize, ShadowColor, 0.99f);
-    DrawDot(b, lowerPos + Vector2.One, dotSize, ShadowColor, 0.99f);
+    DrawDot(b, upperPos + Vector2.One, dotSize, shadowColor, 0.99f);
+    DrawDot(b, lowerPos + Vector2.One, dotSize, shadowColor, 0.99f);
 
     // Dots
-    DrawDot(b, upperPos, dotSize, DotColor, 1f);
-    DrawDot(b, lowerPos, dotSize, DotColor, 1f);
+    DrawDot(b, upperPos, dotSize, dotColor, 1f);
+    DrawDot(b, lowerPos, dotSize, dotColor, 1f);
   }
 
   private static void DrawDot(SpriteBatch b, Vector2 position, float size, Color color, float layerDepth)

@@ -26,10 +26,12 @@
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
 - **v2.4.5**
-  - Add icon sorting in options (1 is Most Right and 20 is Most Left)
+  - Add icon sorting in options
+  - Show buff duration timers below buff icons
   - Changed font visuals for experience bar and experience gain for better look and feel
   - Fix calendar and billboard icons turned invisible when hovered/picking up items in inventory
   - Fix incorrect width on social page when using Better Game Menu
+  - Fix hover-text no being shown for garden pots when they are placed on flooring ([Annosz/UIInfoSuite2#638](https://github.com/Annosz/UIInfoSuite2/pull/638)) [@NermNermNerm](https://github.com/NermNermNerm)
 - **v2.4.4**
   - Split calendar and billboard into two separate icons using game item sprites (more Content Patcher friendly)
   - Fix duplicate birthday icons appearing in multiplayer

@@ -138,6 +138,7 @@
   "ShowFestivalIcon": "Show festival reminder",
   "ShowFishOnCatch": "Always show fish identity when reeling in",
   "ShowFishQualityStar": "Show quality star",
+  "ShowBuffTimers": "Show buff duration timers",
   "FestivalToday": "Today: {0}",
   "FestivalTomorrow": "Tomorrow: {0}",
   //Settings - Icon Order (1 = most right)

@@ -43,6 +43,7 @@ internal record ModOptions
   public bool ShowFestivalIcon { get; set; } = true;
   public bool ShowFishOnCatch { get; set; } = false;
   public bool ShowFishQualityStar { get; set; } = true;
+  public bool ShowBuffTimers { get; set; } = true;
   public Dictionary<string, bool> ShowLocationOfFriends { get; set; } = new();
   public Dictionary<string, int> IconOrder { get; set; } = new()
   {

@@ -106,6 +106,7 @@ internal class ModOptionsPageHandler : IDisposable
     var showTodaysGift = new ShowTodaysGifts(helper);
     var showQuestCount = new ShowQuestCount(helper);
     var showFestivalIcon = new ShowFestivalIcon(helper);
+    var showBuffTimers = new ShowBuffTimers(helper);
     var showFishOnCatch = new ShowFishOnCatch();
 
     _elementsToDispose = new List<IDisposable>
@@ -129,6 +130,7 @@ internal class ModOptionsPageHandler : IDisposable
       showSeasonalBerry,
       showTodaysGift,
       showQuestCount,
+      showBuffTimers,
       showFestivalIcon,
       showFishOnCatch
     };
@@ -282,6 +284,15 @@ internal class ModOptionsPageHandler : IDisposable
         showQuestCount.ToggleOption,
         () => options.ShowQuestCount,
         v => options.ShowQuestCount = v
+      )
+    );
+    _optionsElements.Add(
+      new ModOptionsCheckbox(
+        _helper.SafeGetString(nameof(options.ShowBuffTimers)),
+        whichOption++,
+        showBuffTimers.ToggleOption,
+        () => options.ShowBuffTimers,
+        v => options.ShowBuffTimers = v
       )
     );
     var travellingMerchantIcon = new ModOptionsCheckbox(

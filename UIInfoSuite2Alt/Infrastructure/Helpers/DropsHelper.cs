@@ -123,11 +123,7 @@ public static class DropsHelper
       {
         if (!lastDay.HasValue && !string.IsNullOrEmpty(dropInfo.Condition))
         {
-          // Condition has no day-based queries (e.g. LOCATION_IS_OUTDOORS) — treat as "any day" for now
-          ModEntry.MonitorObject.Log(
-            $"No day-based condition found for {displayName} drop {dropInfo.ItemId}, assuming any day. Condition: {dropInfo.Condition}",
-            LogLevel.Warn
-          );
+          // Condition has no day-based queries (e.g. LOCATION_IS_OUTDOORS) — treat as "any day"
           nextDay = Game1.dayOfMonth + (includeToday ? 0 : 1);
         }
         else

@@ -91,7 +91,6 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
     IClickableMenu? activeMenu = Game1.activeClickableMenu;
 
     if (GameMenuHelper.IsTab(activeMenu, GameMenu.inventoryTab) &&
-        _heldItem.Value == null &&
         GameMenuHelper.GetChildMenu(activeMenu) == null)
     {
       DrawBillboard();
@@ -124,6 +123,11 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
 
     b.Draw(calendarData.GetTexture(), calendarDest, calendarSrc, Color.White);
     b.Draw(Game1.objectSpriteSheet, questDest, new Rectangle(144, 592, 16, 16), Color.White);
+
+    if (_heldItem.Value != null)
+    {
+      _heldItem.Value.drawInMenu(b, new Vector2(Game1.getOldMouseX() + 16, Game1.getOldMouseY() + 16), 1f);
+    }
 
     if (_hoverItem.Value != null)
     {

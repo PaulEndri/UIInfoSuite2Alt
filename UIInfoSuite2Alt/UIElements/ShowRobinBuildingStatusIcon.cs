@@ -38,7 +38,6 @@ internal class ShowRobinBuildingStatusIcon : IDisposable
   {
     _helper.Events.GameLoop.DayStarted -= OnDayStarted;
     _helper.Events.Display.RenderingHud -= OnRenderingHud;
-    _helper.Events.Display.RenderedHud -= OnRenderedHud;
     _helper.Events.GameLoop.OneSecondUpdateTicked -= OnTickInRobinHouse;
 
     if (showRobinBuildingStatus)
@@ -47,7 +46,6 @@ internal class ShowRobinBuildingStatusIcon : IDisposable
 
       _helper.Events.GameLoop.DayStarted += OnDayStarted;
       _helper.Events.Display.RenderingHud += OnRenderingHud;
-      _helper.Events.Display.RenderedHud += OnRenderedHud;
       _helper.Events.GameLoop.OneSecondUpdateTicked += OnTickInRobinHouse;
     }
   }
@@ -71,28 +69,29 @@ internal class ShowRobinBuildingStatusIcon : IDisposable
 
   private void OnRenderingHud(object? sender, RenderingHudEventArgs e)
   {
-    // Draw icon
     if (UIElementUtils.IsRenderingNormally() && _IsBuildingInProgress && _buildingIconSpriteLocation.HasValue)
     {
-      Point iconPosition = IconHandler.Handler.GetNewIconPosition();
-      _buildingIcon.Value = new ClickableTextureComponent(
-        new Rectangle(iconPosition.X, iconPosition.Y, 40, 40),
-        _robinIconSheet,
-        _buildingIconSpriteLocation.Value,
-        8 / 3f
+      IconHandler.Handler.EnqueueIcon(
+        "RobinBuilding",
+        (batch, pos) =>
+        {
+          _buildingIcon.Value = new ClickableTextureComponent(
+            new Rectangle(pos.X, pos.Y, 40, 40),
+            _robinIconSheet,
+            _buildingIconSpriteLocation.Value,
+            8 / 3f
+          );
+          _buildingIcon.Value.draw(batch);
+        },
+        batch =>
+        {
+          if ((_buildingIcon.Value?.containsPoint(Game1.getMouseX(), Game1.getMouseY()) ?? false) &&
+              !string.IsNullOrEmpty(_hoverText))
+          {
+            IClickableMenu.drawHoverText(batch, _hoverText, Game1.dialogueFont);
+          }
+        }
       );
-      _buildingIcon.Value.draw(Game1.spriteBatch);
-    }
-  }
-
-  private void OnRenderedHud(object? sender, RenderedHudEventArgs e)
-  {
-    // Show text on hover
-    if (_IsBuildingInProgress &&
-        (_buildingIcon.Value?.containsPoint(Game1.getMouseX(), Game1.getMouseY()) ?? false) &&
-        !string.IsNullOrEmpty(_hoverText))
-    {
-      IClickableMenu.drawHoverText(Game1.spriteBatch, _hoverText, Game1.dialogueFont);
     }
   }
   #endregion

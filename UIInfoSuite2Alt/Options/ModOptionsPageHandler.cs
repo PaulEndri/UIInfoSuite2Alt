@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.Xna.Framework;
@@ -513,6 +513,38 @@ internal class ModOptionsPageHandler : IDisposable
       )
     );
 
+    // --- Icon Order ---
+    _optionsElements.Add(new ModOptionsElement(I18n.Section_IconOrder()));
+    _optionsElements.Add(new ModOptionsElement(I18n.Section_IconOrder_Subtitle(), whichOption++));
+
+    foreach (string key in IconHandler.IconKeys)
+    {
+      string label = key switch
+      {
+        "Luck" => I18n.IconOrder_Luck(),
+        "Weather" => I18n.IconOrder_Weather(),
+        "Birthday" => I18n.IconOrder_Birthday(),
+        "Festival" => I18n.IconOrder_Festival(),
+        "QueenOfSauce" => I18n.IconOrder_QueenOfSauce(),
+        "ToolUpgrade" => I18n.IconOrder_ToolUpgrade(),
+        "RobinBuilding" => I18n.IconOrder_RobinBuilding(),
+        "SeasonalBerry" => I18n.IconOrder_SeasonalBerry(),
+        "TravelingMerchant" => I18n.IconOrder_TravelingMerchant(),
+        "Bookseller" => I18n.IconOrder_Bookseller(),
+        _ => key
+      };
+
+      string capturedKey = key;
+      _optionsElements.Add(
+        new ModOptionsNumberPicker(
+          label,
+          whichOption++,
+          () => options.IconOrder.TryGetValue(capturedKey, out int v) ? v : 99,
+          v => options.IconOrder[capturedKey] = v
+        )
+      );
+    }
+
     if (_hasBgm)
     {
       RegisterBgmTab();
@@ -568,7 +600,10 @@ internal class ModOptionsPageHandler : IDisposable
       getIcon: () => (iconDraw, true),
       priority: 0,
       getPageInstance: menu => new ModOptionsPage(_optionsElements, _helper.Events, menu),
-      getTabVisible: () => ShowPersonalConfigButton
+      getTabVisible: () => ShowPersonalConfigButton,
+      getWidth: w => w,
+      getHeight: h => h,
+      onResize: ctx => new ModOptionsPage(_optionsElements, _helper.Events, ctx.Menu)
     );
 
     // Right-click context menu: open GMCM settings if available
@@ -649,6 +684,7 @@ internal class ModOptionsPageHandler : IDisposable
               gameMenu.readyToClose())
           {
             ChangeToOurTab(gameMenu);
+            _helper.Input.Suppress(e.Button);
           }
         }
       }

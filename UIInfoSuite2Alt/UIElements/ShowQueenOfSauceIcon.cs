@@ -50,7 +50,6 @@ internal class ShowQueenOfSauceIcon : IDisposable
   public void ToggleOption(bool showQueenOfSauceIcon)
   {
     _helper.Events.Display.RenderingHud -= OnRenderingHud;
-    _helper.Events.Display.RenderedHud -= OnRenderedHud;
     _helper.Events.GameLoop.DayStarted -= OnDayStarted;
     _helper.Events.GameLoop.UpdateTicked -= OnUpdateTicked;
     _helper.Events.GameLoop.SaveLoaded -= OnSaveLoaded;
@@ -62,7 +61,6 @@ internal class ShowQueenOfSauceIcon : IDisposable
 
       _helper.Events.GameLoop.DayStarted += OnDayStarted;
       _helper.Events.Display.RenderingHud += OnRenderingHud;
-      _helper.Events.Display.RenderedHud += OnRenderedHud;
       _helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
       _helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
     }
@@ -95,65 +93,61 @@ internal class ShowQueenOfSauceIcon : IDisposable
 
   private void OnRenderingHud(object? sender, RenderingHudEventArgs e)
   {
-    if (UIElementUtils.IsRenderingNormally())
+    if (UIElementUtils.IsRenderingNormally() && _drawQueenOfSauceIcon.Value && _todaysRecipe != null)
     {
-      if (_drawQueenOfSauceIcon.Value && _todaysRecipe != null)
-      {
-        Point iconPosition = IconHandler.Handler.GetNewIconPosition();
-
-        if (_showRecipeItemIcon)
+      IconHandler.Handler.EnqueueIcon(
+        "QueenOfSauce",
+        (batch, pos) =>
         {
-          // Draw the recipe's food item as the main icon
-          var itemData = _todaysRecipe.GetItemData(useFirst: true);
-          Texture2D itemTexture = itemData.GetTexture();
-          Rectangle itemSourceRect = itemData.GetSourceRect();
+          if (_showRecipeItemIcon)
+          {
+            var itemData = _todaysRecipe.GetItemData(useFirst: true);
+            Texture2D itemTexture = itemData.GetTexture();
+            Rectangle itemSourceRect = itemData.GetSourceRect();
 
-          _icon.Value = new ClickableTextureComponent(
-            new Rectangle(iconPosition.X, iconPosition.Y, 40, 40),
-            itemTexture,
-            itemSourceRect,
-            2.5f
-          );
-          _icon.Value.draw(Game1.spriteBatch);
+            _icon.Value = new ClickableTextureComponent(
+              new Rectangle(pos.X, pos.Y, 40, 40),
+              itemTexture,
+              itemSourceRect,
+              2.5f
+            );
+            _icon.Value.draw(batch);
 
-          // Draw Queen of Sauce TV icon as mini overlay (bottom-right)
-          Game1.spriteBatch.Draw(
-            Game1.mouseCursors,
-            new Vector2(iconPosition.X + 18, iconPosition.Y + 18),
-            new Rectangle(609, 361, 28, 28),
-            Color.White,
-            0f,
-            Vector2.Zero,
-            0.8f,
-            SpriteEffects.None,
-            1f
-          );
-        }
-        else
+            batch.Draw(
+              Game1.mouseCursors,
+              new Vector2(pos.X + 18, pos.Y + 18),
+              new Rectangle(609, 361, 28, 28),
+              Color.White,
+              0f,
+              Vector2.Zero,
+              0.8f,
+              SpriteEffects.None,
+              1f
+            );
+          }
+          else
+          {
+            _icon.Value = new ClickableTextureComponent(
+              new Rectangle(pos.X, pos.Y, 40, 40),
+              Game1.mouseCursors,
+              new Rectangle(609, 361, 28, 28),
+              1.3f
+            );
+            _icon.Value.draw(batch);
+          }
+        },
+        batch =>
         {
-          // Draw classic Queen of Sauce TV icon only
-          _icon.Value = new ClickableTextureComponent(
-            new Rectangle(iconPosition.X, iconPosition.Y, 40, 40),
-            Game1.mouseCursors,
-            new Rectangle(609, 361, 28, 28),
-            1.3f
-          );
-          _icon.Value.draw(Game1.spriteBatch);
+          if (!Game1.IsFakedBlackScreen() &&
+              (_icon.Value?.containsPoint(Game1.getMouseX(), Game1.getMouseY()) ?? false))
+          {
+            IClickableMenu.drawHoverText(
+              batch,
+              I18n.TodaysRecipe() + _todaysRecipe?.DisplayName,
+              Game1.dialogueFont
+            );
+          }
         }
-      }
-    }
-  }
-
-  private void OnRenderedHud(object? sender, RenderedHudEventArgs e)
-  {
-    if (_drawQueenOfSauceIcon.Value &&
-        !Game1.IsFakedBlackScreen() &&
-        (_icon.Value?.containsPoint(Game1.getMouseX(), Game1.getMouseY()) ?? false))
-    {
-      IClickableMenu.drawHoverText(
-        Game1.spriteBatch,
-        I18n.TodaysRecipe() + _todaysRecipe?.DisplayName,
-        Game1.dialogueFont
       );
     }
   }

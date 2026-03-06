@@ -62,12 +62,10 @@ internal class ShowRainyDayIcon : IDisposable
   public void ToggleOption(bool showRainyDay)
   {
     _helper.Events.Display.RenderingHud -= OnRenderingHud;
-    _helper.Events.Display.RenderedHud -= OnRenderedHud;
 
     if (showRainyDay)
     {
       _helper.Events.Display.RenderingHud += OnRenderingHud;
-      _helper.Events.Display.RenderedHud += OnRenderedHud;
     }
   }
   #endregion
@@ -83,63 +81,49 @@ internal class ShowRainyDayIcon : IDisposable
       return;
     }
 
-    RenderLocationWeatherIcon(_valleyWeather);
+    EnqueueWeatherIcon(_valleyWeather);
     if (HasVisitedIsland())
     {
-      RenderLocationWeatherIcon(_islandWeather);
+      EnqueueWeatherIcon(_islandWeather);
     }
   }
 
-  private void OnRenderedHud(object? sender, RenderedHudEventArgs e)
+  private void EnqueueWeatherIcon(LocationWeather weather)
   {
-    if (_requireTv && !TvChannelWatcher.HasWatchedWeather.Value)
-    {
-      return;
-    }
-
-    // Show text on hover
-    RenderWeatherHoverText(_valleyWeather);
-    if (HasVisitedIsland())
-    {
-      RenderWeatherHoverText(_islandWeather);
-    }
-  }
-
-  private void RenderLocationWeatherIcon(LocationWeather weather)
-  {
-    // Escape if we don't have that weather or a sprite
     if (!weather.IsRainyTomorrow || !weather.SpriteLocation.HasValue)
     {
       return;
     }
 
-    // Draw icon
-    Point iconPosition = IconHandler.Handler.GetNewIconPosition();
-    var bounds = new Rectangle(iconPosition.X, iconPosition.Y, 40, 40);
+    IconHandler.Handler.EnqueueIcon(
+      "Weather",
+      (batch, pos) =>
+      {
+        var bounds = new Rectangle(pos.X, pos.Y, 40, 40);
 
-    if (weather.CustomTexture != null)
-    {
-      // Draw weatherbox border at 40x40, then custom icon at 34x34 inset by 3px
-      Game1.spriteBatch.Draw(_weatherBorderTexture, bounds, Color.White);
-      var iconRect = new Rectangle(bounds.X + 3, bounds.Y + 3, 34, 34);
-      Game1.spriteBatch.Draw(weather.CustomTexture, iconRect, weather.SpriteLocation.Value, Color.White);
-      weather.IconComponent = new ClickableTextureComponent(bounds, weather.CustomTexture, weather.SpriteLocation.Value, 1f);
-    }
-    else
-    {
-      weather.IconComponent = new ClickableTextureComponent(bounds, _iconSheet, weather.SpriteLocation.Value, 8 / 3f);
-      weather.IconComponent.draw(Game1.spriteBatch);
-    }
-  }
-
-  private static void RenderWeatherHoverText(LocationWeather weather)
-  {
-    bool hasMouse = weather.IconComponent?.containsPoint(Game1.getMouseX(), Game1.getMouseY()) ?? false;
-    bool hasText = !string.IsNullOrEmpty(weather.HoverText);
-    if (weather.IsRainyTomorrow && hasMouse && hasText)
-    {
-      IClickableMenu.drawHoverText(Game1.spriteBatch, weather.HoverText, Game1.dialogueFont);
-    }
+        if (weather.CustomTexture != null)
+        {
+          batch.Draw(_weatherBorderTexture, bounds, Color.White);
+          var iconRect = new Rectangle(bounds.X + 3, bounds.Y + 3, 34, 34);
+          batch.Draw(weather.CustomTexture, iconRect, weather.SpriteLocation.Value, Color.White);
+          weather.IconComponent = new ClickableTextureComponent(bounds, weather.CustomTexture, weather.SpriteLocation.Value, 1f);
+        }
+        else
+        {
+          weather.IconComponent = new ClickableTextureComponent(bounds, _iconSheet, weather.SpriteLocation.Value, 8 / 3f);
+          weather.IconComponent.draw(batch);
+        }
+      },
+      batch =>
+      {
+        bool hasMouse = weather.IconComponent?.containsPoint(Game1.getMouseX(), Game1.getMouseY()) ?? false;
+        bool hasText = !string.IsNullOrEmpty(weather.HoverText);
+        if (weather.IsRainyTomorrow && hasMouse && hasText)
+        {
+          IClickableMenu.drawHoverText(batch, weather.HoverText, Game1.dialogueFont);
+        }
+      }
+    );
   }
   #endregion
 

@@ -43,7 +43,6 @@ internal class ShowBirthdayIcon : IDisposable
 
     _helper.Events.GameLoop.DayStarted -= OnDayStarted;
     _helper.Events.Display.RenderingHud -= OnRenderingHud;
-    _helper.Events.Display.RenderedHud -= OnRenderedHud;
     _helper.Events.GameLoop.UpdateTicked -= OnUpdateTicked;
 
     if (showBirthdayIcon)
@@ -51,7 +50,6 @@ internal class ShowBirthdayIcon : IDisposable
       CheckForBirthday();
       _helper.Events.GameLoop.DayStarted += OnDayStarted;
       _helper.Events.Display.RenderingHud += OnRenderingHud;
-      _helper.Events.Display.RenderedHud += OnRenderedHud;
       _helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
     }
   }
@@ -82,16 +80,7 @@ internal class ShowBirthdayIcon : IDisposable
   {
     if (UIElementUtils.IsRenderingNormally())
     {
-      DrawBirthdayIcon();
-    }
-  }
-
-
-  private void OnRenderedHud(object? sender, RenderedHudEventArgs e)
-  {
-    if (UIElementUtils.IsRenderingNormally())
-    {
-      DrawHoverText();
+      EnqueueBirthdayIcons();
     }
   }
   #endregion
@@ -163,7 +152,7 @@ internal class ShowBirthdayIcon : IDisposable
 
   private static readonly Rectangle BirthdayBackgroundSource = new(228, 409, 16, 16);
 
-  private void DrawBirthdayIcon()
+  private void EnqueueBirthdayIcons()
   {
     List<NPC> npcs = _birthdayNPCs.Value;
     List<ClickableTextureComponent> icons = _birthdayIcons.Value;
@@ -189,47 +178,36 @@ internal class ShowBirthdayIcon : IDisposable
 
     for (int i = 0; i < npcs.Count; i++)
     {
-      Point iconPosition = IconHandler.Handler.GetNewIconPosition();
+      int capturedI = i;
+      IconHandler.Handler.EnqueueIcon(
+        "Birthday",
+        (batch, pos) =>
+        {
+          batch.Draw(
+            Game1.mouseCursors,
+            new Vector2(pos.X, pos.Y),
+            BirthdayBackgroundSource,
+            Color.White,
+            0.0f,
+            Vector2.Zero,
+            scale,
+            SpriteEffects.None,
+            1f
+          );
 
-      Game1.spriteBatch.Draw(
-        Game1.mouseCursors,
-        new Vector2(iconPosition.X, iconPosition.Y),
-        BirthdayBackgroundSource,
-        Color.White,
-        0.0f,
-        Vector2.Zero,
-        scale,
-        SpriteEffects.None,
-        1f
+          icons[capturedI].bounds = new Rectangle(pos.X - 7, pos.Y - 2, (int)(16.0 * scale), (int)(16.0 * scale));
+          icons[capturedI].sourceRect = npcs[capturedI].GetHeadShot();
+          icons[capturedI].draw(batch);
+        },
+        batch =>
+        {
+          if (icons[capturedI].containsPoint(Game1.getMouseX(), Game1.getMouseY()))
+          {
+            string hoverText = string.Format(I18n.NpcBirthday(), npcs[capturedI].displayName);
+            IClickableMenu.drawHoverText(batch, hoverText, Game1.dialogueFont);
+          }
+        }
       );
-
-      // Update bounds and headshot for existing component
-      icons[i].bounds = new Rectangle(iconPosition.X - 7, iconPosition.Y - 2, (int)(16.0 * scale), (int)(16.0 * scale));
-      icons[i].sourceRect = npcs[i].GetHeadShot();
-      icons[i].draw(Game1.spriteBatch);
-    }
-  }
-
-  private void DrawHoverText()
-  {
-    List<ClickableTextureComponent> icons = _birthdayIcons.Value;
-    List<NPC> npcs = _birthdayNPCs.Value;
-    if (icons.Count != npcs.Count)
-    {
-      ModEntry.MonitorObject.LogOnce(
-        $"{GetType().Name}: The number of tracked npcs and icons do not match",
-        LogLevel.Error
-      );
-      return;
-    }
-
-    for (var i = 0; i < icons.Count; i++)
-    {
-      if (icons[i].containsPoint(Game1.getMouseX(), Game1.getMouseY()))
-      {
-        string hoverText = string.Format(I18n.NpcBirthday(), npcs[i].displayName);
-        IClickableMenu.drawHoverText(Game1.spriteBatch, hoverText, Game1.dialogueFont);
-      }
     }
   }
   #endregion

@@ -13,7 +13,6 @@ namespace UIInfoSuite2Alt.Options;
 public class ModOptionsPage : IClickableMenu
 {
   private const int visibleSlots = 7;
-  private const int Width = 880;
   private readonly ClickableTextureComponent _downArrow;
   private readonly List<ModOptionsElement> _options;
   private readonly ClickableTextureComponent _scrollBar;
@@ -40,7 +39,7 @@ public class ModOptionsPage : IClickableMenu
   public ModOptionsPage(List<ModOptionsElement> options, IModEvents events, IClickableMenu parentMenu) : base(
     parentMenu.xPositionOnScreen,
     parentMenu.yPositionOnScreen + 10,
-    Width,
+    parentMenu.width,
     parentMenu.height
   )
   {

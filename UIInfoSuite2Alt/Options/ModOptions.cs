@@ -44,4 +44,17 @@ internal record ModOptions
   public bool ShowFishOnCatch { get; set; } = false;
   public bool ShowFishQualityStar { get; set; } = true;
   public Dictionary<string, bool> ShowLocationOfFriends { get; set; } = new();
+  public Dictionary<string, int> IconOrder { get; set; } = new()
+  {
+    { "Luck", 1 },
+    { "Weather", 2 },
+    { "Birthday", 3 },
+    { "Festival", 4 },
+    { "QueenOfSauce", 5 },
+    { "ToolUpgrade", 6 },
+    { "RobinBuilding", 7 },
+    { "SeasonalBerry", 8 },
+    { "TravelingMerchant", 9 },
+    { "Bookseller", 10 }
+  };
 }

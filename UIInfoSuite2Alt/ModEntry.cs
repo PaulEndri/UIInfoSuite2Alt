@@ -45,7 +45,7 @@ public class ModEntry : Mod
     helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
     helper.Events.GameLoop.Saved += OnSaved;
     helper.Events.GameLoop.GameLaunched += OnGameLaunched;
-    helper.Events.Display.Rendering += IconHandler.Handler.Reset;
+    helper.Events.Display.RenderedHud += OnRenderedHud;
 
     IconHandler.Handler.IsQuestLogPermanent = helper.ModRegistry.IsLoaded("MolsonCAD.DeluxeJournal");
   }
@@ -153,6 +153,8 @@ public class ModEntry : Mod
                   Helper.Data.ReadJsonFile<ModOptions>($"data/{_modConfig.ApplyDefaultSettingsFromThisSave}.json") ??
                   new ModOptions();
 
+    IconHandler.Handler.IconOrder = _modOptions.IconOrder;
+
     _modOptionsPageHandler?.Dispose();
     _modOptionsPageHandler = new ModOptionsPageHandler(Helper, _modOptions);
   }
@@ -166,6 +168,11 @@ public class ModEntry : Mod
     }
 
     Helper.Data.WriteJsonFile($"data/{Constants.SaveFolderName}.json", _modOptions);
+  }
+
+  private static void OnRenderedHud(object? sender, RenderedHudEventArgs e)
+  {
+    IconHandler.Handler.DrawQueuedIcons(e.SpriteBatch);
   }
 
   public static void RegisterCalendarAndQuestKeyBindings(IModHelper helper, bool subscribe)

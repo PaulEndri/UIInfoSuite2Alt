@@ -38,7 +38,6 @@ public class ShowBookseller : IDisposable
     Enabled = showBookseller;
 
     _helper.Events.Display.RenderingHud -= OnRenderingHud;
-    _helper.Events.Display.RenderedHud -= OnRenderedHud;
     _helper.Events.GameLoop.DayStarted -= OnDayStarted;
     _helper.Events.Display.MenuChanged -= OnMenuChanged;
 
@@ -46,7 +45,6 @@ public class ShowBookseller : IDisposable
     {
       UpdateBookseller();
       _helper.Events.Display.RenderingHud += OnRenderingHud;
-      _helper.Events.Display.RenderedHud += OnRenderedHud;
       _helper.Events.GameLoop.DayStarted += OnDayStarted;
       _helper.Events.Display.MenuChanged += OnMenuChanged;
     }
@@ -78,23 +76,26 @@ public class ShowBookseller : IDisposable
   {
     if (UIElementUtils.IsRenderingNormally() && ShouldDrawIcon())
     {
-      Point iconPosition = IconHandler.Handler.GetNewIconPosition();
-      _booksellerIcon = new ClickableTextureComponent(
-        new Rectangle(iconPosition.X, iconPosition.Y, 40, 40),
-        Game1.mouseCursors_1_6,
-        new Rectangle(52, 477, 20, 20),
-        2f
+      IconHandler.Handler.EnqueueIcon(
+        "Bookseller",
+        (batch, pos) =>
+        {
+          _booksellerIcon = new ClickableTextureComponent(
+            new Rectangle(pos.X, pos.Y, 40, 40),
+            Game1.mouseCursors_1_6,
+            new Rectangle(52, 477, 20, 20),
+            2f
+          );
+          _booksellerIcon.draw(batch);
+        },
+        batch =>
+        {
+          if (_booksellerIcon?.containsPoint(Game1.getMouseX(), Game1.getMouseY()) ?? false)
+          {
+            IClickableMenu.drawHoverText(batch, I18n.BooksellerIsInTown(), Game1.dialogueFont);
+          }
+        }
       );
-      _booksellerIcon.draw(Game1.spriteBatch);
-    }
-  }
-
-  private void OnRenderedHud(object? sender, RenderedHudEventArgs e)
-  {
-    if (ShouldDrawIcon() && (_booksellerIcon?.containsPoint(Game1.getMouseX(), Game1.getMouseY()) ?? false))
-    {
-      string hoverText = I18n.BooksellerIsInTown();
-      IClickableMenu.drawHoverText(Game1.spriteBatch, hoverText, Game1.dialogueFont);
     }
   }
   #endregion

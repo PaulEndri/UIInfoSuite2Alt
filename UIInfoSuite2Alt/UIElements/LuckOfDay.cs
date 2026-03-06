@@ -58,7 +58,6 @@ internal class LuckOfDay : IDisposable
 
     _helper.Events.Player.Warped -= OnWarped;
     _helper.Events.Display.RenderingHud -= OnRenderingHud;
-    _helper.Events.Display.RenderedHud -= OnRenderedHud;
     _helper.Events.GameLoop.UpdateTicked -= OnUpdateTicked;
 
     if (showLuckOfDay)
@@ -67,7 +66,6 @@ internal class LuckOfDay : IDisposable
       _helper.Events.Player.Warped += OnWarped;
       _helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
       _helper.Events.Display.RenderingHud += OnRenderingHud;
-      _helper.Events.Display.RenderedHud += OnRenderedHud;
     }
   }
 
@@ -90,27 +88,28 @@ internal class LuckOfDay : IDisposable
     CalculateLuck(e);
   }
 
-  private void OnRenderedHud(object? sender, RenderedHudEventArgs e)
-  {
-    // draw hover text
-    if ((!RequireTv || TvChannelWatcher.HasWatchedFortune.Value)
-        && _icon.Value.containsPoint(Game1.getMouseX(), Game1.getMouseY()))
-    {
-      IClickableMenu.drawHoverText(Game1.spriteBatch, _hoverText.Value, Game1.dialogueFont);
-    }
-  }
-
   private void OnRenderingHud(object? sender, RenderingHudEventArgs e)
   {
-    // draw dice icon
     if (UIElementUtils.IsRenderingNormally() && (!RequireTv || TvChannelWatcher.HasWatchedFortune.Value))
     {
-      Point iconPosition = IconHandler.Handler.GetNewIconPosition();
-      ClickableTextureComponent icon = _icon.Value;
-      icon.bounds.X = iconPosition.X;
-      icon.bounds.Y = iconPosition.Y;
-      _icon.Value = icon;
-      _icon.Value.draw(Game1.spriteBatch, _color.Value, 1f);
+      IconHandler.Handler.EnqueueIcon(
+        "Luck",
+        (batch, pos) =>
+        {
+          ClickableTextureComponent icon = _icon.Value;
+          icon.bounds.X = pos.X;
+          icon.bounds.Y = pos.Y;
+          _icon.Value = icon;
+          _icon.Value.draw(batch, _color.Value, 1f);
+        },
+        batch =>
+        {
+          if (_icon.Value.containsPoint(Game1.getMouseX(), Game1.getMouseY()))
+          {
+            IClickableMenu.drawHoverText(batch, _hoverText.Value, Game1.dialogueFont);
+          }
+        }
+      );
     }
   }
   #endregion

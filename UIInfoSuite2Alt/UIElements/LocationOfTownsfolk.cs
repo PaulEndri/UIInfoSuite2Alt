@@ -72,7 +72,7 @@ internal class LocationOfTownsfolk : IDisposable
 
   private void OnButtonPressed_ForSocialPage(object? sender, ButtonPressedEventArgs e)
   {
-    if (Game1.activeClickableMenu is GameMenu &&
+    if (GameMenuHelper.IsTab(Game1.activeClickableMenu, GameMenu.socialTab) &&
         e.Button is SButton.MouseLeft or SButton.ControllerA or SButton.ControllerX)
     {
       CheckSelectedBox(e);
@@ -175,7 +175,7 @@ internal class LocationOfTownsfolk : IDisposable
       var rect = new Rectangle(checkbox.bounds.X, checkbox.bounds.Y, checkbox.bounds.Width, checkbox.bounds.Height);
       if (e.Button == SButton.ControllerX)
       {
-        rect.Width += SocialPanelWidth + Game1.activeClickableMenu.width;
+        rect.Width += SocialPanelWidth + _socialPage.width;
       }
 
       if (rect.Contains(
@@ -194,10 +194,10 @@ internal class LocationOfTownsfolk : IDisposable
   private void DrawSocialPageOptions()
   {
     Game1.drawDialogueBox(
-      Game1.activeClickableMenu.xPositionOnScreen - SocialPanelXOffset,
-      Game1.activeClickableMenu.yPositionOnScreen,
+      _socialPage.xPositionOnScreen - SocialPanelXOffset,
+      _socialPage.yPositionOnScreen,
       SocialPanelWidth,
-      Game1.activeClickableMenu.height,
+      _socialPage.height,
       false,
       true
     );
@@ -207,9 +207,9 @@ internal class LocationOfTownsfolk : IDisposable
     for (int i = _socialPage.slotPosition; i < _socialPage.slotPosition + 5 && i < _friendNames.Count; ++i)
     {
       OptionsCheckbox checkbox = _checkboxes[i];
-      checkbox.bounds.X = Game1.activeClickableMenu.xPositionOnScreen - 60;
+      checkbox.bounds.X = _socialPage.xPositionOnScreen - 60;
 
-      checkbox.bounds.Y = Game1.activeClickableMenu.yPositionOnScreen + 130 + yOffset;
+      checkbox.bounds.Y = _socialPage.yPositionOnScreen + 130 + yOffset;
 
       checkbox.draw(Game1.spriteBatch, 0, 0);
       yOffset += 112;

@@ -140,6 +140,19 @@
   "ShowFishQualityStar": "Show quality star",
   "FestivalToday": "Today: {0}",
   "FestivalTomorrow": "Tomorrow: {0}",
+  //Settings - Icon Order (1 = most right)
+  "Section.IconOrder": "Icon Order",
+  "Section.IconOrder.Subtitle": "(1 is Most Right, 20 is Most Left)",
+  "IconOrder.Luck": "Luck",
+  "IconOrder.Weather": "Weather",
+  "IconOrder.Birthday": "Birthday",
+  "IconOrder.Festival": "Festival",
+  "IconOrder.QueenOfSauce": "Queen of Sauce",
+  "IconOrder.ToolUpgrade": "Tool Upgrade",
+  "IconOrder.RobinBuilding": "Robin Building",
+  "IconOrder.SeasonalBerry": "Seasonal Berry",
+  "IconOrder.TravelingMerchant": "Traveling Merchant",
+  "IconOrder.Bookseller": "Bookseller",
   //Others
   "LevelUp": "Level Up",
   "TrackOnMap": "Track on map"

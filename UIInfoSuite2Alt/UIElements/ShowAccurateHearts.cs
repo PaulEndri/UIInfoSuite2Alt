@@ -109,7 +109,7 @@ internal class ShowAccurateHearts : IDisposable
       {
         int pointsToNextHeart = friendshipValues.Points % 250;
         int numHearts = friendshipValues.Points / 250;
-        int yPosition = Game1.activeClickableMenu.yPositionOnScreen + 130 + yOffset;
+        int yPosition = _socialPage.yPositionOnScreen + 130 + yOffset;
         DrawEachIndividualSquare(numHearts, pointsToNextHeart, yPosition);
       }
 
@@ -141,7 +141,7 @@ internal class ShowAccurateHearts : IDisposable
           Game1.spriteBatch.Draw(
             Game1.staminaRect,
             new Rectangle(
-              Game1.activeClickableMenu.xPositionOnScreen + 320 + num2 + j * 4,
+              _socialPage!.xPositionOnScreen + 320 + num2 + j * 4,
               yPosition + 14 + i * 4,
               4,
               4

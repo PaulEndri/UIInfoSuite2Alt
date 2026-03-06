@@ -64,14 +64,12 @@ internal class ShowFestivalIcon : IDisposable
   public void ToggleOption(bool enabled)
   {
     _helper.Events.Display.RenderingHud -= OnRenderingHud;
-    _helper.Events.Display.RenderedHud -= OnRenderedHud;
     _helper.Events.GameLoop.DayStarted -= OnDayStarted;
 
     if (enabled)
     {
       CheckForFestival();
       _helper.Events.Display.RenderingHud += OnRenderingHud;
-      _helper.Events.Display.RenderedHud += OnRenderedHud;
       _helper.Events.GameLoop.DayStarted += OnDayStarted;
     }
   }
@@ -246,48 +244,52 @@ internal class ShowFestivalIcon : IDisposable
         break;
     }
 
-    Point iconPosition = IconHandler.Handler.GetNewIconPosition();
-    icon.bounds.X = iconPosition.X;
-    icon.bounds.Y = iconPosition.Y;
+    IconHandler.Handler.EnqueueIcon(
+      "Festival",
+      (batch, pos) =>
+      {
+        icon.bounds.X = pos.X;
+        icon.bounds.Y = pos.Y;
 
-    // Offset icons to center them in the icon slot
-    if (_festivalType.Value == FestivalType.Passive)
-    {
-      icon.bounds.X += 8;
-      icon.bounds.Y += 8;
-    }
-    else if (_festivalType.Value == FestivalType.FishingDerby)
-    {
-      icon.bounds.X += 3;
-      icon.bounds.Y += 3;
-    }
+        // Offset icons to center them in the icon slot
+        if (_festivalType.Value == FestivalType.Passive)
+        {
+          icon.bounds.X += 8;
+          icon.bounds.Y += 8;
+        }
+        else if (_festivalType.Value == FestivalType.FishingDerby)
+        {
+          icon.bounds.X += 3;
+          icon.bounds.Y += 3;
+        }
 
-    icon.draw(e.SpriteBatch);
+        icon.draw(batch);
 
-    // Draw static exclamation mark overlay for "today"
-    if (_isToday.Value)
-    {
-      float scale = 1.6f;
-      e.SpriteBatch.Draw(
-        Game1.mouseCursors,
-        new Vector2(iconPosition.X + 30 + 2.5f * scale, iconPosition.Y + 16 + 7f * scale),
-        new Rectangle(403, 496, 5, 14),
-        Color.White,
-        0f,
-        new Vector2(2.5f, 7f),
-        scale,
-        SpriteEffects.None,
-        1f
-      );
-    }
-  }
-
-  private void OnRenderedHud(object? sender, RenderedHudEventArgs e)
-  {
-    if (ShouldDrawIcon && _festivalIcon.Value.containsPoint(Game1.getMouseX(), Game1.getMouseY()))
-    {
-      IClickableMenu.drawHoverText(Game1.spriteBatch, _hoverText.Value, Game1.dialogueFont);
-    }
+        // Draw static exclamation mark overlay for "today"
+        if (_isToday.Value)
+        {
+          float scale = 1.6f;
+          batch.Draw(
+            Game1.mouseCursors,
+            new Vector2(pos.X + 30 + 2.5f * scale, pos.Y + 16 + 7f * scale),
+            new Rectangle(403, 496, 5, 14),
+            Color.White,
+            0f,
+            new Vector2(2.5f, 7f),
+            scale,
+            SpriteEffects.None,
+            1f
+          );
+        }
+      },
+      batch =>
+      {
+        if (_festivalIcon.Value.containsPoint(Game1.getMouseX(), Game1.getMouseY()))
+        {
+          IClickableMenu.drawHoverText(batch, _hoverText.Value, Game1.dialogueFont);
+        }
+      }
+    );
   }
   #endregion
 }

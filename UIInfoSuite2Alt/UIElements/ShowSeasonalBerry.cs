@@ -69,7 +69,6 @@ internal class ShowSeasonalBerry : IDisposable
     _berrySpriteLocation = null;
     _helper.Events.GameLoop.DayStarted -= OnDayStarted;
     _helper.Events.Display.RenderingHud -= OnRenderingHud;
-    _helper.Events.Display.RenderedHud -= OnRenderedHud;
 
     if (showSeasonalBerry)
     {
@@ -77,7 +76,6 @@ internal class ShowSeasonalBerry : IDisposable
 
       _helper.Events.GameLoop.DayStarted += OnDayStarted;
       _helper.Events.Display.RenderingHud += OnRenderingHud;
-      _helper.Events.Display.RenderedHud += OnRenderedHud;
     }
   }
 
@@ -96,31 +94,33 @@ internal class ShowSeasonalBerry : IDisposable
 
   private void OnRenderingHud(object? sender, RenderingHudEventArgs e)
   {
-    // Draw icon
     if (!UIElementUtils.IsRenderingNormally() || !_berrySpriteLocation.HasValue)
     {
       return;
     }
 
-    Point iconPosition = IconHandler.Handler.GetNewIconPosition();
-    _berryIcon = new ClickableTextureComponent(
-      new Rectangle(iconPosition.X, iconPosition.Y, 40, 40),
-      Game1.objectSpriteSheet,
-      _berrySpriteLocation.Value,
-      _spriteScale
+    IconHandler.Handler.EnqueueIcon(
+      "SeasonalBerry",
+      (batch, pos) =>
+      {
+        _berryIcon = new ClickableTextureComponent(
+          new Rectangle(pos.X, pos.Y, 40, 40),
+          Game1.objectSpriteSheet,
+          _berrySpriteLocation.Value,
+          _spriteScale
+        );
+        _berryIcon.draw(batch);
+      },
+      batch =>
+      {
+        bool hasMouse = _berryIcon?.containsPoint(Game1.getMouseX(), Game1.getMouseY()) ?? false;
+        bool hasText = !string.IsNullOrEmpty(_hoverText);
+        if (_berrySpriteLocation.HasValue && hasMouse && hasText)
+        {
+          IClickableMenu.drawHoverText(batch, _hoverText, Game1.dialogueFont);
+        }
+      }
     );
-    _berryIcon.draw(Game1.spriteBatch);
-  }
-
-  private void OnRenderedHud(object? sender, RenderedHudEventArgs e)
-  {
-    // Show text on hover
-    bool hasMouse = _berryIcon?.containsPoint(Game1.getMouseX(), Game1.getMouseY()) ?? false;
-    bool hasText = !string.IsNullOrEmpty(_hoverText);
-    if (_berrySpriteLocation.HasValue && hasMouse && hasText)
-    {
-      IClickableMenu.drawHoverText(Game1.spriteBatch, _hoverText, Game1.dialogueFont);
-    }
   }
   #endregion
 }

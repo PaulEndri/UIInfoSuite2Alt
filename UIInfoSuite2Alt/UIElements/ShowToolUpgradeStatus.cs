@@ -93,7 +93,6 @@ internal class ShowToolUpgradeStatus : IDisposable
   public void ToggleOption(bool showToolUpgradeStatus)
   {
     _helper.Events.Display.RenderingHud -= OnRenderingHud;
-    _helper.Events.Display.RenderedHud -= OnRenderedHud;
     _helper.Events.GameLoop.DayStarted -= OnDayStarted;
     _helper.Events.GameLoop.UpdateTicked -= OnUpdateTicked;
 
@@ -101,7 +100,6 @@ internal class ShowToolUpgradeStatus : IDisposable
     {
       UpdateToolInfo();
       _helper.Events.Display.RenderingHud += OnRenderingHud;
-      _helper.Events.Display.RenderedHud += OnRenderedHud;
       _helper.Events.GameLoop.DayStarted += OnDayStarted;
       _helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
     }
@@ -130,20 +128,22 @@ internal class ShowToolUpgradeStatus : IDisposable
       return;
     }
 
-    Point iconPosition = IconHandler.Handler.GetNewIconPosition();
-    _toolUpgradeIcon.Value.bounds.X = iconPosition.X;
-    _toolUpgradeIcon.Value.bounds.Y = iconPosition.Y;
-
-    _toolUpgradeIcon.Value.draw(e.SpriteBatch);
-  }
-
-  private void OnRenderedHud(object? sender, RenderedHudEventArgs e)
-  {
-    // Show text on hover
-    if (_toolBeingUpgraded.Value != null && _toolUpgradeIcon.Value.containsPoint(Game1.getMouseX(), Game1.getMouseY()))
-    {
-      IClickableMenu.drawHoverText(Game1.spriteBatch, _hoverText.Value, Game1.dialogueFont);
-    }
+    IconHandler.Handler.EnqueueIcon(
+      "ToolUpgrade",
+      (batch, pos) =>
+      {
+        _toolUpgradeIcon.Value.bounds.X = pos.X;
+        _toolUpgradeIcon.Value.bounds.Y = pos.Y;
+        _toolUpgradeIcon.Value.draw(batch);
+      },
+      batch =>
+      {
+        if (_toolUpgradeIcon.Value.containsPoint(Game1.getMouseX(), Game1.getMouseY()))
+        {
+          IClickableMenu.drawHoverText(batch, _hoverText.Value, Game1.dialogueFont);
+        }
+      }
+    );
   }
   #endregion
 }

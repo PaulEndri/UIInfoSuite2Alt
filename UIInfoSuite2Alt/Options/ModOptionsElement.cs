@@ -12,8 +12,7 @@ public class ModOptionsElement
   protected const int DefaultY = 4;
   protected const int DefaultPixelSize = 9;
 
-  private readonly Rectangle _bounds;
-  private readonly string _label;
+  protected readonly string _label;
 
   protected readonly ModOptionsElement? _parent;
   private readonly int _whichOption;
@@ -30,14 +29,14 @@ public class ModOptionsElement
       x += DefaultX * 2 * Game1.pixelZoom;
     }
 
-    _bounds = new Rectangle(x, y, width, height);
+    Bounds = new Rectangle(x, y, width, height);
     _label = label;
     _whichOption = whichOption;
 
     _parent = parent;
   }
 
-  public Rectangle Bounds => _bounds;
+  public Rectangle Bounds { get; protected set; }
 
   public virtual void ReceiveLeftClick(int x, int y) { }
 
@@ -54,8 +53,8 @@ public class ModOptionsElement
       SpriteText.drawString(
         batch,
         _label,
-        slotX + _bounds.X,
-        slotY + _bounds.Y + Game1.pixelZoom * 3,
+        slotX + Bounds.X,
+        slotY + Bounds.Y + Game1.pixelZoom * 3,
         999,
         -1,
         999,
@@ -69,7 +68,7 @@ public class ModOptionsElement
         batch,
         _label,
         Game1.dialogueFont,
-        new Vector2(slotX + _bounds.X + _bounds.Width + Game1.pixelZoom * 2, slotY + _bounds.Y),
+        new Vector2(slotX + Bounds.X + Bounds.Width + Game1.pixelZoom * 2, slotY + Bounds.Y),
         Game1.textColor,
         1f,
         0.1f

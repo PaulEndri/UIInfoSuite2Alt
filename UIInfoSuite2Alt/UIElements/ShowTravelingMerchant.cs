@@ -51,7 +51,6 @@ public class ShowTravelingMerchant : IDisposable
     Enabled = showTravelingMerchant;
 
     _helper.Events.Display.RenderingHud -= OnRenderingHud;
-    _helper.Events.Display.RenderedHud -= OnRenderedHud;
     _helper.Events.GameLoop.DayStarted -= OnDayStarted;
     _helper.Events.GameLoop.UpdateTicked -= OnUpdateTicked;
     _helper.Events.Display.MenuChanged -= OnMenuChanged;
@@ -60,7 +59,6 @@ public class ShowTravelingMerchant : IDisposable
     {
       UpdateTravelingMerchant();
       _helper.Events.Display.RenderingHud += OnRenderingHud;
-      _helper.Events.Display.RenderedHud += OnRenderedHud;
       _helper.Events.GameLoop.DayStarted += OnDayStarted;
       _helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
       _helper.Events.Display.MenuChanged += OnMenuChanged;
@@ -129,68 +127,69 @@ public class ShowTravelingMerchant : IDisposable
 
   private void OnRenderingHud(object? sender, RenderingHudEventArgs e)
   {
-    // Draw icon
     if (UIElementUtils.IsRenderingNormally() && ShouldDrawIcon())
     {
-      Point iconPosition = IconHandler.Handler.GetNewIconPosition();
-      _travelingMerchantIcon = new ClickableTextureComponent(
-        new Rectangle(iconPosition.X, iconPosition.Y, 40, 40),
-        Game1.mouseCursors,
-        new Rectangle(192, 1411, 20, 20),
-        2f
-      );
-      _travelingMerchantIcon.draw(Game1.spriteBatch);
-
-      // Draw bundle overlay icon with pulse animation
-      if (_merchantHasBundleItems && ShowBundleIcon)
-      {
-        float baseScale = 1.6f;
-        float scale = baseScale;
-        Vector2 shake = Vector2.Zero;
-
-        if (_bundlePulseTimer > 0)
+      IconHandler.Handler.EnqueueIcon(
+        "TravelingMerchant",
+        (batch, pos) =>
         {
-          float pulseScale = 1f / (Math.Max(300f, Math.Abs(_bundlePulseTimer % 1000 - 500)) / 500f);
-          scale = baseScale * pulseScale;
-          if (pulseScale > 1f)
+          _travelingMerchantIcon = new ClickableTextureComponent(
+            new Rectangle(pos.X, pos.Y, 40, 40),
+            Game1.mouseCursors,
+            new Rectangle(192, 1411, 20, 20),
+            2f
+          );
+          _travelingMerchantIcon.draw(batch);
+
+          if (_merchantHasBundleItems && ShowBundleIcon)
           {
-            shake = new Vector2(Game1.random.Next(-1, 2), Game1.random.Next(-1, 2));
+            float baseScale = 1.6f;
+            float scale = baseScale;
+            Vector2 shake = Vector2.Zero;
+
+            if (_bundlePulseTimer > 0)
+            {
+              float pulseScale = 1f / (Math.Max(300f, Math.Abs(_bundlePulseTimer % 1000 - 500)) / 500f);
+              scale = baseScale * pulseScale;
+              if (pulseScale > 1f)
+              {
+                shake = new Vector2(Game1.random.Next(-1, 2), Game1.random.Next(-1, 2));
+              }
+            }
+
+            batch.Draw(
+              Game1.mouseCursors,
+              new Vector2(pos.X + 27 + 2.5f * baseScale, pos.Y + 11 + 7f * baseScale) + shake,
+              new Rectangle(403, 496, 5, 14),
+              Color.White,
+              0f,
+              new Vector2(2.5f, 7f),
+              scale,
+              SpriteEffects.None,
+              1f
+            );
+          }
+        },
+        batch =>
+        {
+          if (_travelingMerchantIcon?.containsPoint(Game1.getMouseX(), Game1.getMouseY()) ?? false)
+          {
+            string hoverText = I18n.TravelingMerchantIsInTown();
+
+            if (_merchantHasBundleItems && ShowBundleIcon)
+            {
+              hoverText += "\n" + I18n.TravelingMerchantHasBundleItem();
+
+              if (ShowBundleItemNames && _bundleItemNames.Count > 0)
+              {
+                hoverText += "\n" + string.Join(", ", _bundleItemNames);
+              }
+            }
+
+            IClickableMenu.drawHoverText(batch, hoverText, Game1.dialogueFont);
           }
         }
-
-        Game1.spriteBatch.Draw(
-          Game1.mouseCursors,
-          new Vector2(iconPosition.X + 27 + 2.5f * baseScale, iconPosition.Y + 11 + 7f * baseScale) + shake,
-          new Rectangle(403, 496, 5, 14),
-          Color.White,
-          0f,
-          new Vector2(2.5f, 7f),
-          scale,
-          SpriteEffects.None,
-          1f
-        );
-      }
-    }
-  }
-
-  private void OnRenderedHud(object? sender, RenderedHudEventArgs e)
-  {
-    // Show text on hover
-    if (ShouldDrawIcon() && (_travelingMerchantIcon?.containsPoint(Game1.getMouseX(), Game1.getMouseY()) ?? false))
-    {
-      string hoverText = I18n.TravelingMerchantIsInTown();
-
-      if (_merchantHasBundleItems && ShowBundleIcon)
-      {
-        hoverText += "\n" + I18n.TravelingMerchantHasBundleItem();
-
-        if (ShowBundleItemNames && _bundleItemNames.Count > 0)
-        {
-          hoverText += "\n" + string.Join(", ", _bundleItemNames);
-        }
-      }
-
-      IClickableMenu.drawHoverText(Game1.spriteBatch, hoverText, Game1.dialogueFont);
+      );
     }
   }
   #endregion

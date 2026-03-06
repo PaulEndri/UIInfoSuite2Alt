@@ -103,7 +103,7 @@ public static class GameMenuHelper
     // Try known tab names that might contain the requested page type
     foreach (string tabName in bgmMenu.VisibleTabs)
     {
-      if (bgmMenu.TryGetPage(tabName, out IClickableMenu? page, forceCreation: true) && page is T found)
+      if (bgmMenu.TryGetPage(tabName, out IClickableMenu? page) && page is T found)
       {
         return found;
       }

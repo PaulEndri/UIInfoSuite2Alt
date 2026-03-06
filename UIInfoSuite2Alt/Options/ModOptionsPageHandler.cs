@@ -526,7 +526,7 @@ internal class ModOptionsPageHandler : IDisposable
 
     // --- Icon Order ---
     _optionsElements.Add(new ModOptionsElement(I18n.Section_IconOrder()));
-    _optionsElements.Add(new ModOptionsElement(I18n.Section_IconOrder_Subtitle(), whichOption++));
+    _optionsElements.Add(new ModOptionsElement(I18n.Section_IconOrder_Subtitle(), isSubtitle: true));
 
     foreach (string key in IconHandler.IconKeys)
     {

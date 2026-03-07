@@ -52,6 +52,7 @@ internal class ShowRainyDayIcon : IDisposable
     ToggleOption(false);
     _iconSheet.Dispose();
     _weatherBorderTexture.Dispose();
+    _customWeatherTextureCache.Clear();
   }
 
   public void ToggleRequireTvOption(bool requireTv)

@@ -41,7 +41,7 @@ internal class ShowSeasonalBerry : IDisposable
 
   #region Properties
   private Rectangle? _berrySpriteLocation;
-  private float _spriteScale = 8 / 3f;
+  private float _spriteScale;
   private string _hoverText = "";
   private ClickableTextureComponent _berryIcon = null!;
 

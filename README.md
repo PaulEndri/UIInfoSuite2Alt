@@ -25,6 +25,8 @@
 
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
+- **v2.4.6**
+  - Fix Custom Bush tooltip showing wrong or no name
 - **v2.4.5**
   - Add icon sorting in options
   - Show buff duration timers below buff icons

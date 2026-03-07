@@ -16,7 +16,7 @@ namespace UIInfoSuite2Alt;
 public class ModEntry : Mod
 {
   private static SkipIntro _skipIntro = null!; // Needed so GC won't throw away object with subscriptions
-  public static ModConfig _modConfig = null!;
+  public static Options.ModConfig ModConfig { get; set; } = null!;
 
   private static EventHandler<ButtonsChangedEventArgs>? _calendarAndQuestKeyBindingsHandler;
 
@@ -39,7 +39,7 @@ public class ModEntry : Mod
     ShowFishOnCatch.Initialize(harmony);
 
     _skipIntro = new SkipIntro(helper.Events);
-    _modConfig = Helper.ReadConfig<ModConfig>();
+    ModConfig = Helper.ReadConfig<Options.ModConfig>();
 
     helper.Events.GameLoop.ReturnedToTitle += OnReturnedToTitle;
     helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
@@ -68,43 +68,43 @@ public class ModEntry : Mod
     }
 
     // register mod
-    configMenu.Register(ModManifest, () => _modConfig = new ModConfig(), () => Helper.WriteConfig(_modConfig));
+    configMenu.Register(ModManifest, () => ModConfig = new Options.ModConfig(), () => Helper.WriteConfig(ModConfig));
 
     // add some config options
     configMenu.AddBoolOption(
       ModManifest,
       name: () => I18n.Bool_ShowOptionsTabInMenu_DisplayedName(),
       tooltip: () => I18n.Bool_ShowOptionsTabInMenu_Tooltip(),
-      getValue: () => _modConfig.ShowOptionsTabInMenu,
-      setValue: value => _modConfig.ShowOptionsTabInMenu = value
+      getValue: () => ModConfig.ShowOptionsTabInMenu,
+      setValue: value => ModConfig.ShowOptionsTabInMenu = value
     );
     configMenu.AddTextOption(
       ModManifest,
       name: () => I18n.Text_ApplyDefaultSettingsFromThisSave_DisplayedName(),
       tooltip: () => I18n.Text_ApplyDefaultSettingsFromThisSave_Tooltip(),
-      getValue: () => _modConfig.ApplyDefaultSettingsFromThisSave,
-      setValue: value => _modConfig.ApplyDefaultSettingsFromThisSave = value
+      getValue: () => ModConfig.ApplyDefaultSettingsFromThisSave,
+      setValue: value => ModConfig.ApplyDefaultSettingsFromThisSave = value
     );
     configMenu.AddKeybindList(
       ModManifest,
       name: () => I18n.Keybinds_OpenCalendarKeybind_DisplayedName(),
       tooltip: () => I18n.Keybinds_OpenCalendarKeybind_Tooltip(),
-      getValue: () => _modConfig.OpenCalendarKeybind,
-      setValue: value => _modConfig.OpenCalendarKeybind = value
+      getValue: () => ModConfig.OpenCalendarKeybind,
+      setValue: value => ModConfig.OpenCalendarKeybind = value
     );
     configMenu.AddKeybindList(
       ModManifest,
       name: () => I18n.Keybinds_OpenQuestBoardKeybind_DisplayedName(),
       tooltip: () => I18n.Keybinds_OpenQuestBoardKeybind_Tooltip(),
-      getValue: () => _modConfig.OpenQuestBoardKeybind,
-      setValue: value => _modConfig.OpenQuestBoardKeybind = value
+      getValue: () => ModConfig.OpenQuestBoardKeybind,
+      setValue: value => ModConfig.OpenQuestBoardKeybind = value
     );
     configMenu.AddKeybindList(
       ModManifest,
       name: () => I18n.Keybinds_OpenModOptionsKeybind_DisplayedName(),
       tooltip: () => I18n.Keybinds_OpenModOptionsKeybind_Tooltip(),
-      getValue: () => _modConfig.OpenModOptionsKeybind,
-      setValue: value => _modConfig.OpenModOptionsKeybind = value
+      getValue: () => ModConfig.OpenModOptionsKeybind,
+      setValue: value => ModConfig.OpenModOptionsKeybind = value
     );
     // Show item effect ranges
     configMenu.AddSectionTitle(
@@ -116,15 +116,15 @@ public class ModEntry : Mod
       ModManifest,
       name: () => I18n.Keybinds_ShowOneRange_DisplayedName(),
       tooltip: () => I18n.Keybinds_ShowOneRange_Tooltip(),
-      getValue: () => _modConfig.ShowOneRange,
-      setValue: value => _modConfig.ShowOneRange = value
+      getValue: () => ModConfig.ShowOneRange,
+      setValue: value => ModConfig.ShowOneRange = value
     );
     configMenu.AddKeybindList(
       ModManifest,
       name: () => I18n.Keybinds_ShowAllRange_DisplayedName(),
       tooltip: () => I18n.Keybinds_ShowAllRange_Tooltip(),
-      getValue: () => _modConfig.ShowAllRange,
-      setValue: value => _modConfig.ShowAllRange = value
+      getValue: () => ModConfig.ShowAllRange,
+      setValue: value => ModConfig.ShowAllRange = value
       );
   }
   #endregion
@@ -150,7 +150,7 @@ public class ModEntry : Mod
     }
 
     _modOptions = Helper.Data.ReadJsonFile<ModOptions>($"data/{Constants.SaveFolderName}.json") ??
-                  Helper.Data.ReadJsonFile<ModOptions>($"data/{_modConfig.ApplyDefaultSettingsFromThisSave}.json") ??
+                  Helper.Data.ReadJsonFile<ModOptions>($"data/{ModConfig.ApplyDefaultSettingsFromThisSave}.json") ??
                   new ModOptions();
 
     IconHandler.Handler.IconOrder = _modOptions.IconOrder;
@@ -192,19 +192,16 @@ public class ModEntry : Mod
 
   private static void HandleCalendarAndQuestKeyBindings(IModHelper helper)
   {
-    if (_modConfig != null)
+    if (Context.IsPlayerFree && ModConfig.OpenCalendarKeybind.JustPressed())
     {
-      if (Context.IsPlayerFree && _modConfig.OpenCalendarKeybind.JustPressed())
-      {
-        helper.Input.SuppressActiveKeybinds(_modConfig.OpenCalendarKeybind);
-        Game1.activeClickableMenu = new Billboard();
-      }
-      else if (Context.IsPlayerFree && _modConfig.OpenQuestBoardKeybind.JustPressed())
-      {
-        helper.Input.SuppressActiveKeybinds(_modConfig.OpenQuestBoardKeybind);
-        Game1.RefreshQuestOfTheDay();
-        Game1.activeClickableMenu = new Billboard(true);
-      }
+      helper.Input.SuppressActiveKeybinds(ModConfig.OpenCalendarKeybind);
+      Game1.activeClickableMenu = new Billboard();
+    }
+    else if (Context.IsPlayerFree && ModConfig.OpenQuestBoardKeybind.JustPressed())
+    {
+      helper.Input.SuppressActiveKeybinds(ModConfig.OpenQuestBoardKeybind);
+      Game1.RefreshQuestOfTheDay();
+      Game1.activeClickableMenu = new Billboard(true);
     }
   }
   #endregion

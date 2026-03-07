@@ -57,7 +57,7 @@ internal class ModOptionsPageHandler : IDisposable
 
   private readonly List<ModOptionsElement> _optionsElements = new();
   private readonly PerScreen<ModOptionsPageState?> _savedPageState = new();
-  private bool ShowPersonalConfigButton => ModEntry._modConfig.ShowOptionsTabInMenu;
+  private bool ShowPersonalConfigButton => ModEntry.ModConfig.ShowOptionsTabInMenu;
 
   private bool _addOurTabBeforeTick;
   private readonly PerScreen<bool> _switchToOurTabNextTick = new();
@@ -706,7 +706,7 @@ internal class ModOptionsPageHandler : IDisposable
 
   private void OnButtonsChanged(object? sender, ButtonsChangedEventArgs e)
   {
-    KeybindList keybind = ModEntry._modConfig.OpenModOptionsKeybind;
+    KeybindList keybind = ModEntry.ModConfig.OpenModOptionsKeybind;
     if (!keybind.JustPressed())
     {
       return;

@@ -173,19 +173,16 @@ internal class ShowItemEffectRanges : IDisposable
 
   private void OnButtonChanged(object? sender, ButtonsChangedEventArgs e)
   {
-    if (ModEntry._modConfig != null)
+    if (Context.IsPlayerFree)
     {
-      if (Context.IsPlayerFree)
+      if (ModEntry.ModConfig.ShowOneRange.IsDown())
       {
-        if (ModEntry._modConfig.ShowOneRange.IsDown())
-        {
-          ButtonShowOneRange = true;
-        }
+        ButtonShowOneRange = true;
+      }
 
-        if (ModEntry._modConfig.ShowAllRange.IsDown())
-        {
-          ButtonShowAllRanges = true;
-        }
+      if (ModEntry.ModConfig.ShowAllRange.IsDown())
+      {
+        ButtonShowAllRanges = true;
       }
     }
   }

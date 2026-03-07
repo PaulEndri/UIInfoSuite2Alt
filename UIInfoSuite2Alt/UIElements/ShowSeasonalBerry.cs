@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
@@ -10,35 +10,6 @@ namespace UIInfoSuite2Alt.UIElements;
 
 internal class ShowSeasonalBerry : IDisposable
 {
-  #region Logic
-  private void UpdateBerryForDay()
-  {
-    string? season = Game1.currentSeason;
-    int day = Game1.dayOfMonth;
-    switch (season)
-    {
-      case "spring" when day is >= 15 and <= 18:
-        _berrySpriteLocation = new Rectangle(128, 193, 15, 15);
-        _hoverText = I18n.CanFindSalmonberry();
-        _spriteScale = 8 / 3f;
-        break;
-      case "fall" when day is >= 8 and <= 11:
-        _berrySpriteLocation = new Rectangle(32, 272, 16, 16);
-        _hoverText = I18n.CanFindBlackberry();
-        _spriteScale = 5 / 2f;
-        break;
-      case "fall" when day >= 15 && ShowHazelnut:
-        _berrySpriteLocation = new Rectangle(1, 274, 14, 14);
-        _hoverText = I18n.CanFindHazelnut();
-        _spriteScale = 20 / 7f;
-        break;
-      default:
-        _berrySpriteLocation = null;
-        break;
-    }
-  }
-  #endregion
-
   #region Properties
   private Rectangle? _berrySpriteLocation;
   private float _spriteScale;
@@ -121,6 +92,35 @@ internal class ShowSeasonalBerry : IDisposable
         }
       }
     );
+  }
+  #endregion
+
+  #region Logic
+  private void UpdateBerryForDay()
+  {
+    string? season = Game1.currentSeason;
+    int day = Game1.dayOfMonth;
+    switch (season)
+    {
+      case "spring" when day is >= 15 and <= 18:
+        _berrySpriteLocation = new Rectangle(128, 193, 15, 15);
+        _hoverText = I18n.CanFindSalmonberry();
+        _spriteScale = 8 / 3f;
+        break;
+      case "fall" when day is >= 8 and <= 11:
+        _berrySpriteLocation = new Rectangle(32, 272, 16, 16);
+        _hoverText = I18n.CanFindBlackberry();
+        _spriteScale = 5 / 2f;
+        break;
+      case "fall" when day >= 15 && ShowHazelnut:
+        _berrySpriteLocation = new Rectangle(1, 274, 14, 14);
+        _hoverText = I18n.CanFindHazelnut();
+        _spriteScale = 20 / 7f;
+        break;
+      default:
+        _berrySpriteLocation = null;
+        break;
+    }
   }
   #endregion
 }

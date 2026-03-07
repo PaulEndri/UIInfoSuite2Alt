@@ -30,6 +30,8 @@ internal class LocationOfTownsfolk : IDisposable
 
   private const int SocialPanelWidth = 190;
   private const int SocialPanelXOffset = 160;
+  private const int MaxVisibleSlots = 5;
+  private const int PixelsPerSlot = 112;
   #endregion
 
   #region Lifecycle
@@ -169,7 +171,7 @@ internal class LocationOfTownsfolk : IDisposable
 
   private void CheckSelectedBox(ButtonPressedEventArgs e)
   {
-    for (int i = _socialPage.slotPosition; i < _socialPage.slotPosition + 5; ++i)
+    for (int i = _socialPage.slotPosition; i < _socialPage.slotPosition + MaxVisibleSlots; ++i)
     {
       OptionsCheckbox checkbox = _checkboxes[i];
       var rect = new Rectangle(checkbox.bounds.X, checkbox.bounds.Y, checkbox.bounds.Width, checkbox.bounds.Height);
@@ -204,7 +206,7 @@ internal class LocationOfTownsfolk : IDisposable
 
     var yOffset = 0;
 
-    for (int i = _socialPage.slotPosition; i < _socialPage.slotPosition + 5 && i < _friendNames.Count; ++i)
+    for (int i = _socialPage.slotPosition; i < _socialPage.slotPosition + MaxVisibleSlots && i < _friendNames.Count; ++i)
     {
       OptionsCheckbox checkbox = _checkboxes[i];
       checkbox.bounds.X = _socialPage.xPositionOnScreen - 60;
@@ -212,7 +214,7 @@ internal class LocationOfTownsfolk : IDisposable
       checkbox.bounds.Y = _socialPage.yPositionOnScreen + 130 + yOffset;
 
       checkbox.draw(Game1.spriteBatch, 0, 0);
-      yOffset += 112;
+      yOffset += PixelsPerSlot;
       Color color = checkbox.isChecked ? Color.White : Color.Gray;
 
       Game1.spriteBatch.Draw(
@@ -227,7 +229,7 @@ internal class LocationOfTownsfolk : IDisposable
         1f
       );
 
-      if (yOffset != 560)
+      if (yOffset != MaxVisibleSlots * PixelsPerSlot)
       {
         // draw seperator line
         Game1.spriteBatch.Draw(

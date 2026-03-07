@@ -26,7 +26,9 @@
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
 - **v2.4.6**
-  - Fix Custom Bush tooltip showing wrong or no name
+  - Add alpha pulsation and color to buff duration timers
+  - Lower quest counter opacity to blend with background colors better
+  - Fix tooltip showing wrong or no name for Custom Bush Mods
 - **v2.4.5**
   - Add icon sorting in options
   - Show buff duration timers below buff icons

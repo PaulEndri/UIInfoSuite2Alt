@@ -174,8 +174,14 @@ internal class ShowQueenOfSauceIcon : IDisposable
   {
     int recipiesKnownBeforeTvCall = Game1.player.cookingRecipes.Count();
     string[] dialogue = new QueenOfSauceTV().GetWeeklyRecipe();
-    // TODO fix nullability reference
-    _todaysRecipe = new CraftingRecipe(_recipesByDescription.GetOrDefault(dialogue[0], ""), true);
+    if (!_recipesByDescription.TryGetValue(dialogue[0], out string? recipeName))
+    {
+      _todaysRecipe = null;
+      _drawQueenOfSauceIcon.Value = false;
+      return;
+    }
+
+    _todaysRecipe = new CraftingRecipe(recipeName, true);
 
     if (Game1.player.cookingRecipes.Count() > recipiesKnownBeforeTvCall)
     {

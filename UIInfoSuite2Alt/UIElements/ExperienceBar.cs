@@ -62,7 +62,7 @@ public partial class ExperienceBar
   private readonly PerScreen<bool> _isMasteryActive = new();
 
   private static readonly Color MasteryFillColor = new(60 / 255f, 180 / 255f, 80 / 255f, 0.63f);
-  private static readonly Rectangle MasteryIconRectangle = new(0, 340, 15, 16);
+  private static readonly Rectangle MasteryIconRectangle = new(457, 298, 11, 11);
 
   private readonly PerScreen<Rectangle> _experienceIconRectangle = new(() => SkillIconRectangles[SkillType.Farming]);
 
@@ -256,7 +256,7 @@ public partial class ExperienceBar
         _currentSkillLevel.Value,
         _isMasteryActive.Value ? Game1.mouseCursors_1_6 : null,
         _isMasteryActive.Value,
-        _isMasteryActive.Value ? 1.8f : 2.9f
+        _isMasteryActive.Value ? (29f / 11f) : 2.9f
       );
     }
   }

@@ -92,13 +92,15 @@ internal class ShowQuestCount : IDisposable
     float numberX = centerX - digitStringWidth / 2f;
     float numberY = y - 8;
 
+    Color questColor = new(255, 255, 255, 175);
+
     Utility.drawTinyDigits(
       questCount,
       Game1.spriteBatch,
       new Vector2(numberX, numberY),
       DigitScale,
       0.99f,
-      Color.White
+      questColor
     );
   }
   #endregion

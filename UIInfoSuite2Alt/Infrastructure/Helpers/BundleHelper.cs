@@ -103,7 +103,7 @@ internal static class BundleHelper
     }
 
     output = GetBundleItemIfNotDonatedFromList(bundleRequiredItemsList, donatedItem);
-    return output ?? null;
+    return output;
   }
 
   private static BundleRequiredItem? GetBundleItemIfNotDonatedFromList(List<List<int>>? lists, ISalable obj)

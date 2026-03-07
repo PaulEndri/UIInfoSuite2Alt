@@ -126,6 +126,11 @@ public class DisplayedExperienceBar
   #region Static helpers
   private static int GetBarWidth(int experienceEarnedThisLevel, int experienceDifferenceBetweenLevels, int maxBarWidth)
   {
+    if (experienceDifferenceBetweenLevels <= 0)
+    {
+      return maxBarWidth;
+    }
+
     return (int)((double)experienceEarnedThisLevel / experienceDifferenceBetweenLevels * maxBarWidth);
   }
 

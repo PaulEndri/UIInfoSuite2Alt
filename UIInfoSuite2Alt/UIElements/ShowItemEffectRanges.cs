@@ -90,7 +90,7 @@ internal class ShowItemEffectRanges : IDisposable
       return;
     }
 
-    if (_mutex.WaitOne())
+    if (_mutex.WaitOne(100))
     {
       try
       {
@@ -407,7 +407,7 @@ internal class ShowItemEffectRanges : IDisposable
 
   private void AddTilesToHighlightedArea(IEnumerable<Vector2> tiles, bool overlap, int xPos = 0, int yPos = 0)
   {
-    if (_mutex.WaitOne())
+    if (_mutex.WaitOne(100))
     {
       try
       {
@@ -437,7 +437,7 @@ internal class ShowItemEffectRanges : IDisposable
   {
     int xOffset = tileMap.Length / 2;
 
-    if (_mutex.WaitOne())
+    if (_mutex.WaitOne(100))
     {
       try
       {

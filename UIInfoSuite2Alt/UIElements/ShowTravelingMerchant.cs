@@ -208,10 +208,6 @@ public class ShowTravelingMerchant : IDisposable
       CheckMerchantForBundleItems();
     }
 
-    // // DEBUG: Force bundle indicator for testing (remove before release)
-    // _merchantHasBundleItems = true;
-    // _bundleItemNames.Clear();
-    // _bundleItemNames.Add("Caviar");
   }
 
   private void CheckMerchantForBundleItems()

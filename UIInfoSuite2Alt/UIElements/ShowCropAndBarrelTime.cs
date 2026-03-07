@@ -543,7 +543,6 @@ internal class ShowCropAndBarrelTime : IDisposable
             displayName = TokenParser.ParseText(displayName);
           }
 
-          bushName = $"{displayName} Bush";
           ageToMature = customBushData.AgeToProduce;
           inProductionPeriod = Game1.dayOfMonth >= customBushData.DayToBeginProducing;
           daysUntilProductionPeriod = inProductionPeriod ? 0 : 22 - Game1.dayOfMonth;
@@ -555,6 +554,17 @@ internal class ShowCropAndBarrelTime : IDisposable
           else
           {
             droppedItems = customBushApi.GetCustomBushDropItems(customBushData, id);
+          }
+
+          // Use the drop item's name for the bush if there's exactly one drop
+          if (droppedItems.Count == 1)
+          {
+            string suffix = bush.getAge() >= ageToMature ? "Bush" : "Sapling";
+            bushName = $"{droppedItems[0].Item.DisplayName} {suffix}";
+          }
+          else
+          {
+            bushName = displayName;
           }
         }
       }

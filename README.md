@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <img src=".github/assets/showcase-animation.webp" alt="Showcase">
+  <img src=".github/assets/showcase-animation-2.webp" alt="Showcase">
 </p>
 
 <p align="center">

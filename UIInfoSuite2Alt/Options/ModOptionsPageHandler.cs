@@ -205,6 +205,61 @@ internal class ModOptionsPageHandler : IDisposable
         birthdayIcon
       )
     );
+    var travellingMerchantIcon = new ModOptionsCheckbox(
+      _helper.SafeGetString(nameof(options.ShowTravelingMerchant)),
+      whichOption++,
+      showTravelingMerchant.ToggleOption,
+      () => options.ShowTravelingMerchant,
+      v => options.ShowTravelingMerchant = v
+    );
+    _optionsElements.Add(travellingMerchantIcon);
+    _optionsElements.Add(
+      new ModOptionsCheckbox(
+        _helper.SafeGetString(nameof(options.HideMerchantWhenVisited)),
+        whichOption++,
+        showTravelingMerchant.ToggleHideWhenVisitedOption,
+        () => options.HideMerchantWhenVisited,
+        v => options.HideMerchantWhenVisited = v,
+        travellingMerchantIcon
+      )
+    );
+    var merchantBundleIcon = new ModOptionsCheckbox(
+      _helper.SafeGetString(nameof(options.ShowMerchantBundleIcon)),
+      whichOption++,
+      showTravelingMerchant.ToggleShowBundleIconOption,
+      () => options.ShowMerchantBundleIcon,
+      v => options.ShowMerchantBundleIcon = v,
+      travellingMerchantIcon
+    );
+    _optionsElements.Add(merchantBundleIcon);
+    _optionsElements.Add(
+      new ModOptionsCheckbox(
+        _helper.SafeGetString(nameof(options.ShowMerchantBundleItemNames)),
+        whichOption++,
+        showTravelingMerchant.ToggleShowBundleItemNamesOption,
+        () => options.ShowMerchantBundleItemNames,
+        v => options.ShowMerchantBundleItemNames = v,
+        merchantBundleIcon
+      )
+    );
+    var booksellerIcon = new ModOptionsCheckbox(
+      _helper.SafeGetString(nameof(options.ShowBookseller)),
+      whichOption++,
+      showBookseller.ToggleOption,
+      () => options.ShowBookseller,
+      v => options.ShowBookseller = v
+    );
+    _optionsElements.Add(booksellerIcon);
+    _optionsElements.Add(
+      new ModOptionsCheckbox(
+        _helper.SafeGetString(nameof(options.HideBooksellerWhenVisited)),
+        whichOption++,
+        showBookseller.ToggleHideWhenVisitedOption,
+        () => options.HideBooksellerWhenVisited,
+        v => options.HideBooksellerWhenVisited = v,
+        booksellerIcon
+      )
+    );
     _optionsElements.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(options.ShowFestivalIcon)),
@@ -293,61 +348,6 @@ internal class ModOptionsPageHandler : IDisposable
         showBuffTimers.ToggleOption,
         () => options.ShowBuffTimers,
         v => options.ShowBuffTimers = v
-      )
-    );
-    var travellingMerchantIcon = new ModOptionsCheckbox(
-      _helper.SafeGetString(nameof(options.ShowTravelingMerchant)),
-      whichOption++,
-      showTravelingMerchant.ToggleOption,
-      () => options.ShowTravelingMerchant,
-      v => options.ShowTravelingMerchant = v
-    );
-    _optionsElements.Add(travellingMerchantIcon);
-    _optionsElements.Add(
-      new ModOptionsCheckbox(
-        _helper.SafeGetString(nameof(options.HideMerchantWhenVisited)),
-        whichOption++,
-        showTravelingMerchant.ToggleHideWhenVisitedOption,
-        () => options.HideMerchantWhenVisited,
-        v => options.HideMerchantWhenVisited = v,
-        travellingMerchantIcon
-      )
-    );
-    var merchantBundleIcon = new ModOptionsCheckbox(
-      _helper.SafeGetString(nameof(options.ShowMerchantBundleIcon)),
-      whichOption++,
-      showTravelingMerchant.ToggleShowBundleIconOption,
-      () => options.ShowMerchantBundleIcon,
-      v => options.ShowMerchantBundleIcon = v,
-      travellingMerchantIcon
-    );
-    _optionsElements.Add(merchantBundleIcon);
-    _optionsElements.Add(
-      new ModOptionsCheckbox(
-        _helper.SafeGetString(nameof(options.ShowMerchantBundleItemNames)),
-        whichOption++,
-        showTravelingMerchant.ToggleShowBundleItemNamesOption,
-        () => options.ShowMerchantBundleItemNames,
-        v => options.ShowMerchantBundleItemNames = v,
-        merchantBundleIcon
-      )
-    );
-    var booksellerIcon = new ModOptionsCheckbox(
-      _helper.SafeGetString(nameof(options.ShowBookseller)),
-      whichOption++,
-      showBookseller.ToggleOption,
-      () => options.ShowBookseller,
-      v => options.ShowBookseller = v
-    );
-    _optionsElements.Add(booksellerIcon);
-    _optionsElements.Add(
-      new ModOptionsCheckbox(
-        _helper.SafeGetString(nameof(options.HideBooksellerWhenVisited)),
-        whichOption++,
-        showBookseller.ToggleHideWhenVisitedOption,
-        () => options.HideBooksellerWhenVisited,
-        v => options.HideBooksellerWhenVisited = v,
-        booksellerIcon
       )
     );
 

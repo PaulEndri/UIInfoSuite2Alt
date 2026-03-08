@@ -27,7 +27,7 @@
 
 - **v2.4.9**
   - Show exclamation mark on billboard icon in inventory when a daily quest is available
-  - Add Special Orders & Mr. Qi's Special Orders board icon in inventory with animated exclamation mark when new orders are available
+  - Add Special Orders & Mr. Qi's Special Orders board icons in inventory with animated exclamation marks when new orders are available and be able to accept new SO's through the clickable icons
   - Add option to switch between the new clover luck icon and the classic dice icon
 - **v2.4.8**
   - Replace dice luck icon with custom 4-leaf clover spritesheet (8 tiers of luck, including Special Charm and shrine extremes)

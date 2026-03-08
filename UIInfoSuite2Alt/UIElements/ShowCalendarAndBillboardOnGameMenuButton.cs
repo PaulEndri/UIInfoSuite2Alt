@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
@@ -7,6 +9,7 @@ using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.ItemTypeDefinitions;
 using StardewValley.Menus;
+using StardewValley.SpecialOrders;
 using UIInfoSuite2Alt.Compatibility;
 using UIInfoSuite2Alt.Infrastructure;
 
@@ -20,17 +23,24 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
 
   private readonly PerScreen<Rectangle> _calendarBounds = new(() => Rectangle.Empty);
   private readonly PerScreen<Rectangle> _questBounds = new(() => Rectangle.Empty);
+  private readonly PerScreen<Rectangle> _specialOrdersBounds = new(() => Rectangle.Empty);
 
   private readonly IModHelper _helper;
+  private readonly Texture2D _townTexture;
 
   private readonly PerScreen<Item?> _hoverItem = new();
   private readonly PerScreen<Item?> _heldItem = new();
+
+  private int _soPulseTimer;
+  private int _soPulseDelay;
+  private readonly PerScreen<HashSet<string>> _viewedSpecialOrderKeys = new(() => new HashSet<string>());
   #endregion
 
   #region Lifecycle
   public ShowCalendarAndBillboardOnGameMenuButton(IModHelper helper)
   {
     _helper = helper;
+    _townTexture = helper.GameContent.Load<Texture2D>("Maps/spring_town");
   }
 
   public void Dispose()
@@ -45,12 +55,14 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
     _helper.Events.Display.RenderedActiveMenu -= OnRenderedActiveMenu;
     _helper.Events.Input.ButtonPressed -= OnButtonPressed;
     _helper.Events.GameLoop.UpdateTicked -= OnUpdateTicked;
+    _helper.Events.GameLoop.DayStarted -= OnDayStarted;
 
     if (showCalendarAndBillboard)
     {
       _helper.Events.Display.RenderedActiveMenu += OnRenderedActiveMenu;
       _helper.Events.Input.ButtonPressed += OnButtonPressed;
       _helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
+      _helper.Events.GameLoop.DayStarted += OnDayStarted;
     }
   }
   #endregion
@@ -59,6 +71,22 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
   #region Event subscriptions
   private void OnUpdateTicked(object? sender, EventArgs e)
   {
+    // Update special orders pulse timer
+    int elapsed = (int)Game1.currentGameTime.ElapsedGameTime.TotalMilliseconds;
+    if (_soPulseTimer > 0)
+    {
+      _soPulseTimer -= elapsed;
+    }
+    else if (_soPulseDelay > 0)
+    {
+      _soPulseDelay -= elapsed;
+    }
+    else
+    {
+      _soPulseTimer = 1000;
+      _soPulseDelay = 3000;
+    }
+
     // Get hovered and hold item
     _hoverItem.Value = Tools.GetHoveredItem();
     IClickableMenu? menu = Game1.activeClickableMenu;
@@ -83,6 +111,20 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
     else if (e.Button == SButton.ControllerA)
     {
       ActivateBillboard();
+    }
+  }
+
+  private void OnDayStarted(object? sender, DayStartedEventArgs e)
+  {
+    // Clear viewed keys if available orders have changed
+    HashSet<string> currentKeys = new(
+      Game1.player.team.availableSpecialOrders
+        .Where(o => o.orderType.Value == "")
+        .Select(o => o.questKey.Value));
+
+    if (!_viewedSpecialOrderKeys.Value.SetEquals(currentKeys))
+    {
+      _viewedSpecialOrderKeys.Value.Clear();
     }
   }
 
@@ -124,6 +166,53 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
     b.Draw(calendarData.GetTexture(), calendarDest, calendarSrc, Color.White);
     b.Draw(Game1.objectSpriteSheet, questDest, new Rectangle(144, 592, 16, 16), Color.White);
 
+    // Draw exclamation mark when a daily quest is available
+    if (Game1.CanAcceptDailyQuest())
+    {
+      float scale = 1.6f;
+      b.Draw(
+        Game1.mouseCursors,
+        new Vector2(questDest.X + questDest.Width - 3f, questDest.Y - 5f),
+        new Rectangle(403, 496, 5, 14),
+        Color.White,
+        0f,
+        Vector2.Zero,
+        scale,
+        SpriteEffects.None,
+        1f
+      );
+    }
+
+    // Draw Special Orders board icon below billboard (only when unlocked)
+    if (SpecialOrder.IsSpecialOrdersBoardUnlocked())
+    {
+      int soWidth = DrawSize * 17 / 13;
+      Rectangle specialOrdersDest = new(
+        questDest.X - 4, questDest.Y + DrawSize + IconSpacing, soWidth, DrawSize
+      );
+      _specialOrdersBounds.Value = specialOrdersDest;
+
+      b.Draw(
+        _townTexture, specialOrdersDest,
+        new Rectangle(480, 1001, 17, 13), Color.White
+      );
+
+      // Draw animated exclamation mark when special orders are available
+      bool hasUnviewedOrders = Game1.player.team.availableSpecialOrders
+        .Where(o => o.orderType.Value == "")
+        .Any(o => !_viewedSpecialOrderKeys.Value.Contains(o.questKey.Value));
+      if (hasUnviewedOrders && !Game1.player.team.acceptedSpecialOrderTypes.Contains(""))
+      {
+        DrawPulsingExclamation(b, new Vector2(
+          specialOrdersDest.X + specialOrdersDest.Width - 4f,
+          specialOrdersDest.Y + 5f));
+      }
+    }
+    else
+    {
+      _specialOrdersBounds.Value = Rectangle.Empty;
+    }
+
     if (_heldItem.Value != null)
     {
       _heldItem.Value.drawInMenu(b, new Vector2(Game1.getOldMouseX() + 16, Game1.getOldMouseY() + 16), 1f);
@@ -150,6 +239,39 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
     {
       IClickableMenu.drawHoverText(b, I18n.Billboard(), Game1.dialogueFont);
     }
+    else if (_specialOrdersBounds.Value.Contains(mouseX, mouseY))
+    {
+      IClickableMenu.drawHoverText(b, I18n.SpecialOrders(), Game1.dialogueFont);
+    }
+  }
+
+  private void DrawPulsingExclamation(SpriteBatch b, Vector2 position)
+  {
+    float baseScale = 1.6f;
+    float scale = baseScale;
+    Vector2 shake = Vector2.Zero;
+
+    if (_soPulseTimer > 0)
+    {
+      float pulseScale = 1f / (Math.Max(300f, Math.Abs(_soPulseTimer % 1000 - 500)) / 500f);
+      scale = baseScale * pulseScale;
+      if (pulseScale > 1f)
+      {
+        shake = new Vector2(Game1.random.Next(-1, 2), Game1.random.Next(-1, 2));
+      }
+    }
+
+    b.Draw(
+      Game1.mouseCursors,
+      position + shake,
+      new Rectangle(403, 496, 5, 14),
+      Color.White,
+      0f,
+      new Vector2(2.5f, 7f),
+      scale,
+      SpriteEffects.None,
+      1f
+    );
   }
 
   private void ActivateBillboard()
@@ -165,9 +287,20 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
 
     bool isCalendar = _calendarBounds.Value.Contains(mouseX, mouseY);
     bool isQuest = _questBounds.Value.Contains(mouseX, mouseY);
+    bool isSpecialOrders = _specialOrdersBounds.Value.Contains(mouseX, mouseY);
 
-    if (!isCalendar && !isQuest)
+    if (!isCalendar && !isQuest && !isSpecialOrders)
     {
+      return;
+    }
+
+    if (isSpecialOrders)
+    {
+      _viewedSpecialOrderKeys.Value = new HashSet<string>(
+        Game1.player.team.availableSpecialOrders
+          .Where(o => o.orderType.Value == "")
+          .Select(o => o.questKey.Value));
+      Game1.activeClickableMenu = new SpecialOrdersBoard();
       return;
     }
 

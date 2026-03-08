@@ -193,13 +193,21 @@ internal class ShowFestivalIcon : IDisposable
     }
   }
 
-  // Get display name, falling back to humanized ID ("TroutDerby" → "Trout Derby")
+  // Get display name from data, then localized strings, falling back to humanized ID
   private static string GetPassiveFestivalName(string festivalId, PassiveFestivalData data)
   {
     string parsed = TokenParser.ParseText(data.DisplayName);
     if (!string.IsNullOrWhiteSpace(parsed))
     {
       return parsed;
+    }
+
+    // Some passive festivals (TroutDerby, SquidFest) have empty DisplayName but store
+    // their localized name in Strings/1_6_Strings using the festival ID as the key
+    Dictionary<string, string> strings = Game1.content.Load<Dictionary<string, string>>("Strings\\1_6_Strings");
+    if (strings.TryGetValue(festivalId, out string? localizedName) && !string.IsNullOrWhiteSpace(localizedName))
+    {
+      return localizedName;
     }
 
     // Insert spaces before uppercase letters: "TroutDerby" → "Trout Derby"

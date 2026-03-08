@@ -20,7 +20,7 @@ namespace UIInfoSuite2Alt.UIElements;
 internal class LocationOfTownsfolk : IDisposable
 {
   #region Properties
-  private SocialPage _socialPage = null!;
+  private SocialPage? _socialPage;
   private readonly List<string> _friendNames = new();
   private readonly List<NPC> _townsfolk = new();
   private readonly List<OptionsCheckbox> _checkboxes = new();
@@ -171,6 +171,15 @@ internal class LocationOfTownsfolk : IDisposable
 
   private void CheckSelectedBox(ButtonPressedEventArgs e)
   {
+    if (_socialPage is null || _checkboxes.Count == 0)
+    {
+      ModEntry.MonitorObject.LogOnce(
+        $"Social page not ready during checkbox input (socialPage: {_socialPage is not null}, checkboxes: {_checkboxes.Count}, activeMenu: {Game1.activeClickableMenu?.GetType().FullName ?? "null"}). Another mod may be interfering.",
+        LogLevel.Warn
+      );
+      return;
+    }
+
     for (int i = _socialPage.slotPosition; i < _socialPage.slotPosition + MaxVisibleSlots; ++i)
     {
       OptionsCheckbox checkbox = _checkboxes[i];
@@ -195,6 +204,15 @@ internal class LocationOfTownsfolk : IDisposable
 
   private void DrawSocialPageOptions()
   {
+    if (_socialPage is null || _checkboxes.Count == 0)
+    {
+      ModEntry.MonitorObject.LogOnce(
+        $"Social page not ready during draw (socialPage: {_socialPage is not null}, checkboxes: {_checkboxes.Count}, activeMenu: {Game1.activeClickableMenu?.GetType().FullName ?? "null"}). Another mod may be interfering.",
+        LogLevel.Warn
+      );
+      return;
+    }
+
     Game1.drawDialogueBox(
       _socialPage.xPositionOnScreen - SocialPanelXOffset,
       _socialPage.yPositionOnScreen,

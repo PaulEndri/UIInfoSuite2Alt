@@ -19,6 +19,7 @@ internal class LuckOfDay : IDisposable
 
   private readonly PerScreen<string> _hoverText = new(() => string.Empty);
   private readonly PerScreen<int> _cloverFrame = new(() => 4);
+  private readonly PerScreen<Color> _diceColor = new(() => new Color(Color.White.ToVector4()));
 
   private readonly Texture2D _cloverTexture;
 
@@ -29,6 +30,15 @@ internal class LuckOfDay : IDisposable
   private bool Enabled { get; set; }
   private bool ShowExactValue { get; set; }
   private bool RequireTv { get; set; }
+  private bool UseClassicIcon { get; set; }
+
+  // Classic dice icon colors
+  private static readonly Color Luck1Color = new(87, 255, 106, 255);
+  private static readonly Color Luck2Color = new(148, 255, 210, 255);
+  private static readonly Color Luck3Color = new(246, 255, 145, 255);
+  private static readonly Color Luck4Color = new(255, 255, 255, 255);
+  private static readonly Color Luck5Color = new(255, 155, 155, 255);
+  private static readonly Color Luck6Color = new(165, 165, 165, 204);
   #endregion
 
   #region Lifecycle
@@ -75,6 +85,12 @@ internal class LuckOfDay : IDisposable
     RequireTv = requireTv;
     ToggleOption(Enabled);
   }
+
+  public void ToggleUseClassicIconOption(bool useClassicIcon)
+  {
+    UseClassicIcon = useClassicIcon;
+    AdjustIconXToBlackBorder();
+  }
   #endregion
 
   #region Event subscriptions
@@ -87,26 +103,60 @@ internal class LuckOfDay : IDisposable
   {
     if (UIElementUtils.IsRenderingNormally() && (!RequireTv || TvChannelWatcher.HasWatchedFortune.Value))
     {
-      IconHandler.Handler.EnqueueIcon(
-        "Luck",
-        (batch, pos) =>
-        {
-          ClickableTextureComponent icon = _icon.Value;
-          icon.bounds.X = pos.X;
-          icon.bounds.Y = pos.Y;
-          icon.sourceRect = new Rectangle(_cloverFrame.Value * CloverFrameSize, 0, CloverFrameSize, CloverFrameSize);
-          _icon.Value = icon;
-          _icon.Value.draw(batch, Color.White * 0.9f, 1f);
-        },
-        batch =>
-        {
-          if (_icon.Value.containsPoint(Game1.getMouseX(), Game1.getMouseY()))
-          {
-            IClickableMenu.drawHoverText(batch, _hoverText.Value, Game1.dialogueFont);
-          }
-        }
-      );
+      if (UseClassicIcon)
+      {
+        DrawClassicIcon();
+      }
+      else
+      {
+        DrawCloverIcon();
+      }
     }
+  }
+
+  private void DrawCloverIcon()
+  {
+    IconHandler.Handler.EnqueueIcon(
+      "Luck",
+      (batch, pos) =>
+      {
+        ClickableTextureComponent icon = _icon.Value;
+        icon.bounds.X = pos.X;
+        icon.bounds.Y = pos.Y;
+        icon.sourceRect = new Rectangle(_cloverFrame.Value * CloverFrameSize, 0, CloverFrameSize, CloverFrameSize);
+        _icon.Value = icon;
+        _icon.Value.draw(batch, Color.White * 0.9f, 1f);
+      },
+      batch =>
+      {
+        if (_icon.Value.containsPoint(Game1.getMouseX(), Game1.getMouseY()))
+        {
+          IClickableMenu.drawHoverText(batch, _hoverText.Value, Game1.dialogueFont);
+        }
+      }
+    );
+  }
+
+  private void DrawClassicIcon()
+  {
+    IconHandler.Handler.EnqueueIcon(
+      "Luck",
+      (batch, pos) =>
+      {
+        ClickableTextureComponent icon = _icon.Value;
+        icon.bounds.X = pos.X;
+        icon.bounds.Y = pos.Y;
+        _icon.Value = icon;
+        _icon.Value.draw(batch, _diceColor.Value, 1f);
+      },
+      batch =>
+      {
+        if (_icon.Value.containsPoint(Game1.getMouseX(), Game1.getMouseY()))
+        {
+          IClickableMenu.drawHoverText(batch, _hoverText.Value, Game1.dialogueFont);
+        }
+      }
+    );
   }
   #endregion
 
@@ -123,45 +173,53 @@ internal class LuckOfDay : IDisposable
         case <= -0.075:
           _hoverText.Value = I18n.LuckStatus6();
           _cloverFrame.Value = 0;
+          _diceColor.Value = Luck6Color;
           break;
         // Very bad luck
         case < -0.07:
           _hoverText.Value = I18n.LuckStatus6();
           _cloverFrame.Value = 1;
+          _diceColor.Value = Luck6Color;
           break;
         // Bad luck
         case < -0.02:
           _hoverText.Value = I18n.LuckStatus5();
           _cloverFrame.Value = 2;
+          _diceColor.Value = Luck5Color;
           break;
         // Absolutely neutral
         case 0:
           _hoverText.Value = I18n.LuckStatus4();
           _cloverFrame.Value = 3;
+          _diceColor.Value = Luck4Color;
           break;
         // Near-neutral (non-zero, between -0.02 and +0.02)
         case <= 0.02:
           _hoverText.Value = I18n.LuckStatus3();
           _cloverFrame.Value = 4;
+          _diceColor.Value = Luck3Color;
           break;
         // Good luck
         case <= 0.07:
           _hoverText.Value = I18n.LuckStatus2();
           _cloverFrame.Value = 5;
+          _diceColor.Value = Luck2Color;
           break;
         // Very good luck
         case < 0.1:
           _hoverText.Value = I18n.LuckStatus1();
           _cloverFrame.Value = 6;
+          _diceColor.Value = Luck1Color;
           break;
         // Max luck — includes shrine extremes
         default:
           _hoverText.Value = I18n.LuckStatus1();
           _cloverFrame.Value = 7;
+          _diceColor.Value = Luck1Color;
           break;
       }
 
-      // Rewrite the text, but keep the frame
+      // Rewrite the text, but keep the frame/color
       if (ShowExactValue)
       {
         _hoverText.Value = string.Format(I18n.DailyLuckValue(), Game1.player.DailyLuck.ToString("N3"));
@@ -185,6 +243,19 @@ internal class LuckOfDay : IDisposable
 
   private ClickableTextureComponent CreateIcon()
   {
+    if (UseClassicIcon)
+    {
+      return new ClickableTextureComponent(
+        "",
+        new Rectangle(Tools.GetWidthInPlayArea() - 134, 290, 10 * Game1.pixelZoom, 10 * Game1.pixelZoom),
+        "",
+        "",
+        Game1.mouseCursors,
+        new Rectangle(50, 428, 10, 14),
+        Game1.pixelZoom
+      );
+    }
+
     int scaledSize = (int)(CloverFrameSize * CloverScale);
     return new ClickableTextureComponent(
       "",

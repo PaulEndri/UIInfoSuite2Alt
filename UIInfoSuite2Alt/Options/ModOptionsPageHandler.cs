@@ -151,6 +151,16 @@ internal class ModOptionsPageHandler : IDisposable
     _optionsElements.Add(luckIcon);
     _optionsElements.Add(
       new ModOptionsCheckbox(
+        _helper.SafeGetString(nameof(options.UseClassicLuckIcon)),
+        whichOption++,
+        luckOfDay.ToggleUseClassicIconOption,
+        () => options.UseClassicLuckIcon,
+        v => options.UseClassicLuckIcon = v,
+        luckIcon
+      )
+    );
+    _optionsElements.Add(
+      new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(options.ShowExactValue)),
         whichOption++,
         luckOfDay.ToggleShowExactValueOption,

@@ -45,6 +45,8 @@ internal class ShowCropAndBarrelTime : IDisposable
   private readonly PerScreen<Building?> _currentTileBuilding = new();
 
   private readonly IModHelper _helper;
+  private bool _showCropTooltip;
+  private bool _showBarrelTooltip;
 
   public ShowCropAndBarrelTime(IModHelper helper)
   {
@@ -53,15 +55,28 @@ internal class ShowCropAndBarrelTime : IDisposable
 
   public void Dispose()
   {
-    ToggleOption(false);
+    ToggleCropOption(false);
+    ToggleBarrelOption(false);
   }
 
-  public void ToggleOption(bool showCropAndBarrelTimes)
+  public void ToggleCropOption(bool showCropTooltip)
+  {
+    _showCropTooltip = showCropTooltip;
+    UpdateEventSubscriptions();
+  }
+
+  public void ToggleBarrelOption(bool showBarrelTooltip)
+  {
+    _showBarrelTooltip = showBarrelTooltip;
+    UpdateEventSubscriptions();
+  }
+
+  private void UpdateEventSubscriptions()
   {
     _helper.Events.Display.RenderingHud -= OnRenderingHud;
     _helper.Events.GameLoop.UpdateTicked -= OnUpdateTicked;
 
-    if (!showCropAndBarrelTimes)
+    if (!_showCropTooltip && !_showBarrelTooltip)
     {
       return;
     }
@@ -147,7 +162,7 @@ internal class ShowCropAndBarrelTime : IDisposable
     int overrideX = -1;
     int overrideY = -1;
 
-    if (currentTileBuilding is not null)
+    if (_showBarrelTooltip && currentTileBuilding is not null)
     {
       foreach (Func<Building?, List<string>, bool> buildingDetailRenderer in BuildingDetailRenderers)
       {
@@ -161,7 +176,7 @@ internal class ShowCropAndBarrelTime : IDisposable
       }
     }
 
-    if (currentTile is not null)
+    if (_showBarrelTooltip && currentTile is not null)
     {
       foreach (Func<Object?, List<string>, bool> machineDetailRenderer in MachineDetailRenderers)
       {
@@ -174,7 +189,7 @@ internal class ShowCropAndBarrelTime : IDisposable
       }
     }
 
-    if (terrain is not null)
+    if (_showCropTooltip && terrain is not null)
     {
       foreach (Func<TerrainFeature, List<string>, bool> terrainDetailRenderer in TerrainDetailRenderers)
       {

@@ -15,7 +15,8 @@ internal record ModOptions
   public bool ShowTravelingMerchant { get; set; } = true;
   public bool ShowBookseller { get; set; } = true;
   public bool ShowRainyDay { get; set; } = true;
-  public bool ShowCropAndBarrelTooltip { get; set; } = true;
+  public bool ShowCropTooltip { get; set; } = true;
+  public bool ShowBarrelTooltip { get; set; } = true;
   public bool ShowBirthdayIcon { get; set; } = true;
   public bool ShowAnimalsNeedPets { get; set; } = true;
   public bool HideAnimalPetOnMaxFriendship { get; set; } = true;

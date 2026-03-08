@@ -26,8 +26,10 @@
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
 - **v2.4.7**
-  - Fix NullReferenceException crash when opening the social tab if the social page hasn't fully loaded yet
-  - Add diagnostic warning log when social page is not ready to help identify mod conflicts
+  - Split "Show crop and barrel times" option into separate "Show crop and tree times" and "Show machine and barrel times" options
+  - "Show bomb range" is now a standalone option, no longer nested under "Show scarecrow and sprinkler range"
+  - Fix crash when opening the social tab if the social page hasn't fully loaded yet
+  - Add warning log when social page is not ready to help identify mod conflicts
   - Fix fishing festival names (Trout Derby, SquidFest) not showing translated names in non-English locales
 - **v2.4.6**
   - Add alpha pulsation and color to buff duration timers
@@ -116,7 +118,8 @@ The current features include:
 - Display more information on item mouse overs, including items that are still needed for bundles
 - View calendar and quest billboard anywhere
 - Display icons over animals that need petting
-- Display crop type and days until harvest
+- Display crop type, tree info, and days until harvest
+- Display machine and barrel processing times
 - Display icon when animal has item yield (milk, wool)
 - Sprinkler, scarecrow, beehive and junimo hut ranges
 - Display npc locations on map

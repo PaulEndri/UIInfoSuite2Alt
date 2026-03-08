@@ -25,6 +25,8 @@ internal class ShowItemEffectRanges : IDisposable
 
   private readonly IModHelper _helper;
 
+  private bool _showItemEffectRanges;
+
   private bool ButtonControlShow { get; set; }
   private bool ShowBombRange { get; set; }
 
@@ -42,20 +44,14 @@ internal class ShowItemEffectRanges : IDisposable
   public void Dispose()
   {
     ToggleOption(false);
+    ToggleShowBombRangeOption(false);
   }
 
   public void ToggleOption(bool showItemEffectRanges)
   {
+    _showItemEffectRanges = showItemEffectRanges;
     ToggleButtonControlShowOption(showItemEffectRanges);
-
-    _helper.Events.Display.RenderingHud -= OnRenderingHud;
-    _helper.Events.GameLoop.UpdateTicked -= OnUpdateTicked;
-
-    if (showItemEffectRanges)
-    {
-      _helper.Events.Display.RenderingHud += OnRenderingHud;
-      _helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
-    }
+    UpdateEventSubscriptions();
   }
 
   public void ToggleButtonControlShowOption(bool buttonControlShow)
@@ -72,6 +68,19 @@ internal class ShowItemEffectRanges : IDisposable
   public void ToggleShowBombRangeOption(bool showBombRange)
   {
     ShowBombRange = showBombRange;
+    UpdateEventSubscriptions();
+  }
+
+  private void UpdateEventSubscriptions()
+  {
+    _helper.Events.Display.RenderingHud -= OnRenderingHud;
+    _helper.Events.GameLoop.UpdateTicked -= OnUpdateTicked;
+
+    if (_showItemEffectRanges || ShowBombRange)
+    {
+      _helper.Events.Display.RenderingHud += OnRenderingHud;
+      _helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
+    }
   }
   #endregion
 
@@ -196,22 +205,25 @@ internal class ShowItemEffectRanges : IDisposable
     List<Object> similarObjects;
 
     // Junimo Hut is handled differently, because it is a building
-    Building building = Game1.currentLocation.getBuildingAt(Game1.GetPlacementGrabTile());
-
-    if (building is JunimoHut)
+    if (_showItemEffectRanges)
     {
-      arrayToUse = GetDistanceArray(ObjectsWithDistance.JunimoHut);
-      foreach (Building? nextBuilding in Game1.currentLocation.buildings)
+      Building building = Game1.currentLocation.getBuildingAt(Game1.GetPlacementGrabTile());
+
+      if (building is JunimoHut)
       {
-        if (nextBuilding is JunimoHut nextHut)
+        arrayToUse = GetDistanceArray(ObjectsWithDistance.JunimoHut);
+        foreach (Building? nextBuilding in Game1.currentLocation.buildings)
         {
-          AddTilesToHighlightedArea(arrayToUse, false, nextHut.tileX.Value + 1, nextHut.tileY.Value + 1);
+          if (nextBuilding is JunimoHut nextHut)
+          {
+            AddTilesToHighlightedArea(arrayToUse, false, nextHut.tileX.Value + 1, nextHut.tileY.Value + 1);
+          }
         }
       }
     }
 
     // Every other item is here
-    if (ButtonControlShow && (ButtonShowOneRange || ButtonShowAllRanges))
+    if (_showItemEffectRanges && ButtonControlShow && (ButtonShowOneRange || ButtonShowAllRanges))
     {
       Vector2 gamepadTile = Game1.player.CurrentTool != null
         ? Utility.snapToInt(Game1.player.GetToolLocation() / Game1.tileSize)
@@ -303,7 +315,7 @@ internal class ShowItemEffectRanges : IDisposable
         }
       }
     }
-    else if (Game1.player.CurrentItem is Object currentItem && currentItem.isPlaceable())
+    if (Game1.player.CurrentItem is Object currentItem && currentItem.isPlaceable())
     {
       string itemName = currentItem.Name;
 
@@ -321,68 +333,72 @@ internal class ShowItemEffectRanges : IDisposable
                           Game1.tileSize;
       Game1.isCheckingNonMousePlacement = false;
 
-      if (itemName.IndexOf("arecrow", StringComparison.OrdinalIgnoreCase) >= 0)
+      if (_showItemEffectRanges)
       {
-        arrayToUse = itemName.Contains("eluxe")
-          ? GetDistanceArray(ObjectsWithDistance.DeluxeScarecrow, false, currentItem)
-          : GetDistanceArray(ObjectsWithDistance.Scarecrow, false, currentItem);
-        AddTilesToHighlightedArea(arrayToUse, true, (int)validTile.X, (int)validTile.Y);
-
-        similarObjects = GetSimilarObjectsInLocation("arecrow");
-        foreach (Object next in similarObjects)
+        if (itemName.IndexOf("arecrow", StringComparison.OrdinalIgnoreCase) >= 0)
         {
-          arrayToUse = next.Name.IndexOf("eluxe", StringComparison.OrdinalIgnoreCase) >= 0
-            ? GetDistanceArray(ObjectsWithDistance.DeluxeScarecrow, false, next)
-            : GetDistanceArray(ObjectsWithDistance.Scarecrow, false, next);
-          AddTilesToHighlightedArea(arrayToUse, false, (int)next.TileLocation.X, (int)next.TileLocation.Y);
+          arrayToUse = itemName.Contains("eluxe")
+            ? GetDistanceArray(ObjectsWithDistance.DeluxeScarecrow, false, currentItem)
+            : GetDistanceArray(ObjectsWithDistance.Scarecrow, false, currentItem);
+          AddTilesToHighlightedArea(arrayToUse, true, (int)validTile.X, (int)validTile.Y);
+
+          similarObjects = GetSimilarObjectsInLocation("arecrow");
+          foreach (Object next in similarObjects)
+          {
+            arrayToUse = next.Name.IndexOf("eluxe", StringComparison.OrdinalIgnoreCase) >= 0
+              ? GetDistanceArray(ObjectsWithDistance.DeluxeScarecrow, false, next)
+              : GetDistanceArray(ObjectsWithDistance.Scarecrow, false, next);
+            AddTilesToHighlightedArea(arrayToUse, false, (int)next.TileLocation.X, (int)next.TileLocation.Y);
+          }
+        }
+        else if (itemName.IndexOf("sprinkler", StringComparison.OrdinalIgnoreCase) >= 0)
+        {
+          // Relative tile positions to the placable items locations - need to pass coordinates
+
+          /*
+           * @NermNermNerm:
+           * This change is a little bit worrisome because Object.GetSprinklerTiles didn't semantically change in 1.6...
+           * But it did change. Somebody noodled over it and changed a variable name.
+           * However, its behavior got changed by something else -
+           * in the past it was zero-based - as Object.tileLocation used to be 0.0 for unplaced objects,
+           * and now it's the tile that's being hovered over.
+           * That new behavior might not be intended and might get rolled back.
+           */
+
+          // Move tiles to 0, 0 and then offset by the correct tile.
+          IEnumerable<Vector2> unplacedSprinklerTiles = currentItem.GetSprinklerTiles();
+          if (currentItem.TileLocation != validTile)
+          {
+            unplacedSprinklerTiles = unplacedSprinklerTiles.Select(tile => tile - currentItem.TileLocation + validTile);
+          }
+
+          AddTilesToHighlightedArea(unplacedSprinklerTiles, true);
+
+          similarObjects = GetSimilarObjectsInLocation("sprinkler");
+          foreach (Object next in similarObjects)
+          {
+            // Absolute tile positions
+            AddTilesToHighlightedArea(next.GetSprinklerTiles(), false);
+          }
+        }
+        else if (itemName.IndexOf("bee house", StringComparison.OrdinalIgnoreCase) >= 0)
+        {
+          arrayToUse = GetDistanceArray(ObjectsWithDistance.Beehouse);
+          AddTilesToHighlightedArea(arrayToUse, false, (int)validTile.X, (int)validTile.Y);
+        }
+        else if (itemName.IndexOf("mushroom log", StringComparison.OrdinalIgnoreCase) >= 0)
+        {
+          arrayToUse = GetDistanceArray(ObjectsWithDistance.MushroomLog);
+          AddTilesToHighlightedArea(arrayToUse, false, (int)validTile.X, (int)validTile.Y);
+        }
+        else if (itemName.IndexOf("mossy seed", StringComparison.OrdinalIgnoreCase) >= 0)
+        {
+          arrayToUse = GetDistanceArray(ObjectsWithDistance.MossySeed);
+          AddTilesToHighlightedArea(arrayToUse, false, (int)validTile.X, (int)validTile.Y);
         }
       }
-      else if (itemName.IndexOf("sprinkler", StringComparison.OrdinalIgnoreCase) >= 0)
-      {
-        // Relative tile positions to the placable items locations - need to pass coordinates
 
-        /*
-         * @NermNermNerm:
-         * This change is a little bit worrisome because Object.GetSprinklerTiles didn't semantically change in 1.6...
-         * But it did change. Somebody noodled over it and changed a variable name.
-         * However, its behavior got changed by something else -
-         * in the past it was zero-based - as Object.tileLocation used to be 0.0 for unplaced objects,
-         * and now it's the tile that's being hovered over.
-         * That new behavior might not be intended and might get rolled back.
-         */
-
-        // Move tiles to 0, 0 and then offset by the correct tile.
-        IEnumerable<Vector2> unplacedSprinklerTiles = currentItem.GetSprinklerTiles();
-        if (currentItem.TileLocation != validTile)
-        {
-          unplacedSprinklerTiles = unplacedSprinklerTiles.Select(tile => tile - currentItem.TileLocation + validTile);
-        }
-
-        AddTilesToHighlightedArea(unplacedSprinklerTiles, true);
-
-        similarObjects = GetSimilarObjectsInLocation("sprinkler");
-        foreach (Object next in similarObjects)
-        {
-          // Absolute tile positions
-          AddTilesToHighlightedArea(next.GetSprinklerTiles(), false);
-        }
-      }
-      else if (itemName.IndexOf("bee house", StringComparison.OrdinalIgnoreCase) >= 0)
-      {
-        arrayToUse = GetDistanceArray(ObjectsWithDistance.Beehouse);
-        AddTilesToHighlightedArea(arrayToUse, false, (int)validTile.X, (int)validTile.Y);
-      }
-      else if (itemName.IndexOf("mushroom log", StringComparison.OrdinalIgnoreCase) >= 0)
-      {
-        arrayToUse = GetDistanceArray(ObjectsWithDistance.MushroomLog);
-        AddTilesToHighlightedArea(arrayToUse, false, (int)validTile.X, (int)validTile.Y);
-      }
-      else if (itemName.IndexOf("mossy seed", StringComparison.OrdinalIgnoreCase) >= 0)
-      {
-        arrayToUse = GetDistanceArray(ObjectsWithDistance.MossySeed);
-        AddTilesToHighlightedArea(arrayToUse, false, (int)validTile.X, (int)validTile.Y);
-      }
-      else if (ShowBombRange && itemName.IndexOf("Bomb", StringComparison.OrdinalIgnoreCase) >= 0)
+      if (ShowBombRange && itemName.IndexOf("Bomb", StringComparison.OrdinalIgnoreCase) >= 0)
       {
         if (itemName.Contains("ega"))
         {

@@ -374,11 +374,20 @@ internal class ModOptionsPageHandler : IDisposable
     );
     _optionsElements.Add(
       new ModOptionsCheckbox(
-        _helper.SafeGetString(nameof(options.ShowCropAndBarrelTooltip)),
+        _helper.SafeGetString(nameof(options.ShowCropTooltip)),
         whichOption++,
-        showCropAndBarrelTime.ToggleOption,
-        () => options.ShowCropAndBarrelTooltip,
-        v => options.ShowCropAndBarrelTooltip = v
+        showCropAndBarrelTime.ToggleCropOption,
+        () => options.ShowCropTooltip,
+        v => options.ShowCropTooltip = v
+      )
+    );
+    _optionsElements.Add(
+      new ModOptionsCheckbox(
+        _helper.SafeGetString(nameof(options.ShowBarrelTooltip)),
+        whichOption++,
+        showCropAndBarrelTime.ToggleBarrelOption,
+        () => options.ShowBarrelTooltip,
+        v => options.ShowBarrelTooltip = v
       )
     );
     var ScarecrowAndSprinklerRangeIcon = new ModOptionsCheckbox(
@@ -405,8 +414,7 @@ internal class ModOptionsPageHandler : IDisposable
         whichOption++,
         showScarecrowAndSprinklerRange.ToggleShowBombRangeOption,
         () => options.ShowBombRange,
-        v => options.ShowBombRange = v,
-        ScarecrowAndSprinklerRangeIcon
+        v => options.ShowBombRange = v
       )
     );
 

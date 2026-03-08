@@ -9,6 +9,7 @@ using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.ItemTypeDefinitions;
 using StardewValley.Menus;
+using StardewValley.Locations;
 using StardewValley.SpecialOrders;
 using UIInfoSuite2Alt.Compatibility;
 using UIInfoSuite2Alt.Infrastructure;
@@ -24,6 +25,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
   private readonly PerScreen<Rectangle> _calendarBounds = new(() => Rectangle.Empty);
   private readonly PerScreen<Rectangle> _questBounds = new(() => Rectangle.Empty);
   private readonly PerScreen<Rectangle> _specialOrdersBounds = new(() => Rectangle.Empty);
+  private readonly PerScreen<Rectangle> _qiOrdersBounds = new(() => Rectangle.Empty);
 
   private readonly IModHelper _helper;
   private readonly Texture2D _townTexture;
@@ -34,6 +36,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
   private int _soPulseTimer;
   private int _soPulseDelay;
   private readonly PerScreen<HashSet<string>> _viewedSpecialOrderKeys = new(() => new HashSet<string>());
+  private readonly PerScreen<HashSet<string>> _viewedQiOrderKeys = new(() => new HashSet<string>());
   #endregion
 
   #region Lifecycle
@@ -126,6 +129,17 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
     {
       _viewedSpecialOrderKeys.Value.Clear();
     }
+
+    // Clear viewed Qi keys if available Qi orders have changed
+    HashSet<string> currentQiKeys = new(
+      Game1.player.team.availableSpecialOrders
+        .Where(o => o.orderType.Value == "Qi")
+        .Select(o => o.questKey.Value));
+
+    if (!_viewedQiOrderKeys.Value.SetEquals(currentQiKeys))
+    {
+      _viewedQiOrderKeys.Value.Clear();
+    }
   }
 
   private void OnRenderedActiveMenu(object? sender, EventArgs e)
@@ -213,6 +227,44 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
       _specialOrdersBounds.Value = Rectangle.Empty;
     }
 
+    // Draw Qi's Special Orders board icon to the left of SO icon (only when Qi room unlocked)
+    if (IslandWest.IsQiWalnutRoomDoorUnlocked(out _))
+    {
+      int qiWidth = 15 * 2;
+      int qiHeight = 14 * 2;
+      Rectangle soBounds = _specialOrdersBounds.Value;
+      Rectangle qiOrdersDest = new(
+        soBounds != Rectangle.Empty
+          ? soBounds.X - qiWidth - IconSpacing + 4
+          : questDest.X - 4,
+        (soBounds != Rectangle.Empty
+          ? soBounds.Y
+          : questDest.Y + DrawSize + IconSpacing) + 2,
+        qiWidth, qiHeight
+      );
+      _qiOrdersBounds.Value = qiOrdersDest;
+
+      b.Draw(
+        Game1.objectSpriteSheet, qiOrdersDest,
+        new Rectangle(288, 561, 15, 14), Color.White
+      );
+
+      // Draw animated exclamation mark when Qi orders are available
+      bool hasUnviewedQiOrders = Game1.player.team.availableSpecialOrders
+        .Where(o => o.orderType.Value == "Qi")
+        .Any(o => !_viewedQiOrderKeys.Value.Contains(o.questKey.Value));
+      if (hasUnviewedQiOrders && !Game1.player.team.acceptedSpecialOrderTypes.Contains("Qi"))
+      {
+        DrawPulsingExclamation(b, new Vector2(
+          qiOrdersDest.X + qiOrdersDest.Width - 4f,
+          qiOrdersDest.Y + 3f));
+      }
+    }
+    else
+    {
+      _qiOrdersBounds.Value = Rectangle.Empty;
+    }
+
     if (_heldItem.Value != null)
     {
       _heldItem.Value.drawInMenu(b, new Vector2(Game1.getOldMouseX() + 16, Game1.getOldMouseY() + 16), 1f);
@@ -242,6 +294,10 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
     else if (_specialOrdersBounds.Value.Contains(mouseX, mouseY))
     {
       IClickableMenu.drawHoverText(b, I18n.SpecialOrders(), Game1.dialogueFont);
+    }
+    else if (_qiOrdersBounds.Value.Contains(mouseX, mouseY))
+    {
+      IClickableMenu.drawHoverText(b, I18n.QiSpecialOrders(), Game1.dialogueFont);
     }
   }
 
@@ -288,9 +344,20 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
     bool isCalendar = _calendarBounds.Value.Contains(mouseX, mouseY);
     bool isQuest = _questBounds.Value.Contains(mouseX, mouseY);
     bool isSpecialOrders = _specialOrdersBounds.Value.Contains(mouseX, mouseY);
+    bool isQiOrders = _qiOrdersBounds.Value.Contains(mouseX, mouseY);
 
-    if (!isCalendar && !isQuest && !isSpecialOrders)
+    if (!isCalendar && !isQuest && !isSpecialOrders && !isQiOrders)
     {
+      return;
+    }
+
+    if (isQiOrders)
+    {
+      _viewedQiOrderKeys.Value = new HashSet<string>(
+        Game1.player.team.availableSpecialOrders
+          .Where(o => o.orderType.Value == "Qi")
+          .Select(o => o.questKey.Value));
+      Game1.activeClickableMenu = new SpecialOrdersBoard("Qi");
       return;
     }
 

@@ -26,9 +26,9 @@
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
 - **v2.4.9**
-  - Add option to switch between the new clover luck icon and the classic dice icon
   - Show exclamation mark on billboard icon in inventory when a daily quest is available
-  - Add Special Orders board icon in inventory with animated exclamation mark when new orders are available
+  - Add Special Orders & Mr. Qi's Special Orders board icon in inventory with animated exclamation mark when new orders are available
+  - Add option to switch between the new clover luck icon and the classic dice icon
 - **v2.4.8**
   - Replace dice luck icon with custom 4-leaf clover spritesheet (8 tiers of luck, including Special Charm and shrine extremes)
   - Add [Ferngill Simple Economy](https://www.nexusmods.com/stardewvalley/mods/21414) compatibility: item sell price tooltip no longer overlaps with Ferngill's supply/demand bar

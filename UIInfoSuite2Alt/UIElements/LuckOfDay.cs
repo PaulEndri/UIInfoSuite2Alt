@@ -1,5 +1,7 @@
-﻿using System;
+using System;
+using System.IO;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
@@ -12,39 +14,32 @@ namespace UIInfoSuite2Alt.UIElements;
 internal class LuckOfDay : IDisposable
 {
   #region Properties
-  private readonly PerScreen<string> _hoverText = new(() => string.Empty);
-  private readonly PerScreen<Color> _color = new(() => new Color(Color.White.ToVector4()));
+  private const int CloverFrameSize = 26;
+  private const float CloverScale = Game1.pixelZoom / 2.6f;
 
-  private readonly PerScreen<ClickableTextureComponent> _icon = new(
-    () => new ClickableTextureComponent(
-      "",
-      new Rectangle(Tools.GetWidthInPlayArea() - 134, 290, 10 * Game1.pixelZoom, 10 * Game1.pixelZoom),
-      "",
-      "",
-      Game1.mouseCursors,
-      new Rectangle(50, 428, 10, 14),
-      Game1.pixelZoom
-    )
-  );
+  private readonly PerScreen<string> _hoverText = new(() => string.Empty);
+  private readonly PerScreen<int> _cloverFrame = new(() => 4);
+
+  private readonly Texture2D _cloverTexture;
+
+  private readonly PerScreen<ClickableTextureComponent> _icon;
 
   private readonly IModHelper _helper;
 
   private bool Enabled { get; set; }
   private bool ShowExactValue { get; set; }
   private bool RequireTv { get; set; }
-
-  private static readonly Color Luck1Color = new(87, 255, 106, 255);
-  private static readonly Color Luck2Color = new(148, 255, 210, 255);
-  private static readonly Color Luck3Color = new(246, 255, 145, 255);
-  private static readonly Color Luck4Color = new(255, 255, 255, 255);
-  private static readonly Color Luck5Color = new(255, 155, 155, 255);
-  private static readonly Color Luck6Color = new(165, 165, 165, 204);
   #endregion
 
   #region Lifecycle
   public LuckOfDay(IModHelper helper)
   {
     _helper = helper;
+    _cloverTexture = Texture2D.FromFile(
+      Game1.graphics.GraphicsDevice,
+      Path.Combine(helper.DirectoryPath, "assets", "clover_group.png")
+    );
+    _icon = new PerScreen<ClickableTextureComponent>(() => CreateIcon());
   }
 
   public void Dispose()
@@ -99,8 +94,9 @@ internal class LuckOfDay : IDisposable
           ClickableTextureComponent icon = _icon.Value;
           icon.bounds.X = pos.X;
           icon.bounds.Y = pos.Y;
+          icon.sourceRect = new Rectangle(_cloverFrame.Value * CloverFrameSize, 0, CloverFrameSize, CloverFrameSize);
           _icon.Value = icon;
-          _icon.Value.draw(batch, _color.Value, 1f);
+          _icon.Value.draw(batch, Color.White * 0.9f, 1f);
         },
         batch =>
         {
@@ -119,44 +115,53 @@ internal class LuckOfDay : IDisposable
   {
     if (e.IsMultipleOf(30)) // half second
     {
-      switch (Game1.player.DailyLuck)
+      double luck = Game1.player.DailyLuck;
+
+      switch (luck)
       {
-        // Spirits are very happy (FeelingLucky)
-        case var l when l > 0.07:
-          _hoverText.Value = I18n.LuckStatus1();
-          _color.Value = Luck1Color;
-          break;
-        // Spirits are in good humor (LuckyButNotTooLucky)
-        case var l when l > 0.02 && l <= 0.07:
-          _hoverText.Value = I18n.LuckStatus2();
-          _color.Value = Luck2Color;
-
-          break;
-        // The spirits feel neutral
-        case var l when l >= -0.02 && l <= 0.02 && l != 0:
-          _hoverText.Value = I18n.LuckStatus3();
-          _color.Value = Luck3Color;
-
-          break;
-        // The spirits feel absolutely neutral
-        case var l when l == 0:
-          _hoverText.Value = I18n.LuckStatus4();
-          _color.Value = Luck4Color;
-          break;
-        // The spirits are somewhat annoyed (NotFeelingLuckyAtAll)
-        case var l when l >= -0.07 && l < -0.02:
-          _hoverText.Value = I18n.LuckStatus5();
-          _color.Value = Luck5Color;
-
-          break;
-        // The spirits are very displeased (MaybeStayHome)
-        case var l when l < -0.07:
+        // Min luck — includes shrine extremes
+        case <= -0.075:
           _hoverText.Value = I18n.LuckStatus6();
-          _color.Value = Luck6Color;
+          _cloverFrame.Value = 0;
+          break;
+        // Very bad luck
+        case < -0.07:
+          _hoverText.Value = I18n.LuckStatus6();
+          _cloverFrame.Value = 1;
+          break;
+        // Bad luck
+        case < -0.02:
+          _hoverText.Value = I18n.LuckStatus5();
+          _cloverFrame.Value = 2;
+          break;
+        // Absolutely neutral
+        case 0:
+          _hoverText.Value = I18n.LuckStatus4();
+          _cloverFrame.Value = 3;
+          break;
+        // Near-neutral (non-zero, between -0.02 and +0.02)
+        case <= 0.02:
+          _hoverText.Value = I18n.LuckStatus3();
+          _cloverFrame.Value = 4;
+          break;
+        // Good luck
+        case <= 0.07:
+          _hoverText.Value = I18n.LuckStatus2();
+          _cloverFrame.Value = 5;
+          break;
+        // Very good luck
+        case < 0.1:
+          _hoverText.Value = I18n.LuckStatus1();
+          _cloverFrame.Value = 6;
+          break;
+        // Max luck — includes shrine extremes
+        default:
+          _hoverText.Value = I18n.LuckStatus1();
+          _cloverFrame.Value = 7;
           break;
       }
 
-      // Rewrite the text, but keep the color
+      // Rewrite the text, but keep the frame
       if (ShowExactValue)
       {
         _hoverText.Value = string.Format(I18n.DailyLuckValue(), Game1.player.DailyLuck.ToString("N3"));
@@ -175,14 +180,20 @@ internal class LuckOfDay : IDisposable
 
   private void AdjustIconXToBlackBorder()
   {
-    _icon.Value = new ClickableTextureComponent(
+    _icon.Value = CreateIcon();
+  }
+
+  private ClickableTextureComponent CreateIcon()
+  {
+    int scaledSize = (int)(CloverFrameSize * CloverScale);
+    return new ClickableTextureComponent(
       "",
-      new Rectangle(Tools.GetWidthInPlayArea() - 134, 290, 10 * Game1.pixelZoom, 10 * Game1.pixelZoom),
+      new Rectangle(Tools.GetWidthInPlayArea() - 134, 290, scaledSize, scaledSize),
       "",
       "",
-      Game1.mouseCursors,
-      new Rectangle(50, 428, 10, 14),
-      Game1.pixelZoom
+      _cloverTexture,
+      new Rectangle(_cloverFrame.Value * CloverFrameSize, 0, CloverFrameSize, CloverFrameSize),
+      CloverScale
     );
   }
   #endregion

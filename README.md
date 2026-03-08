@@ -26,6 +26,7 @@
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
 - **v2.4.8**
+  - Replace dice luck icon with custom 4-leaf clover spritesheet (8 tiers of luck, including Special Charm and shrine extremes)
   - Add [Ferngill Simple Economy](https://www.nexusmods.com/stardewvalley/mods/21414) compatibility: item sell price tooltip no longer overlaps with Ferngill's supply/demand bar
 - **v2.4.7**
   - Split "Show crop and barrel times" option into separate "Show crop and tree times" and "Show machine and barrel times" options

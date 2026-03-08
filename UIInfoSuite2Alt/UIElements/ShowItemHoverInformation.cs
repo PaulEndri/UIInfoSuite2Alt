@@ -9,6 +9,7 @@ using StardewValley;
 using StardewValley.Locations;
 using StardewValley.Menus;
 using StardewValley.Tools;
+using UIInfoSuite2Alt.Compatibility;
 using UIInfoSuite2Alt.Infrastructure;
 using UIInfoSuite2Alt.Infrastructure.Extensions;
 using UIInfoSuite2Alt.Infrastructure.Helpers;
@@ -219,6 +220,15 @@ internal class ShowItemHoverInformation : IDisposable
 
       int windowY = Game1.getMouseY() + 20;
       int windowX = Game1.getMouseX() - 25 - windowWidth;
+
+      // Avoid overlapping Ferngill Simple Economy's supply/demand tooltip
+      if (hoveredObject != null &&
+          ApiManager.GetApi(ModCompat.FerngillEconomy, out IFerngillSimpleEconomyApi? fseApi) &&
+          fseApi.IsLoaded() &&
+          fseApi.ItemIsInEconomy(hoveredObject))
+      {
+        windowX -= 270;
+      }
 
       // Adjust the tooltip's position when it overflows
       Rectangle safeArea = Utility.getSafeArea();

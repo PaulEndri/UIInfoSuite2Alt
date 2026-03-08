@@ -25,6 +25,8 @@
 
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
+- **v2.4.8**
+  - Add [Ferngill Simple Economy](https://www.nexusmods.com/stardewvalley/mods/21414) compatibility: item sell price tooltip no longer overlaps with Ferngill's supply/demand bar
 - **v2.4.7**
   - Split "Show crop and barrel times" option into separate "Show crop and tree times" and "Show machine and barrel times" options
   - "Show bomb range" is now a standalone option, no longer nested under "Show scarecrow and sprinkler range"
@@ -80,8 +82,10 @@ All mods listed here are **optional** and not required for UI Info Suite 2 Alter
 - [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098)
 - [NPC Map Locations](https://www.nexusmods.com/stardewvalley/mods/239)
 - [Bigger Backpack](https://www.nexusmods.com/stardewvalley/mods/1845)
+- [Ferngill Simple Economy](https://www.nexusmods.com/stardewvalley/mods/31007)
 - [Level Extender](https://www.nexusmods.com/stardewvalley/mods/1471)
 - [Better Farm Animal Variety](https://www.nexusmods.com/stardewvalley/mods/3273)
+- [Ferngill Simple Economy](https://www.nexusmods.com/stardewvalley/mods/21414)
 
 ---
 

@@ -11,6 +11,7 @@ public static class ModCompat
   public const string CloudySkies = "leclair.cloudyskies";
   public const string DeluxeJournal = "MolsonCAD.DeluxeJournal";
   public const string BetterGameMenu = "leclair.bettergamemenu";
+  public const string FerngillEconomy = "paulsteele.fse";
 }
 
 public static class ApiManager

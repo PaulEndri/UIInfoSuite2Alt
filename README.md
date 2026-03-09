@@ -27,6 +27,7 @@
 
 - **v2.5.1**
   - Add colored text to crop, tree, and bush tooltips: harvest status (ready/days remaining), watered/not watered indicators are now color-coded for quick readability
+  - Converted `LevelUp.wav` to `LevelUp.ogg` for smaller filesize
 - **v2.5.0**
   - **Settings are now global**
     - All settings moved from per-save files to a single global `config.json`, applying across all save files

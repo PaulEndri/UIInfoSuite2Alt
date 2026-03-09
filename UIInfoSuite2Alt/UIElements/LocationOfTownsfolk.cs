@@ -13,8 +13,6 @@ using StardewValley.WorldMaps;
 using UIInfoSuite2Alt.Compatibility;
 using UIInfoSuite2Alt.Infrastructure;
 using UIInfoSuite2Alt.Infrastructure.Extensions;
-using UIInfoSuite2Alt.Options;
-
 namespace UIInfoSuite2Alt.UIElements;
 
 internal class LocationOfTownsfolk : IDisposable
@@ -25,7 +23,6 @@ internal class LocationOfTownsfolk : IDisposable
   private readonly List<NPC> _townsfolk = new();
   private readonly List<OptionsCheckbox> _checkboxes = new();
 
-  private readonly ModOptions _options;
   private readonly IModHelper _helper;
 
   private const int SocialPanelWidth = 190;
@@ -35,10 +32,9 @@ internal class LocationOfTownsfolk : IDisposable
   #endregion
 
   #region Lifecycle
-  public LocationOfTownsfolk(IModHelper helper, ModOptions options)
+  public LocationOfTownsfolk(IModHelper helper)
   {
     _helper = helper;
-    _options = options;
   }
 
   public void ToggleShowNPCLocationsOnMap(bool showLocations)
@@ -155,7 +151,7 @@ internal class LocationOfTownsfolk : IDisposable
         {
           // npc
           checkbox.greyedOut = false;
-          checkbox.isChecked = _options.ShowLocationOfFriends.GetOrDefault(friendName, true);
+          checkbox.isChecked = ModEntry.ModConfig.ShowLocationOfFriends.GetOrDefault(friendName, true);
         }
         else
         {
@@ -196,7 +192,8 @@ internal class LocationOfTownsfolk : IDisposable
           !checkbox.greyedOut)
       {
         checkbox.isChecked = !checkbox.isChecked;
-        _options.ShowLocationOfFriends[_friendNames[checkbox.whichOption]] = checkbox.isChecked;
+        ModEntry.ModConfig.ShowLocationOfFriends[_friendNames[checkbox.whichOption]] = checkbox.isChecked;
+        ModEntry.SaveConfig();
         Game1.playSound("drumkit6");
       }
     }
@@ -292,7 +289,7 @@ internal class LocationOfTownsfolk : IDisposable
       try
       {
         bool shouldDrawCharacter = Game1.player.friendshipData.ContainsKey(character.Name) &&
-                                   _options.ShowLocationOfFriends.GetOrDefault(character.Name, true) &&
+                                   ModEntry.ModConfig.ShowLocationOfFriends.GetOrDefault(character.Name, true) &&
                                    character.id != -1 &&
                                    character.IsInvisible != true;
         if (shouldDrawCharacter)

@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.IO;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
@@ -8,6 +9,7 @@ using UIInfoSuite2Alt.Compatibility;
 using UIInfoSuite2Alt.Compatibility.CustomBush;
 using HarmonyLib;
 using UIInfoSuite2Alt.Infrastructure;
+using UIInfoSuite2Alt.Infrastructure.Extensions;
 using UIInfoSuite2Alt.Options;
 using UIInfoSuite2Alt.UIElements;
 
@@ -20,12 +22,18 @@ public class ModEntry : Mod
 
   private static EventHandler<ButtonsChangedEventArgs>? _calendarAndQuestKeyBindingsHandler;
 
-  private ModOptions _modOptions = null!;
+  private static IModHelper _modHelper = null!;
   private ModOptionsPageHandler? _modOptionsPageHandler;
 
   public static IReflectionHelper Reflection { get; private set; } = null!;
 
   public static IMonitor MonitorObject { get; private set; } = null!;
+
+  /// <summary>Save the global config.json to disk.</summary>
+  public static void SaveConfig()
+  {
+    _modHelper.WriteConfig(ModConfig);
+  }
 
   #region Entry
   public override void Entry(IModHelper helper)
@@ -33,6 +41,7 @@ public class ModEntry : Mod
     I18n.Init(helper.Translation);
     Reflection = helper.Reflection;
     MonitorObject = Monitor;
+    _modHelper = helper;
 
     var harmony = new Harmony(ModManifest.UniqueID);
     TvChannelWatcher.Initialize(harmony, helper);
@@ -43,7 +52,7 @@ public class ModEntry : Mod
 
     helper.Events.GameLoop.ReturnedToTitle += OnReturnedToTitle;
     helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
-    helper.Events.GameLoop.Saved += OnSaved;
+    helper.Events.GameLoop.DayStarted += OnDayStarted;
     helper.Events.GameLoop.GameLaunched += OnGameLaunched;
     helper.Events.Display.RenderedHud += OnRenderedHud;
 
@@ -69,7 +78,15 @@ public class ModEntry : Mod
     }
 
     // register mod
-    configMenu.Register(ModManifest, () => ModConfig = new Options.ModConfig(), () => Helper.WriteConfig(ModConfig));
+    configMenu.Register(
+      ModManifest,
+      reset: () => ModConfig = new Options.ModConfig(),
+      save: () =>
+      {
+        Helper.WriteConfig(ModConfig);
+        ApplyFeatures();
+      }
+    );
 
     // add some config options
     configMenu.AddBoolOption(
@@ -78,13 +95,6 @@ public class ModEntry : Mod
       tooltip: () => I18n.Bool_ShowOptionsTabInMenu_Tooltip(),
       getValue: () => ModConfig.ShowOptionsTabInMenu,
       setValue: value => ModConfig.ShowOptionsTabInMenu = value
-    );
-    configMenu.AddTextOption(
-      ModManifest,
-      name: () => I18n.Text_ApplyDefaultSettingsFromThisSave_DisplayedName(),
-      tooltip: () => I18n.Text_ApplyDefaultSettingsFromThisSave_Tooltip(),
-      getValue: () => ModConfig.ApplyDefaultSettingsFromThisSave,
-      setValue: value => ModConfig.ApplyDefaultSettingsFromThisSave = value
     );
     configMenu.AddKeybindList(
       ModManifest,
@@ -127,6 +137,137 @@ public class ModEntry : Mod
       getValue: () => ModConfig.ShowAllRange,
       setValue: value => ModConfig.ShowAllRange = value
       );
+
+    RegisterGmcmFeatureToggles(configMenu);
+  }
+
+  private void RegisterGmcmFeatureToggles(IGenericModConfigMenuApi configMenu)
+  {
+    // Helpers to reduce boilerplate
+    void AddBool(string key, Func<bool> get, Action<bool> set) =>
+      configMenu.AddBoolOption(ModManifest, name: () => Helper.SafeGetString(key), getValue: get, setValue: set);
+
+    void AddSubBool(string key, Func<bool> get, Action<bool> set) =>
+      configMenu.AddBoolOption(ModManifest, name: () => "- " + Helper.SafeGetString(key), getValue: get, setValue: set);
+
+    void Spacer() => configMenu.AddParagraph(ModManifest, text: () => "");
+
+    // --- HUD Icons ---
+    configMenu.AddSectionTitle(ModManifest, text: () => I18n.Section_HudIcons());
+
+    AddBool(nameof(ModConfig.ShowLuckIcon), () => ModConfig.ShowLuckIcon, v => ModConfig.ShowLuckIcon = v);
+    AddSubBool(nameof(ModConfig.UseClassicLuckIcon), () => ModConfig.UseClassicLuckIcon, v => ModConfig.UseClassicLuckIcon = v);
+    AddSubBool(nameof(ModConfig.ShowExactValue), () => ModConfig.ShowExactValue, v => ModConfig.ShowExactValue = v);
+    AddSubBool(nameof(ModConfig.RequireTvForLuck), () => ModConfig.RequireTvForLuck, v => ModConfig.RequireTvForLuck = v);
+    Spacer();
+    AddBool(nameof(ModConfig.ShowRainyDay), () => ModConfig.ShowRainyDay, v => ModConfig.ShowRainyDay = v);
+    AddSubBool(nameof(ModConfig.RequireTvForWeather), () => ModConfig.RequireTvForWeather, v => ModConfig.RequireTvForWeather = v);
+    Spacer();
+    AddBool(nameof(ModConfig.ShowBirthdayIcon), () => ModConfig.ShowBirthdayIcon, v => ModConfig.ShowBirthdayIcon = v);
+    AddSubBool(nameof(ModConfig.HideBirthdayIfFullFriendShip), () => ModConfig.HideBirthdayIfFullFriendShip, v => ModConfig.HideBirthdayIfFullFriendShip = v);
+    Spacer();
+    AddBool(nameof(ModConfig.ShowTravelingMerchant), () => ModConfig.ShowTravelingMerchant, v => ModConfig.ShowTravelingMerchant = v);
+    AddSubBool(nameof(ModConfig.HideMerchantWhenVisited), () => ModConfig.HideMerchantWhenVisited, v => ModConfig.HideMerchantWhenVisited = v);
+    AddSubBool(nameof(ModConfig.ShowMerchantBundleIcon), () => ModConfig.ShowMerchantBundleIcon, v => ModConfig.ShowMerchantBundleIcon = v);
+    configMenu.AddBoolOption(ModManifest, name: () => "  - " + Helper.SafeGetString(nameof(ModConfig.ShowMerchantBundleItemNames)), getValue: () => ModConfig.ShowMerchantBundleItemNames, setValue: v => ModConfig.ShowMerchantBundleItemNames = v);
+    Spacer();
+    AddBool(nameof(ModConfig.ShowBookseller), () => ModConfig.ShowBookseller, v => ModConfig.ShowBookseller = v);
+    AddSubBool(nameof(ModConfig.HideBooksellerWhenVisited), () => ModConfig.HideBooksellerWhenVisited, v => ModConfig.HideBooksellerWhenVisited = v);
+    Spacer();
+    AddBool(nameof(ModConfig.ShowFestivalIcon), () => ModConfig.ShowFestivalIcon, v => ModConfig.ShowFestivalIcon = v);
+    AddBool(nameof(ModConfig.ShowWhenNewRecipesAreAvailable), () => ModConfig.ShowWhenNewRecipesAreAvailable, v => ModConfig.ShowWhenNewRecipesAreAvailable = v);
+    AddSubBool(nameof(ModConfig.ShowRecipeItemIcon), () => ModConfig.ShowRecipeItemIcon, v => ModConfig.ShowRecipeItemIcon = v);
+    Spacer();
+    AddBool(nameof(ModConfig.ShowToolUpgradeStatus), () => ModConfig.ShowToolUpgradeStatus, v => ModConfig.ShowToolUpgradeStatus = v);
+    AddBool(nameof(ModConfig.ShowRobinBuildingStatusIcon), () => ModConfig.ShowRobinBuildingStatusIcon, v => ModConfig.ShowRobinBuildingStatusIcon = v);
+    AddBool(nameof(ModConfig.ShowSeasonalBerry), () => ModConfig.ShowSeasonalBerry, v => ModConfig.ShowSeasonalBerry = v);
+    AddSubBool(nameof(ModConfig.ShowSeasonalBerryHazelnut), () => ModConfig.ShowSeasonalBerryHazelnut, v => ModConfig.ShowSeasonalBerryHazelnut = v);
+    Spacer();
+    AddBool(nameof(ModConfig.ShowTodaysGifts), () => ModConfig.ShowTodaysGifts, v => ModConfig.ShowTodaysGifts = v);
+    AddBool(nameof(ModConfig.ShowQuestCount), () => ModConfig.ShowQuestCount, v => ModConfig.ShowQuestCount = v);
+    AddBool(nameof(ModConfig.ShowBuffTimers), () => ModConfig.ShowBuffTimers, v => ModConfig.ShowBuffTimers = v);
+
+    // --- Farm & Field ---
+    configMenu.AddSectionTitle(ModManifest, text: () => I18n.Section_FarmAndField());
+
+    AddBool(nameof(ModConfig.ShowAnimalsNeedPets), () => ModConfig.ShowAnimalsNeedPets, v => ModConfig.ShowAnimalsNeedPets = v);
+    AddSubBool(nameof(ModConfig.HideAnimalPetOnMaxFriendship), () => ModConfig.HideAnimalPetOnMaxFriendship, v => ModConfig.HideAnimalPetOnMaxFriendship = v);
+    Spacer();
+    AddBool(nameof(ModConfig.ShowCropTooltip), () => ModConfig.ShowCropTooltip, v => ModConfig.ShowCropTooltip = v);
+    AddBool(nameof(ModConfig.ShowBarrelTooltip), () => ModConfig.ShowBarrelTooltip, v => ModConfig.ShowBarrelTooltip = v);
+    configMenu.AddBoolOption(
+      ModManifest,
+      name: () => I18n.ShowItemEffectRanges(),
+      getValue: () => ModConfig.ShowItemEffectRanges,
+      setValue: v => ModConfig.ShowItemEffectRanges = v
+    );
+    configMenu.AddBoolOption(
+      ModManifest,
+      name: () => "- " + I18n.ButtonControlShow(),
+      getValue: () => ModConfig.ButtonControlShow,
+      setValue: v => ModConfig.ButtonControlShow = v
+    );
+    Spacer();
+    configMenu.AddBoolOption(
+      ModManifest,
+      name: () => I18n.ShowBombRange(),
+      getValue: () => ModConfig.ShowBombRange,
+      setValue: v => ModConfig.ShowBombRange = v
+    );
+
+    // --- Experience & Skills ---
+    configMenu.AddSectionTitle(ModManifest, text: () => I18n.Section_ExperienceAndSkills());
+
+    AddBool(nameof(ModConfig.ShowLevelUpAnimation), () => ModConfig.ShowLevelUpAnimation, v => ModConfig.ShowLevelUpAnimation = v);
+    AddBool(nameof(ModConfig.ShowExperienceBar), () => ModConfig.ShowExperienceBar, v => ModConfig.ShowExperienceBar = v);
+    AddBool(nameof(ModConfig.AllowExperienceBarToFadeOut), () => ModConfig.AllowExperienceBarToFadeOut, v => ModConfig.AllowExperienceBarToFadeOut = v);
+    AddBool(nameof(ModConfig.ShowExperienceGain), () => ModConfig.ShowExperienceGain, v => ModConfig.ShowExperienceGain = v);
+    AddBool(nameof(ModConfig.ShowFishOnCatch), () => ModConfig.ShowFishOnCatch, v => ModConfig.ShowFishOnCatch = v);
+    AddSubBool(nameof(ModConfig.ShowFishQualityStar), () => ModConfig.ShowFishQualityStar, v => ModConfig.ShowFishQualityStar = v);
+
+    // --- Items & Shopping ---
+    configMenu.AddSectionTitle(ModManifest, text: () => I18n.Section_ItemsAndShopping());
+
+    AddBool(nameof(ModConfig.ShowExtraItemInformation), () => ModConfig.ShowExtraItemInformation, v => ModConfig.ShowExtraItemInformation = v);
+    AddBool(nameof(ModConfig.ShowHarvestPricesInShop), () => ModConfig.ShowHarvestPricesInShop, v => ModConfig.ShowHarvestPricesInShop = v);
+
+    // --- NPC & Social ---
+    configMenu.AddSectionTitle(ModManifest, text: () => I18n.Section_NpcAndSocial());
+
+    AddBool(nameof(ModConfig.ShowLocationOfTownsPeople), () => ModConfig.ShowLocationOfTownsPeople, v => ModConfig.ShowLocationOfTownsPeople = v);
+    AddBool(nameof(ModConfig.ShowHeartFills), () => ModConfig.ShowHeartFills, v => ModConfig.ShowHeartFills = v);
+    AddBool(nameof(ModConfig.DisplayCalendarAndBillboard), () => ModConfig.DisplayCalendarAndBillboard, v => ModConfig.DisplayCalendarAndBillboard = v);
+
+    // --- Icon Order ---
+    configMenu.AddSectionTitle(ModManifest, text: () => I18n.Section_IconOrder());
+
+    foreach (string key in IconHandler.IconKeys)
+    {
+      string capturedKey = key;
+      string label = key switch
+      {
+        "Luck" => I18n.IconOrder_Luck(),
+        "Weather" => I18n.IconOrder_Weather(),
+        "Birthday" => I18n.IconOrder_Birthday(),
+        "Festival" => I18n.IconOrder_Festival(),
+        "QueenOfSauce" => I18n.IconOrder_QueenOfSauce(),
+        "ToolUpgrade" => I18n.IconOrder_ToolUpgrade(),
+        "RobinBuilding" => I18n.IconOrder_RobinBuilding(),
+        "SeasonalBerry" => I18n.IconOrder_SeasonalBerry(),
+        "TravelingMerchant" => I18n.IconOrder_TravelingMerchant(),
+        "Bookseller" => I18n.IconOrder_Bookseller(),
+        _ => key
+      };
+
+      configMenu.AddNumberOption(
+        ModManifest,
+        name: () => label,
+        getValue: () => ModConfig.IconOrder.TryGetValue(capturedKey, out int v) ? v : 99,
+        setValue: v => ModConfig.IconOrder[capturedKey] = v,
+        min: 1,
+        max: 20
+      );
+    }
   }
   #endregion
 
@@ -144,31 +285,60 @@ public class ModEntry : Mod
 
   private void OnSaveLoaded(object? sender, SaveLoadedEventArgs e)
   {
-    // Only load once for split screen.
     if (Context.ScreenId != 0)
     {
       return;
     }
 
-    _modOptions = Helper.Data.ReadJsonFile<ModOptions>($"data/{Constants.SaveFolderName}.json") ??
-                  Helper.Data.ReadJsonFile<ModOptions>($"data/{ModConfig.ApplyDefaultSettingsFromThisSave}.json") ??
-                  new ModOptions();
-
-    IconHandler.Handler.IconOrder = _modOptions.IconOrder;
-
-    _modOptionsPageHandler?.Dispose();
-    _modOptionsPageHandler = new ModOptionsPageHandler(Helper, _modOptions);
+    CleanUpLegacyPerSaveFiles();
   }
 
-  private void OnSaved(object? sender, EventArgs e)
+  private void OnDayStarted(object? sender, DayStartedEventArgs e)
   {
-    // Only save for the main player.
     if (Context.ScreenId != 0)
     {
       return;
     }
 
-    Helper.Data.WriteJsonFile($"data/{Constants.SaveFolderName}.json", _modOptions);
+    // Re-read config from disk in case it was edited externally
+    ModConfig = Helper.ReadConfig<Options.ModConfig>();
+    ApplyFeatures();
+  }
+
+  /// <summary>Dispose and recreate the feature handler so all toggles re-apply from current config.</summary>
+  private void ApplyFeatures()
+  {
+    if (!Context.IsWorldReady)
+    {
+      return;
+    }
+
+    IconHandler.Handler.IconOrder = ModConfig.IconOrder;
+    _modOptionsPageHandler?.Dispose();
+    _modOptionsPageHandler = new ModOptionsPageHandler(Helper, ModConfig, SaveConfig);
+  }
+
+  /// <summary>Delete legacy per-save .json files from the data/ folder.</summary>
+  private void CleanUpLegacyPerSaveFiles()
+  {
+    string dataDir = Path.Combine(Helper.DirectoryPath, "data");
+    if (!Directory.Exists(dataDir))
+    {
+      return;
+    }
+
+    string[] jsonFiles = Directory.GetFiles(dataDir, "*.json");
+    if (jsonFiles.Length == 0)
+    {
+      return;
+    }
+
+    foreach (string file in jsonFiles)
+    {
+      File.Delete(file);
+    }
+
+    Monitor.Log($"Removed {jsonFiles.Length} legacy per-save settings file(s) from data/", LogLevel.Info);
   }
 
   private static void OnRenderedHud(object? sender, RenderedHudEventArgs e)

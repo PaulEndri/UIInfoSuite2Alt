@@ -63,10 +63,14 @@ internal class ModOptionsPageHandler : IDisposable
   private readonly PerScreen<bool> _switchToOurTabNextTick = new();
   private bool _windowResizing;
 
-  public ModOptionsPageHandler(IModHelper helper, ModOptions options)
+  public ModOptionsPageHandler(IModHelper helper, ModConfig config, Action saveConfig)
   {
     _helper = helper;
     _hasBgm = GameMenuHelper.HasBetterGameMenu;
+
+    // Wrap setters to also persist config.json on each change
+    Action<bool> Set(Action<bool> setter) => v => { setter(v); saveConfig(); };
+    Action<int> SetInt(Action<int> setter) => v => { setter(v); saveConfig(); };
 
     helper.Events.Input.ButtonsChanged += OnButtonsChanged;
 
@@ -88,7 +92,7 @@ internal class ModOptionsPageHandler : IDisposable
     var luckOfDay = new LuckOfDay(helper);
     var showBirthdayIcon = new ShowBirthdayIcon(helper);
     var showAccurateHearts = new ShowAccurateHearts(helper.Events);
-    var locationOfTownsfolk = new LocationOfTownsfolk(helper, options);
+    var locationOfTownsfolk = new LocationOfTownsfolk(helper);
     var showWhenAnimalNeedsPet = new ShowWhenAnimalNeedsPet(helper);
     var showCalendarAndBillboardOnGameMenuButton = new ShowCalendarAndBillboardOnGameMenuButton(helper);
     var showScarecrowAndSprinklerRange = new ShowItemEffectRanges(helper);
@@ -142,222 +146,222 @@ internal class ModOptionsPageHandler : IDisposable
     _optionsElements.Add(new ModOptionsElement(I18n.Section_HudIcons()));
 
     var luckIcon = new ModOptionsCheckbox(
-      _helper.SafeGetString(nameof(options.ShowLuckIcon)),
+      _helper.SafeGetString(nameof(config.ShowLuckIcon)),
       whichOption++,
       luckOfDay.ToggleOption,
-      () => options.ShowLuckIcon,
-      v => options.ShowLuckIcon = v
+      () => config.ShowLuckIcon,
+      Set(v => config.ShowLuckIcon = v)
     );
     _optionsElements.Add(luckIcon);
     _optionsElements.Add(
       new ModOptionsCheckbox(
-        _helper.SafeGetString(nameof(options.UseClassicLuckIcon)),
+        _helper.SafeGetString(nameof(config.UseClassicLuckIcon)),
         whichOption++,
         luckOfDay.ToggleUseClassicIconOption,
-        () => options.UseClassicLuckIcon,
-        v => options.UseClassicLuckIcon = v,
+        () => config.UseClassicLuckIcon,
+        Set(v => config.UseClassicLuckIcon = v),
         luckIcon
       )
     );
     _optionsElements.Add(
       new ModOptionsCheckbox(
-        _helper.SafeGetString(nameof(options.ShowExactValue)),
+        _helper.SafeGetString(nameof(config.ShowExactValue)),
         whichOption++,
         luckOfDay.ToggleShowExactValueOption,
-        () => options.ShowExactValue,
-        v => options.ShowExactValue = v,
+        () => config.ShowExactValue,
+        Set(v => config.ShowExactValue = v),
         luckIcon
       )
     );
     _optionsElements.Add(
       new ModOptionsCheckbox(
-        _helper.SafeGetString(nameof(options.RequireTvForLuck)),
+        _helper.SafeGetString(nameof(config.RequireTvForLuck)),
         whichOption++,
         luckOfDay.ToggleRequireTvOption,
-        () => options.RequireTvForLuck,
-        v => options.RequireTvForLuck = v,
+        () => config.RequireTvForLuck,
+        Set(v => config.RequireTvForLuck = v),
         luckIcon
       )
     );
     var rainyDayIcon = new ModOptionsCheckbox(
-      _helper.SafeGetString(nameof(options.ShowRainyDay)),
+      _helper.SafeGetString(nameof(config.ShowRainyDay)),
       whichOption++,
       showRainyDayIcon.ToggleOption,
-      () => options.ShowRainyDay,
-      v => options.ShowRainyDay = v
+      () => config.ShowRainyDay,
+      Set(v => config.ShowRainyDay = v)
     );
     _optionsElements.Add(rainyDayIcon);
     _optionsElements.Add(
       new ModOptionsCheckbox(
-        _helper.SafeGetString(nameof(options.RequireTvForWeather)),
+        _helper.SafeGetString(nameof(config.RequireTvForWeather)),
         whichOption++,
         showRainyDayIcon.ToggleRequireTvOption,
-        () => options.RequireTvForWeather,
-        v => options.RequireTvForWeather = v,
+        () => config.RequireTvForWeather,
+        Set(v => config.RequireTvForWeather = v),
         rainyDayIcon
       )
     );
     var birthdayIcon = new ModOptionsCheckbox(
-      _helper.SafeGetString(nameof(options.ShowBirthdayIcon)),
+      _helper.SafeGetString(nameof(config.ShowBirthdayIcon)),
       whichOption++,
       showBirthdayIcon.ToggleOption,
-      () => options.ShowBirthdayIcon,
-      v => options.ShowBirthdayIcon = v
+      () => config.ShowBirthdayIcon,
+      Set(v => config.ShowBirthdayIcon = v)
     );
     _optionsElements.Add(birthdayIcon);
     _optionsElements.Add(
       new ModOptionsCheckbox(
-        _helper.SafeGetString(nameof(options.HideBirthdayIfFullFriendShip)),
+        _helper.SafeGetString(nameof(config.HideBirthdayIfFullFriendShip)),
         whichOption++,
         showBirthdayIcon.ToggleDisableOnMaxFriendshipOption,
-        () => options.HideBirthdayIfFullFriendShip,
-        v => options.HideBirthdayIfFullFriendShip = v,
+        () => config.HideBirthdayIfFullFriendShip,
+        Set(v => config.HideBirthdayIfFullFriendShip = v),
         birthdayIcon
       )
     );
     var travellingMerchantIcon = new ModOptionsCheckbox(
-      _helper.SafeGetString(nameof(options.ShowTravelingMerchant)),
+      _helper.SafeGetString(nameof(config.ShowTravelingMerchant)),
       whichOption++,
       showTravelingMerchant.ToggleOption,
-      () => options.ShowTravelingMerchant,
-      v => options.ShowTravelingMerchant = v
+      () => config.ShowTravelingMerchant,
+      Set(v => config.ShowTravelingMerchant = v)
     );
     _optionsElements.Add(travellingMerchantIcon);
     _optionsElements.Add(
       new ModOptionsCheckbox(
-        _helper.SafeGetString(nameof(options.HideMerchantWhenVisited)),
+        _helper.SafeGetString(nameof(config.HideMerchantWhenVisited)),
         whichOption++,
         showTravelingMerchant.ToggleHideWhenVisitedOption,
-        () => options.HideMerchantWhenVisited,
-        v => options.HideMerchantWhenVisited = v,
+        () => config.HideMerchantWhenVisited,
+        Set(v => config.HideMerchantWhenVisited = v),
         travellingMerchantIcon
       )
     );
     var merchantBundleIcon = new ModOptionsCheckbox(
-      _helper.SafeGetString(nameof(options.ShowMerchantBundleIcon)),
+      _helper.SafeGetString(nameof(config.ShowMerchantBundleIcon)),
       whichOption++,
       showTravelingMerchant.ToggleShowBundleIconOption,
-      () => options.ShowMerchantBundleIcon,
-      v => options.ShowMerchantBundleIcon = v,
+      () => config.ShowMerchantBundleIcon,
+      Set(v => config.ShowMerchantBundleIcon = v),
       travellingMerchantIcon
     );
     _optionsElements.Add(merchantBundleIcon);
     _optionsElements.Add(
       new ModOptionsCheckbox(
-        _helper.SafeGetString(nameof(options.ShowMerchantBundleItemNames)),
+        _helper.SafeGetString(nameof(config.ShowMerchantBundleItemNames)),
         whichOption++,
         showTravelingMerchant.ToggleShowBundleItemNamesOption,
-        () => options.ShowMerchantBundleItemNames,
-        v => options.ShowMerchantBundleItemNames = v,
+        () => config.ShowMerchantBundleItemNames,
+        Set(v => config.ShowMerchantBundleItemNames = v),
         merchantBundleIcon
       )
     );
     var booksellerIcon = new ModOptionsCheckbox(
-      _helper.SafeGetString(nameof(options.ShowBookseller)),
+      _helper.SafeGetString(nameof(config.ShowBookseller)),
       whichOption++,
       showBookseller.ToggleOption,
-      () => options.ShowBookseller,
-      v => options.ShowBookseller = v
+      () => config.ShowBookseller,
+      Set(v => config.ShowBookseller = v)
     );
     _optionsElements.Add(booksellerIcon);
     _optionsElements.Add(
       new ModOptionsCheckbox(
-        _helper.SafeGetString(nameof(options.HideBooksellerWhenVisited)),
+        _helper.SafeGetString(nameof(config.HideBooksellerWhenVisited)),
         whichOption++,
         showBookseller.ToggleHideWhenVisitedOption,
-        () => options.HideBooksellerWhenVisited,
-        v => options.HideBooksellerWhenVisited = v,
+        () => config.HideBooksellerWhenVisited,
+        Set(v => config.HideBooksellerWhenVisited = v),
         booksellerIcon
       )
     );
     _optionsElements.Add(
       new ModOptionsCheckbox(
-        _helper.SafeGetString(nameof(options.ShowFestivalIcon)),
+        _helper.SafeGetString(nameof(config.ShowFestivalIcon)),
         whichOption++,
         showFestivalIcon.ToggleOption,
-        () => options.ShowFestivalIcon,
-        v => options.ShowFestivalIcon = v
+        () => config.ShowFestivalIcon,
+        Set(v => config.ShowFestivalIcon = v)
       )
     );
     var queenOfSauceCheckbox = new ModOptionsCheckbox(
-      _helper.SafeGetString(nameof(options.ShowWhenNewRecipesAreAvailable)),
+      _helper.SafeGetString(nameof(config.ShowWhenNewRecipesAreAvailable)),
       whichOption++,
       showQueenOfSauceIcon.ToggleOption,
-      () => options.ShowWhenNewRecipesAreAvailable,
-      v => options.ShowWhenNewRecipesAreAvailable = v
+      () => config.ShowWhenNewRecipesAreAvailable,
+      Set(v => config.ShowWhenNewRecipesAreAvailable = v)
     );
     _optionsElements.Add(queenOfSauceCheckbox);
     _optionsElements.Add(
       new ModOptionsCheckbox(
-        _helper.SafeGetString(nameof(options.ShowRecipeItemIcon)),
+        _helper.SafeGetString(nameof(config.ShowRecipeItemIcon)),
         whichOption++,
         showQueenOfSauceIcon.ToggleShowRecipeItemIcon,
-        () => options.ShowRecipeItemIcon,
-        v => options.ShowRecipeItemIcon = v,
+        () => config.ShowRecipeItemIcon,
+        Set(v => config.ShowRecipeItemIcon = v),
         queenOfSauceCheckbox
       )
     );
     _optionsElements.Add(
       new ModOptionsCheckbox(
-        _helper.SafeGetString(nameof(options.ShowToolUpgradeStatus)),
+        _helper.SafeGetString(nameof(config.ShowToolUpgradeStatus)),
         whichOption++,
         showToolUpgradeStatus.ToggleOption,
-        () => options.ShowToolUpgradeStatus,
-        v => options.ShowToolUpgradeStatus = v
+        () => config.ShowToolUpgradeStatus,
+        Set(v => config.ShowToolUpgradeStatus = v)
       )
     );
     _optionsElements.Add(
       new ModOptionsCheckbox(
-        _helper.SafeGetString(nameof(options.ShowRobinBuildingStatusIcon)),
+        _helper.SafeGetString(nameof(config.ShowRobinBuildingStatusIcon)),
         whichOption++,
         showRobinBuildingStatusIcon.ToggleOption,
-        () => options.ShowRobinBuildingStatusIcon,
-        v => options.ShowRobinBuildingStatusIcon = v
+        () => config.ShowRobinBuildingStatusIcon,
+        Set(v => config.ShowRobinBuildingStatusIcon = v)
       )
     );
     var seasonalBerryIcon = new ModOptionsCheckbox(
-      _helper.SafeGetString(nameof(options.ShowSeasonalBerry)),
+      _helper.SafeGetString(nameof(config.ShowSeasonalBerry)),
       whichOption++,
       showSeasonalBerry.ToggleOption,
-      () => options.ShowSeasonalBerry,
-      v => options.ShowSeasonalBerry = v
+      () => config.ShowSeasonalBerry,
+      Set(v => config.ShowSeasonalBerry = v)
     );
     _optionsElements.Add(seasonalBerryIcon);
     _optionsElements.Add(
       new ModOptionsCheckbox(
-        _helper.SafeGetString(nameof(options.ShowSeasonalBerryHazelnut)),
+        _helper.SafeGetString(nameof(config.ShowSeasonalBerryHazelnut)),
         whichOption++,
         showSeasonalBerry.ToggleHazelnutOption,
-        () => options.ShowSeasonalBerryHazelnut,
-        v => options.ShowSeasonalBerryHazelnut = v,
+        () => config.ShowSeasonalBerryHazelnut,
+        Set(v => config.ShowSeasonalBerryHazelnut = v),
         seasonalBerryIcon
       )
     );
     _optionsElements.Add(
       new ModOptionsCheckbox(
-        _helper.SafeGetString(nameof(options.ShowTodaysGifts)),
+        _helper.SafeGetString(nameof(config.ShowTodaysGifts)),
         whichOption++,
         showTodaysGift.ToggleOption,
-        () => options.ShowTodaysGifts,
-        v => options.ShowTodaysGifts = v
+        () => config.ShowTodaysGifts,
+        Set(v => config.ShowTodaysGifts = v)
       )
     );
     _optionsElements.Add(
       new ModOptionsCheckbox(
-        _helper.SafeGetString(nameof(options.ShowQuestCount)),
+        _helper.SafeGetString(nameof(config.ShowQuestCount)),
         whichOption++,
         showQuestCount.ToggleOption,
-        () => options.ShowQuestCount,
-        v => options.ShowQuestCount = v
+        () => config.ShowQuestCount,
+        Set(v => config.ShowQuestCount = v)
       )
     );
     _optionsElements.Add(
       new ModOptionsCheckbox(
-        _helper.SafeGetString(nameof(options.ShowBuffTimers)),
+        _helper.SafeGetString(nameof(config.ShowBuffTimers)),
         whichOption++,
         showBuffTimers.ToggleOption,
-        () => options.ShowBuffTimers,
-        v => options.ShowBuffTimers = v
+        () => config.ShowBuffTimers,
+        Set(v => config.ShowBuffTimers = v)
       )
     );
 
@@ -365,47 +369,47 @@ internal class ModOptionsPageHandler : IDisposable
     _optionsElements.Add(new ModOptionsElement(I18n.Section_FarmAndField()));
 
     var animalPetIcon = new ModOptionsCheckbox(
-      _helper.SafeGetString(nameof(options.ShowAnimalsNeedPets)),
+      _helper.SafeGetString(nameof(config.ShowAnimalsNeedPets)),
       whichOption++,
       showWhenAnimalNeedsPet.ToggleOption,
-      () => options.ShowAnimalsNeedPets,
-      v => options.ShowAnimalsNeedPets = v
+      () => config.ShowAnimalsNeedPets,
+      Set(v => config.ShowAnimalsNeedPets = v)
     );
     _optionsElements.Add(animalPetIcon);
     _optionsElements.Add(
       new ModOptionsCheckbox(
-        _helper.SafeGetString(nameof(options.HideAnimalPetOnMaxFriendship)),
+        _helper.SafeGetString(nameof(config.HideAnimalPetOnMaxFriendship)),
         whichOption++,
         showWhenAnimalNeedsPet.ToggleDisableOnMaxFriendshipOption,
-        () => options.HideAnimalPetOnMaxFriendship,
-        v => options.HideAnimalPetOnMaxFriendship = v,
+        () => config.HideAnimalPetOnMaxFriendship,
+        Set(v => config.HideAnimalPetOnMaxFriendship = v),
         animalPetIcon
       )
     );
     _optionsElements.Add(
       new ModOptionsCheckbox(
-        _helper.SafeGetString(nameof(options.ShowCropTooltip)),
+        _helper.SafeGetString(nameof(config.ShowCropTooltip)),
         whichOption++,
         showCropAndBarrelTime.ToggleCropOption,
-        () => options.ShowCropTooltip,
-        v => options.ShowCropTooltip = v
+        () => config.ShowCropTooltip,
+        Set(v => config.ShowCropTooltip = v)
       )
     );
     _optionsElements.Add(
       new ModOptionsCheckbox(
-        _helper.SafeGetString(nameof(options.ShowBarrelTooltip)),
+        _helper.SafeGetString(nameof(config.ShowBarrelTooltip)),
         whichOption++,
         showCropAndBarrelTime.ToggleBarrelOption,
-        () => options.ShowBarrelTooltip,
-        v => options.ShowBarrelTooltip = v
+        () => config.ShowBarrelTooltip,
+        Set(v => config.ShowBarrelTooltip = v)
       )
     );
     var ScarecrowAndSprinklerRangeIcon = new ModOptionsCheckbox(
       I18n.ShowItemEffectRanges(),
       whichOption++,
       showScarecrowAndSprinklerRange.ToggleOption,
-      () => options.ShowItemEffectRanges,
-      v => options.ShowItemEffectRanges = v
+      () => config.ShowItemEffectRanges,
+      Set(v => config.ShowItemEffectRanges = v)
     );
     _optionsElements.Add(ScarecrowAndSprinklerRangeIcon);
     _optionsElements.Add(
@@ -413,8 +417,8 @@ internal class ModOptionsPageHandler : IDisposable
         I18n.ButtonControlShow(),
         whichOption++,
         showScarecrowAndSprinklerRange.ToggleButtonControlShowOption,
-        () => options.ButtonControlShow,
-        v => options.ButtonControlShow = v,
+        () => config.ButtonControlShow,
+        Set(v => config.ButtonControlShow = v),
         ScarecrowAndSprinklerRangeIcon
       )
     );
@@ -423,8 +427,8 @@ internal class ModOptionsPageHandler : IDisposable
         I18n.ShowBombRange(),
         whichOption++,
         showScarecrowAndSprinklerRange.ToggleShowBombRangeOption,
-        () => options.ShowBombRange,
-        v => options.ShowBombRange = v
+        () => config.ShowBombRange,
+        Set(v => config.ShowBombRange = v)
       )
     );
 
@@ -433,55 +437,55 @@ internal class ModOptionsPageHandler : IDisposable
 
     _optionsElements.Add(
       new ModOptionsCheckbox(
-        _helper.SafeGetString(nameof(options.ShowLevelUpAnimation)),
+        _helper.SafeGetString(nameof(config.ShowLevelUpAnimation)),
         whichOption++,
         experienceBar.ToggleLevelUpAnimation,
-        () => options.ShowLevelUpAnimation,
-        v => options.ShowLevelUpAnimation = v
+        () => config.ShowLevelUpAnimation,
+        Set(v => config.ShowLevelUpAnimation = v)
       )
     );
     _optionsElements.Add(
       new ModOptionsCheckbox(
-        _helper.SafeGetString(nameof(options.ShowExperienceBar)),
+        _helper.SafeGetString(nameof(config.ShowExperienceBar)),
         whichOption++,
         experienceBar.ToggleShowExperienceBar,
-        () => options.ShowExperienceBar,
-        v => options.ShowExperienceBar = v
+        () => config.ShowExperienceBar,
+        Set(v => config.ShowExperienceBar = v)
       )
     );
     _optionsElements.Add(
       new ModOptionsCheckbox(
-        _helper.SafeGetString(nameof(options.AllowExperienceBarToFadeOut)),
+        _helper.SafeGetString(nameof(config.AllowExperienceBarToFadeOut)),
         whichOption++,
         experienceBar.ToggleExperienceBarFade,
-        () => options.AllowExperienceBarToFadeOut,
-        v => options.AllowExperienceBarToFadeOut = v
+        () => config.AllowExperienceBarToFadeOut,
+        Set(v => config.AllowExperienceBarToFadeOut = v)
       )
     );
     _optionsElements.Add(
       new ModOptionsCheckbox(
-        _helper.SafeGetString(nameof(options.ShowExperienceGain)),
+        _helper.SafeGetString(nameof(config.ShowExperienceGain)),
         whichOption++,
         experienceBar.ToggleShowExperienceGain,
-        () => options.ShowExperienceGain,
-        v => options.ShowExperienceGain = v
+        () => config.ShowExperienceGain,
+        Set(v => config.ShowExperienceGain = v)
       )
     );
     var fishOnCatchIcon = new ModOptionsCheckbox(
-      _helper.SafeGetString(nameof(options.ShowFishOnCatch)),
+      _helper.SafeGetString(nameof(config.ShowFishOnCatch)),
       whichOption++,
       showFishOnCatch.ToggleOption,
-      () => options.ShowFishOnCatch,
-      v => options.ShowFishOnCatch = v
+      () => config.ShowFishOnCatch,
+      Set(v => config.ShowFishOnCatch = v)
     );
     _optionsElements.Add(fishOnCatchIcon);
     _optionsElements.Add(
       new ModOptionsCheckbox(
-        _helper.SafeGetString(nameof(options.ShowFishQualityStar)),
+        _helper.SafeGetString(nameof(config.ShowFishQualityStar)),
         whichOption++,
         showFishOnCatch.ToggleQualityStarOption,
-        () => options.ShowFishQualityStar,
-        v => options.ShowFishQualityStar = v,
+        () => config.ShowFishQualityStar,
+        Set(v => config.ShowFishQualityStar = v),
         fishOnCatchIcon
       )
     );
@@ -491,20 +495,20 @@ internal class ModOptionsPageHandler : IDisposable
 
     _optionsElements.Add(
       new ModOptionsCheckbox(
-        _helper.SafeGetString(nameof(options.ShowExtraItemInformation)),
+        _helper.SafeGetString(nameof(config.ShowExtraItemInformation)),
         whichOption++,
         showItemHoverInformation.ToggleOption,
-        () => options.ShowExtraItemInformation,
-        v => options.ShowExtraItemInformation = v
+        () => config.ShowExtraItemInformation,
+        Set(v => config.ShowExtraItemInformation = v)
       )
     );
     _optionsElements.Add(
       new ModOptionsCheckbox(
-        _helper.SafeGetString(nameof(options.ShowHarvestPricesInShop)),
+        _helper.SafeGetString(nameof(config.ShowHarvestPricesInShop)),
         whichOption++,
         shopHarvestPrices.ToggleOption,
-        () => options.ShowHarvestPricesInShop,
-        v => options.ShowHarvestPricesInShop = v
+        () => config.ShowHarvestPricesInShop,
+        Set(v => config.ShowHarvestPricesInShop = v)
       )
     );
 
@@ -515,30 +519,30 @@ internal class ModOptionsPageHandler : IDisposable
     {
       _optionsElements.Add(
         new ModOptionsCheckbox(
-          _helper.SafeGetString(nameof(options.ShowLocationOfTownsPeople)),
+          _helper.SafeGetString(nameof(config.ShowLocationOfTownsPeople)),
           whichOption++,
           locationOfTownsfolk.ToggleShowNPCLocationsOnMap,
-          () => options.ShowLocationOfTownsPeople,
-          v => options.ShowLocationOfTownsPeople = v
+          () => config.ShowLocationOfTownsPeople,
+          Set(v => config.ShowLocationOfTownsPeople = v)
         )
       );
     }
     _optionsElements.Add(
       new ModOptionsCheckbox(
-        _helper.SafeGetString(nameof(options.ShowHeartFills)),
+        _helper.SafeGetString(nameof(config.ShowHeartFills)),
         whichOption++,
         showAccurateHearts.ToggleOption,
-        () => options.ShowHeartFills,
-        v => options.ShowHeartFills = v
+        () => config.ShowHeartFills,
+        Set(v => config.ShowHeartFills = v)
       )
     );
     _optionsElements.Add(
       new ModOptionsCheckbox(
-        _helper.SafeGetString(nameof(options.DisplayCalendarAndBillboard)),
+        _helper.SafeGetString(nameof(config.DisplayCalendarAndBillboard)),
         whichOption++,
         showCalendarAndBillboardOnGameMenuButton.ToggleOption,
-        () => options.DisplayCalendarAndBillboard,
-        v => options.DisplayCalendarAndBillboard = v
+        () => config.DisplayCalendarAndBillboard,
+        Set(v => config.DisplayCalendarAndBillboard = v)
       )
     );
 
@@ -568,8 +572,8 @@ internal class ModOptionsPageHandler : IDisposable
         new ModOptionsNumberPicker(
           label,
           whichOption++,
-          () => options.IconOrder.TryGetValue(capturedKey, out int v) ? v : 99,
-          v => options.IconOrder[capturedKey] = v
+          () => config.IconOrder.TryGetValue(capturedKey, out int v) ? v : 99,
+          SetInt(v => config.IconOrder[capturedKey] = v)
         )
       );
     }

@@ -157,7 +157,7 @@ internal class ShowRainyDayIcon : IDisposable
   /// </summary>
   private void CreateTileSheet()
   {
-    ModEntry.MonitorObject.Log("Setting up icon sheet", LogLevel.Info);
+    // ModEntry.MonitorObject.Log("Setting up icon sheet", LogLevel.Info);
     // Setup Texture sheet as a copy, so as not to disturb existing sprites
     _iconSheet = new Texture2D(Game1.graphics.GraphicsDevice, WeatherSheetWidth, WeatherSheetHeight);
     _weatherIconColors = new Color[WeatherSheetWidth * WeatherSheetHeight];

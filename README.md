@@ -26,7 +26,7 @@
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
 - **v2.5.1**
-  - Add colored text to crop, tree, and bush tooltips: harvest status (ready/days remaining), watered/not watered indicators are now color-coded for quick readability
+  - Add colored tooltips to crops for quick and better readability
   - Add [Cornucopia](https://www.nexusmods.com/stardewvalley/mods/19508) Sapodilla tree to known treetypes
   - Converted `LevelUp.wav` to `LevelUp.ogg` for smaller filesize
 - **v2.5.0**

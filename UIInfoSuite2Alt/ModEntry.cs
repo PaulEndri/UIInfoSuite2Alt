@@ -335,10 +335,11 @@ public class ModEntry : Mod
 
     foreach (string file in jsonFiles)
     {
-      File.Delete(file);
+      string backupPath = Path.ChangeExtension(file, ".json.old");
+      File.Move(file, backupPath, overwrite: true);
     }
 
-    Monitor.Log($"v2.5.0(Run Once): Removed {jsonFiles.Length} legacy settings file(s)", LogLevel.Info);
+    Monitor.Log($"v2.5.0: Renamed {jsonFiles.Length} legacy settings file(s) to .json.old — settings are now global in config.json", LogLevel.Info);
   }
 
   private static void OnRenderedHud(object? sender, RenderedHudEventArgs e)

@@ -25,6 +25,10 @@
 
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
+- **v2.5.0**
+  - Settings are now global — all settings moved from per-save files to a single global `config.json`, applying across all save files
+    - Old per-save settings files in `data/` are automatically renamed to `.json.old` on first load for reference
+    - Full [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098) (GMCM) integration for all settings
 - **v2.4.9**
   - Show exclamation mark on billboard icon in inventory when a daily quest is available
   - Add Special Orders & Mr. Qi's Special Orders board icons in inventory with animated exclamation marks when new orders are available and be able to accept new SO's through the clickable icons

@@ -391,6 +391,8 @@ internal class ShowCropAndBarrelTime : IDisposable
         return I18n.SVEBirch();
       case "FlashShifter.StardewValleyExpandedCP_Fir_Tree":
         return I18n.SVEFir();
+      case "Cornucopia_SapodillaSeed":
+        return I18n.CORSapodilla();
       default:
         return $"Unknown (#{treeType})";
     }

@@ -26,7 +26,8 @@
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
 - **v2.5.0**
-  - Settings are now global — all settings moved from per-save files to a single global `config.json`, applying across all save files
+  - **Settings are now global**
+    - All settings moved from per-save files to a single global `config.json`, applying across all save files
     - Old per-save settings files in `data/` are automatically renamed to `.json.old` on first load for reference
     - Full [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098) (GMCM) integration for all settings
 - **v2.4.9**

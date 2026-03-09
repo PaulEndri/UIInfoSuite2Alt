@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
@@ -338,7 +338,7 @@ public class ModEntry : Mod
       File.Delete(file);
     }
 
-    Monitor.Log($"Removed {jsonFiles.Length} legacy per-save settings file(s) from data/", LogLevel.Info);
+    Monitor.Log($"v2.5.0(Run Once): Removed {jsonFiles.Length} legacy settings file(s)", LogLevel.Info);
   }
 
   private static void OnRenderedHud(object? sender, RenderedHudEventArgs e)

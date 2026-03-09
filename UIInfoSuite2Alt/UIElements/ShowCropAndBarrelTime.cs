@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
@@ -21,21 +22,58 @@ using Object = StardewValley.Object;
 
 namespace UIInfoSuite2Alt.UIElements;
 
+internal readonly struct HoverSegment
+{
+  public string Text { get; }
+  public Color? Color { get; }
+
+  public HoverSegment(string text, Color? color = null)
+  {
+    Text = text;
+    Color = color;
+  }
+
+  public static implicit operator HoverSegment(string text) => new(text);
+}
+
+internal readonly struct HoverLine
+{
+  public IReadOnlyList<HoverSegment> Segments { get; }
+
+  public HoverLine(string text, Color? color = null)
+  {
+    Segments = new[] { new HoverSegment(text, color) };
+  }
+
+  public HoverLine(params HoverSegment[] segments)
+  {
+    Segments = segments;
+  }
+
+  public static implicit operator HoverLine(string text) => new(text);
+}
+
 internal class ShowCropAndBarrelTime : IDisposable
 {
   private const int MAX_TREE_GROWTH_STAGE = 5;
 
-  private static readonly List<Func<Building?, List<string>, bool>> BuildingDetailRenderers = new()
+  // Colors for the different tooltip text
+  private static readonly Color ReadyColor = new(60, 100, 20);
+  private static readonly Color WaitingColor = new(110, 70, 25);
+  private static readonly Color WateredColor = new(25, 85, 145);
+  private static readonly Color NotWateredColor = new(165, 25, 25);
+
+  private static readonly List<Func<Building?, List<HoverLine>, bool>> BuildingDetailRenderers = new()
   {
     DetailRenderers.BuildingOutput
   };
 
-  private static readonly List<Func<Object?, List<string>, bool>> MachineDetailRenderers = new()
+  private static readonly List<Func<Object?, List<HoverLine>, bool>> MachineDetailRenderers = new()
   {
     DetailRenderers.MachineTime
   };
 
-  private static readonly List<Func<TerrainFeature?, List<string>, bool>> TerrainDetailRenderers = new()
+  private static readonly List<Func<TerrainFeature?, List<HoverLine>, bool>> TerrainDetailRenderers = new()
   {
     DetailRenderers.CropRender, DetailRenderers.TreeRender, DetailRenderers.FruitTreeRender, DetailRenderers.TeaBush
   };
@@ -153,7 +191,7 @@ internal class ShowCropAndBarrelTime : IDisposable
       return;
     }
 
-    List<string> lines = new();
+    List<HoverLine> lines = new();
     Vector2 tile = Vector2.Zero;
     Building? currentTileBuilding = _currentTileBuilding.Value;
     Object? currentTile = _currentTile.Value;
@@ -164,7 +202,7 @@ internal class ShowCropAndBarrelTime : IDisposable
 
     if (_showBarrelTooltip && currentTileBuilding is not null)
     {
-      foreach (Func<Building?, List<string>, bool> buildingDetailRenderer in BuildingDetailRenderers)
+      foreach (Func<Building?, List<HoverLine>, bool> buildingDetailRenderer in BuildingDetailRenderers)
       {
         if (!buildingDetailRenderer(currentTileBuilding, lines))
         {
@@ -178,7 +216,7 @@ internal class ShowCropAndBarrelTime : IDisposable
 
     if (_showBarrelTooltip && currentTile is not null)
     {
-      foreach (Func<Object?, List<string>, bool> machineDetailRenderer in MachineDetailRenderers)
+      foreach (Func<Object?, List<HoverLine>, bool> machineDetailRenderer in MachineDetailRenderers)
       {
         if (machineDetailRenderer(currentTile, lines))
         {
@@ -191,7 +229,7 @@ internal class ShowCropAndBarrelTime : IDisposable
 
     if (_showCropTooltip && terrain is not null)
     {
-      foreach (Func<TerrainFeature, List<string>, bool> terrainDetailRenderer in TerrainDetailRenderers)
+      foreach (Func<TerrainFeature?, List<HoverLine>, bool> terrainDetailRenderer in TerrainDetailRenderers)
       {
         if (terrainDetailRenderer(terrain, lines))
         {
@@ -211,13 +249,90 @@ internal class ShowCropAndBarrelTime : IDisposable
       overrideY = (int)(tile.Y + Utility.ModifyCoordinateForUIScale(32));
     }
 
-    IClickableMenu.drawHoverText(
-      Game1.spriteBatch,
-      string.Join('\n', lines),
-      Game1.smallFont,
-      overrideX: overrideX,
-      overrideY: overrideY
-    );
+    DrawColoredHoverText(Game1.spriteBatch, lines, Game1.smallFont, overrideX, overrideY);
+  }
+
+  private static void DrawColoredHoverText(
+    SpriteBatch b, List<HoverLine> lines, SpriteFont font, int overrideX = -1, int overrideY = -1)
+  {
+    float maxWidth = 0;
+    foreach (HoverLine line in lines)
+    {
+      float lineWidth = 0;
+      foreach (HoverSegment segment in line.Segments)
+      {
+        if (segment.Text.Length > 0)
+        {
+          lineWidth += font.MeasureString(segment.Text).X;
+        }
+      }
+
+      maxWidth = Math.Max(maxWidth, lineWidth);
+    }
+
+    int width = (int)maxWidth + 32;
+    int height = Math.Max(60, lines.Count * font.LineSpacing + 32);
+
+    int x = Game1.getOldMouseX() + 32;
+    int y = Game1.getOldMouseY() + 32;
+
+    if (overrideX != -1)
+    {
+      x = overrideX;
+    }
+
+    if (overrideY != -1)
+    {
+      y = overrideY;
+    }
+
+    Rectangle safeArea = Utility.getSafeArea();
+    if (x + width > safeArea.Right)
+    {
+      x = safeArea.Right - width;
+      y += 16;
+    }
+
+    if (y + height > safeArea.Bottom)
+    {
+      x += 16;
+      if (x + width > safeArea.Right)
+      {
+        x = safeArea.Right - width;
+      }
+
+      y = safeArea.Bottom - height;
+    }
+
+    width += 4;
+
+    IClickableMenu.drawTextureBox(
+      b, Game1.menuTexture, new Rectangle(0, 256, 60, 60),
+      x, y, width, height, Color.White);
+
+    Color defaultColor = Game1.textColor;
+    Color shadowColor = Game1.textShadowColor;
+    float lineY = y + 16 + 4;
+
+    foreach (HoverLine line in lines)
+    {
+      float segX = x + 16;
+      foreach (HoverSegment segment in line.Segments)
+      {
+        if (segment.Text.Length > 0)
+        {
+          Color segColor = segment.Color ?? defaultColor;
+          Vector2 pos = new(segX, lineY);
+          b.DrawString(font, segment.Text, pos + new Vector2(2f, 2f), shadowColor);
+          b.DrawString(font, segment.Text, pos + new Vector2(0f, 2f), shadowColor);
+          b.DrawString(font, segment.Text, pos + new Vector2(2f, 0f), shadowColor);
+          b.DrawString(font, segment.Text, pos, segColor * 0.9f);
+          segX += font.MeasureString(segment.Text).X;
+        }
+      }
+
+      lineY += font.LineSpacing;
+    }
   }
 
   private static string GetFertilizerString(HoeDirt dirtTile)
@@ -283,15 +398,15 @@ internal class ShowCropAndBarrelTime : IDisposable
 
   private static class DetailRenderers
   {
-    private static string GetInfoStringForDrop(PossibleDroppedItem item)
+    private static HoverLine GetInfoStringForDrop(PossibleDroppedItem item)
     {
       (int nextDayToProduce, ParsedItemData? parsedItemData, float chance, string? _) = item;
 
       string chanceStr = 1.0f.Equals(chance) ? "" : $" ({chance * 100:2F}%)";
       int daysUntilReady = nextDayToProduce - Game1.dayOfMonth;
       return daysUntilReady <= 0
-        ? $"{parsedItemData.DisplayName}: {I18n.ReadyToHarvest()}"
-        : $"{parsedItemData.DisplayName}: {daysUntilReady} {I18n.Days()}{chanceStr}";
+        ? new HoverLine($"{parsedItemData.DisplayName}: ", new HoverSegment(I18n.ReadyToHarvest(), ReadyColor))
+        : new HoverLine($"{parsedItemData.DisplayName}: ", new HoverSegment($"{daysUntilReady} {I18n.Days()}{chanceStr}", WaitingColor));
     }
 
     private static Dictionary<string, int> GetItemCountMap(List<Item?> items)
@@ -311,7 +426,7 @@ internal class ShowCropAndBarrelTime : IDisposable
       return itemCounter;
     }
 
-    public static bool BuildingOutput(Building? building, List<string> entries)
+    public static bool BuildingOutput(Building? building, List<HoverLine> entries)
     {
       if (building is null)
       {
@@ -354,7 +469,7 @@ internal class ShowCropAndBarrelTime : IDisposable
       return true;
     }
 
-    public static bool MachineTime(Object? tileObject, List<string> entries)
+    public static bool MachineTime(Object? tileObject, List<HoverLine> entries)
     {
       if (tileObject == null ||
           !tileObject.bigCraftable.Value ||
@@ -417,7 +532,7 @@ internal class ShowCropAndBarrelTime : IDisposable
       return true;
     }
 
-    public static bool CropRender(TerrainFeature? terrain, List<string> entries)
+    public static bool CropRender(TerrainFeature? terrain, List<HoverLine> entries)
     {
       if (terrain is not HoeDirt hoeDirt)
       {
@@ -454,10 +569,13 @@ internal class ShowCropAndBarrelTime : IDisposable
 
         string cropName = DropsHelper.GetCropHarvestName(crop);
         string daysLeftStr = daysLeft <= 0 ? I18n.ReadyToHarvest() : $"{daysLeft} {I18n.Days()}";
-        entries.Add($"{cropName}: {daysLeftStr}");
+        Color cropColor = daysLeft <= 0 ? ReadyColor : WaitingColor;
+        entries.Add(new HoverLine($"{cropName}: ", new HoverSegment(daysLeftStr, cropColor)));
 
-        string waterStatus = hoeDirt.state.Value == 1 ? I18n.Watered() : I18n.NotWatered();
-        entries.Add(waterStatus);
+        bool isWatered = hoeDirt.state.Value == 1;
+        string waterStatus = isWatered ? I18n.Watered() : I18n.NotWatered();
+        Color waterColor = isWatered ? WateredColor : NotWateredColor;
+        entries.Add(new HoverLine(waterStatus, waterColor));
 
         if (!string.IsNullOrEmpty(fertilizerStr))
         {
@@ -473,7 +591,7 @@ internal class ShowCropAndBarrelTime : IDisposable
       return true;
     }
 
-    public static bool TreeRender(TerrainFeature? terrain, List<string> entries)
+    public static bool TreeRender(TerrainFeature? terrain, List<HoverLine> entries)
     {
       if (terrain is not Tree tree)
       {
@@ -499,7 +617,7 @@ internal class ShowCropAndBarrelTime : IDisposable
       return true;
     }
 
-    public static bool FruitTreeRender(TerrainFeature? terrain, List<string> entries)
+    public static bool FruitTreeRender(TerrainFeature? terrain, List<HoverLine> entries)
     {
       if (terrain is not FruitTree fruitTree)
       {
@@ -523,7 +641,7 @@ internal class ShowCropAndBarrelTime : IDisposable
       return true;
     }
 
-    public static bool TeaBush(TerrainFeature? terrain, List<string> entries)
+    public static bool TeaBush(TerrainFeature? terrain, List<HoverLine> entries)
     {
       if (terrain is not Bush bush || bush.size.Value != Bush.greenTeaBush)
       {

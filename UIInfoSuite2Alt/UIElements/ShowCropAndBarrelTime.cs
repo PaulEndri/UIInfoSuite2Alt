@@ -393,7 +393,10 @@ internal class ShowCropAndBarrelTime : IDisposable
         return I18n.SVEFir();
       case "Cornucopia_SapodillaSeed":
         return I18n.CORSapodilla();
+      case "Cornucopia_CorpseFlowerSeed":
+        return I18n.CORCorpseFlower();
       default:
+        ModEntry.MonitorObject.LogOnce($"Unknown tree type: {treeType} (Post a Bug Report on NexusMods)", LogLevel.Warn);
         return $"Unknown (#{treeType})";
     }
   }

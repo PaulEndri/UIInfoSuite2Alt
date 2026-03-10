@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <img src=".github/assets/showcase-animation-2.webp" alt="Showcase">
+  <img src=".github/assets/showcase-animation-2-compressed.webp" alt="Showcase">
 </p>
 
 <p align="center">
@@ -25,6 +25,9 @@
 
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
+- **v2.5.2**
+  - Add [Cornucopia](https://www.nexusmods.com/stardewvalley/mods/19508) Corpse Flower & Date Palm tree to known treetypes
+  - Add warning log for unknown/missing tree types
 - **v2.5.1**
   - Add colored tooltips to crops for quick and better readability
   - Add [Cornucopia](https://www.nexusmods.com/stardewvalley/mods/19508) Sapodilla tree to known treetypes

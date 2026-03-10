@@ -58,7 +58,7 @@ internal class ShowCropAndBarrelTime : IDisposable
   private const int MAX_TREE_GROWTH_STAGE = 5;
 
   // Colors for the different tooltip text
-  private static readonly Color ReadyColor = new(60, 100, 20);
+  private static readonly Color ReadyColor = new(45, 100, 5);
   private static readonly Color WaitingColor = new(110, 70, 25);
   private static readonly Color WateredColor = new(25, 85, 145);
   private static readonly Color NotWateredColor = new(165, 25, 25);
@@ -395,6 +395,8 @@ internal class ShowCropAndBarrelTime : IDisposable
         return I18n.CORSapodilla();
       case "Cornucopia_CorpseFlowerSeed":
         return I18n.CORCorpseFlower();
+      case "Cornucopia_DatePalmSeed":
+        return I18n.CORDatePalm();
       default:
         ModEntry.MonitorObject.LogOnce($"Unknown tree type: {treeType} (Post a Bug Report on NexusMods)", LogLevel.Warn);
         return $"Unknown (#{treeType})";

@@ -163,7 +163,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
 
     int baseX = menu.xPositionOnScreen + menu.width - 120;
     int baseY = menu.yPositionOnScreen + menu.height -
-                (_helper.ModRegistry.IsLoaded("spacechase0.BiggerBackpack") ? 230 : 300);
+                (_helper.ModRegistry.IsLoaded("spacechase0.BiggerBackpack") ? 230 : 294);
 
     SpriteBatch b = Game1.spriteBatch;
     int mouseX = Game1.getMouseX();

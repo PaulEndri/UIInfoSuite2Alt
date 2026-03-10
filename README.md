@@ -25,6 +25,8 @@
 
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
+- **v2.5.3**
+  - Reverted `LevelUp.ogg` to `LevelUp.wav` to fix certain audio/config issues in-game
 - **v2.5.2**
   - Add [Cornucopia](https://www.nexusmods.com/stardewvalley/mods/19508) Corpse Flower & Date Palm tree to known treetypes
   - Add warning log for unknown/missing tree types

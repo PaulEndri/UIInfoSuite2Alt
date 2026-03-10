@@ -28,6 +28,7 @@
 - **v2.5.2**
   - Add [Cornucopia](https://www.nexusmods.com/stardewvalley/mods/19508) Corpse Flower & Date Palm tree to known treetypes
   - Add warning log for unknown/missing tree types
+  - Adjusted icon margin for Calendar/Billboard icons
 - **v2.5.1**
   - Add colored tooltips to crops for quick and better readability
   - Add [Cornucopia](https://www.nexusmods.com/stardewvalley/mods/19508) Sapodilla tree to known treetypes

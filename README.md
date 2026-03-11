@@ -25,6 +25,8 @@
 
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
+- **v2.5.5**
+  - Add keybind to open Monster eradication goals (Default F9)
 - **v2.5.4**
   - Fixed fertilizer string overlapping tooltip when using mods such as [Ultimate Fertilizer](https://www.nexusmods.com/stardewvalley/mods/21318)
 - **v2.5.3**

@@ -21,6 +21,7 @@ public class ModEntry : Mod
   public static Options.ModConfig ModConfig { get; set; } = null!;
 
   private static EventHandler<ButtonsChangedEventArgs>? _calendarAndQuestKeyBindingsHandler;
+  private static EventHandler<ButtonsChangedEventArgs>? _monsterEradicationKeyBindingsHandler;
 
   private static IModHelper _modHelper = null!;
   private ModOptionsPageHandler? _modOptionsPageHandler;
@@ -55,6 +56,9 @@ public class ModEntry : Mod
     helper.Events.GameLoop.DayStarted += OnDayStarted;
     helper.Events.GameLoop.GameLaunched += OnGameLaunched;
     helper.Events.Display.RenderedHud += OnRenderedHud;
+
+    RegisterCalendarAndQuestKeyBindings(helper, true);
+    RegisterMonsterEradicationKeyBindings(helper, true);
 
     IconHandler.Handler.IsQuestLogPermanent = helper.ModRegistry.IsLoaded("MolsonCAD.DeluxeJournal");
   }
@@ -116,6 +120,13 @@ public class ModEntry : Mod
       tooltip: () => I18n.Keybinds_OpenModOptionsKeybind_Tooltip(),
       getValue: () => ModConfig.OpenModOptionsKeybind,
       setValue: value => ModConfig.OpenModOptionsKeybind = value
+    );
+    configMenu.AddKeybindList(
+      ModManifest,
+      name: () => I18n.Keybinds_OpenMonsterEradicationKeybind_DisplayedName(),
+      tooltip: () => I18n.Keybinds_OpenMonsterEradicationKeybind_Tooltip(),
+      getValue: () => ModConfig.OpenMonsterEradicationKeybind,
+      setValue: value => ModConfig.OpenMonsterEradicationKeybind = value
     );
     // Show item effect ranges
     configMenu.AddSectionTitle(
@@ -374,6 +385,30 @@ public class ModEntry : Mod
       helper.Input.SuppressActiveKeybinds(ModConfig.OpenQuestBoardKeybind);
       Game1.RefreshQuestOfTheDay();
       Game1.activeClickableMenu = new Billboard(true);
+    }
+  }
+
+  public static void RegisterMonsterEradicationKeyBindings(IModHelper helper, bool subscribe)
+  {
+    if (_monsterEradicationKeyBindingsHandler == null)
+    {
+      _monsterEradicationKeyBindingsHandler = (sender, e) => HandleMonsterEradicationKeyBindings(helper);
+    }
+
+    helper.Events.Input.ButtonsChanged -= _monsterEradicationKeyBindingsHandler;
+
+    if (subscribe)
+    {
+      helper.Events.Input.ButtonsChanged += _monsterEradicationKeyBindingsHandler;
+    }
+  }
+
+  private static void HandleMonsterEradicationKeyBindings(IModHelper helper)
+  {
+    if (Context.IsPlayerFree && ModConfig.OpenMonsterEradicationKeybind.JustPressed())
+    {
+      helper.Input.SuppressActiveKeybinds(ModConfig.OpenMonsterEradicationKeybind);
+      MonsterQuestHelper.ShowMonsterKillList();
     }
   }
   #endregion

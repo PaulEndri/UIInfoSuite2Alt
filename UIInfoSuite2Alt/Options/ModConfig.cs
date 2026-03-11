@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using StardewModdingAPI;
 using StardewModdingAPI.Utilities;
 
@@ -13,6 +13,7 @@ public class ModConfig
   public KeybindList ShowOneRange { get; set; } = KeybindList.ForSingle(SButton.LeftControl);
   public KeybindList ShowAllRange { get; set; } = KeybindList.Parse("LeftControl + LeftAlt");
   public KeybindList OpenModOptionsKeybind { get; set; } = KeybindList.ForSingle(SButton.F8);
+  public KeybindList OpenMonsterEradicationKeybind { get; set; } = KeybindList.ForSingle(SButton.F9);
 
   // --- Feature toggles (migrated from per-save ModOptions) ---
   public bool AllowExperienceBarToFadeOut { get; set; } = true;

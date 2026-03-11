@@ -161,9 +161,29 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
     IClickableMenu menu = Game1.activeClickableMenu;
     if (menu == null) return;
 
+    // Library Mods
+    bool biggerBackpack = _helper.ModRegistry.IsLoaded("spacechase0.BiggerBackpack");
+    bool fullInventoryView = _helper.ModRegistry.IsLoaded("CpdnCristiano.FullInventoryView");
+
+    // Content Patcher Mods
+    bool cpCatValley = _helper.ModRegistry.IsLoaded("RimeNovi.CatValley");
+
+    // Vanilla offset
+    int offset = 294;
+
+    if (biggerBackpack)
+      offset -= 64;
+
+    if (fullInventoryView)
+      offset -= 64;
+
+    if (cpCatValley)
+      offset -= 8;
+
+    ModEntry.MonitorObject.LogOnce($"offset: {offset}", LogLevel.Warn);
+
     int baseX = menu.xPositionOnScreen + menu.width - 120;
-    int baseY = menu.yPositionOnScreen + menu.height -
-                (_helper.ModRegistry.IsLoaded("spacechase0.BiggerBackpack") ? 230 : 294);
+    int baseY = menu.yPositionOnScreen + menu.height - offset;
 
     SpriteBatch b = Game1.spriteBatch;
     int mouseX = Game1.getMouseX();

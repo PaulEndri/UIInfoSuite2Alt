@@ -108,6 +108,11 @@ internal class ShowItemHoverInformation : IDisposable
   /// <param name="e">The event arguments.</param>
   private void OnRenderedHud(object? sender, RenderedHudEventArgs e)
   {
+    if (!Game1.displayHUD || Game1.eventUp || Game1.isFestival())
+    {
+      return;
+    }
+
     if (Game1.activeClickableMenu == null)
     {
       DrawAdvancedTooltip(e.SpriteBatch);

@@ -335,27 +335,28 @@ internal class ShowCropAndBarrelTime : IDisposable
     }
   }
 
-  private static string GetFertilizerString(HoeDirt dirtTile)
+  private static IEnumerable<string> GetFertilizerList(HoeDirt dirtTile)
   {
+    if (string.IsNullOrWhiteSpace(dirtTile.fertilizer.Value))
+      return Enumerable.Empty<string>();
+
     var fertilizerNames = new Dictionary<string, int>();
+
     // Ultimate Fertilizer Integration
-    foreach (string fertilizerStr in dirtTile.fertilizer.Value.Split("|"))
+    foreach (string fertilizerStr in dirtTile.fertilizer.Value.Split('|'))
     {
       string name = ItemRegistry.GetData(fertilizerStr)?.DisplayName ?? "Unknown Fertilizer";
-      int count = fertilizerNames.GetOrDefault(name);
+      int count = fertilizerNames.GetValueOrDefault(name, 0);
       fertilizerNames[name] = count + 1;
     }
 
-    IEnumerable<string> formattedNames = fertilizerNames.OrderBy(kv => kv.Value)
-                                                        .ThenBy(kv => kv.Key)
-                                                        .Select(
-                                                          kv =>
-                                                          {
-                                                            string quantityStr = kv.Value == 1 ? "" : $" x{kv.Value}";
-                                                            return $"{kv.Key}{quantityStr}";
-                                                          }
-                                                        );
-    return string.Join(",\n", formattedNames);
+    return fertilizerNames.OrderBy(kv => kv.Value)
+                          .ThenBy(kv => kv.Key)
+                          .Select(kv =>
+                          {
+                            string quantityStr = kv.Value == 1 ? "" : $" x{kv.Value}";
+                            return $"{kv.Key}{quantityStr}";
+                          });
   }
 
   // See: https://stardewvalleywiki.com/Trees
@@ -546,12 +547,11 @@ internal class ShowCropAndBarrelTime : IDisposable
         return false;
       }
 
-      var fertilizerStr = "";
-      // Special case, someone had a case where id "0" was set in fertilizer, which is weeds...
-      // Weird, right?
+      IEnumerable<string> fertilizers = Enumerable.Empty<string>();
+
       if (!string.IsNullOrEmpty(hoeDirt.fertilizer.Value) && !"0".Equals(hoeDirt.fertilizer.Value))
       {
-        fertilizerStr = GetFertilizerString(hoeDirt);
+        fertilizers = GetFertilizerList(hoeDirt);
       }
 
       if (hoeDirt.crop is not null && !hoeDirt.crop.dead.Value)
@@ -569,10 +569,8 @@ internal class ShowCropAndBarrelTime : IDisposable
           {
             daysLeft += hoeDirt.crop.phaseDays[i];
           }
-
           daysLeft -= hoeDirt.crop.dayOfCurrentPhase.Value;
         }
-
 
         string cropName = DropsHelper.GetCropHarvestName(crop);
         string daysLeftStr = daysLeft <= 0 ? I18n.ReadyToHarvest() : $"{daysLeft} {I18n.Days()}";
@@ -583,16 +581,35 @@ internal class ShowCropAndBarrelTime : IDisposable
         string waterStatus = isWatered ? I18n.Watered() : I18n.NotWatered();
         Color waterColor = isWatered ? WateredColor : NotWateredColor;
         entries.Add(new HoverLine(waterStatus, waterColor));
-
-        if (!string.IsNullOrEmpty(fertilizerStr))
-        {
-          fertilizerStr = $"({I18n.With()} {fertilizerStr})";
-        }
       }
 
-      if (!string.IsNullOrEmpty(fertilizerStr))
+      if (fertilizers.Any())
       {
-        entries.Add(fertilizerStr);
+        var fertList = fertilizers.ToList();
+
+        for (int i = 0; i < fertList.Count; i++)
+        {
+          string currentName = fertList[i];
+          string lineText;
+
+          if (fertList.Count == 1)
+          {
+            lineText = $"({I18n.With()} {currentName})";
+          }
+          else if (i == 0)
+          {
+            lineText = $"({I18n.With()} {currentName},";
+          }
+          else if (i == fertList.Count - 1)
+          {
+            lineText = $"{currentName})";
+          }
+          else
+          {
+            lineText = $"{currentName},";
+          }
+          entries.Add(new HoverLine(lineText));
+        }
       }
 
       return true;

@@ -27,6 +27,7 @@
 
 - **v2.5.5**
   - Add keybind to open Monster eradication goals (Default F9)
+  - Fix tooltip showing up during special events/festivals/cutscenes
 - **v2.5.4**
   - Fixed fertilizer string overlapping tooltip when using mods such as [Ultimate Fertilizer](https://www.nexusmods.com/stardewvalley/mods/21318)
 - **v2.5.3**

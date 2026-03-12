@@ -180,7 +180,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
     if (cpCatValley)
       offset -= 8;
 
-    ModEntry.MonitorObject.LogOnce($"offset: {offset}", LogLevel.Warn);
+    //ModEntry.MonitorObject.LogOnce($"offset: {offset}", LogLevel.Warn);
 
     int baseX = menu.xPositionOnScreen + menu.width - 120;
     int baseY = menu.yPositionOnScreen + menu.height - offset;

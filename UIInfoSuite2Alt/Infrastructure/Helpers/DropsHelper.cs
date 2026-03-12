@@ -5,6 +5,7 @@ using StardewValley;
 using StardewValley.GameData.FruitTrees;
 using StardewValley.ItemTypeDefinitions;
 using StardewValley.TerrainFeatures;
+using StardewValley.TokenizableStrings;
 using Object = StardewValley.Object;
 
 namespace UIInfoSuite2Alt.Infrastructure.Helpers;
@@ -93,14 +94,41 @@ public static class DropsHelper
 
   public static FruitTreeInfo GetFruitTreeInfo(FruitTree tree, bool harvestIncludeToday = false)
   {
-    var name = "Fruit Tree";
-    List<PossibleDroppedItem> drops = GetFruitTreeDropItems(tree, harvestIncludeToday);
-    if (drops.Count == 1)
+    var treeData = tree.GetData();
+    string? displayName = null;
+
+    if (treeData?.DisplayName != null)
     {
-      name = $"{drops[0].Item.DisplayName}{I18n.Tree()}";
+      displayName = TokenParser.ParseText(treeData.DisplayName);
     }
 
-    return new FruitTreeInfo(name, drops);
+    if (string.IsNullOrEmpty(displayName))
+    {
+      var itemData = ItemRegistry.GetData(tree.treeId.Value);
+      if (itemData != null) displayName = itemData.DisplayName;
+    }
+
+    List<PossibleDroppedItem> drops = GetFruitTreeDropItems(tree, harvestIncludeToday);
+
+    if (drops.Count > 1)
+    {
+      drops = new List<PossibleDroppedItem> { drops[0] };
+    }
+
+    if (string.IsNullOrEmpty(displayName) && drops.Count > 0)
+    {
+      displayName = drops[0].Item.DisplayName;
+    }
+
+    if (string.IsNullOrEmpty(displayName))
+    {
+      displayName = tree.treeId.Value;
+    }
+
+    string cleanName = displayName.Replace(" Sapling", "");
+    string finalName = $"{cleanName}{I18n.Tree()}";
+
+    return new FruitTreeInfo(finalName, drops);
   }
 
   public static List<PossibleDroppedItem> GetGenericDropItems<T>(
@@ -135,10 +163,9 @@ public static class DropsHelper
       ParsedItemData? itemData = ItemRegistry.GetData(dropInfo.ItemId);
       if (itemData == null)
       {
-        ModEntry.MonitorObject.Log(
-          $"Couldn't parse the correct item {displayName} will drop. ItemId: {dropInfo.ItemId}. Please report this error.",
-          LogLevel.Error
-        );
+        ModEntry.MonitorObject.LogOnce(
+          $"DropsHelper: Could not parse the correct item '{displayName}' will drop. (ItemId: {dropInfo.ItemId})",
+        LogLevel.Debug);
         continue;
       }
 

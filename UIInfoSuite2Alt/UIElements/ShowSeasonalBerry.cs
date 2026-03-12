@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
@@ -106,6 +106,11 @@ internal class ShowSeasonalBerry : IDisposable
         _berrySpriteLocation = new Rectangle(128, 193, 15, 15);
         _hoverText = I18n.CanFindSalmonberry();
         _spriteScale = 8 / 3f;
+        break;
+      case "summer" when day is >= 12 and <= 14:
+        _berrySpriteLocation = new Rectangle(144, 256, 16, 16);
+        _hoverText = I18n.CanFindBeachForage();
+        _spriteScale = 5 / 2f;
         break;
       case "fall" when day is >= 8 and <= 11:
         _berrySpriteLocation = new Rectangle(32, 272, 16, 16);

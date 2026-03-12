@@ -25,6 +25,9 @@
 
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
+- **v2.5.6**
+  - Add missing tree types to i18n for [Visit Mount Vapius](https://www.nexusmods.com/stardewvalley/mods/9600) and [Sunberry Village](https://www.nexusmods.com/stardewvalley/mods/11111)([Rose and the Alchemist](https://www.nexusmods.com/stardewvalley/mods/32385))
+  - Improved fruit tree name resolution and tooltips for modded fruit trees
 - **v2.5.5**
   - Add keybind to open Monster eradication goals (Default F9)
   - Fix tooltip showing up during special events/festivals/cutscenes

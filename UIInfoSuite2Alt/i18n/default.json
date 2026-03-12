@@ -59,9 +59,27 @@
   "GreenRainType2": "Green Rain Type 2",
   "GreenRainType3": "Green Rain Type 3",
   "Mystic": "Mystic",
+  //Visit Mount Vapius
   "VmvBirch": "(VMV) Birch",
+  "VmvHazelnut": "(VMV) Hazelnut",
+  "VmvSkyshardPine": "(VMV) Skyshard Pine",
+  "VmvAmber": "(VMV) Amber",
+  "VmvBlackChanterelle": "(VMV) Black Chanterelle",
+  //Sunberry Village(Alchemist)
+  "SbvStoutFunnel": "(SBV) Stout Funnel",
+  "SbvSparklingAgaric": "(SBV) Sparkling Agaric",
+  "SbvSeafoamWaxcap": "(SBV) Seafoam Waxcap",
+  "SbvLunarPoof": "(SBV) Lunar Poof",
+  "SbvIndigoCap": "(SBV) Indigo Cap",
+  "SbvLilacFunnel": "(SBV) Lilac Funnel",
+  "SbvLimeyBonnet": "(SBV) Limey Bonnet",
+  "SbvCoralFungus": "(SBV) Coral Fungus",
+  "SbvGhostlyParasol": "(SBV) Ghostly Parasol",
+  "SbvFrillyGilly": "(SBV) Frilly Gilly",
+  //Stardew Valley Expanded
   "SVEBirch": "(SVE) Birch",
   "SVEFir": "(SVE) Fir",
+  //Cornucopia
   "CORSapodilla": "(COR) Sapodilla",
   "CORCorpseFlower": "(COR) Corpse Flower",
   "CORDatePalm": "(COR) Date Palm",

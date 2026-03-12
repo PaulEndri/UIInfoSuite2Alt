@@ -388,6 +388,14 @@ internal class ShowCropAndBarrelTime : IDisposable
         return I18n.Mystic();
       case "Lumisteria.MtVapius.Birchtree":
         return I18n.VmvBirch();
+      case "Lumisteria.MtVapius.HazelnutTree":
+        return I18n.VmvHazelnut();
+      case "Lumisteria.MtVapius.SkyshardPineTree":
+        return I18n.VmvSkyshardPine();
+      case "Lumisteria.MtVapius.AmberTree":
+        return I18n.VmvAmber();
+      case "Lumisteria.MtVapius.BlackChanterelleTree":
+        return I18n.VmvBlackChanterelle();
       case "FlashShifter.StardewValleyExpandedCP_Birch_Tree":
         return I18n.SVEBirch();
       case "FlashShifter.StardewValleyExpandedCP_Fir_Tree":
@@ -398,6 +406,26 @@ internal class ShowCropAndBarrelTime : IDisposable
         return I18n.CORCorpseFlower();
       case "Cornucopia_DatePalmSeed":
         return I18n.CORDatePalm();
+      case "Wildflour.SASS_Stout_Funnel_Tree":
+        return I18n.SbvStoutFunnel();
+      case "Wildflour.SASS_Sparkling_Agaric_Tree":
+        return I18n.SbvSparklingAgaric();
+      case "Wildflour.SASS_Seafoam_Waxcap_Tree":
+        return I18n.SbvSeafoamWaxcap();
+      case "Wildflour.SASS_Lunar_Poof_Tree":
+        return I18n.SbvLunarPoof();
+      case "Wildflour.SASS_Indigo_Cap_Tree":
+        return I18n.SbvIndigoCap();
+      case "Wildflour.SASS_Lilac_Funnel_Tree":
+        return I18n.SbvLilacFunnel();
+      case "Wildflour.SASS_Limey_Bonnet_Tree":
+        return I18n.SbvLimeyBonnet();
+      case "Wildflour.SASS_Coral_Fungus_Tree":
+        return I18n.SbvCoralFungus();
+      case "Wildflour.SASS_Ghostly_Parasol_Tree":
+        return I18n.SbvGhostlyParasol();
+      case "Wildflour.SASS_Frilly_Gilly_Tree":
+        return I18n.SbvFrillyGilly();
       default:
         ModEntry.MonitorObject.LogOnce($"Unknown tree type: {treeType} (Post a Bug Report on NexusMods)", LogLevel.Warn);
         return $"Unknown (#{treeType})";

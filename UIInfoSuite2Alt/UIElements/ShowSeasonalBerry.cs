@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
@@ -11,13 +12,8 @@ namespace UIInfoSuite2Alt.UIElements;
 internal class ShowSeasonalBerry : IDisposable
 {
   #region Properties
-  private Rectangle? _berrySpriteLocation;
-  private float _spriteScale;
-  private string _hoverText = "";
-  private ClickableTextureComponent _berryIcon = null!;
-
   private readonly IModHelper _helper;
-
+  private Texture2D? _cursors16;
   private bool Enabled { get; set; }
   private bool ShowHazelnut { get; set; }
   #endregion
@@ -26,6 +22,8 @@ internal class ShowSeasonalBerry : IDisposable
   public ShowSeasonalBerry(IModHelper helper)
   {
     _helper = helper;
+
+    _cursors16 ??= Game1.content.Load<Texture2D>("LooseSprites\\Cursors_1_6");
   }
 
   public void Dispose()
@@ -37,14 +35,11 @@ internal class ShowSeasonalBerry : IDisposable
   {
     Enabled = showSeasonalBerry;
 
-    _berrySpriteLocation = null;
     _helper.Events.GameLoop.DayStarted -= OnDayStarted;
     _helper.Events.Display.RenderingHud -= OnRenderingHud;
 
     if (showSeasonalBerry)
     {
-      UpdateBerryForDay();
-
       _helper.Events.GameLoop.DayStarted += OnDayStarted;
       _helper.Events.Display.RenderingHud += OnRenderingHud;
     }
@@ -60,72 +55,90 @@ internal class ShowSeasonalBerry : IDisposable
   #region Event subscriptions
   private void OnDayStarted(object? sender, DayStartedEventArgs e)
   {
-    UpdateBerryForDay();
+    // Empty, for now...
   }
 
   private void OnRenderingHud(object? sender, RenderingHudEventArgs e)
   {
-    if (!UIElementUtils.IsRenderingNormally() || !_berrySpriteLocation.HasValue)
+    if (!UIElementUtils.IsRenderingNormally() || !Enabled)
     {
       return;
     }
 
-    IconHandler.Handler.EnqueueIcon(
-      "SeasonalBerry",
-      (batch, pos) =>
+    string season = Game1.currentSeason;
+    int day = Game1.dayOfMonth;
+
+    if (season == "spring" && day is >= 15 and <= 18)
+      AddIcon("Salmonberry", new Rectangle(128, 193, 15, 15), I18n.CanFindSalmonberry(), 8 / 3f);
+
+    else if (season == "summer" && day is >= 12 and <= 14)
+      AddIcon("BeachForage", new Rectangle(144, 256, 16, 16), I18n.CanFindBeachForage(), 20 / 8f);
+
+    else if (season == "fall" && day is >= 8 and <= 11)
+      AddIcon("Blackberry", new Rectangle(32, 272, 16, 16), I18n.CanFindBlackberry(), 20 / 8f);
+
+    else if (season == "fall" && day >= 15 && ShowHazelnut)
+      AddIcon("Hazelnut", new Rectangle(1, 274, 14, 14), I18n.CanFindHazelnut(), 20 / 7f);
+
+    if (season == "spring" && day == 17)
+    {
+      if (IsPotOfGoldStillThere())
       {
-        _berryIcon = new ClickableTextureComponent(
-          new Rectangle(pos.X, pos.Y, 40, 40),
-          Game1.objectSpriteSheet,
-          _berrySpriteLocation.Value,
-          _spriteScale
+        AddIcon(
+            "PotOfGold",
+            new Rectangle(131, 0, 16, 16),
+            I18n.CanFindPotOfGold(),
+            20 / 8f,
+            _cursors16
         );
-        _berryIcon.draw(batch);
-      },
-      batch =>
-      {
-        bool hasMouse = _berryIcon?.containsPoint(Game1.getMouseX(), Game1.getMouseY()) ?? false;
-        bool hasText = !string.IsNullOrEmpty(_hoverText);
-        if (_berrySpriteLocation.HasValue && hasMouse && hasText)
-        {
-          IClickableMenu.drawHoverText(batch, _hoverText, Game1.dialogueFont);
-        }
       }
-    );
+    }
+  }
+
+  private bool IsPotOfGoldStillThere()
+  {
+    GameLocation forest = Game1.getLocationFromName("Forest");
+    if (forest == null) return false;
+
+    // Pot of Gold Position in Forest
+    Vector2 potPosition = new Vector2(52f, 98f);
+
+    if (forest.objects.TryGetValue(potPosition, out StardewValley.Object obj))
+    {
+      return obj.QualifiedItemId == "(O)PotOfGold";
+    }
+
+    return false;
   }
   #endregion
 
   #region Logic
-  private void UpdateBerryForDay()
+  private void AddIcon(string id, Rectangle sourceRect, string hoverText, float scale, Texture2D? customTexture = null)
   {
-    string? season = Game1.currentSeason;
-    int day = Game1.dayOfMonth;
-    switch (season)
-    {
-      case "spring" when day is >= 15 and <= 18:
-        _berrySpriteLocation = new Rectangle(128, 193, 15, 15);
-        _hoverText = I18n.CanFindSalmonberry();
-        _spriteScale = 8 / 3f;
-        break;
-      case "summer" when day is >= 12 and <= 14:
-        _berrySpriteLocation = new Rectangle(144, 256, 16, 16);
-        _hoverText = I18n.CanFindBeachForage();
-        _spriteScale = 5 / 2f;
-        break;
-      case "fall" when day is >= 8 and <= 11:
-        _berrySpriteLocation = new Rectangle(32, 272, 16, 16);
-        _hoverText = I18n.CanFindBlackberry();
-        _spriteScale = 5 / 2f;
-        break;
-      case "fall" when day >= 15 && ShowHazelnut:
-        _berrySpriteLocation = new Rectangle(1, 274, 14, 14);
-        _hoverText = I18n.CanFindHazelnut();
-        _spriteScale = 20 / 7f;
-        break;
-      default:
-        _berrySpriteLocation = null;
-        break;
-    }
+    ClickableTextureComponent? currentIcon = null;
+
+    Texture2D textureToUse = customTexture ?? Game1.objectSpriteSheet;
+
+    IconHandler.Handler.EnqueueIcon(
+      id,
+      (batch, pos) =>
+      {
+        currentIcon = new ClickableTextureComponent(
+          new Rectangle(pos.X, pos.Y, 40, 40),
+          textureToUse,
+          sourceRect,
+          scale
+        );
+        currentIcon.draw(batch);
+      },
+      batch =>
+      {
+        if (currentIcon != null && currentIcon.containsPoint(Game1.getMouseX(), Game1.getMouseY()))
+        {
+          IClickableMenu.drawHoverText(batch, hoverText, Game1.dialogueFont);
+        }
+      }
+    );
   }
   #endregion
 }

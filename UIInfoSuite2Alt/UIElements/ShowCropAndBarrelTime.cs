@@ -406,6 +406,8 @@ internal class ShowCropAndBarrelTime : IDisposable
         return I18n.CORCorpseFlower();
       case "Cornucopia_DatePalmSeed":
         return I18n.CORDatePalm();
+      case "skellady.SBVCP.CinderTree":
+        return I18n.SbvCinder();
       case "Wildflour.SASS_Stout_Funnel_Tree":
         return I18n.SbvStoutFunnel();
       case "Wildflour.SASS_Sparkling_Agaric_Tree":

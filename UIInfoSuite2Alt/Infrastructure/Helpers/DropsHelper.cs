@@ -126,7 +126,18 @@ public static class DropsHelper
     }
 
     string cleanName = displayName.Replace(" Sapling", "");
-    string finalName = $"{cleanName}{I18n.Tree()}";
+    string treeSuffix = I18n.Tree();
+    string finalName;
+
+    if (cleanName.EndsWith(treeSuffix.Trim(), StringComparison.OrdinalIgnoreCase) ||
+        cleanName.EndsWith("Tree", StringComparison.OrdinalIgnoreCase))
+    {
+      finalName = cleanName;
+    }
+    else
+    {
+      finalName = $"{cleanName}{treeSuffix}";
+    }
 
     return new FruitTreeInfo(finalName, drops);
   }

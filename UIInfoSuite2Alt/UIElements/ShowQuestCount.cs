@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
@@ -70,7 +70,7 @@ internal class ShowQuestCount : IDisposable
     float numberX = centerX - digitStringWidth / 2f;
     float numberY = y - 8;
 
-    Color questColor = new(255, 255, 255, 175);
+    Color questColor = new(255, 255, 255, 145);
 
     Utility.drawTinyDigits(
       questCount,

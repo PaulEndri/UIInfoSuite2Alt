@@ -11,6 +11,7 @@ using StardewValley.Locations;
 using StardewValley.Menus;
 using StardewValley.Objects;
 using UIInfoSuite2Alt.Infrastructure;
+using UIInfoSuite2Alt.Infrastructure.Extensions;
 using UIInfoSuite2Alt.Infrastructure.Helpers;
 
 namespace UIInfoSuite2Alt.UIElements;
@@ -25,6 +26,14 @@ public class ShowTravelingMerchant : IDisposable
   private ClickableTextureComponent _travelingMerchantIcon = null!;
   private int _bundlePulseTimer;
   private int _bundlePulseDelay;
+
+  private bool _rsvIsLoaded;
+  private bool _rsvMerchantIsHere;
+  private bool _rsvMerchantIsVisited;
+  private Texture2D? _rsvIconTexture;
+  private const string RsvModId = "Rafseazz.RidgesideVillage";
+  private const string RsvMerchantLocation = "Custom_Ridgeside_RSVTheHike";
+  private const float RsvHueShift = -50f;
 
   private bool Enabled { get; set; }
   private bool HideWhenVisited { get; set; }
@@ -57,6 +66,7 @@ public class ShowTravelingMerchant : IDisposable
 
     if (showTravelingMerchant)
     {
+      _rsvIsLoaded = _helper.ModRegistry.IsLoaded(RsvModId);
       UpdateTravelingMerchant();
       _helper.Events.Display.RenderingHud += OnRenderingHud;
       _helper.Events.GameLoop.DayStarted += OnDayStarted;
@@ -93,11 +103,22 @@ public class ShowTravelingMerchant : IDisposable
 
   private void OnMenuChanged(object? sender, MenuChangedEventArgs e)
   {
-    if (e.NewMenu is ShopMenu menu && menu.forSale.Any(s => !(s is Hat)) && Game1.currentLocation.Name == "Forest")
+    if (e.NewMenu is ShopMenu menu && menu.forSale.Any(s => !(s is Hat)))
     {
-      _travelingMerchantIsVisited = true;
-      _merchantHasBundleItems = false;
-      _bundleItemNames.Clear();
+      string locationName = Game1.currentLocation.Name;
+
+      if (locationName == "Forest")
+      {
+        _travelingMerchantIsVisited = true;
+        _merchantHasBundleItems = false;
+        _bundleItemNames.Clear();
+      }
+      else if (locationName == RsvMerchantLocation)
+      {
+        _rsvMerchantIsVisited = true;
+        _merchantHasBundleItems = false;
+        _bundleItemNames.Clear();
+      }
     }
   }
 
@@ -133,10 +154,17 @@ public class ShowTravelingMerchant : IDisposable
         "TravelingMerchant",
         (batch, pos) =>
         {
+          bool useRsvIcon = _rsvMerchantIsHere && (!_rsvMerchantIsVisited || !HideWhenVisited)
+            && (!_travelingMerchantIsHere || _travelingMerchantIsVisited);
+          Texture2D iconTexture = useRsvIcon ? GetRsvIconTexture() : Game1.mouseCursors;
+          Rectangle iconSource = useRsvIcon
+            ? new Rectangle(0, 0, 20, 20)
+            : new Rectangle(192, 1411, 20, 20);
+
           _travelingMerchantIcon = new ClickableTextureComponent(
             new Rectangle(pos.X, pos.Y, 40, 40),
-            Game1.mouseCursors,
-            new Rectangle(192, 1411, 20, 20),
+            iconTexture,
+            iconSource,
             2f
           );
           _travelingMerchantIcon.draw(batch);
@@ -174,19 +202,39 @@ public class ShowTravelingMerchant : IDisposable
         {
           if (_travelingMerchantIcon?.containsPoint(Game1.getMouseX(), Game1.getMouseY()) ?? false)
           {
-            string hoverText = I18n.TravelingMerchantIsInTown();
+            var lines = new List<string>();
 
-            if (_merchantHasBundleItems && ShowBundleIcon)
+            if (_travelingMerchantIsHere && (!_travelingMerchantIsVisited || !HideWhenVisited))
             {
-              hoverText += "\n" + I18n.TravelingMerchantHasBundleItem();
+              lines.Add(I18n.TravelingMerchantIsInTown());
 
-              if (ShowBundleItemNames && _bundleItemNames.Count > 0)
+              if (_merchantHasBundleItems && ShowBundleIcon)
               {
-                hoverText += "\n" + string.Join(", ", _bundleItemNames);
+                lines.Add(I18n.TravelingMerchantHasBundleItem());
+
+                if (ShowBundleItemNames && _bundleItemNames.Count > 0)
+                {
+                  lines.Add(string.Join(", ", _bundleItemNames));
+                }
               }
             }
 
-            IClickableMenu.drawHoverText(batch, hoverText, Game1.dialogueFont);
+            if (_rsvMerchantIsHere && (!_rsvMerchantIsVisited || !HideWhenVisited))
+            {
+              lines.Add(I18n.RsvTravelingMerchantIsAtHike());
+
+              if (!_travelingMerchantIsHere && _merchantHasBundleItems && ShowBundleIcon)
+              {
+                lines.Add(I18n.TravelingMerchantHasBundleItem());
+
+                if (ShowBundleItemNames && _bundleItemNames.Count > 0)
+                {
+                  lines.Add(string.Join(", ", _bundleItemNames));
+                }
+              }
+            }
+
+            IClickableMenu.drawHoverText(batch, string.Join("\n", lines), Game1.dialogueFont);
           }
         }
       );
@@ -203,11 +251,13 @@ public class ShowTravelingMerchant : IDisposable
     _merchantHasBundleItems = false;
     _bundleItemNames.Clear();
 
-    if (_travelingMerchantIsHere)
+    _rsvMerchantIsHere = _rsvIsLoaded && Game1.dayOfMonth % 7 == 3;
+    _rsvMerchantIsVisited = false;
+
+    if (_travelingMerchantIsHere || _rsvMerchantIsHere)
     {
       CheckMerchantForBundleItems();
     }
-
   }
 
   private void CheckMerchantForBundleItems()
@@ -236,7 +286,32 @@ public class ShowTravelingMerchant : IDisposable
 
   private bool ShouldDrawIcon()
   {
-    return _travelingMerchantIsHere && (!_travelingMerchantIsVisited || !HideWhenVisited);
+    bool vanillaVisible = _travelingMerchantIsHere && (!_travelingMerchantIsVisited || !HideWhenVisited);
+    bool rsvVisible = _rsvMerchantIsHere && (!_rsvMerchantIsVisited || !HideWhenVisited);
+    return vanillaVisible || rsvVisible;
+  }
+
+  private Texture2D GetRsvIconTexture()
+  {
+    if (_rsvIconTexture == null)
+    {
+      var sourceRect = new Rectangle(192, 1411, 20, 20);
+      var pixels = new Color[sourceRect.Width * sourceRect.Height];
+      Game1.mouseCursors.GetData(0, sourceRect, pixels, 0, pixels.Length);
+
+      for (int i = 0; i < pixels.Length; i++)
+      {
+        if (pixels[i].A > 0)
+        {
+          pixels[i] = pixels[i].ShiftHue(RsvHueShift);
+        }
+      }
+
+      _rsvIconTexture = new Texture2D(Game1.graphics.GraphicsDevice, sourceRect.Width, sourceRect.Height);
+      _rsvIconTexture.SetData(pixels);
+    }
+
+    return _rsvIconTexture;
   }
   #endregion
 }

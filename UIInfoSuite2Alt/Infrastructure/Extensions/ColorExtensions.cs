@@ -15,6 +15,17 @@ public static class ColorExtensions
     return newColor;
   }
 
+  public static Color ShiftHue(this Color color, float degrees)
+  {
+    float hue, saturation, lum;
+    ColorToHsl(color, out hue, out saturation, out lum);
+    hue += degrees / 360f;
+    if (hue < 0) hue += 1f;
+    if (hue > 1) hue -= 1f;
+    Color newColor = HslToColor(hue, saturation, lum);
+    newColor.A = color.A;
+    return newColor;
+  }
 
   // Help from https://gist.github.com/profexorgeek/a407c0c96f69a37a2f2554b43491e247
   private static void ColorToHsl(Color color, out float h, out float s, out float l)

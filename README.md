@@ -26,7 +26,9 @@
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
 - **v2.5.6**
-  - Show icon when there is extra forage to gather on Beach during Summer(12-14)
+  - Show icon when there is extra forage to gather on The Beach during Summer(12-14)
+  - Show icon when there is a Pot of Gold at the End of the Rainbow 🌈
+  - Add gamepad navigation support for Calendar, Billboard, Special Orders, and Qi Orders icons in inventory
   - Add missing tree types to i18n for [Visit Mount Vapius](https://www.nexusmods.com/stardewvalley/mods/9600) and [Sunberry Village](https://www.nexusmods.com/stardewvalley/mods/11111)([Rose and the Alchemist](https://www.nexusmods.com/stardewvalley/mods/32385))
   - Improved fruit tree name resolution and tooltips for modded fruit trees
 - **v2.5.5**

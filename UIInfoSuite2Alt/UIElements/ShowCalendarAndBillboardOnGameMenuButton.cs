@@ -22,10 +22,25 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
   private const int IconSpacing = 8;
   private const int DrawSize = 32;
 
+  // Snap component IDs for gamepad navigation
+  private const int CalendarSnapId = 77770;
+  private const int QuestSnapId = 77771;
+  private const int QiOrdersSnapId = 77772;
+  private const int SpecialOrdersSnapId = 77773;
+
   private readonly PerScreen<Rectangle> _calendarBounds = new(() => Rectangle.Empty);
   private readonly PerScreen<Rectangle> _questBounds = new(() => Rectangle.Empty);
   private readonly PerScreen<Rectangle> _specialOrdersBounds = new(() => Rectangle.Empty);
   private readonly PerScreen<Rectangle> _qiOrdersBounds = new(() => Rectangle.Empty);
+
+  private readonly PerScreen<ClickableComponent> _calendarSnap = new(() =>
+    new ClickableComponent(Rectangle.Empty, "calendar") { myID = CalendarSnapId });
+  private readonly PerScreen<ClickableComponent> _questSnap = new(() =>
+    new ClickableComponent(Rectangle.Empty, "quest") { myID = QuestSnapId });
+  private readonly PerScreen<ClickableComponent> _specialOrdersSnap = new(() =>
+    new ClickableComponent(Rectangle.Empty, "specialOrders") { myID = SpecialOrdersSnapId });
+  private readonly PerScreen<ClickableComponent> _qiOrdersSnap = new(() =>
+    new ClickableComponent(Rectangle.Empty, "qiOrders") { myID = QiOrdersSnapId });
 
   private readonly IModHelper _helper;
   private readonly Texture2D _townTexture;
@@ -107,13 +122,12 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
 
   private void OnButtonPressed(object? sender, ButtonPressedEventArgs e)
   {
-    if (e.Button == SButton.MouseLeft)
+    if (e.Button is SButton.MouseLeft or SButton.ControllerA)
     {
-      ActivateBillboard();
-    }
-    else if (e.Button == SButton.ControllerA)
-    {
-      ActivateBillboard();
+      if (ActivateBillboard())
+      {
+        _helper.Input.Suppress(e.Button);
+      }
     }
   }
 
@@ -319,6 +333,9 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
     {
       IClickableMenu.drawHoverText(b, I18n.QiSpecialOrders(), Game1.dialogueFont);
     }
+
+    // Inject snap components for gamepad navigation
+    InjectSnapComponents(menu);
   }
 
   private void DrawPulsingExclamation(SpriteBatch b, Vector2 position)
@@ -350,12 +367,122 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
     );
   }
 
-  private void ActivateBillboard()
+  private void InjectSnapComponents(IClickableMenu menu)
+  {
+    IClickableMenu? page = GameMenuHelper.GetCurrentPage(menu);
+    if (page == null) return;
+
+    if (page.allClickableComponents == null)
+      page.populateClickableComponentList();
+    if (page.allClickableComponents == null) return;
+
+    page.allClickableComponents.RemoveAll(c =>
+      c.myID is CalendarSnapId or QuestSnapId or SpecialOrdersSnapId or QiOrdersSnapId);
+
+    // Calendar and quest are always visible
+    _calendarSnap.Value.bounds = _calendarBounds.Value;
+    _questSnap.Value.bounds = _questBounds.Value;
+    page.allClickableComponents.Add(_calendarSnap.Value);
+    page.allClickableComponents.Add(_questSnap.Value);
+
+    bool hasSO = _specialOrdersBounds.Value != Rectangle.Empty;
+    bool hasQi = _qiOrdersBounds.Value != Rectangle.Empty;
+
+    if (hasSO)
+    {
+      _specialOrdersSnap.Value.bounds = _specialOrdersBounds.Value;
+      page.allClickableComponents.Add(_specialOrdersSnap.Value);
+    }
+
+    if (hasQi)
+    {
+      _qiOrdersSnap.Value.bounds = _qiOrdersBounds.Value;
+      page.allClickableComponents.Add(_qiOrdersSnap.Value);
+    }
+
+    // Wire bottom-row inventory slots down to our icons for gamepad navigation.
+    int lastSlotId = Game1.player.MaxItems - 1;       // slot 12
+    int secondLastSlotId = Game1.player.MaxItems - 2;  // slot 11
+    int thirdLastSlotId = Game1.player.MaxItems - 3;   // slot 10
+
+    // 12, 11: Quest icon
+    ClickableComponent? lastSlot = page.getComponentWithID(lastSlotId);
+    if (lastSlot != null)
+    {
+      lastSlot.downNeighborID = QuestSnapId;
+    }
+
+    ClickableComponent? secondLastSlot = page.getComponentWithID(secondLastSlotId);
+    if (secondLastSlot != null)
+    {
+      secondLastSlot.downNeighborID = QuestSnapId;
+    }
+
+    // 10: Calendar icon
+    ClickableComponent? thirdLastSlot = page.getComponentWithID(thirdLastSlotId);
+    if (thirdLastSlot != null)
+    {
+      thirdLastSlot.downNeighborID = CalendarSnapId;
+    }
+
+    // R1: Calendar and Quest
+    _calendarSnap.Value.rightNeighborID = QuestSnapId;
+    _calendarSnap.Value.leftNeighborID = -99998;
+    _calendarSnap.Value.upNeighborID = thirdLastSlotId;
+
+    _questSnap.Value.leftNeighborID = CalendarSnapId;
+    _questSnap.Value.rightNeighborID = -99998;
+    _questSnap.Value.upNeighborID = lastSlotId;
+
+    // R2: SO(+Qi) based on visibility
+    if (hasSO && hasQi)
+    {
+      _calendarSnap.Value.downNeighborID = QiOrdersSnapId;
+      _questSnap.Value.downNeighborID = SpecialOrdersSnapId;
+
+      _specialOrdersSnap.Value.upNeighborID = QuestSnapId;
+      _specialOrdersSnap.Value.leftNeighborID = QiOrdersSnapId;
+      _specialOrdersSnap.Value.rightNeighborID = -99998;
+      _specialOrdersSnap.Value.downNeighborID = -99998;
+
+      _qiOrdersSnap.Value.upNeighborID = CalendarSnapId;
+      _qiOrdersSnap.Value.rightNeighborID = SpecialOrdersSnapId;
+      _qiOrdersSnap.Value.leftNeighborID = -99998;
+      _qiOrdersSnap.Value.downNeighborID = -99998;
+    }
+    else if (hasSO)
+    {
+      _calendarSnap.Value.downNeighborID = SpecialOrdersSnapId;
+      _questSnap.Value.downNeighborID = SpecialOrdersSnapId;
+
+      _specialOrdersSnap.Value.upNeighborID = QuestSnapId;
+      _specialOrdersSnap.Value.leftNeighborID = -99998;
+      _specialOrdersSnap.Value.rightNeighborID = -99998;
+      _specialOrdersSnap.Value.downNeighborID = -99998;
+    }
+    else if (hasQi)
+    {
+      _calendarSnap.Value.downNeighborID = QiOrdersSnapId;
+      _questSnap.Value.downNeighborID = QiOrdersSnapId;
+
+      _qiOrdersSnap.Value.upNeighborID = CalendarSnapId;
+      _qiOrdersSnap.Value.leftNeighborID = -99998;
+      _qiOrdersSnap.Value.rightNeighborID = -99998;
+      _qiOrdersSnap.Value.downNeighborID = -99998;
+    }
+    else
+    {
+      _calendarSnap.Value.downNeighborID = -99998;
+      _questSnap.Value.downNeighborID = -99998;
+    }
+  }
+
+  private bool ActivateBillboard()
   {
     if (!GameMenuHelper.IsTab(Game1.activeClickableMenu, GameMenu.inventoryTab) ||
         _heldItem.Value != null)
     {
-      return;
+      return false;
     }
 
     int mouseX = (int)Utility.ModifyCoordinateForUIScale(Game1.getMouseX());
@@ -368,7 +495,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
 
     if (!isCalendar && !isQuest && !isSpecialOrders && !isQiOrders)
     {
-      return;
+      return false;
     }
 
     if (isQiOrders)
@@ -378,7 +505,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
           .Where(o => o.orderType.Value == "Qi")
           .Select(o => o.questKey.Value));
       Game1.activeClickableMenu = new SpecialOrdersBoard("Qi");
-      return;
+      return true;
     }
 
     if (isSpecialOrders)
@@ -388,7 +515,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
           .Where(o => o.orderType.Value == "")
           .Select(o => o.questKey.Value));
       Game1.activeClickableMenu = new SpecialOrdersBoard();
-      return;
+      return true;
     }
 
     if (Game1.questOfTheDay != null && string.IsNullOrEmpty(Game1.questOfTheDay.currentObjective))
@@ -397,6 +524,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
     }
 
     Game1.activeClickableMenu = new Billboard(dailyQuest: isQuest);
+    return true;
   }
   #endregion
 }

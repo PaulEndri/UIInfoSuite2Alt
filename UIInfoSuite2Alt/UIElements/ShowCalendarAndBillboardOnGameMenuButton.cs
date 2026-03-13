@@ -44,14 +44,15 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
 
   private readonly IModHelper _helper;
   private readonly Texture2D _townTexture;
+  private readonly bool _hasRidgesideVillage;
+  private readonly bool _hasSunberryVillage;
 
   private readonly PerScreen<Item?> _hoverItem = new();
   private readonly PerScreen<Item?> _heldItem = new();
 
   private int _soPulseTimer;
   private int _soPulseDelay;
-  private readonly PerScreen<HashSet<string>> _viewedSpecialOrderKeys = new(() => new HashSet<string>());
-  private readonly PerScreen<HashSet<string>> _viewedQiOrderKeys = new(() => new HashSet<string>());
+  private const string BoardSigPrefix = "UIInfoSuite2Alt.BoardSig.";
   #endregion
 
   #region Lifecycle
@@ -59,6 +60,8 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
   {
     _helper = helper;
     _townTexture = helper.GameContent.Load<Texture2D>("Maps/spring_town");
+    _hasRidgesideVillage = helper.ModRegistry.IsLoaded(ModCompat.RidgesideVillage);
+    _hasSunberryVillage = helper.ModRegistry.IsLoaded(ModCompat.SunberryVillage);
   }
 
   public void Dispose()
@@ -73,14 +76,12 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
     _helper.Events.Display.RenderedActiveMenu -= OnRenderedActiveMenu;
     _helper.Events.Input.ButtonPressed -= OnButtonPressed;
     _helper.Events.GameLoop.UpdateTicked -= OnUpdateTicked;
-    _helper.Events.GameLoop.DayStarted -= OnDayStarted;
 
     if (showCalendarAndBillboard)
     {
       _helper.Events.Display.RenderedActiveMenu += OnRenderedActiveMenu;
       _helper.Events.Input.ButtonPressed += OnButtonPressed;
       _helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
-      _helper.Events.GameLoop.DayStarted += OnDayStarted;
     }
   }
   #endregion
@@ -128,31 +129,6 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
       {
         _helper.Input.Suppress(e.Button);
       }
-    }
-  }
-
-  private void OnDayStarted(object? sender, DayStartedEventArgs e)
-  {
-    // Clear viewed keys if available orders have changed
-    HashSet<string> currentKeys = new(
-      Game1.player.team.availableSpecialOrders
-        .Where(o => o.orderType.Value == "")
-        .Select(o => o.questKey.Value));
-
-    if (!_viewedSpecialOrderKeys.Value.SetEquals(currentKeys))
-    {
-      _viewedSpecialOrderKeys.Value.Clear();
-    }
-
-    // Clear viewed Qi keys if available Qi orders have changed
-    HashSet<string> currentQiKeys = new(
-      Game1.player.team.availableSpecialOrders
-        .Where(o => o.orderType.Value == "Qi")
-        .Select(o => o.questKey.Value));
-
-    if (!_viewedQiOrderKeys.Value.SetEquals(currentQiKeys))
-    {
-      _viewedQiOrderKeys.Value.Clear();
     }
   }
 
@@ -246,10 +222,8 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
       );
 
       // Draw animated exclamation mark when special orders are available
-      bool hasUnviewedOrders = Game1.player.team.availableSpecialOrders
-        .Where(o => o.orderType.Value == "")
-        .Any(o => !_viewedSpecialOrderKeys.Value.Contains(o.questKey.Value));
-      if (hasUnviewedOrders && !Game1.player.team.acceptedSpecialOrderTypes.Contains(""))
+      if (HasUnviewedOrders("") ||
+          GetAvailableModBoards().Any(mb => HasUnviewedOrders(mb.BoardType)))
       {
         DrawPulsingExclamation(b, new Vector2(
           specialOrdersDest.X + specialOrdersDest.Width - 4f,
@@ -284,10 +258,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
       );
 
       // Draw animated exclamation mark when Qi orders are available
-      bool hasUnviewedQiOrders = Game1.player.team.availableSpecialOrders
-        .Where(o => o.orderType.Value == "Qi")
-        .Any(o => !_viewedQiOrderKeys.Value.Contains(o.questKey.Value));
-      if (hasUnviewedQiOrders && !Game1.player.team.acceptedSpecialOrderTypes.Contains("Qi"))
+      if (HasUnviewedOrders("Qi"))
       {
         DrawPulsingExclamation(b, new Vector2(
           qiOrdersDest.X + qiOrdersDest.Width - 4f,
@@ -477,6 +448,48 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
     }
   }
 
+  private void OnBoardSelected(string boardType)
+  {
+    MarkBoardViewed(boardType);
+  }
+
+  private static string GetBoardSignature(string boardType)
+  {
+    return string.Join(",",
+      Game1.player.team.availableSpecialOrders
+        .Where(o => o.orderType.Value == boardType)
+        .Select(o => o.questKey.Value)
+        .OrderBy(k => k));
+  }
+
+  private static bool HasUnviewedOrders(string boardType)
+  {
+    if (Game1.player.team.acceptedSpecialOrderTypes.Contains(boardType))
+      return false;
+
+    string signature = GetBoardSignature(boardType);
+    if (string.IsNullOrEmpty(signature))
+      return false;
+
+    return !Game1.player.modData.TryGetValue(BoardSigPrefix + boardType, out string? viewedSig)
+      || viewedSig != signature;
+  }
+
+  private static void MarkBoardViewed(string boardType)
+  {
+    Game1.player.modData[BoardSigPrefix + boardType] = GetBoardSignature(boardType);
+  }
+
+  private List<(string BoardType, string DisplayName)> GetAvailableModBoards()
+  {
+    var boards = new List<(string, string)>();
+    if (_hasRidgesideVillage && Game1.player.eventsSeen.Contains("75160207"))
+      boards.Add(("RSVTownSO", I18n.SpecialOrdersRSVTown()));
+    if (_hasSunberryVillage && Game1.MasterPlayer.mailReceived.Contains("skellady.SBVCP_SpecialOrderBoardReady"))
+      boards.Add(("SunberryBoard", I18n.SpecialOrdersSunberry()));
+    return boards;
+  }
+
   private bool ActivateBillboard()
   {
     if (!GameMenuHelper.IsTab(Game1.activeClickableMenu, GameMenu.inventoryTab) ||
@@ -500,21 +513,31 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
 
     if (isQiOrders)
     {
-      _viewedQiOrderKeys.Value = new HashSet<string>(
-        Game1.player.team.availableSpecialOrders
-          .Where(o => o.orderType.Value == "Qi")
-          .Select(o => o.questKey.Value));
+      MarkBoardViewed("Qi");
       Game1.activeClickableMenu = new SpecialOrdersBoard("Qi");
       return true;
     }
 
     if (isSpecialOrders)
     {
-      _viewedSpecialOrderKeys.Value = new HashSet<string>(
-        Game1.player.team.availableSpecialOrders
-          .Where(o => o.orderType.Value == "")
-          .Select(o => o.questKey.Value));
-      Game1.activeClickableMenu = new SpecialOrdersBoard();
+      List<(string BoardType, string DisplayName)> modBoards = GetAvailableModBoards();
+      if (modBoards.Count > 0)
+      {
+        var viewedTypes = new HashSet<string>();
+        if (!HasUnviewedOrders(""))
+          viewedTypes.Add("");
+        foreach ((string boardType, _) in modBoards)
+        {
+          if (!HasUnviewedOrders(boardType))
+            viewedTypes.Add(boardType);
+        }
+        Game1.activeClickableMenu = new SpecialOrdersBoardSelector(modBoards, OnBoardSelected, viewedTypes);
+      }
+      else
+      {
+        MarkBoardViewed("");
+        Game1.activeClickableMenu = new SpecialOrdersBoard();
+      }
       return true;
     }
 

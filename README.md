@@ -26,6 +26,7 @@
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
 - **v2.6.0**
+  - Add Special Orders board selection menu when detecting more available boards from mods
   - Show icon when there is extra forage to gather on The Beach during Summer
   - Show icon when there is a Pot of Gold at the End of the Rainbow 🌈
   - Show icon for Traveling merchant for [Ridgeside Village](https://www.nexusmods.com/stardewvalley/mods/7286) on Wednesdays

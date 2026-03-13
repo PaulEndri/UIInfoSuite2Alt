@@ -12,6 +12,8 @@ public static class ModCompat
   public const string DeluxeJournal = "MolsonCAD.DeluxeJournal";
   public const string BetterGameMenu = "leclair.bettergamemenu";
   public const string FerngillEconomy = "paulsteele.fse";
+  public const string RidgesideVillage = "Rafseazz.RidgesideVillage";
+  public const string SunberryVillage = "SunberryTeam.SBVSMAPI";
 }
 
 public static class ApiManager

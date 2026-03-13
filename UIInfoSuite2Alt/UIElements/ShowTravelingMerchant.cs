@@ -33,7 +33,7 @@ public class ShowTravelingMerchant : IDisposable
   private Texture2D? _rsvIconTexture;
   private const string RsvModId = "Rafseazz.RidgesideVillage";
   private const string RsvMerchantLocation = "Custom_Ridgeside_RSVTheHike";
-  private const float RsvHueShift = -50f;
+  private const float RsvHueShift = -60f;
 
   private bool Enabled { get; set; }
   private bool HideWhenVisited { get; set; }

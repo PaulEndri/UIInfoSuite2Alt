@@ -26,6 +26,10 @@
   "Calendar": "Calendar",
   "SpecialOrders": "Special Orders",
   "QiSpecialOrders": "Qi's Special Orders",
+  "SpecialOrdersBoardSelector": "Choose a Special Orders Board",
+  "SpecialOrdersVanilla": "Pelican Town",
+  "SpecialOrdersRSVTown": "Ridgeside Village",
+  "SpecialOrdersSunberry": "Sunberry Village",
   "SlayerGoals": "Monster Eradication Goals",
   //GUI - Seed shop
   "HarvestPrice": "Harvest price",

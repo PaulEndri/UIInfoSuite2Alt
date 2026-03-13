@@ -23,7 +23,7 @@ internal class ShowSeasonalBerry : IDisposable
   {
     _helper = helper;
 
-    _cursors16 ??= Game1.content.Load<Texture2D>("LooseSprites\\Cursors_1_6");
+    _cursors16 = Game1.content.Load<Texture2D>("LooseSprites\\Cursors_1_6");
   }
 
   public void Dispose()
@@ -35,12 +35,10 @@ internal class ShowSeasonalBerry : IDisposable
   {
     Enabled = showSeasonalBerry;
 
-    _helper.Events.GameLoop.DayStarted -= OnDayStarted;
     _helper.Events.Display.RenderingHud -= OnRenderingHud;
 
     if (showSeasonalBerry)
     {
-      _helper.Events.GameLoop.DayStarted += OnDayStarted;
       _helper.Events.Display.RenderingHud += OnRenderingHud;
     }
   }
@@ -53,11 +51,6 @@ internal class ShowSeasonalBerry : IDisposable
   #endregion
 
   #region Event subscriptions
-  private void OnDayStarted(object? sender, DayStartedEventArgs e)
-  {
-    // Empty, for now...
-  }
-
   private void OnRenderingHud(object? sender, RenderingHudEventArgs e)
   {
     if (!UIElementUtils.IsRenderingNormally() || !Enabled)

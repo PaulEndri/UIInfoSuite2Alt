@@ -10,6 +10,7 @@ using StardewValley.Internal;
 using StardewValley.Locations;
 using StardewValley.Menus;
 using StardewValley.Objects;
+using UIInfoSuite2Alt.Compatibility;
 using UIInfoSuite2Alt.Infrastructure;
 using UIInfoSuite2Alt.Infrastructure.Extensions;
 using UIInfoSuite2Alt.Infrastructure.Helpers;
@@ -31,7 +32,7 @@ public class ShowTravelingMerchant : IDisposable
   private bool _rsvMerchantIsHere;
   private bool _rsvMerchantIsVisited;
   private Texture2D? _rsvIconTexture;
-  private const string RsvModId = "Rafseazz.RidgesideVillage";
+  private const string RsvModId = ModCompat.RidgesideVillage;
   private const string RsvMerchantLocation = "Custom_Ridgeside_RSVTheHike";
   private const float RsvHueShift = -60f;
 
@@ -53,6 +54,8 @@ public class ShowTravelingMerchant : IDisposable
   public void Dispose()
   {
     ToggleOption(false);
+    _rsvIconTexture?.Dispose();
+    _rsvIconTexture = null;
   }
 
   public void ToggleOption(bool showTravelingMerchant)
@@ -103,22 +106,22 @@ public class ShowTravelingMerchant : IDisposable
 
   private void OnMenuChanged(object? sender, MenuChangedEventArgs e)
   {
-    if (e.NewMenu is ShopMenu menu && menu.forSale.Any(s => !(s is Hat)))
-    {
-      string locationName = Game1.currentLocation.Name;
+    if (e.NewMenu is not ShopMenu menu)
+      return;
 
-      if (locationName == "Forest")
-      {
-        _travelingMerchantIsVisited = true;
-        _merchantHasBundleItems = false;
-        _bundleItemNames.Clear();
-      }
-      else if (locationName == RsvMerchantLocation)
-      {
-        _rsvMerchantIsVisited = true;
-        _merchantHasBundleItems = false;
-        _bundleItemNames.Clear();
-      }
+    string locationName = Game1.currentLocation.Name;
+
+    if (locationName == "Forest" && menu.forSale.Any(s => s is not Hat))
+    {
+      _travelingMerchantIsVisited = true;
+      _merchantHasBundleItems = false;
+      _bundleItemNames.Clear();
+    }
+    else if (locationName == RsvMerchantLocation && menu.forSale.Any(s => s is not Hat))
+    {
+      _rsvMerchantIsVisited = true;
+      _merchantHasBundleItems = false;
+      _bundleItemNames.Clear();
     }
   }
 

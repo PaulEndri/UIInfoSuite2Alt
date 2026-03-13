@@ -50,9 +50,11 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
   private readonly PerScreen<Item?> _hoverItem = new();
   private readonly PerScreen<Item?> _heldItem = new();
 
-  private int _soPulseTimer;
-  private int _soPulseDelay;
+  private readonly PerScreen<int> _soPulseTimer = new();
+  private readonly PerScreen<int> _soPulseDelay = new();
   private const string BoardSigPrefix = "UIInfoSuite2Alt.BoardSig.";
+  private List<(string BoardType, string DisplayName)>? _cachedModBoards;
+  private int _cachedModBoardsDay = -1;
   #endregion
 
   #region Lifecycle
@@ -92,18 +94,18 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
   {
     // Update special orders pulse timer
     int elapsed = (int)Game1.currentGameTime.ElapsedGameTime.TotalMilliseconds;
-    if (_soPulseTimer > 0)
+    if (_soPulseTimer.Value > 0)
     {
-      _soPulseTimer -= elapsed;
+      _soPulseTimer.Value -= elapsed;
     }
-    else if (_soPulseDelay > 0)
+    else if (_soPulseDelay.Value > 0)
     {
-      _soPulseDelay -= elapsed;
+      _soPulseDelay.Value -= elapsed;
     }
     else
     {
-      _soPulseTimer = 1000;
-      _soPulseDelay = 3000;
+      _soPulseTimer.Value = 1000;
+      _soPulseDelay.Value = 3000;
     }
 
     // Get hovered and hold item
@@ -169,8 +171,6 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
 
     if (cpCatValley)
       offset -= 8;
-
-    //ModEntry.MonitorObject.LogOnce($"offset: {offset}", LogLevel.Warn);
 
     int baseX = menu.xPositionOnScreen + menu.width - 120;
     int baseY = menu.yPositionOnScreen + menu.height - offset;
@@ -315,9 +315,9 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
     float scale = baseScale;
     Vector2 shake = Vector2.Zero;
 
-    if (_soPulseTimer > 0)
+    if (_soPulseTimer.Value > 0)
     {
-      float pulseScale = 1f / (Math.Max(300f, Math.Abs(_soPulseTimer % 1000 - 500)) / 500f);
+      float pulseScale = 1f / (Math.Max(300f, Math.Abs(_soPulseTimer.Value % 1000 - 500)) / 500f);
       scale = baseScale * pulseScale;
       if (pulseScale > 1f)
       {
@@ -482,11 +482,17 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
 
   private List<(string BoardType, string DisplayName)> GetAvailableModBoards()
   {
+    if (_cachedModBoards != null && _cachedModBoardsDay == Game1.dayOfMonth)
+      return _cachedModBoards;
+
     var boards = new List<(string, string)>();
     if (_hasRidgesideVillage && Game1.player.eventsSeen.Contains("75160207"))
       boards.Add(("RSVTownSO", I18n.SpecialOrdersRSVTown()));
     if (_hasSunberryVillage && Game1.MasterPlayer.mailReceived.Contains("skellady.SBVCP_SpecialOrderBoardReady"))
       boards.Add(("SunberryBoard", I18n.SpecialOrdersSunberry()));
+
+    _cachedModBoards = boards;
+    _cachedModBoardsDay = Game1.dayOfMonth;
     return boards;
   }
 

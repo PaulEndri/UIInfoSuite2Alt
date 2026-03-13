@@ -186,7 +186,7 @@ internal class ShowCropAndBarrelTime : IDisposable
   /// <param name="e">The event arguments.</param>
   private void OnRenderingHud(object? sender, RenderingHudEventArgs e)
   {
-    if (Game1.activeClickableMenu != null)
+    if (!UIElementUtils.IsRenderingNormally() || Game1.activeClickableMenu != null)
     {
       return;
     }

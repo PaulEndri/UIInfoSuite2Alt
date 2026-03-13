@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Menus;
+using UIInfoSuite2Alt.UIElements;
 
 namespace UIInfoSuite2Alt.Infrastructure;
 
@@ -64,6 +65,13 @@ public sealed class IconHandler
     List<QueuedIcon> icons = _queuedIcons.Value;
     if (icons.Count == 0)
     {
+      return;
+    }
+
+    // Safety net: don't draw icons when HUD is hidden (cutscenes, events, etc.)
+    if (!UIElementUtils.IsRenderingNormally())
+    {
+      icons.Clear();
       return;
     }
 

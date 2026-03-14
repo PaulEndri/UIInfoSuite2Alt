@@ -521,7 +521,7 @@ internal class ShowCropAndBarrelTime : IDisposable
       entries.Add(tileObject.heldObject.Value.DisplayName);
       if (tileObject is Cask cask)
       {
-        entries.Add($"{(int)(cask.daysToMature.Value / cask.agingRate.Value)} {I18n.DaysToMature()}");
+        entries.Add($"{(int)Math.Ceiling(cask.daysToMature.Value / cask.agingRate.Value)} {I18n.DaysToMature()}");
         return true;
       }
 

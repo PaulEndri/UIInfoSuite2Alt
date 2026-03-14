@@ -25,6 +25,8 @@
 
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
+- **v2.6.2**
+  - Fix cask tooltip showing "0 days to mature" on the last day before full maturity in certain locations
 - **v2.6.1**
   - Show [Stardew Aquarium](https://www.nexusmods.com/stardewvalley/mods/6372) donation indicator on fish item tooltips (Curator headshot, like Gunther for museum)
   - Add option to stack HUD icons vertically (downward from journal icon) instead of horizontally

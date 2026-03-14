@@ -28,7 +28,7 @@
 - **v2.6.2**
   - Add Quest Board selection menu for [Ridgeside Village](https://www.nexusmods.com/stardewvalley/mods/7286)
   - Add Special Orders selection menu for [Visit Mount Vapius](https://www.nexusmods.com/stardewvalley/mods/9600)
-  - Fix cask tooltip showing "0 days to mature" on the last day before full maturity in certain locations
+  - Fix cask tooltip calculation
 - **v2.6.1**
   - Show [Stardew Aquarium](https://www.nexusmods.com/stardewvalley/mods/6372) donation indicator on fish item tooltips (Curator headshot, like Gunther for museum)
   - Add option to stack HUD icons vertically (downward from journal icon) instead of horizontally
@@ -127,7 +127,6 @@ All mods listed here are **optional** and not required for UI Info Suite 2 Alter
 - [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098)
 - [NPC Map Locations](https://www.nexusmods.com/stardewvalley/mods/239)
 - [Bigger Backpack](https://www.nexusmods.com/stardewvalley/mods/1845)
-- [Ferngill Simple Economy](https://www.nexusmods.com/stardewvalley/mods/31007)
 - [Level Extender](https://www.nexusmods.com/stardewvalley/mods/1471)
 - [Better Farm Animal Variety](https://www.nexusmods.com/stardewvalley/mods/3273)
 - [Ferngill Simple Economy](https://www.nexusmods.com/stardewvalley/mods/21414)

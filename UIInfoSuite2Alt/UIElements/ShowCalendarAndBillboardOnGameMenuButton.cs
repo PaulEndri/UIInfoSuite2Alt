@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
@@ -55,6 +56,15 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
   private const string BoardSigPrefix = "UIInfoSuite2Alt.BoardSig.";
   private List<(string BoardType, string DisplayName)>? _cachedModBoards;
   private int _cachedModBoardsDay = -1;
+
+  // RSV quest board reflection cache
+  private bool _rsvQuestReflectionInit;
+  private FieldInfo? _rsvDailyQuestDataField;
+  private ConstructorInfo? _rsvQuestBoardCtor;
+  private FieldInfo? _rsvAcceptedDailyQuestField;
+  private FieldInfo? _rsvDailyTownQuestField;
+  private List<(string BoardType, string DisplayName)>? _cachedModQuestBoards;
+  private int _cachedModQuestBoardsDay = -1;
   #endregion
 
   #region Lifecycle
@@ -190,8 +200,9 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
     b.Draw(calendarData.GetTexture(), calendarDest, calendarSrc, Color.White);
     b.Draw(Game1.objectSpriteSheet, questDest, new Rectangle(144, 592, 16, 16), Color.White);
 
-    // Draw exclamation mark when a daily quest is available
-    if (Game1.CanAcceptDailyQuest())
+    // Draw exclamation mark when a daily quest is available (vanilla or modded)
+    if (Game1.CanAcceptDailyQuest() ||
+        GetAvailableModQuestBoards().Any(mb => HasRsvUnacceptedQuest(mb.BoardType)))
     {
       float scale = 1.6f;
       b.Draw(
@@ -547,6 +558,25 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
       return true;
     }
 
+    // Handle quest board with mod board selector support
+    if (isQuest)
+    {
+      List<(string BoardType, string DisplayName)> modQuestBoards = GetAvailableModQuestBoards();
+      if (modQuestBoards.Count > 0)
+      {
+        var viewedTypes = new HashSet<string>();
+        if (!Game1.CanAcceptDailyQuest())
+          viewedTypes.Add("");
+        foreach ((string boardType, _) in modQuestBoards)
+        {
+          if (!HasRsvUnacceptedQuest(boardType))
+            viewedTypes.Add(boardType);
+        }
+        Game1.activeClickableMenu = new QuestBoardSelector(modQuestBoards, OnQuestBoardSelected, viewedTypes);
+        return true;
+      }
+    }
+
     if (Game1.questOfTheDay != null && string.IsNullOrEmpty(Game1.questOfTheDay.currentObjective))
     {
       Game1.questOfTheDay.currentObjective = "wat?";
@@ -555,5 +585,143 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
     Game1.activeClickableMenu = new Billboard(dailyQuest: isQuest);
     return true;
   }
+
+  #region RSV Quest Board Support
+  private void InitRsvQuestReflection()
+  {
+    if (_rsvQuestReflectionInit) return;
+    _rsvQuestReflectionInit = true;
+    if (!_hasRidgesideVillage) return;
+
+    try
+    {
+      Assembly? rsvAssembly = null;
+      foreach (Assembly asm in AppDomain.CurrentDomain.GetAssemblies())
+      {
+        if (asm.GetName().Name == "RidgesideVillage")
+        {
+          rsvAssembly = asm;
+          break;
+        }
+      }
+      if (rsvAssembly == null) return;
+
+      Type? questControllerType = rsvAssembly.GetType("RidgesideVillage.Questing.QuestController");
+      Type? questBoardType = rsvAssembly.GetType("RidgesideVillage.Questing.RSVQuestBoard");
+      Type? questDataType = rsvAssembly.GetType("RidgesideVillage.Questing.QuestData");
+      if (questControllerType == null || questBoardType == null || questDataType == null) return;
+
+      _rsvDailyQuestDataField = questControllerType.GetField("dailyQuestData",
+        BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
+
+      _rsvQuestBoardCtor = questBoardType.GetConstructor(
+        BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,
+        null, new[] { questDataType, typeof(string) }, null);
+
+      _rsvAcceptedDailyQuestField = questDataType.GetField("acceptedDailyQuest",
+        BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+      _rsvDailyTownQuestField = questDataType.GetField("dailyTownQuest",
+        BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+    }
+    catch (Exception)
+    {
+      // RSV reflection failed — disable quest board support silently
+    }
+  }
+
+  private object? GetRsvQuestData()
+  {
+    if (_rsvDailyQuestDataField == null) return null;
+    try
+    {
+      object? perScreen = _rsvDailyQuestDataField.GetValue(null);
+      return perScreen?.GetType().GetProperty("Value")?.GetValue(perScreen);
+    }
+    catch
+    {
+      return null;
+    }
+  }
+
+  private bool HasRsvUnacceptedQuest(string boardType)
+  {
+    InitRsvQuestReflection();
+    object? questData = GetRsvQuestData();
+    if (questData == null) return false;
+
+    try
+    {
+      if (boardType == "VillageQuestBoard")
+      {
+        object? quest = _rsvDailyTownQuestField?.GetValue(questData);
+        bool accepted = (bool?)_rsvAcceptedDailyQuestField?.GetValue(questData) ?? true;
+        return quest != null && !accepted;
+      }
+
+    }
+    catch
+    {
+      // Reflection access failed
+    }
+    return false;
+  }
+
+  private bool TryOpenRsvQuestBoard(string boardType)
+  {
+    InitRsvQuestReflection();
+    if (_rsvQuestBoardCtor == null) return false;
+
+    try
+    {
+      object? questData = GetRsvQuestData();
+      if (questData == null) return false;
+
+      object? board = _rsvQuestBoardCtor.Invoke(new[] { questData, boardType });
+      if (board is IClickableMenu menu)
+      {
+        Game1.activeClickableMenu = menu;
+        return true;
+      }
+    }
+    catch
+    {
+      // Reflection instantiation failed
+    }
+    return false;
+  }
+
+  private List<(string BoardType, string DisplayName)> GetAvailableModQuestBoards()
+  {
+    if (_cachedModQuestBoards != null && _cachedModQuestBoardsDay == Game1.dayOfMonth)
+      return _cachedModQuestBoards;
+
+    var boards = new List<(string, string)>();
+    if (_hasRidgesideVillage && Game1.player.eventsSeen.Contains("75160207"))
+      boards.Add(("VillageQuestBoard", I18n.SpecialOrdersRSVTown()));
+
+    _cachedModQuestBoards = boards;
+    _cachedModQuestBoardsDay = Game1.dayOfMonth;
+    return boards;
+  }
+
+  private void OnQuestBoardSelected(string boardType)
+  {
+    if (boardType == "")
+    {
+      if (Game1.questOfTheDay != null && string.IsNullOrEmpty(Game1.questOfTheDay.currentObjective))
+        Game1.questOfTheDay.currentObjective = "wat?";
+      Game1.activeClickableMenu = new Billboard(dailyQuest: true);
+    }
+    else
+    {
+      if (!TryOpenRsvQuestBoard(boardType))
+      {
+        // Fallback to vanilla billboard if reflection fails
+        Game1.activeClickableMenu = new Billboard(dailyQuest: true);
+      }
+    }
+  }
+  #endregion
+
   #endregion
 }

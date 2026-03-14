@@ -29,6 +29,7 @@
   - Show [Stardew Aquarium](https://www.nexusmods.com/stardewvalley/mods/6372) donation indicator on fish item tooltips (Curator headshot, like Gunther for museum)
   - Add option to stack HUD icons vertically (downward from journal icon) instead of horizontally
   - Fix HUD icons and overlays showing during overnight farm events and minigames
+  - Fix Traveling Merchant icon being invisible or look strange with certain Content Patcher mods
 - **v2.6.0**
   - Show icon when there is extra forage to gather on The Beach during Summer
   - Show icon when there is a Pot of Gold at the End of the Rainbow 🌈

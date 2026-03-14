@@ -25,6 +25,7 @@ public class ShowTravelingMerchant : IDisposable
   private bool _merchantHasBundleItems;
   private readonly List<string> _bundleItemNames = new();
   private ClickableTextureComponent _travelingMerchantIcon = null!;
+  private Texture2D _merchantTexture = null!;
   private int _bundlePulseTimer;
   private int _bundlePulseDelay;
 
@@ -69,6 +70,9 @@ public class ShowTravelingMerchant : IDisposable
 
     if (showTravelingMerchant)
     {
+      _merchantTexture = _helper.ModContent.Load<Texture2D>("assets/merchant.png");
+      _rsvIconTexture?.Dispose();
+      _rsvIconTexture = null;
       _rsvIsLoaded = _helper.ModRegistry.IsLoaded(RsvModId);
       UpdateTravelingMerchant();
       _helper.Events.Display.RenderingHud += OnRenderingHud;
@@ -159,10 +163,8 @@ public class ShowTravelingMerchant : IDisposable
         {
           bool useRsvIcon = _rsvMerchantIsHere && (!_rsvMerchantIsVisited || !HideWhenVisited)
             && (!_travelingMerchantIsHere || _travelingMerchantIsVisited);
-          Texture2D iconTexture = useRsvIcon ? GetRsvIconTexture() : Game1.mouseCursors;
-          Rectangle iconSource = useRsvIcon
-            ? new Rectangle(0, 0, 20, 20)
-            : new Rectangle(192, 1411, 20, 20);
+          Texture2D iconTexture = useRsvIcon ? GetRsvIconTexture() : _merchantTexture;
+          var iconSource = new Rectangle(0, 0, _merchantTexture.Width, _merchantTexture.Height);
 
           _travelingMerchantIcon = new ClickableTextureComponent(
             new Rectangle(pos.X, pos.Y, 40, 40),
@@ -298,9 +300,8 @@ public class ShowTravelingMerchant : IDisposable
   {
     if (_rsvIconTexture == null)
     {
-      var sourceRect = new Rectangle(192, 1411, 20, 20);
-      var pixels = new Color[sourceRect.Width * sourceRect.Height];
-      Game1.mouseCursors.GetData(0, sourceRect, pixels, 0, pixels.Length);
+      var pixels = new Color[_merchantTexture.Width * _merchantTexture.Height];
+      _merchantTexture.GetData(pixels);
 
       for (int i = 0; i < pixels.Length; i++)
       {
@@ -310,7 +311,7 @@ public class ShowTravelingMerchant : IDisposable
         }
       }
 
-      _rsvIconTexture = new Texture2D(Game1.graphics.GraphicsDevice, sourceRect.Width, sourceRect.Height);
+      _rsvIconTexture = new Texture2D(Game1.graphics.GraphicsDevice, _merchantTexture.Width, _merchantTexture.Height);
       _rsvIconTexture.SetData(pixels);
     }
 

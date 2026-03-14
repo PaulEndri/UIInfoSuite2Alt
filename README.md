@@ -28,6 +28,7 @@
 - **v2.6.2**
   - Add Quest Board selection menu for [Ridgeside Village](https://www.nexusmods.com/stardewvalley/mods/7286)
   - Add Special Orders selection menu for [Visit Mount Vapius](https://www.nexusmods.com/stardewvalley/mods/9600)
+  - Fix fruit tree tooltip showing "(no translation:...)" for Content Patcher mods with mismatched i18n keys (e.g. [Perfect Fruit](https://www.nexusmods.com/stardewvalley/mods/38413))
   - Fix cask tooltip calculation
 - **v2.6.1**
   - Show [Stardew Aquarium](https://www.nexusmods.com/stardewvalley/mods/6372) donation indicator on fish item tooltips (Curator headshot, like Gunther for museum)

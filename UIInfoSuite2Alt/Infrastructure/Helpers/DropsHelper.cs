@@ -100,6 +100,12 @@ public static class DropsHelper
     if (treeData?.DisplayName != null)
     {
       displayName = TokenParser.ParseText(treeData.DisplayName);
+
+      // Work around Content Patcher mods with mismatched i18n keys
+      if (displayName.Contains("(no translation:"))
+      {
+        displayName = null;
+      }
     }
 
     if (string.IsNullOrEmpty(displayName))

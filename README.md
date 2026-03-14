@@ -25,6 +25,9 @@
 
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
+- **v2.6.1**
+  - Show [Stardew Aquarium](https://www.nexusmods.com/stardewvalley/mods/6372) donation indicator on fish item tooltips (Curator headshot, like Gunther for museum)
+  - Fix HUD icons and overlays showing during overnight farm events and minigames
 - **v2.6.0**
   - Show icon when there is extra forage to gather on The Beach during Summer
   - Show icon when there is a Pot of Gold at the End of the Rainbow 🌈
@@ -119,6 +122,7 @@ All mods listed here are **optional** and not required for UI Info Suite 2 Alter
 - [Level Extender](https://www.nexusmods.com/stardewvalley/mods/1471)
 - [Better Farm Animal Variety](https://www.nexusmods.com/stardewvalley/mods/3273)
 - [Ferngill Simple Economy](https://www.nexusmods.com/stardewvalley/mods/21414)
+- [Stardew Aquarium](https://www.nexusmods.com/stardewvalley/mods/6372)
 
 ---
 

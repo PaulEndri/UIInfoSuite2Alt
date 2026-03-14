@@ -32,6 +32,8 @@ internal class ShowItemHoverInformation : IDisposable
   private readonly PerScreen<Item?> _hoverItem = new();
   private readonly ClickableTextureComponent _museumIcon;
 
+  private readonly ClickableTextureComponent? _aquariumIcon;
+
   private readonly ClickableTextureComponent _shippingBottomIcon = new(
     new Rectangle(0, 0, Game1.tileSize, Game1.tileSize),
     Game1.mouseCursors,
@@ -68,6 +70,29 @@ internal class ShowItemHoverInformation : IDisposable
       gunther.GetHeadShot(),
       Game1.pixelZoom
     );
+
+    AquariumHelper.Initialize(helper);
+
+    if (AquariumHelper.IsModLoaded)
+    {
+      try
+      {
+        Texture2D curatorTexture = helper.GameContent.Load<Texture2D>("Characters/Curator");
+        _aquariumIcon = new ClickableTextureComponent(
+          new Rectangle(0, 0, Game1.tileSize, Game1.tileSize),
+          curatorTexture,
+          new Rectangle(0, 1, 16, 16),
+          Game1.pixelZoom
+        );
+      }
+      catch (Exception)
+      {
+        ModEntry.MonitorObject.Log(
+          $"{GetType().Name}: Stardew Aquarium is installed but could not load Curator sprite.",
+          LogLevel.Warn
+        );
+      }
+    }
   }
 
   public void Dispose()
@@ -154,6 +179,7 @@ internal class ShowItemHoverInformation : IDisposable
 
       bool notDonatedYet = _libraryMuseum?.isItemSuitableForDonation(_hoverItem.Value) ?? false;
 
+      bool notDonatedToAquarium = AquariumHelper.IsUndonatedAquariumFish(_hoverItem.Value);
 
       bool notShippedYet = hoveredObject != null &&
                            hoveredObject.countsForShippedCollection() &&
@@ -265,6 +291,7 @@ internal class ShowItemHoverInformation : IDisposable
           cropPrice > 0 ||
           !string.IsNullOrEmpty(requiredBundleName) ||
           notDonatedYet ||
+          notDonatedToAquarium ||
           notShippedYet)
       {
         IClickableMenu.drawTextureBox(
@@ -355,6 +382,21 @@ internal class ShowItemHoverInformation : IDisposable
           Color.White,
           0f,
           new Vector2(_museumIcon.sourceRect.Width / 2, _museumIcon.sourceRect.Height),
+          2,
+          SpriteEffects.None,
+          0.86f
+        );
+      }
+
+      if (notDonatedToAquarium && _aquariumIcon != null)
+      {
+        spriteBatch.Draw(
+          _aquariumIcon.texture,
+          windowPos + new Vector2(2, windowHeight + 8),
+          _aquariumIcon.sourceRect,
+          Color.White,
+          0f,
+          new Vector2(_aquariumIcon.sourceRect.Width / 2, _aquariumIcon.sourceRect.Height),
           2,
           SpriteEffects.None,
           0.86f

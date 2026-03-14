@@ -47,6 +47,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
   private readonly Texture2D _townTexture;
   private readonly bool _hasRidgesideVillage;
   private readonly bool _hasSunberryVillage;
+  private readonly bool _hasEscasModdingPlugins;
 
   private readonly PerScreen<Item?> _hoverItem = new();
   private readonly PerScreen<Item?> _heldItem = new();
@@ -74,6 +75,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
     _townTexture = helper.GameContent.Load<Texture2D>("Maps/spring_town");
     _hasRidgesideVillage = helper.ModRegistry.IsLoaded(ModCompat.RidgesideVillage);
     _hasSunberryVillage = helper.ModRegistry.IsLoaded(ModCompat.SunberryVillage);
+    _hasEscasModdingPlugins = helper.ModRegistry.IsLoaded(ModCompat.EscasModdingPlugins);
   }
 
   public void Dispose()
@@ -501,6 +503,8 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
       boards.Add(("RSVTownSO", I18n.SpecialOrdersRSVTown()));
     if (_hasSunberryVillage && Game1.MasterPlayer.mailReceived.Contains("skellady.SBVCP_SpecialOrderBoardReady"))
       boards.Add(("SunberryBoard", I18n.SpecialOrdersSunberry()));
+    if (_hasEscasModdingPlugins && Game1.player.eventsSeen.Contains("Lumisteria.MtVapius_Hamlet_OrderBoard"))
+      boards.Add(("Esca.EMP/MtVapiusBoard", I18n.SpecialOrdersMtVapius()));
 
     _cachedModBoards = boards;
     _cachedModBoardsDay = Game1.dayOfMonth;

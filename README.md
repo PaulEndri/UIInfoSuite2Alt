@@ -26,7 +26,8 @@
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
 - **v2.6.2**
-  - Add Quest Board selection menu for [Ridgeside Village](https://www.nexusmods.com/stardewvalley/mods/7286) daily quests
+  - Add Quest Board selection menu for [Ridgeside Village](https://www.nexusmods.com/stardewvalley/mods/7286)
+  - Add Special Orders selection menu for [Visit Mount Vapius](https://www.nexusmods.com/stardewvalley/mods/9600)
   - Fix cask tooltip showing "0 days to mature" on the last day before full maturity in certain locations
 - **v2.6.1**
   - Show [Stardew Aquarium](https://www.nexusmods.com/stardewvalley/mods/6372) donation indicator on fish item tooltips (Curator headshot, like Gunther for museum)
@@ -37,7 +38,7 @@
   - Show icon when there is extra forage to gather on The Beach during Summer
   - Show icon when there is a Pot of Gold at the End of the Rainbow 🌈
   - Show icon for Traveling merchant for [Ridgeside Village](https://www.nexusmods.com/stardewvalley/mods/7286) on Wednesdays
-  - Add Special Orders board selection menu when detecting more available boards from mods(Currently: RSV & SBV)
+  - Add Special Orders board selection menu when detecting more available boards from mods (Currently: RSV, SBV & VMV)
   - Add gamepad navigation support for Calendar, Billboard, Special Orders, and Qi Orders icons in inventory
   - Add missing tree types to i18n for [Visit Mount Vapius](https://www.nexusmods.com/stardewvalley/mods/9600) and [Sunberry Village](https://www.nexusmods.com/stardewvalley/mods/11111)([Rose and the Alchemist](https://www.nexusmods.com/stardewvalley/mods/32385))
   - Improved fruit tree name resolution and tooltips for modded fruit trees
@@ -116,6 +117,9 @@
 
 All mods listed here are **optional** and not required for UI Info Suite 2 Alternative.
 
+- [Ridgeside Village](https://www.nexusmods.com/stardewvalley/mods/7286)
+- [Sunberry Village](https://www.nexusmods.com/stardewvalley/mods/11111)
+- [Visit Mount Vapius](https://www.nexusmods.com/stardewvalley/mods/9600)
 - [Better Game Menu](https://www.nexusmods.com/stardewvalley/mods/12667)
 - [Cloudy Skies](https://www.nexusmods.com/stardewvalley/mods/23868)
 - [Custom Bush](https://www.nexusmods.com/stardewvalley/mods/20619)

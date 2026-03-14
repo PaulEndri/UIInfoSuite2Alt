@@ -27,12 +27,13 @@
 
 - **v2.6.1**
   - Show [Stardew Aquarium](https://www.nexusmods.com/stardewvalley/mods/6372) donation indicator on fish item tooltips (Curator headshot, like Gunther for museum)
+  - Add option to stack HUD icons vertically (downward from journal icon) instead of horizontally
   - Fix HUD icons and overlays showing during overnight farm events and minigames
 - **v2.6.0**
   - Show icon when there is extra forage to gather on The Beach during Summer
   - Show icon when there is a Pot of Gold at the End of the Rainbow 🌈
   - Show icon for Traveling merchant for [Ridgeside Village](https://www.nexusmods.com/stardewvalley/mods/7286) on Wednesdays
-  - Add Special Orders board selection menu when detecting more available boards from mods
+  - Add Special Orders board selection menu when detecting more available boards from mods(Currently: RSV & SBV)
   - Add gamepad navigation support for Calendar, Billboard, Special Orders, and Qi Orders icons in inventory
   - Add missing tree types to i18n for [Visit Mount Vapius](https://www.nexusmods.com/stardewvalley/mods/9600) and [Sunberry Village](https://www.nexusmods.com/stardewvalley/mods/11111)([Rose and the Alchemist](https://www.nexusmods.com/stardewvalley/mods/32385))
   - Improved fruit tree name resolution and tooltips for modded fruit trees

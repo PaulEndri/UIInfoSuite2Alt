@@ -54,6 +54,7 @@ public class ModConfig
   public bool ShowTodaysGifts { get; set; } = true;
   public bool HideBirthdayIfFullFriendShip { get; set; } = true;
   public bool ShowQuestCount { get; set; } = true;
+  public bool UseVerticalIconLayout { get; set; } = false;
   public bool ShowFestivalIcon { get; set; } = true;
   public bool ShowFishOnCatch { get; set; } = false;
   public bool ShowFishQualityStar { get; set; } = true;

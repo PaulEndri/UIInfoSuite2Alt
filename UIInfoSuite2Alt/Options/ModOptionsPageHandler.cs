@@ -145,6 +145,16 @@ internal class ModOptionsPageHandler : IDisposable
     // --- HUD Icons ---
     _optionsElements.Add(new ModOptionsElement(I18n.Section_HudIcons()));
 
+    _optionsElements.Add(
+      new ModOptionsCheckbox(
+        _helper.SafeGetString(nameof(config.UseVerticalIconLayout)),
+        whichOption++,
+        v => IconHandler.Handler.UseVerticalLayout = v,
+        () => config.UseVerticalIconLayout,
+        Set(v => config.UseVerticalIconLayout = v)
+      )
+    );
+
     var luckIcon = new ModOptionsCheckbox(
       _helper.SafeGetString(nameof(config.ShowLuckIcon)),
       whichOption++,

@@ -37,6 +37,9 @@ public sealed class IconHandler
   /// <summary>The configured icon order, keyed by icon key. Lower = more right.</summary>
   public Dictionary<string, int> IconOrder { get; set; } = new();
 
+  /// <summary>When true, icons stack vertically downward instead of horizontally to the left.</summary>
+  public bool UseVerticalLayout { get; set; }
+
   /// <summary>
   ///   Enqueue an icon to be drawn this frame. Icons are sorted by configured order
   ///   and drawn together during <see cref="DrawQueuedIcons" />.
@@ -89,7 +92,9 @@ public sealed class IconHandler
     // Draw all icons
     for (int i = 0; i < sorted.Count; i++)
     {
-      var pos = new Point(xBase - 48 * i, yPos);
+      Point pos = UseVerticalLayout
+        ? new Point(xBase, yPos + 48 * i)
+        : new Point(xBase - 48 * i, yPos);
       sorted[i].Draw(batch, pos);
     }
 

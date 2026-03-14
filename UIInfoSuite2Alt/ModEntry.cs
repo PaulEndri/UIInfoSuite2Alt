@@ -166,6 +166,7 @@ public class ModEntry : Mod
     // --- HUD Icons ---
     configMenu.AddSectionTitle(ModManifest, text: () => I18n.Section_HudIcons());
 
+    AddBool(nameof(ModConfig.UseVerticalIconLayout), () => ModConfig.UseVerticalIconLayout, v => ModConfig.UseVerticalIconLayout = v);
     AddBool(nameof(ModConfig.ShowLuckIcon), () => ModConfig.ShowLuckIcon, v => ModConfig.ShowLuckIcon = v);
     AddSubBool(nameof(ModConfig.UseClassicLuckIcon), () => ModConfig.UseClassicLuckIcon, v => ModConfig.UseClassicLuckIcon = v);
     AddSubBool(nameof(ModConfig.ShowExactValue), () => ModConfig.ShowExactValue, v => ModConfig.ShowExactValue = v);
@@ -325,6 +326,7 @@ public class ModEntry : Mod
     }
 
     IconHandler.Handler.IconOrder = ModConfig.IconOrder;
+    IconHandler.Handler.UseVerticalLayout = ModConfig.UseVerticalIconLayout;
     _modOptionsPageHandler?.Dispose();
     _modOptionsPageHandler = new ModOptionsPageHandler(Helper, ModConfig, SaveConfig);
   }

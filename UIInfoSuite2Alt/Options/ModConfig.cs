@@ -44,7 +44,7 @@ public class ModConfig
   public bool ShowMerchantBundleIcon { get; set; } = false;
   public bool ShowMerchantBundleItemNames { get; set; } = false;
   public bool HideBooksellerWhenVisited { get; set; } = false;
-  public bool UseClassicLuckIcon { get; set; } = false;
+  public int LuckIconStyle { get; set; } = 0;
   public bool ShowExactValue { get; set; } = false;
   public bool RequireTvForLuck { get; set; } = false;
   public bool RequireTvForWeather { get; set; } = false;

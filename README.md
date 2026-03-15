@@ -25,6 +25,9 @@
 
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
+- **v2.6.4**
+  - Add TV Fortune icon style for the luck HUD icon, using the game's fortune teller sprites
+  - Luck icon style is now a dropdown selector (Clover, Dice, TV Fortune) instead of a checkbox toggle
 - **v2.6.3**
   - Show tool upgrade icon for modded tools (e.g. [The Love of Cooking](https://www.nexusmods.com/stardewvalley/mods/6830))
   - Show festival/event start and end times on the festival reminder icon tooltip

@@ -22,7 +22,7 @@ internal class LuckOfDay : IDisposable
   private readonly PerScreen<Color> _diceColor = new(() => new Color(Color.White.ToVector4()));
 
   private readonly Texture2D _cloverTexture;
-  private readonly Texture2D _tvBgTexture;
+  private readonly Texture2D _tvLuckTexture;
 
   private readonly PerScreen<ClickableTextureComponent> _icon;
 
@@ -30,17 +30,11 @@ internal class LuckOfDay : IDisposable
 
   private const int IconStyleDice = 1;
   private const int IconStyleTvFortune = 2;
-  private const int TvIconSize = 13;
-  private const float TvIconScale = 3f;
+  private const int TvFrameWidth = 42;
+  private const int TvFrameHeight = 28;
+  private const float TvIconScale = 1.5f;
 
-  // TV fortune icon source rects (13x13 from Game1.mouseCursors)
-  private static readonly Rectangle TvIconBest = new(644, 333, 13, 13);
-  private static readonly Rectangle TvIconGood = new(605, 333, 13, 13);
-  private static readonly Rectangle TvIconNeutral = new(553, 333, 13, 13);
-  private static readonly Rectangle TvIconBad = new(540, 346, 13, 13);
-  private static readonly Rectangle TvIconWorst = new(592, 346, 13, 13);
-
-  private readonly PerScreen<Rectangle> _tvIconSource = new(() => TvIconNeutral);
+  private readonly PerScreen<int> _tvFrame = new(() => 3);
 
   private bool Enabled { get; set; }
   private bool ShowExactValue { get; set; }
@@ -64,9 +58,9 @@ internal class LuckOfDay : IDisposable
       Game1.graphics.GraphicsDevice,
       Path.Combine(helper.DirectoryPath, "assets", "clover_group.png")
     );
-    _tvBgTexture = Texture2D.FromFile(
+    _tvLuckTexture = Texture2D.FromFile(
       Game1.graphics.GraphicsDevice,
-      Path.Combine(helper.DirectoryPath, "assets", "tv-luck-bg.png")
+      Path.Combine(helper.DirectoryPath, "assets", "tv_luck.png")
     );
     _icon = new PerScreen<ClickableTextureComponent>(() => CreateIcon());
   }
@@ -162,30 +156,22 @@ internal class LuckOfDay : IDisposable
 
   private void DrawTvIcon()
   {
+    int scaledW = (int)(TvFrameWidth * TvIconScale);
+    int scaledH = (int)(TvFrameHeight * TvIconScale);
+
     IconHandler.Handler.EnqueueIcon(
       "Luck",
       (batch, pos) =>
       {
+        var sourceRect = new Rectangle(_tvFrame.Value * TvFrameWidth, 0, TvFrameWidth, TvFrameHeight);
+        var destRect = new Rectangle(pos.X, pos.Y, scaledW, scaledH);
+
+        batch.Draw(_tvLuckTexture, destRect, sourceRect, Color.White * 0.9f);
+
+        // Update icon bounds for hover detection
         ClickableTextureComponent icon = _icon.Value;
-        icon.bounds.X = pos.X;
-        icon.bounds.Y = pos.Y;
-        icon.sourceRect = _tvIconSource.Value;
+        icon.bounds = destRect;
         _icon.Value = icon;
-
-        // Draw TV background behind the icon (1px taller than icon)
-        batch.Draw(
-          _tvBgTexture,
-          new Rectangle(pos.X, pos.Y, icon.bounds.Width, icon.bounds.Height + 1),
-          Color.White * 0.9f
-        );
-
-        // Draw icon centered on background
-        batch.Draw(
-          Game1.mouseCursors,
-          new Rectangle(pos.X + 2, pos.Y + 2, icon.bounds.Width - 3, icon.bounds.Height - 3),
-          _tvIconSource.Value,
-          Color.White
-        );
       },
       batch =>
       {
@@ -193,7 +179,8 @@ internal class LuckOfDay : IDisposable
         {
           IClickableMenu.drawHoverText(batch, _hoverText.Value, Game1.dialogueFont);
         }
-      }
+      },
+      scaledW
     );
   }
 
@@ -234,56 +221,56 @@ internal class LuckOfDay : IDisposable
           _hoverText.Value = I18n.LuckStatus6();
           _cloverFrame.Value = 0;
           _diceColor.Value = Luck6Color;
-          _tvIconSource.Value = TvIconWorst;
+          _tvFrame.Value = 0;
           break;
         // Very bad luck
         case < -0.07:
           _hoverText.Value = I18n.LuckStatus6();
           _cloverFrame.Value = 1;
           _diceColor.Value = Luck6Color;
-          _tvIconSource.Value = TvIconWorst;
+          _tvFrame.Value = 1;
           break;
         // Bad luck
         case < -0.02:
           _hoverText.Value = I18n.LuckStatus5();
           _cloverFrame.Value = 2;
           _diceColor.Value = Luck5Color;
-          _tvIconSource.Value = TvIconBad;
+          _tvFrame.Value = 2;
           break;
         // Absolutely neutral
         case 0:
           _hoverText.Value = I18n.LuckStatus4();
           _cloverFrame.Value = 3;
           _diceColor.Value = Luck4Color;
-          _tvIconSource.Value = TvIconNeutral;
+          _tvFrame.Value = 3;
           break;
         // Near-neutral (non-zero, between -0.02 and +0.02)
         case <= 0.02:
           _hoverText.Value = I18n.LuckStatus3();
           _cloverFrame.Value = 4;
           _diceColor.Value = Luck3Color;
-          _tvIconSource.Value = TvIconNeutral;
+          _tvFrame.Value = 3;
           break;
         // Good luck
         case <= 0.07:
           _hoverText.Value = I18n.LuckStatus2();
           _cloverFrame.Value = 5;
           _diceColor.Value = Luck2Color;
-          _tvIconSource.Value = TvIconGood;
+          _tvFrame.Value = 4;
           break;
         // Very good luck
         case < 0.1:
           _hoverText.Value = I18n.LuckStatus1();
           _cloverFrame.Value = 6;
           _diceColor.Value = Luck1Color;
-          _tvIconSource.Value = TvIconBest;
+          _tvFrame.Value = 5;
           break;
         // Max luck — includes shrine extremes
         default:
           _hoverText.Value = I18n.LuckStatus1();
           _cloverFrame.Value = 7;
           _diceColor.Value = Luck1Color;
-          _tvIconSource.Value = TvIconBest;
+          _tvFrame.Value = 6;
           break;
       }
 
@@ -326,14 +313,15 @@ internal class LuckOfDay : IDisposable
 
     if (IconStyle == IconStyleTvFortune)
     {
-      int tvScaledSize = (int)(TvIconSize * TvIconScale);
+      int tvScaledW = (int)(TvFrameWidth * TvIconScale);
+      int tvScaledH = (int)(TvFrameHeight * TvIconScale);
       return new ClickableTextureComponent(
         "",
-        new Rectangle(Tools.GetWidthInPlayArea() - 134, 290, tvScaledSize, tvScaledSize),
+        new Rectangle(Tools.GetWidthInPlayArea() - 134, 290, tvScaledW, tvScaledH),
         "",
         "",
-        Game1.mouseCursors,
-        _tvIconSource.Value,
+        _tvLuckTexture,
+        new Rectangle(_tvFrame.Value * TvFrameWidth, 0, TvFrameWidth, TvFrameHeight),
         TvIconScale
       );
     }

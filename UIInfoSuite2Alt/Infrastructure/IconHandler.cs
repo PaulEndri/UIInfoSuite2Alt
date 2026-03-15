@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
@@ -26,6 +26,9 @@ public sealed class IconHandler
     "Bookseller"
   };
 
+  private const int DefaultIconWidth = 40;
+  private const int IconGap = 8;
+
   private readonly PerScreen<List<QueuedIcon>> _queuedIcons = new(() => new());
 
   private IconHandler() { }
@@ -33,6 +36,9 @@ public sealed class IconHandler
   public static IconHandler Handler { get; } = new();
 
   public bool IsQuestLogPermanent { get; set; } = false;
+
+  /// <summary>When true, a quest count number is drawn below the journal icon, requiring more vertical clearance.</summary>
+  public bool ShowQuestCount { get; set; } = true;
 
   /// <summary>The configured icon order, keyed by icon key. Lower = more right.</summary>
   public Dictionary<string, int> IconOrder { get; set; } = new();
@@ -47,7 +53,8 @@ public sealed class IconHandler
   /// <param name="iconKey">The icon key used to look up the configured sort order</param>
   /// <param name="draw">Draws the icon at the given position</param>
   /// <param name="drawHover">Draws hover text if the icon is hovered (called after all icons are drawn)</param>
-  public void EnqueueIcon(string iconKey, Action<SpriteBatch, Point> draw, Action<SpriteBatch>? drawHover = null)
+  /// <param name="iconWidth">Pixel width of this icon (0 = standard ~40px)</param>
+  public void EnqueueIcon(string iconKey, Action<SpriteBatch, Point> draw, Action<SpriteBatch>? drawHover = null, int iconWidth = 0)
   {
     int order = IconOrder.TryGetValue(iconKey, out int o) ? o : 99;
     _queuedIcons.Value.Add(new QueuedIcon
@@ -55,7 +62,8 @@ public sealed class IconHandler
       Draw = draw,
       DrawHover = drawHover,
       SortOrder = order,
-      RegistrationOrder = _queuedIcons.Value.Count
+      RegistrationOrder = _queuedIcons.Value.Count,
+      IconWidth = iconWidth
     });
   }
 
@@ -86,16 +94,42 @@ public sealed class IconHandler
 
     if (IsQuestLogPermanent || Game1.player.questLog.Any() || Game1.player.team.specialOrders.Any())
     {
-      xBase -= 65;
+      if (UseVerticalLayout)
+      {
+        xBase -= 16;
+        yPos += ShowQuestCount ? 55 : 20;
+      }
+      else
+      {
+        xBase -= 65;
+      }
+    }
+    else if (UseVerticalLayout)
+    {
+      yPos -= 30;
     }
 
-    // Draw all icons
+    // Offset xBase if the rightmost icon is wider than standard
+    if (!UseVerticalLayout)
+    {
+      int firstWidth = sorted[0].IconWidth > 0 ? sorted[0].IconWidth : DefaultIconWidth;
+      xBase -= Math.Max(0, firstWidth - DefaultIconWidth);
+    }
+
+    // Draw all icons with variable-width spacing
+    int xOffset = 0;
     for (int i = 0; i < sorted.Count; i++)
     {
       Point pos = UseVerticalLayout
         ? new Point(xBase, yPos + 48 * i)
-        : new Point(xBase - 48 * i, yPos);
+        : new Point(xBase - xOffset, yPos);
       sorted[i].Draw(batch, pos);
+
+      if (!UseVerticalLayout && i + 1 < sorted.Count)
+      {
+        int nextWidth = sorted[i + 1].IconWidth > 0 ? sorted[i + 1].IconWidth : DefaultIconWidth;
+        xOffset += IconGap + nextWidth;
+      }
     }
 
     // Draw hover text on top
@@ -118,5 +152,6 @@ public sealed class IconHandler
     public Action<SpriteBatch>? DrawHover { get; set; }
     public int SortOrder { get; set; }
     public int RegistrationOrder { get; set; }
+    public int IconWidth { get; set; }
   }
 }

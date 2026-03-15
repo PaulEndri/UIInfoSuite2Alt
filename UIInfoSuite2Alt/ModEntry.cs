@@ -337,6 +337,7 @@ public class ModEntry : Mod
 
     IconHandler.Handler.IconOrder = ModConfig.IconOrder;
     IconHandler.Handler.UseVerticalLayout = ModConfig.UseVerticalIconLayout;
+    IconHandler.Handler.ShowQuestCount = ModConfig.ShowQuestCount;
     _modOptionsPageHandler?.Dispose();
     _modOptionsPageHandler = new ModOptionsPageHandler(Helper, ModConfig, SaveConfig);
   }

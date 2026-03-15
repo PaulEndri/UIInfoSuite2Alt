@@ -368,7 +368,7 @@ internal class ModOptionsPageHandler : IDisposable
         whichOption++,
         showQuestCount.ToggleOption,
         () => config.ShowQuestCount,
-        Set(v => config.ShowQuestCount = v)
+        Set(v => { config.ShowQuestCount = v; IconHandler.Handler.ShowQuestCount = v; })
       )
     );
     _optionsElements.Add(

@@ -112,11 +112,19 @@ internal class ShowWhenAnimalNeedsPet : IDisposable
     foreach (KeyValuePair<long, FarmAnimal> animal in animalsInCurrentLocation.Pairs)
     {
       FarmAnimalHarvestType? harvestType = animal.Value.GetHarvestType();
+      FarmAnimalData? animalData = animal.Value.GetAnimalData();
       if (harvestType == FarmAnimalHarvestType.DropOvernight ||
           animal.Value.IsEmoting ||
           animal.Value.currentProduce.Value == "430" || // 430 is truffle
           animal.Value.currentProduce.Value == null ||
-          animal.Value.age.Value < animal.Value.GetAnimalData().DaysToMature)
+          (animalData != null && animal.Value.age.Value < animalData.DaysToMature))
+      {
+        continue;
+      }
+
+      string produceItemId = animal.Value.currentProduce.Value;
+      ParsedItemData? produceData = ItemRegistry.GetData(produceItemId);
+      if (produceData == null)
       {
         continue;
       }
@@ -144,8 +152,6 @@ internal class ShowWhenAnimalNeedsPet : IDisposable
         1f
       );
 
-      string produceItemId = animal.Value.currentProduce.Value;
-      ParsedItemData? produceData = ItemRegistry.GetData(produceItemId);
       Rectangle sourceRectangle = produceData.GetSourceRect();
       Game1.spriteBatch.Draw(
         produceData.GetTexture(),

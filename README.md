@@ -27,7 +27,9 @@
 
 - **v2.6.3**
   - Show tool upgrade icon for modded tools (e.g. [The Love of Cooking](https://www.nexusmods.com/stardewvalley/mods/6830))
+  - Show festival/event start and end times on the festival reminder icon tooltip
   - Fix error/crash when modded animals have missing or unregistered produce data
+  - Fix festival reminder not showing tomorrow's festival when a passive event is active today
 - **v2.6.2**
   - Add Quest Board selection menu for [Ridgeside Village](https://www.nexusmods.com/stardewvalley/mods/7286)
   - Add Special Orders selection menu for [Visit Mount Vapius](https://www.nexusmods.com/stardewvalley/mods/9600)

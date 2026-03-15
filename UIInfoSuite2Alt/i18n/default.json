@@ -179,6 +179,8 @@
   "ShowBuffTimers": "Show buff duration timers",
   "FestivalToday": "Today: {0}",
   "FestivalTomorrow": "Tomorrow: {0}",
+  "FestivalTimeRange": "{0} - {1}",
+  "FestivalTimeFrom": "From {0}",
   //Settings - Icon Order (1 = most right)
   "Section.IconOrder": "Icon Order",
   "Section.IconOrder.Subtitle": "(1 is Most Right, 20 is Most Left)",

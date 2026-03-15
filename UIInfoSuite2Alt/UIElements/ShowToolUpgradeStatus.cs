@@ -29,7 +29,7 @@ internal class ShowToolUpgradeStatus : IDisposable
         or Hoe
         or WateringCan
         or Pan
-        or GenericTool { IndexOfMenuItemView: >= 13 and <= 16 })
+        or GenericTool)
     {
       ParsedItemData? itemData = ItemRegistry.GetDataOrErrorItem(toolBeingUpgraded.QualifiedItemId);
       Texture2D? itemTexture = itemData.GetTexture();

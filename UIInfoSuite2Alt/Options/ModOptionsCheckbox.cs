@@ -12,6 +12,8 @@ internal class ModOptionsCheckbox : ModOptionsElement
   private readonly Action<bool> _toggleOptionsDelegate;
   private bool _isChecked;
 
+  internal bool IsChecked => _isChecked;
+
   public ModOptionsCheckbox(
     string label,
     int whichOption,

@@ -164,15 +164,21 @@ internal class ModOptionsPageHandler : IDisposable
     );
     _optionsElements.Add(luckIcon);
     _optionsElements.Add(
-      new ModOptionsCheckbox(
-        _helper.SafeGetString(nameof(config.UseClassicLuckIcon)),
+      new ModOptionsDropdown(
+        _helper.SafeGetString(nameof(config.LuckIconStyle)),
         whichOption++,
-        luckOfDay.ToggleUseClassicIconOption,
-        () => config.UseClassicLuckIcon,
-        Set(v => config.UseClassicLuckIcon = v),
+        new List<string>
+        {
+          I18n.LuckIconStyle_Clover(),
+          I18n.LuckIconStyle_Dice(),
+          I18n.LuckIconStyle_TvFortune()
+        },
+        () => config.LuckIconStyle,
+        SetInt(v => { config.LuckIconStyle = v; luckOfDay.SetIconStyle(v); }),
         luckIcon
       )
     );
+    luckOfDay.SetIconStyle(config.LuckIconStyle);
     _optionsElements.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.ShowExactValue)),

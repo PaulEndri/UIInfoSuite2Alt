@@ -128,6 +128,12 @@ public class ModEntry : Mod
       getValue: () => ModConfig.OpenMonsterEradicationKeybind,
       setValue: value => ModConfig.OpenMonsterEradicationKeybind = value
     );
+    configMenu.AddKeybindList(
+      ModManifest,
+      name: () => Helper.SafeGetString(nameof(ModConfig.ToggleMachineProcessingIcons)),
+      getValue: () => ModConfig.ToggleMachineProcessingIcons,
+      setValue: value => ModConfig.ToggleMachineProcessingIcons = value
+    );
     // Range keybinds
     configMenu.AddSectionTitle(
       ModManifest,
@@ -217,6 +223,7 @@ public class ModEntry : Mod
     Spacer();
     AddBool(nameof(ModConfig.ShowCropTooltip), () => ModConfig.ShowCropTooltip, v => ModConfig.ShowCropTooltip = v);
     AddBool(nameof(ModConfig.ShowBarrelTooltip), () => ModConfig.ShowBarrelTooltip, v => ModConfig.ShowBarrelTooltip = v);
+    AddBool(nameof(ModConfig.ShowMachineProcessingIcons), () => ModConfig.ShowMachineProcessingIcons, v => ModConfig.ShowMachineProcessingIcons = v);
     configMenu.AddBoolOption(
       ModManifest,
       name: () => I18n.ShowItemEffectRanges(),

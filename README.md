@@ -25,6 +25,8 @@
 
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
+- **v2.6.5**
+  - Show a small item icon on machines that are currently processing, so you can see at a glance what each machine is working on without hovering (toggleable with F10 keybind)
 - **v2.6.4**
   - Add TV Fortune icon style for the luck HUD icon
   - Luck icon style is now a dropdown selector (Clover, Dice, TV Fortune) instead of a checkbox toggle

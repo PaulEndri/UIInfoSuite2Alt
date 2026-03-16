@@ -91,6 +91,7 @@ internal class ModOptionsPageHandler : IDisposable
     var showTravelingMerchant = new ShowTravelingMerchant(helper);
     var showBookseller = new ShowBookseller(helper);
     var showRainyDayIcon = new ShowRainyDayIcon(helper);
+    var showMachineProcessingItem = new ShowMachineProcessingItem(helper);
     var showCropAndBarrelTime = new ShowCropAndBarrelTime(helper);
     var showToolUpgradeStatus = new ShowToolUpgradeStatus(helper);
     var showRobinBuildingStatusIcon = new ShowRobinBuildingStatusIcon(helper);
@@ -116,6 +117,7 @@ internal class ModOptionsPageHandler : IDisposable
       showTravelingMerchant,
       showBookseller,
       showRainyDayIcon,
+      showMachineProcessingItem,
       showCropAndBarrelTime,
       showToolUpgradeStatus,
       showRobinBuildingStatusIcon,
@@ -406,6 +408,15 @@ internal class ModOptionsPageHandler : IDisposable
         showCropAndBarrelTime.ToggleBarrelOption,
         () => config.ShowBarrelTooltip,
         Set(v => config.ShowBarrelTooltip = v)
+      )
+    );
+    _optionsElements.Add(
+      new ModOptionsCheckbox(
+        _helper.SafeGetString(nameof(config.ShowMachineProcessingIcons)),
+        whichOption++,
+        showMachineProcessingItem.ToggleOption,
+        () => config.ShowMachineProcessingIcons,
+        Set(v => config.ShowMachineProcessingIcons = v)
       )
     );
     var ScarecrowAndSprinklerRangeIcon = new ModOptionsCheckbox(

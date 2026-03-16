@@ -139,6 +139,8 @@
   "HideAnimalPetOnMaxFriendship": "Hide on max friendship",
   "ShowCropTooltip": "Show crop and tree times",
   "ShowBarrelTooltip": "Show machine and barrel times",
+  "ShowMachineProcessingIcons": "Show processing item on machines",
+  "ToggleMachineProcessingIcons": "Toggle machine processing icons",
   "ShowItemEffectRanges": "Show scarecrow and sprinkler range",
   "ButtonControlShow": "Hold LCtrl to show current item range\nHold LCtrl+LAlt to show all item range",
   "ShowBombRange": "Show the bomb destroying range",

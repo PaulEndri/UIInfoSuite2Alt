@@ -102,7 +102,7 @@ internal class LocationOfTownsfolk : IDisposable
 
     _townsfolk.Clear();
 
-    // We shouldn't render if the RSV map is open, it already does its own NPC Tracking
+    // RSV map does its own NPC tracking
     bool isRsvWorldMap =
       Game1.activeClickableMenu?.GetChildMenu()?.GetType().FullName?.Equals("RidgesideVillage.RSVWorldMap") ?? false;
 
@@ -246,7 +246,7 @@ internal class LocationOfTownsfolk : IDisposable
 
       if (yOffset != MaxVisibleSlots * PixelsPerSlot)
       {
-        // draw seperator line
+        // separator line
         Game1.spriteBatch.Draw(
           Game1.staminaRect,
           new Rectangle(checkbox.bounds.X - 50, checkbox.bounds.Y + 72, SocialPanelWidth / 2 - 6, 4),
@@ -305,7 +305,7 @@ internal class LocationOfTownsfolk : IDisposable
 
     DrawNPCNames(namesToShow);
 
-    //The cursor needs to show up in front of the character faces
+    // Cursor must render above character faces
     Tools.DrawMouseCursor();
 
     if (GameMenuHelper.GetCurrentPage(Game1.activeClickableMenu) is MapPage mapPage)
@@ -316,12 +316,7 @@ internal class LocationOfTownsfolk : IDisposable
 
   private static void DrawNPC(NPC character, List<string> namesToShow)
   {
-    // Compare with the game code - MapPage.drawMiniPortraits
-
-    Vector2?
-      location = GetMapCoordinatesForNPC(
-        character
-      ); // location is the absolute position or null if the npc is not on the map
+    Vector2? location = GetMapCoordinatesForNPC(character);
     if (location is null)
     {
       return;
@@ -345,9 +340,7 @@ internal class LocationOfTownsfolk : IDisposable
       location.Value.X + mapBounds.X - headShot.Width,
       location.Value.Y + mapBounds.Y - headShot.Height
     );
-    // NOTE!  This is the same as the game code, except that where we have 'headShot.Width', the game code has a constant 32.  I think that's
-    //  because the player face they draw is 32x32.  So we're keeping to the spirit.
-
+    // Game uses constant 32 (player face size); we use headShot.Width instead
     Color color = character.CurrentDialogue.Count <= 0 ? Color.Gray : Color.White;
     var headShotScale = 2f;
     Game1.spriteBatch.Draw(
@@ -378,11 +371,8 @@ internal class LocationOfTownsfolk : IDisposable
   private static Vector2? GetMapCoordinatesForNPC(NPC character)
   {
     var playerNormalizedTile = new Point(Math.Max(0, Game1.player.TilePoint.X), Math.Max(0, Game1.player.TilePoint.Y));
+    // Falls back to farm position for buildings where GetPositionData returns null
     MapAreaPosition? playerMapAreaPosition = Tools.GetMapPositionDataSafe(Game1.player.currentLocation, playerNormalizedTile);
-    // ^^ Regarding that ?? clause...  If the player is in the farmhouse or barn or any building on the farm, GetPositionData is
-    //  going to return null.  Thus the fallback to pretending the player is on the farm.  However, it seems to me that
-    //  Game1.player.currentLocation.GetParentLocation() would be the safer long-term bet.  But rule number 1 of modding is this:
-    //  the game code is always right, even when it's wrong.
 
     var characterNormalizedTile = new Point(Math.Max(0, character.TilePoint.X), Math.Max(0, character.TilePoint.Y));
     MapAreaPosition? characterMapAreaPosition = Tools.GetMapPositionDataSafe(character.currentLocation, characterNormalizedTile);

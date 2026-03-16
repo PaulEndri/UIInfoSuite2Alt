@@ -104,7 +104,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
   #region Event subscriptions
   private void OnUpdateTicked(object? sender, EventArgs e)
   {
-    // Update special orders pulse timer
+    // Pulse timer for SO exclamation
     int elapsed = (int)Game1.currentGameTime.ElapsedGameTime.TotalMilliseconds;
     if (_soPulseTimer.Value > 0)
     {
@@ -120,7 +120,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
       _soPulseDelay.Value = 3000;
     }
 
-    // Get hovered and hold item
+    // Track hover/held items
     _hoverItem.Value = Tools.GetHoveredItem();
     IClickableMenu? menu = Game1.activeClickableMenu;
     if (!GameMenuHelper.IsGameMenu(menu))
@@ -165,14 +165,10 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
     IClickableMenu menu = Game1.activeClickableMenu;
     if (menu == null) return;
 
-    // Library Mods
+    // Mod compatibility offsets
     bool biggerBackpack = _helper.ModRegistry.IsLoaded("spacechase0.BiggerBackpack");
     bool fullInventoryView = _helper.ModRegistry.IsLoaded("CpdnCristiano.FullInventoryView");
-
-    // Content Patcher Mods
     bool cpCatValley = _helper.ModRegistry.IsLoaded("RimeNovi.CatValley");
-
-    // Vanilla offset
     int offset = 294;
 
     if (biggerBackpack)
@@ -202,7 +198,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
     b.Draw(calendarData.GetTexture(), calendarDest, calendarSrc, Color.White);
     b.Draw(Game1.objectSpriteSheet, questDest, new Rectangle(144, 592, 16, 16), Color.White);
 
-    // Draw exclamation mark when a daily quest is available (vanilla or modded)
+    // Exclamation mark for available daily quests
     if (Game1.CanAcceptDailyQuest() ||
         GetAvailableModQuestBoards().Any(mb => HasRsvUnacceptedQuest(mb.BoardType)))
     {
@@ -220,7 +216,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
       );
     }
 
-    // Draw Special Orders board icon below billboard (only when unlocked)
+    // Special Orders board (if unlocked)
     if (SpecialOrder.IsSpecialOrdersBoardUnlocked())
     {
       int soWidth = DrawSize * 17 / 13;
@@ -234,7 +230,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
         new Rectangle(480, 1001, 17, 13), Color.White
       );
 
-      // Draw animated exclamation mark when special orders are available
+      // Pulse when new orders available
       if (HasUnviewedOrders("") ||
           GetAvailableModBoards().Any(mb => HasUnviewedOrders(mb.BoardType)))
       {
@@ -248,7 +244,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
       _specialOrdersBounds.Value = Rectangle.Empty;
     }
 
-    // Draw Qi's Special Orders board icon to the left of SO icon (only when Qi room unlocked)
+    // Qi Special Orders (if Qi room unlocked)
     if (IslandWest.IsQiWalnutRoomDoorUnlocked(out _))
     {
       int qiWidth = 15 * 2;
@@ -270,7 +266,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
         new Rectangle(288, 561, 15, 14), Color.White
       );
 
-      // Draw animated exclamation mark when Qi orders are available
+      // Pulse when new Qi orders available
       if (HasUnviewedOrders("Qi"))
       {
         DrawPulsingExclamation(b, new Vector2(
@@ -318,7 +314,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
       IClickableMenu.drawHoverText(b, I18n.QiSpecialOrders(), Game1.dialogueFont);
     }
 
-    // Inject snap components for gamepad navigation
+    // Gamepad navigation
     InjectSnapComponents(menu);
   }
 
@@ -363,7 +359,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
     page.allClickableComponents.RemoveAll(c =>
       c.myID is CalendarSnapId or QuestSnapId or SpecialOrdersSnapId or QiOrdersSnapId);
 
-    // Calendar and quest are always visible
+    // Always visible: calendar + quest
     _calendarSnap.Value.bounds = _calendarBounds.Value;
     _questSnap.Value.bounds = _questBounds.Value;
     page.allClickableComponents.Add(_calendarSnap.Value);
@@ -384,12 +380,11 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
       page.allClickableComponents.Add(_qiOrdersSnap.Value);
     }
 
-    // Wire bottom-row inventory slots down to our icons for gamepad navigation.
-    int lastSlotId = Game1.player.MaxItems - 1;       // slot 12
-    int secondLastSlotId = Game1.player.MaxItems - 2;  // slot 11
-    int thirdLastSlotId = Game1.player.MaxItems - 3;   // slot 10
+    // Wire bottom inventory slots → our icons
+    int lastSlotId = Game1.player.MaxItems - 1;
+    int secondLastSlotId = Game1.player.MaxItems - 2;
+    int thirdLastSlotId = Game1.player.MaxItems - 3;
 
-    // 12, 11: Quest icon
     ClickableComponent? lastSlot = page.getComponentWithID(lastSlotId);
     if (lastSlot != null)
     {
@@ -402,14 +397,13 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
       secondLastSlot.downNeighborID = QuestSnapId;
     }
 
-    // 10: Calendar icon
     ClickableComponent? thirdLastSlot = page.getComponentWithID(thirdLastSlotId);
     if (thirdLastSlot != null)
     {
       thirdLastSlot.downNeighborID = CalendarSnapId;
     }
 
-    // R1: Calendar and Quest
+    // Row 1: Calendar ↔ Quest
     _calendarSnap.Value.rightNeighborID = QuestSnapId;
     _calendarSnap.Value.leftNeighborID = -99998;
     _calendarSnap.Value.upNeighborID = thirdLastSlotId;
@@ -418,7 +412,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
     _questSnap.Value.rightNeighborID = -99998;
     _questSnap.Value.upNeighborID = lastSlotId;
 
-    // R2: SO(+Qi) based on visibility
+    // Row 2: SO + Qi (conditional)
     if (hasSO && hasQi)
     {
       _calendarSnap.Value.downNeighborID = QiOrdersSnapId;
@@ -562,7 +556,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
       return true;
     }
 
-    // Handle quest board with mod board selector support
+    // Quest board (with mod board selector if available)
     if (isQuest)
     {
       List<(string BoardType, string DisplayName)> modQuestBoards = GetAvailableModQuestBoards();
@@ -629,7 +623,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
     }
     catch (Exception)
     {
-      // RSV reflection failed — disable quest board support silently
+      // RSV reflection failed
     }
   }
 
@@ -665,7 +659,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
     }
     catch
     {
-      // Reflection access failed
+      // Reflection failed
     }
     return false;
   }
@@ -689,7 +683,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
     }
     catch
     {
-      // Reflection instantiation failed
+      // Reflection failed
     }
     return false;
   }

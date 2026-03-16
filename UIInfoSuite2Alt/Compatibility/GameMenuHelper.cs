@@ -3,9 +3,7 @@ using StardewValley.Menus;
 
 namespace UIInfoSuite2Alt.Compatibility;
 
-/// <summary>
-///   Abstracts GameMenu access to support both vanilla GameMenu and Better Game Menu.
-/// </summary>
+/// <summary>Abstracts GameMenu access to support both vanilla and Better Game Menu.</summary>
 public static class GameMenuHelper
 {
   // Vanilla tab index → BGM tab name mapping

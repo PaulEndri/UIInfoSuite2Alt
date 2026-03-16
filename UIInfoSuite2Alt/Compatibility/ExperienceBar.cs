@@ -7,12 +7,10 @@ using StardewValley.Menus;
 // ReSharper disable once CheckNamespace
 namespace UIInfoSuite2Alt.UIElements;
 
-// This part of the class is only user for compatibility reasons
+// Compatibility partial — kept for mods that patch DrawExperienceBar (e.g. MARGO)
 public partial class ExperienceBar
 {
-  // For providing compatibility for mods that patch this method
-  // TODO: When refactoring is done, mark this as deprecated and provide a long-term new method
-  // Notable dependents: MARGO -- Modular Gameplay Overhaul
+  // TODO: deprecate this method after refactoring; notable dependent: MARGO
   private void DrawExperienceBar(
     int barWidth,
     int experienceGainedThisLevel,

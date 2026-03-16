@@ -149,16 +149,10 @@ internal class ShowRainyDayIcon : IDisposable
     return Game1.netWorldState.Value.GetWeatherForLocation("Island").WeatherForTomorrow;
   }
 
-  /// <summary>
-  ///   Creates a custom tilesheet for weather icons.
-  ///   Meant to mimic the TV screen, which has a border around it, while the individual icons in the Cursors tilesheet
-  ///   don't have a border
-  ///   Extracts the border, and each individual weather icon and stitches them together into one separate sheet
-  /// </summary>
+  /// <summary>Builds a composite weather icon sheet from TV border + individual weather sprites.</summary>
   private void CreateTileSheet()
   {
-    // ModEntry.MonitorObject.Log("Setting up icon sheet", LogLevel.Info);
-    // Setup Texture sheet as a copy, so as not to disturb existing sprites
+    // Build composite sheet (separate copy to avoid disturbing existing sprites)
     _iconSheet = new Texture2D(Game1.graphics.GraphicsDevice, WeatherSheetWidth, WeatherSheetHeight);
     _weatherIconColors = new Color[WeatherSheetWidth * WeatherSheetHeight];
     _weatherBorderTexture = Texture2D.FromFile(
@@ -176,21 +170,20 @@ internal class ShowRainyDayIcon : IDisposable
     Game1.mouseCursors_1_6.GetData(cursorColors_1_6);
     var subTextureColors = new Color[15 * 15];
 
-    // Copy over the bits we want
-    // Border from TV screen
+    // Copy TV border to each icon slot
     Tools.GetSubTexture(
       subTextureColors,
       weatherBorderColors,
       new Rectangle(0, 0, 15, 15),
       new Rectangle(0, 0, 15, 15)
     );
-    // Copy to each destination
+    // Copy to each slot
     for (var i = 0; i < 4; i++)
     {
       Tools.SetSubTexture(subTextureColors, _weatherIconColors, WeatherSheetWidth, new Rectangle(i * 15, 0, 15, 15));
     }
 
-    // Add in expanded sprites for the island parrot
+    // Island parrot expanded sprites
     Tools.SetSubTexture(subTextureColors, _weatherIconColors, WeatherSheetWidth, new Rectangle(60, 0, 15, 15));
     Tools.SetSubTexture(subTextureColors, _weatherIconColors, WeatherSheetWidth, new Rectangle(78, 0, 15, 15));
     Tools.SetSubTexture(subTextureColors, _weatherIconColors, WeatherSheetWidth, new Rectangle(96, 0, 15, 15));
@@ -215,9 +208,7 @@ internal class ShowRainyDayIcon : IDisposable
     Tools.SetSubTexture(subTextureColors, _weatherIconColors, WeatherSheetWidth, new Rectangle(46, 1, 13, 13));
     Tools.SetSubTexture(subTextureColors, _weatherIconColors, WeatherSheetWidth, new Rectangle(97, 1, 13, 13));
 
-    // Size of the parrot icon
     subTextureColors = new Color[9 * 14];
-    // Tools.GetSubTexture(subTextureColors, cursorColors, bounds, new Rectangle(155, 148, 9, 14));
     Tools.GetSubTexture(subTextureColors, cursorColors, bounds, new Rectangle(146, 149, 9, 14));
     Tools.SetSubTexture(subTextureColors, _weatherIconColors, WeatherSheetWidth, new Rectangle(69, 4, 9, 14), true);
     Tools.SetSubTexture(subTextureColors, _weatherIconColors, WeatherSheetWidth, new Rectangle(87, 4, 9, 14), true);

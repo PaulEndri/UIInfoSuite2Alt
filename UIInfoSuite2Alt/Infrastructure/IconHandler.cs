@@ -46,14 +46,7 @@ public sealed class IconHandler
   /// <summary>When true, icons stack vertically downward instead of horizontally to the left.</summary>
   public bool UseVerticalLayout { get; set; }
 
-  /// <summary>
-  ///   Enqueue an icon to be drawn this frame. Icons are sorted by configured order
-  ///   and drawn together during <see cref="DrawQueuedIcons" />.
-  /// </summary>
-  /// <param name="iconKey">The icon key used to look up the configured sort order</param>
-  /// <param name="draw">Draws the icon at the given position</param>
-  /// <param name="drawHover">Draws hover text if the icon is hovered (called after all icons are drawn)</param>
-  /// <param name="iconWidth">Pixel width of this icon (0 = standard ~40px)</param>
+  /// <summary>Enqueue an icon to draw this frame, sorted by configured order.</summary>
   public void EnqueueIcon(string iconKey, Action<SpriteBatch, Point> draw, Action<SpriteBatch>? drawHover = null, int iconWidth = 0)
   {
     int order = IconOrder.TryGetValue(iconKey, out int o) ? o : 99;
@@ -67,10 +60,7 @@ public sealed class IconHandler
     });
   }
 
-  /// <summary>
-  ///   Sort all queued icons by configured order, compute positions, draw them,
-  ///   then draw hover text. Call this once per frame during RenderedHud.
-  /// </summary>
+  /// <summary>Sort, position, draw all queued icons + hover text. Call once per frame.</summary>
   public void DrawQueuedIcons(SpriteBatch batch)
   {
     List<QueuedIcon> icons = _queuedIcons.Value;
@@ -79,14 +69,14 @@ public sealed class IconHandler
       return;
     }
 
-    // Safety net: don't draw icons when HUD is hidden (cutscenes, events, etc.)
+    // Skip when HUD is hidden (cutscenes, events)
     if (!UIElementUtils.IsRenderingNormally())
     {
       icons.Clear();
       return;
     }
 
-    // Stable sort: by configured order, then by registration order
+    // Stable sort: config order, then registration order
     var sorted = icons.OrderBy(i => i.SortOrder).ThenBy(i => i.RegistrationOrder).ToList();
 
     int yPos = Game1.options.zoomButtons ? 290 : 260;
@@ -109,14 +99,14 @@ public sealed class IconHandler
       yPos -= 30;
     }
 
-    // Offset xBase if the rightmost icon is wider than standard
+    // Offset for wide first icon
     if (!UseVerticalLayout)
     {
       int firstWidth = sorted[0].IconWidth > 0 ? sorted[0].IconWidth : DefaultIconWidth;
       xBase -= Math.Max(0, firstWidth - DefaultIconWidth);
     }
 
-    // Draw all icons with variable-width spacing
+    // Draw icons with variable-width spacing
     int xOffset = 0;
     for (int i = 0; i < sorted.Count; i++)
     {

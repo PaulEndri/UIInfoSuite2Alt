@@ -93,7 +93,7 @@ internal class ShowItemEffectRanges : IDisposable
       return;
     }
 
-    // Ticks can happen when the player reverts to the loading screen; defend against that.
+    // Guard against ticks during loading screen
     if (Game1.currentLocation is null)
     {
       return;
@@ -204,7 +204,7 @@ internal class ShowItemEffectRanges : IDisposable
     int[][] arrayToUse;
     List<Object> similarObjects;
 
-    // Junimo Hut is handled differently, because it is a building
+    // Junimo Hut (building, not object)
     if (_showItemEffectRanges)
     {
       Building building = Game1.currentLocation.getBuildingAt(Game1.GetPlacementGrabTile());
@@ -222,7 +222,7 @@ internal class ShowItemEffectRanges : IDisposable
       }
     }
 
-    // Every other item is here
+    // Placed objects (button-controlled range display)
     if (_showItemEffectRanges && ButtonControlShow && (ButtonShowOneRange || ButtonShowAllRanges))
     {
       Vector2 gamepadTile = Game1.player.CurrentTool != null
@@ -353,19 +353,7 @@ internal class ShowItemEffectRanges : IDisposable
         }
         else if (itemName.IndexOf("sprinkler", StringComparison.OrdinalIgnoreCase) >= 0)
         {
-          // Relative tile positions to the placable items locations - need to pass coordinates
-
-          /*
-           * @NermNermNerm:
-           * This change is a little bit worrisome because Object.GetSprinklerTiles didn't semantically change in 1.6...
-           * But it did change. Somebody noodled over it and changed a variable name.
-           * However, its behavior got changed by something else -
-           * in the past it was zero-based - as Object.tileLocation used to be 0.0 for unplaced objects,
-           * and now it's the tile that's being hovered over.
-           * That new behavior might not be intended and might get rolled back.
-           */
-
-          // Move tiles to 0, 0 and then offset by the correct tile.
+          // GetSprinklerTiles returns absolute positions in 1.6+ — offset to valid placement tile
           IEnumerable<Vector2> unplacedSprinklerTiles = currentItem.GetSprinklerTiles();
           if (currentItem.TileLocation != validTile)
           {
@@ -377,7 +365,6 @@ internal class ShowItemEffectRanges : IDisposable
           similarObjects = GetSimilarObjectsInLocation("sprinkler");
           foreach (Object next in similarObjects)
           {
-            // Absolute tile positions
             AddTilesToHighlightedArea(next.GetSprinklerTiles(), false);
           }
         }
@@ -501,9 +488,7 @@ internal class ShowItemEffectRanges : IDisposable
     return result;
   }
 
-  /// <summary>
-  ///   Extract the overlapping area.
-  /// </summary>
+  /// <summary>Compute intersection and exclusive areas between current and other ranges.</summary>
   private void GetOverlapValue()
   {
     _effectiveAreaIntersection.Value = _effectiveAreaOther.Value.Intersect(_effectiveAreaCurrent.Value).ToHashSet();

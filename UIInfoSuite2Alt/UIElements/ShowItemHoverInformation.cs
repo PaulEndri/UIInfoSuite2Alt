@@ -116,21 +116,11 @@ internal class ShowItemHoverInformation : IDisposable
     }
   }
 
-  /// <summary>Raised before the game draws anything to the screen in a draw tick, as soon as the sprite batch is opened.</summary>
-  /// <param name="sender">The event sender.</param>
-  /// <param name="e">The event arguments.</param>
   private void OnRendering(object? sender, EventArgs e)
   {
     _hoverItem.Value = Tools.GetHoveredItem();
   }
 
-  /// <summary>
-  ///   Raised after drawing the HUD (item toolbar, clock, etc) to the sprite batch, but before it's rendered to the
-  ///   screen. The vanilla HUD may be hidden at this point (e.g. because a menu is open). Content drawn to the sprite batch
-  ///   at this point will appear over the HUD.
-  /// </summary>
-  /// <param name="sender">The event sender.</param>
-  /// <param name="e">The event arguments.</param>
   private void OnRenderedHud(object? sender, RenderedHudEventArgs e)
   {
     if (!Game1.displayHUD || Game1.eventUp || Game1.isFestival())
@@ -144,12 +134,6 @@ internal class ShowItemHoverInformation : IDisposable
     }
   }
 
-  /// <summary>
-  ///   Raised after the game draws to the sprite patch in a draw tick, just before the final sprite batch is rendered
-  ///   to the screen.
-  /// </summary>
-  /// <param name="sender">The event sender.</param>
-  /// <param name="e">The event arguments.</param>
   [EventPriority(EventPriority.Low)]
   private void OnRenderedActiveMenu(object? sender, RenderedActiveMenuEventArgs e)
   {
@@ -210,7 +194,6 @@ internal class ShowItemHoverInformation : IDisposable
       var bundleHeaderWidth = 0;
       if (!string.IsNullOrEmpty(requiredBundleName))
       {
-        // bundleHeaderWidth = ((bundleIcon.Width * 3 = 45) - 7 = 38) + 3 + bundleTextSize.X + 3 + ((shippingBin.Width * 1.2 = 36) - 12 = 24)
         bundleHeaderWidth = 68 + (int)Game1.dialogueFont.MeasureString(requiredBundleName).X;
       }
 
@@ -218,7 +201,6 @@ internal class ShowItemHoverInformation : IDisposable
       var stackTextWidth = (int)Game1.smallFont.MeasureString(stackPrice.ToString()).X;
       var cropTextWidth = (int)Game1.smallFont.MeasureString(cropPrice.ToString()).X;
       var minTextWidth = (int)Game1.smallFont.MeasureString("000").X;
-      // largestTextWidth = 12 + 4 + (icon.Width = 32) + 4 + max(textSize.X) + 8 + 16
       int largestTextWidth =
         76 + Math.Max(minTextWidth, Math.Max(stackTextWidth, Math.Max(itemTextWidth, cropTextWidth)));
       windowWidth = Math.Max(bundleHeaderWidth, largestTextWidth);
@@ -245,14 +227,14 @@ internal class ShowItemHoverInformation : IDisposable
         drawPositionOffset.Y += 4;
       }
 
-      // Minimal window dimensions
+      // Min window dimensions
       windowHeight = Math.Max(windowHeight, 40);
       windowWidth = Math.Max(windowWidth, 40);
 
       int windowY = Game1.getMouseY() + 20;
       int windowX = Game1.getMouseX() - 25 - windowWidth;
 
-      // Avoid overlapping Ferngill Simple Economy's supply/demand tooltip
+      // Avoid overlapping Ferngill Simple Economy tooltip
       if (hoveredObject != null &&
           ApiManager.GetApi(ModCompat.FerngillEconomy, out IFerngillSimpleEconomyApi? fseApi) &&
           fseApi.IsLoaded() &&
@@ -261,7 +243,7 @@ internal class ShowItemHoverInformation : IDisposable
         windowX -= 270;
       }
 
-      // Adjust the tooltip's position when it overflows
+      // Adjust overflow
       Rectangle safeArea = Utility.getSafeArea();
 
       if (windowY + windowHeight > safeArea.Bottom)
@@ -281,7 +263,7 @@ internal class ShowItemHoverInformation : IDisposable
       var windowPos = new Vector2(windowX, windowY);
       Vector2 drawPosition = windowPos + new Vector2(16, 20) + drawPositionOffset;
 
-      // Icons are drawn in 32x40 cells. The small font has a cap height of 18 and an offset of (2, 6)
+      // 32x40 icon cells, small font cap height 18 offset (2,6)
       var rowHeight = 40;
       var iconCenterOffset = new Vector2(16, 20);
       var textOffset = new Vector2(32 + 4, (rowHeight - 18) / 2 - 6);
@@ -405,14 +387,13 @@ internal class ShowItemHoverInformation : IDisposable
 
       if (!string.IsNullOrEmpty(requiredBundleName))
       {
-        // Draws a 30x42 bundle icon offset by (-7, -13) from the top-left corner of the window
-        // and the 36px high banner with the bundle name
+        // Bundle icon + banner
         DrawBundleBanner(spriteBatch, requiredBundleName, windowPos + new Vector2(-7, -13), windowWidth, bundleColor);
       }
 
       if (notShippedYet)
       {
-        // Draws a 36x28 shipping bin offset by (-24, -6) from the top-right corner of the window
+        // Shipping bin icon
         var shippingBinDims = new Vector2(30, 24);
         DrawShippingBin(spriteBatch, windowPos + new Vector2(windowWidth - 6, 8), shippingBinDims / 2);
       }
@@ -433,8 +414,6 @@ internal class ShowItemHoverInformation : IDisposable
     Color? color = null
   )
   {
-    // NB The dialogue font has a cap height of 30 and an offset of (3, 6)
-
     Color drawColor = color ?? Color.Crimson;
 
     var bundleBannerX = (int)position.X;
@@ -480,10 +459,6 @@ internal class ShowItemHoverInformation : IDisposable
   private void DrawShippingBin(SpriteBatch b, Vector2 position, Vector2 origin)
   {
     var shippingBinOffset = new Vector2(0, 2);
-    // var shippingBinLidOffset = Vector2.Zero;
-
-    // NB This is not the texture used to draw the shipping bin on the farm map.
-    //    The one for the farm is located in "Buildings\Shipping Bin".
     b.Draw(
       _shippingBottomIcon.texture,
       position,

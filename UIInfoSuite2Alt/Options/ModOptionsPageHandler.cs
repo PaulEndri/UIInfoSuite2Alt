@@ -14,43 +14,31 @@ using UIInfoSuite2Alt.UIElements;
 
 namespace UIInfoSuite2Alt.Options;
 
-/// <summary>
-///   A mix between working around <see cref="GameMenu" /> to add our mod options page,
-///   and loading the UI elements with their logic.
-///   Supports both vanilla GameMenu and Better Game Menu.
-/// </summary>
+/// <summary>Manages mod options page injection into GameMenu (vanilla + BGM) and feature loading.</summary>
 internal class ModOptionsPageHandler : IDisposable
 {
-  // Our mod options tab is positioned approximately above the 11th inventory cell
-  private const int downNeighborInInventory = 10;
+  private const int downNeighborInInventory = 10; // above 11th inventory cell
   private const string optionsTabName = "uiinfosuite2";
 
-  // BGM tab order: after Options (160), before Exit (200)
-  private const int bgmTabOrder = 170;
+  private const int bgmTabOrder = 170; // after Options (160), before Exit (200)
 
-  // For the map page workaround (vanilla only)
-  private readonly PerScreen<bool> _changeToOurTabAfterTick = new();
+  private readonly PerScreen<bool> _changeToOurTabAfterTick = new(); // map page workaround (vanilla)
   private readonly List<IDisposable> _elementsToDispose;
 
   private readonly IModHelper _helper;
   private readonly bool _hasBgm;
 
-  // For the window resize workaround (vanilla only)
-  private readonly List<int> _instancesWithOptionsPageOpen = new();
+  private readonly List<int> _instancesWithOptionsPageOpen = new(); // window resize workaround (vanilla)
   private readonly PerScreen<IClickableMenu?> _lastMenu = new();
 
   private readonly PerScreen<int?> _lastMenuTab = new();
 
-  /// <summary>The mod options page added to <see cref="GameMenu.pages" /> (vanilla only).</summary>
+  // Mod options page added to GameMenu.pages (vanilla only)
   private readonly PerScreen<ModOptionsPage?> _modOptionsPage = new();
 
   private readonly PerScreen<ModOptionsPageButton?> _modOptionsPageButton = new();
 
-  /// <summary>
-  ///   The clickable component for the mod options tab used by gamepad navigation.
-  ///   <para>We don't add it to <see cref="GameMenu.tabs" /> because it messes up the game's logic.</para>
-  ///   <para>Vanilla only — BGM manages its own tab UI.</para>
-  /// </summary>
+  // Gamepad nav component for our tab (not added to GameMenu.tabs — breaks game logic). Vanilla only.
   private readonly PerScreen<ClickableComponent?> _modOptionsTab = new();
 
   private readonly PerScreen<int?> _modOptionsTabPageNumber = new();
@@ -68,7 +56,7 @@ internal class ModOptionsPageHandler : IDisposable
     _helper = helper;
     _hasBgm = GameMenuHelper.HasBetterGameMenu;
 
-    // Wrap setters to also persist config.json on each change
+    // Persist config.json on each change
     Action<bool> Set(Action<bool> setter) => v => { setter(v); saveConfig(); };
     Action<int> SetInt(Action<int> setter) => v => { setter(v); saveConfig(); };
 
@@ -76,7 +64,7 @@ internal class ModOptionsPageHandler : IDisposable
 
     if (_hasBgm)
     {
-      // BGM handles tab UI, rendering, resize, etc. natively — minimal event wiring needed
+      // BGM handles tab UI natively — minimal event wiring needed
     }
     else
     {
@@ -635,7 +623,7 @@ internal class ModOptionsPageHandler : IDisposable
       return;
     }
 
-    // Register our tab with BGM — icon uses the same sprites as ModOptionsPageButton
+    // Register our tab with BGM
     IBetterGameMenuApi.DrawDelegate iconDraw = bgmApi.CreateDraw(
       Game1.mouseCursors,
       new Rectangle(32, 672, 16, 16),
@@ -655,7 +643,7 @@ internal class ModOptionsPageHandler : IDisposable
       onResize: ctx => new ModOptionsPage(_optionsElements, _helper.Events, ctx.Menu)
     );
 
-    // Right-click context menu: open GMCM settings if available
+    // Right-click opens GMCM if available
     bgmApi.OnTabContextMenu(OnBgmTabContextMenu);
   }
 
@@ -701,8 +689,7 @@ internal class ModOptionsPageHandler : IDisposable
 
     if (Game1.activeClickableMenu is GameMenu gameMenu)
     {
-      // Handle right trigger to switch to our mod options page
-      // NB The game does the correct thing for left trigger so we don't need to implement it.
+      // Right trigger → our tab (left trigger is handled by the game)
       if (e.Button == SButton.RightTrigger && !e.IsSuppressed())
       {
         if (gameMenu.currentTab + 1 == _modOptionsTabPageNumber.Value && gameMenu.readyToClose())
@@ -712,10 +699,10 @@ internal class ModOptionsPageHandler : IDisposable
         }
       }
 
-      // Based on GameMenu.receiveLeftClick and Game1.updateActiveMenu
+      // Based on GameMenu.receiveLeftClick / Game1.updateActiveMenu
       if ((e.Button == SButton.MouseLeft || e.Button == SButton.ControllerA) && !e.IsSuppressed())
       {
-        // Workaround when exiting the map page because it calls GameMenu.changeTab and fails
+        // Workaround: map page calls GameMenu.changeTab which fails for our tab
         if (gameMenu.currentTab == GameMenu.mapTab && gameMenu.lastOpenedNonMapTab == _modOptionsTabPageNumber.Value)
         {
           _changeToOurTabAfterTick.Value = true;
@@ -806,8 +793,7 @@ internal class ModOptionsPageHandler : IDisposable
 
   private void OnUpdateTicking(object? sender, EventArgs e)
   {
-    // Usually OnUpdateTicked catches the activeClickableMenu as soon as is it modified during the game update,
-    // so we always add our tab early enough. This is to handle the window resize workaround.
+    // Window resize workaround: re-add our tab before the tick
     if (_addOurTabBeforeTick)
     {
       _addOurTabBeforeTick = false;
@@ -831,7 +817,7 @@ internal class ModOptionsPageHandler : IDisposable
   {
     var gameMenu = Game1.activeClickableMenu as GameMenu;
 
-    // The map was closed and the last opened tab was ours
+    // Map closed → switch back to our tab
     if (_changeToOurTabAfterTick.Value)
     {
       _changeToOurTabAfterTick.Value = false;
@@ -849,7 +835,7 @@ internal class ModOptionsPageHandler : IDisposable
       gameMenu = Game1.activeClickableMenu as GameMenu;
     }
 
-    // Deferred tab switch after opening GameMenu via keybind
+    // Deferred tab switch from keybind open
     if (_switchToOurTabNextTick.Value)
     {
       _switchToOurTabNextTick.Value = false;
@@ -866,7 +852,7 @@ internal class ModOptionsPageHandler : IDisposable
     }
   }
 
-  // Early because it is called during GameLoop.UpdateTicked instead of later during Display.MenuChanged,
+  // Called during UpdateTicked (earlier than Display.MenuChanged)
   private void EarlyOnMenuChanged(IClickableMenu? oldMenu, IClickableMenu? newMenu)
   {
     // Remove from old menu
@@ -890,7 +876,7 @@ internal class ModOptionsPageHandler : IDisposable
     // Add to new menu
     if (newMenu is GameMenu newGameMenu)
     {
-      // Both modOptions variables require Game1.activeClickableMenu to not be null.
+      // Requires Game1.activeClickableMenu to not be null
       if (_modOptionsPage.Value == null)
       {
         _modOptionsPage.Value = new ModOptionsPage(_optionsElements, _helper.Events);
@@ -906,14 +892,14 @@ internal class ModOptionsPageHandler : IDisposable
       _modOptionsTabPageNumber.Value = tabPages.Count;
       tabPages.Add(_modOptionsPage.Value);
 
-      // Load last mod options page state
+      // Restore saved page state (from resize)
       if (_savedPageState.Value != null)
       {
         _modOptionsPage.Value.LoadState(_savedPageState.Value);
         _savedPageState.Value = null;
       }
 
-      // NB For menu tabs, name is the "id" of the tab and label is the hover text.
+      // name = tab id, label = hover text
       _modOptionsTab.Value = new ClickableComponent(
           new Rectangle(
             GetButtonXPosition(newGameMenu),
@@ -923,18 +909,16 @@ internal class ModOptionsPageHandler : IDisposable
           ),
           optionsTabName,
           "ui2_mod_options"
-        ) // Placeholder label that shouldn't be displayed
+        )
       {
-        // The exit page tab ID is 12347
-        myID = 12348,
+        myID = 12348, // exit page tab is 12347
+
         leftNeighborID = 12347,
         tryDefaultIfNoDownNeighborExists = true,
         fullyImmutable = true
       };
 
-      // Do not add our tab to GameMenu.tabs because GameMenu.draw will draw the menu tab incorrectly
-      // when our page is the current tab.
-
+      // Don't add to GameMenu.tabs — GameMenu.draw breaks when our page is current tab
       ClickableComponent? exitTab = newGameMenu.tabs.Find(tab => tab.myID == 12347);
       if (exitTab != null)
       {
@@ -957,7 +941,6 @@ internal class ModOptionsPageHandler : IDisposable
     {
       if (ShowPersonalConfigButton && _modOptionsTab.Value != null)
       {
-        // Update the downNeighborID for our tab
         // Based on GameMenu.setTabNeighborsForCurrentPage
         if (gameMenu.currentTab == GameMenu.inventoryTab)
         {
@@ -986,8 +969,7 @@ internal class ModOptionsPageHandler : IDisposable
 
     if (Game1.activeClickableMenu is GameMenu gameMenu && gameMenu.GetChildMenu() == null)
     {
-      // Draw our tab icon behind the menu even if it is dimmed by the menu's transparent background,
-      // so that it still displays during transitions eg. when a letter is viewed in the collections tab
+      // Draw behind the menu so it's visible during transitions (e.g. collections letter view)
       DrawButton(gameMenu);
     }
   }
@@ -1011,13 +993,13 @@ internal class ModOptionsPageHandler : IDisposable
 
     Tools.DrawMouseCursor();
 
-    // Draw the game menu's hover text again so it displays above our tab
+    // Re-draw game menu hover text above our tab
     if (!gameMenu.hoverText.Equals(""))
     {
       IClickableMenu.drawHoverText(Game1.spriteBatch, gameMenu.hoverText, Game1.smallFont);
     }
 
-    // Draw our tab's hover text
+    // Our tab's hover text
     if (_modOptionsTab.Value?.containsPoint(Game1.getMouseX(), Game1.getMouseY()) == true)
     {
       IClickableMenu.drawHoverText(Game1.spriteBatch, I18n.OptionsTabTooltip(), Game1.smallFont);
@@ -1038,14 +1020,10 @@ internal class ModOptionsPageHandler : IDisposable
     GameRunner.instance.ExecuteForInstances(
       instance =>
       {
-        if (Game1.activeClickableMenu is GameMenu gameMenu
-            // NB SMAPI seems to use the game's instanceID as the screenID for PerScreen
-            &&
+        if (Game1.activeClickableMenu is GameMenu gameMenu &&
             gameMenu.currentTab == _modOptionsTabPageNumber.GetValueForScreen(instance.instanceId))
         {
-          // Temporarily change all open mod options pages to the game's options page
-          // because the GameMenu is recreated when the window is resized, before we can add
-          // our mod options page to GameMenu#pages.
+          // Swap to game's options tab — GameMenu is recreated before we can re-add our page
           if (gameMenu.GetCurrentPage() is ModOptionsPage modOptionsPage)
           {
             _savedPageState.Value = new ModOptionsPageState();
@@ -1065,7 +1043,7 @@ internal class ModOptionsPageHandler : IDisposable
     }
   }
 
-  // This seems to be called after Display.Rendered and Update.Ticking ie. between frames
+  // Called between frames (after Display.Rendered, before Update.Ticking)
   private void OnWindowResized(object? sender, EventArgs e)
   {
     if (_windowResizing)
@@ -1102,8 +1080,7 @@ internal class ModOptionsPageHandler : IDisposable
     gameMenu.invisible = false;
     Game1.playSound("smallSelect");
 
-    // We don't need to call GameMenu.AddTabsToClickableComponents because populateClickableComponentList already does it for us.
-    // However, we must add our mod options tab now because snapToDefaultClickableComponent might use it.
+    // populateClickableComponentList handles AddTabsToClickableComponents; we just add our tab for snap support
     gameMenu.GetCurrentPage().populateClickableComponentList();
     AddOurTabToClickableComponents(gameMenu, _modOptionsTab.Value!);
 
@@ -1114,10 +1091,7 @@ internal class ModOptionsPageHandler : IDisposable
     }
   }
 
-  /// <summary>
-  ///   Add the tab to the current menu page's clickable components
-  ///   <para>It initializes the component list if needed, and doesn't add the tab if it is already present.</para>
-  /// </summary>
+  /// <summary>Add our tab to the page's clickable components (initializes list if needed, skips duplicates).</summary>
   private void AddOurTabToClickableComponents(GameMenu gameMenu, ClickableComponent modOptionsTab)
   {
     IClickableMenu currentPage = gameMenu.GetCurrentPage()!;
@@ -1154,13 +1128,7 @@ internal class ModOptionsPageHandler : IDisposable
 
   #endregion
 
-  /// <summary>
-  ///   Tries hard to return a version string for the mod like "v2.2.9"
-  ///   <para>
-  ///     Try to get the version from the SMAPI manifest; then from the assembly in which case it is formatted as v=...;
-  ///     then give up and return a default value.
-  ///   </para>
-  /// </summary>
+  /// <summary>Returns version string from SMAPI manifest, assembly, or "(unknown version)".</summary>
   private static string GetVersionString(IModHelper helper)
   {
     IModInfo? modInfo = helper.ModRegistry.Get(helper.ModRegistry.ModID);
@@ -1188,7 +1156,7 @@ internal class ModOptionsPageHandler : IDisposable
   }
 }
 
-/// <summary>Data that is saved and restored when the the game menu is resized</summary>
+/// <summary>Saved/restored state across game menu resizes.</summary>
 internal class ModOptionsPageState
 {
   public int? currentComponent;

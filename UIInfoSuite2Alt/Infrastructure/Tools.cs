@@ -150,7 +150,7 @@ public static class Tools
         int idx = destBounds.X + xOffset + destWidth * (yOffset + destBounds.Y);
         Color sourcePixel = sourceColors[srcIdx++];
 
-        // If using overlay mode, don't copy transparent pixels
+        // Skip transparent pixels in overlay mode
         if (overlay && emptyColor.Equals(sourcePixel))
         {
           continue;
@@ -169,7 +169,7 @@ public static class Tools
     bool overlayTransparent = false
   )
   {
-    // Ensure the source rectangle is within the bounds of the source texture
+    // Validate source bounds
     if (sourceRectangle.X < 0 ||
         sourceRectangle.Y < 0 ||
         sourceRectangle.X + sourceRectangle.Width > sourceTexture.Width ||
@@ -181,7 +181,7 @@ public static class Tools
       );
     }
 
-    // Ensure the destination rectangle is within the bounds of the destination texture
+    // Validate destination bounds
     if (destinationPosition.X < 0 ||
         destinationPosition.Y < 0 ||
         destinationPosition.X + sourceRectangle.Width > destinationTexture.Width ||
@@ -197,11 +197,11 @@ public static class Tools
     var sourceData = new Color[sourceRectangle.Width * sourceRectangle.Height];
     sourceTexture.GetData(0, sourceRectangle, sourceData, 0, sourceData.Length);
 
-    // Extract the color data from the destination texture
+    // Extract destination data
     var destinationData = new Color[destinationTexture.Width * destinationTexture.Height];
     destinationTexture.GetData(destinationData);
 
-    // Copy the source data into the destination data at the specified position
+    // Copy source into destination
     for (var y = 0; y < sourceRectangle.Height; y++)
     {
       for (var x = 0; x < sourceRectangle.Width; x++)
@@ -211,7 +211,7 @@ public static class Tools
 
         Color sourcePixel = sourceData[sourceIndex];
 
-        // If using overlay mode, don't copy transparent pixels
+        // Skip transparent pixels in overlay mode
         if (overlayTransparent && emptyColor.Equals(sourcePixel))
         {
           continue;
@@ -221,7 +221,7 @@ public static class Tools
       }
     }
 
-    // Set the modified color data back to the destination texture
+    // Write back
     destinationTexture.SetData(destinationData);
   }
 
@@ -255,8 +255,7 @@ public static class Tools
     }
     else if ("day_of_week".Equals(queryStr, StringComparison.OrdinalIgnoreCase))
     {
-      // Convert day-of-week names to all matching days in a 28-day month
-      // SDV: dayOfMonth % 7 gives DayOfWeek (Sun=0, Mon=1, ..., Sat=6)
+      // Convert day-of-week to matching days in 28-day month (dayOfMonth % 7 = DayOfWeek)
       for (var i = 1; i < parsedGameStateQuery.Query.Length; i++)
       {
         if (WorldDate.TryGetDayOfWeekFor(parsedGameStateQuery.Query[i], out DayOfWeek dayOfWeek))

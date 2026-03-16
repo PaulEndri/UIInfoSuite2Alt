@@ -5,10 +5,7 @@ using StardewValley;
 
 namespace UIInfoSuite2Alt.Options;
 
-/// <summary>
-///   A number picker element for the mod options page.
-///   Click left arrow to decrement, right arrow to increment.
-/// </summary>
+/// <summary>Number picker element with left/right arrows for the mod options page.</summary>
 internal class ModOptionsNumberPicker : ModOptionsElement
 {
   private static readonly Rectangle LeftArrowSource = new(352, 495, 12, 11);

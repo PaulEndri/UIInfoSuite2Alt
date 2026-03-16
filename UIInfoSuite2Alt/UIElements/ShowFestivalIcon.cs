@@ -180,12 +180,7 @@ internal class ShowFestivalIcon : IDisposable
     }
   }
 
-  /// <summary>
-  ///   Load regular festival times from individual festival data files and append
-  ///   them to the cached hover text. Deferred to avoid content loads during DayStarted
-  ///   which can trigger Content Patcher token re-evaluation and cascading texture
-  ///   invalidations that break mods like CP Animations.
-  /// </summary>
+  /// <summary>Load festival times from data files, deferred to avoid breaking CP Animations etc.</summary>
   private void ResolvePendingFestivalTimes()
   {
     List<(string key, bool isToday)> pending = _pendingRegularFestivals.Value;

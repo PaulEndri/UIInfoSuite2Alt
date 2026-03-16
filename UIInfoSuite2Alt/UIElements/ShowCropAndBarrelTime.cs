@@ -123,9 +123,6 @@ internal class ShowCropAndBarrelTime : IDisposable
     _helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
   }
 
-  /// <summary>Raised after the game state is updated (≈60 times per second).</summary>
-  /// <param name="sender">The event sender.</param>
-  /// <param name="e">The event arguments.</param>
   private void OnUpdateTicked(object? sender, UpdateTickedEventArgs e)
   {
     if (!e.IsMultipleOf(4))
@@ -178,12 +175,6 @@ internal class ShowCropAndBarrelTime : IDisposable
     }
   }
 
-  /// <summary>
-  ///   Raised before drawing the HUD (item toolbar, clock, etc) to the screen. The vanilla HUD may be hidden at this
-  ///   point (e.g. because a menu is open).
-  /// </summary>
-  /// <param name="sender">The event sender.</param>
-  /// <param name="e">The event arguments.</param>
   private void OnRenderingHud(object? sender, RenderingHudEventArgs e)
   {
     if (!UIElementUtils.IsRenderingNormally() || Game1.activeClickableMenu != null)
@@ -342,7 +333,7 @@ internal class ShowCropAndBarrelTime : IDisposable
 
     var fertilizerNames = new Dictionary<string, int>();
 
-    // Ultimate Fertilizer Integration
+    // Supports Ultimate Fertilizer's pipe-delimited format
     foreach (string fertilizerStr in dirtTile.fertilizer.Value.Split('|'))
     {
       string name = ItemRegistry.GetData(fertilizerStr)?.DisplayName ?? "Unknown Fertilizer";
@@ -359,7 +350,7 @@ internal class ShowCropAndBarrelTime : IDisposable
                           });
   }
 
-  // See: https://stardewvalleywiki.com/Trees
+  // See: stardewvalleywiki.com/Trees
   private static string GetTreeTypeName(string treeType)
   {
     switch (treeType)
@@ -531,23 +522,16 @@ internal class ShowCropAndBarrelTime : IDisposable
       int shortTime = timeLeft % 60;
       string shortText = I18n.Minutes();
 
-      // 1600 minutes per day if you go to bed at 2am, more if you sleep early.
+      // ~1600 minutes per day — approximate since overnight time varies
       if (timeLeft >= 1600)
       {
-        // Unlike crops and casks, this is only an approximate number of days
-        // because of how time works while sleeping. It's close enough though.
         longText = I18n.Days();
         longTime = timeLeft / 1600;
 
         shortText = I18n.Hours();
         shortTime = timeLeft % 1600;
 
-        // Hours below 1200 are 60 minutes per hour. Overnight it's 100 minutes per hour.
-        // We could just divide by 60 here but then you could see strange times like
-        // "2 days, 25 hours".
-        // This is a bit of a fudge since depending on the current time of day and when the
-        // farmer goes to bed, the night might happen earlier or last longer, but it's just
-        // an approximation; regardless the processing won't finish before tomorrow.
+        // Fudged: 60min/hr daytime, 100min/hr overnight — prevents "25 hours" display
         if (shortTime <= 1200)
         {
           shortTime /= 60;
@@ -743,7 +727,7 @@ internal class ShowCropAndBarrelTime : IDisposable
             droppedItems = customBushApi.GetCustomBushDropItems(customBushData, id);
           }
 
-          // Use the drop item's name for the bush if there's exactly one drop
+          // Single-drop bush: use item name as bush name
           if (droppedItems.Count == 1)
           {
             string suffix = bush.getAge() >= ageToMature ? "Bush" : "Sapling";
@@ -773,7 +757,7 @@ internal class ShowCropAndBarrelTime : IDisposable
         return true;
       }
 
-      // Too early in the season to produce
+      // Not yet in production period
       if (!inProductionPeriod)
       {
         entries.Add($"{daysUntilProductionPeriod} {I18n.Days()}");

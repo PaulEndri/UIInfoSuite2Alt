@@ -69,7 +69,7 @@ public class ModEntry : Mod
   {
     SoundHelper.Instance.Initialize(Helper);
 
-    // get Generic Mod Config Menu's API (if it's installed)
+    // Register mod compatibility APIs
     var configMenu = ApiManager.TryRegisterApi<IGenericModConfigMenuApi>(Helper, ModCompat.Gmcm, "1.6.0");
     ApiManager.TryRegisterApi<ICustomBushApi>(Helper, ModCompat.CustomBush, "1.2.1", true);
     ApiManager.TryRegisterApi<ICloudySkiesApi>(Helper, ModCompat.CloudySkies);
@@ -81,7 +81,7 @@ public class ModEntry : Mod
       return;
     }
 
-    // register mod
+    // Register GMCM
     configMenu.Register(
       ModManifest,
       reset: () => ModConfig = new Options.ModConfig(),
@@ -92,7 +92,7 @@ public class ModEntry : Mod
       }
     );
 
-    // add some config options
+    // Global settings
     configMenu.AddBoolOption(
       ModManifest,
       name: () => I18n.Bool_ShowOptionsTabInMenu_DisplayedName(),
@@ -128,7 +128,7 @@ public class ModEntry : Mod
       getValue: () => ModConfig.OpenMonsterEradicationKeybind,
       setValue: value => ModConfig.OpenMonsterEradicationKeybind = value
     );
-    // Show item effect ranges
+    // Range keybinds
     configMenu.AddSectionTitle(
       ModManifest,
       text: () => I18n.Keybinds_Subtitle_ShowRange_DisplayedName(),
@@ -296,7 +296,7 @@ public class ModEntry : Mod
   #region Event subscriptions
   private void OnReturnedToTitle(object? sender, ReturnedToTitleEventArgs e)
   {
-    // Unload if the main player quits.
+    // Only main player screen
     if (Context.ScreenId != 0)
     {
       return;
@@ -322,12 +322,12 @@ public class ModEntry : Mod
       return;
     }
 
-    // Re-read config from disk in case it was edited externally
+    // Re-read config (may have been edited externally)
     ModConfig = Helper.ReadConfig<Options.ModConfig>();
     ApplyFeatures();
   }
 
-  /// <summary>Dispose and recreate the feature handler so all toggles re-apply from current config.</summary>
+  /// <summary>Recreate feature handler to re-apply all toggles from current config.</summary>
   private void ApplyFeatures()
   {
     if (!Context.IsWorldReady)
@@ -342,7 +342,7 @@ public class ModEntry : Mod
     _modOptionsPageHandler = new ModOptionsPageHandler(Helper, ModConfig, SaveConfig);
   }
 
-  /// <summary>Delete legacy per-save .json files from the data/ folder.</summary>
+  /// <summary>Rename legacy per-save .json files in data/ to .json.old.</summary>
   private void CleanUpLegacyPerSaveFiles()
   {
     string dataDir = Path.Combine(Helper.DirectoryPath, "data");

@@ -21,13 +21,7 @@ public class ModOptionsPage : IClickableMenu
   private string _hoverText = "";
   private bool _isScrolling;
 
-  /// <summary>
-  ///   The visible option slots
-  ///   <para>
-  ///     Must be public so
-  ///     <see cref="IClickableMenu.populateClickableComponentList" /> can find it.
-  ///   </para>
-  /// </summary>
+  /// <summary>Visible option slots. Public so populateClickableComponentList can find it.</summary>
   public List<ClickableComponent> _optionSlots = new();
 
   private int _optionsSlotHeld = -1;

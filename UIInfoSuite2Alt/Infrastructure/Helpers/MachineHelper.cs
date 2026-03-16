@@ -10,16 +10,9 @@ namespace UIInfoSuite2Alt.Infrastructure.Helpers;
 
 public static class MachineHelper
 {
-  // Welcome to the fun section: Stuff I stole from Pathoschild
-  // https://github.com/Pathoschild/StardewMods
+  // Adapted from Pathoschild/StardewMods: https://github.com/Pathoschild/StardewMods
 
-  /*********
-   ** Building data
-   *********/
-  /// <summary>Get the building chest names referenced by a building's item conversion rules.</summary>
-  /// <param name="data">The building data.</param>
-  /// <param name="inputChests">The input chest names found in the conversion rules.</param>
-  /// <param name="outputChests">The output chest names found in the conversion rules.</param>
+  /// <summary>Get building chest names referenced by item conversion rules.</summary>
   public static void GetBuildingChestNames(BuildingData? data, ISet<string> inputChests, ISet<string> outputChests)
   {
     if (data?.ItemConversions?.Count is not > 0)
@@ -41,11 +34,7 @@ public static class MachineHelper
     }
   }
 
-  /// <summary>Get the building chest names referenced by a building's item conversion rules.</summary>
-  /// <param name="data">The building data.</param>
-  /// <param name="inputChests">The input chest names found in the conversion rules.</param>
-  /// <param name="outputChests">The output chest names found in the conversion rules.</param>
-  /// <returns>Returns whether any input or output chests were found.</returns>
+  /// <summary>Try to get building chest names from item conversion rules.</summary>
   public static bool TryGetBuildingChestNames(
     BuildingData? data,
     out ISet<string> inputChests,
@@ -60,9 +49,7 @@ public static class MachineHelper
     return inputChests.Count > 0 || outputChests.Count > 0;
   }
 
-  /// <summary>Get the building chests which match a set of chest names.</summary>
-  /// <param name="building">The building whose chests to get.</param>
-  /// <param name="chestNames">The chest names to match.</param>
+  /// <summary>Get building chests matching the given chest names.</summary>
   public static IEnumerable<Chest> GetBuildingChests(Building building, ISet<string> chestNames)
   {
     foreach (Chest chest in building.buildingChests)
@@ -102,12 +89,7 @@ public static class MachineHelper
   }
 
 
-  /// <summary>
-  ///   Get all output items from a building.
-  /// </summary>
-  /// <param name="building">The input building, nullable.</param>
-  /// <param name="whichItems">Which chests to get items for.</param>
-  /// <returns>All items from all output chests, or an empty list if the building is null.</returns>
+  /// <summary>Get all items from a building's chests.</summary>
   public static List<Item?> GetBuildingChestItems(
     Building? building,
     BuildingChestType whichItems = BuildingChestType.Chest

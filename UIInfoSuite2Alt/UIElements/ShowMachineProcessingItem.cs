@@ -160,17 +160,13 @@ internal class ShowMachineProcessingItem : IDisposable
         machineCenterY - 16f + machine.Offset.Y
       );
 
-      spriteBatch.Draw(
-        machine.ItemData.GetTexture(),
-        iconPos,
-        machine.ItemData.GetSourceRect(),
-        Color.White * 0.9f,
-        0f,
-        Vector2.Zero,
-        2f,
-        SpriteEffects.None,
-        1f
-      );
+      Texture2D texture = machine.ItemData.GetTexture();
+      Rectangle sourceRect = machine.ItemData.GetSourceRect();
+
+      // Outline: 2px larger black silhouette centered behind the icon
+      float outlineScale = 2f + 2f / sourceRect.Width;
+      spriteBatch.Draw(texture, iconPos - new Vector2(1f, 1f), sourceRect, Color.Black * 0.5f, 0f, Vector2.Zero, outlineScale, SpriteEffects.None, 1f);
+      spriteBatch.Draw(texture, iconPos, sourceRect, Color.White * 0.9f, 0f, Vector2.Zero, 2f, SpriteEffects.None, 1f);
     }
   }
 

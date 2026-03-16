@@ -9,6 +9,7 @@ using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Buildings;
+using StardewValley.GameData.FishPonds;
 using StardewValley.ItemTypeDefinitions;
 using StardewValley.Menus;
 using StardewValley.Objects;
@@ -53,7 +54,7 @@ internal readonly struct HoverLine
   public static implicit operator HoverLine(string text) => new(text);
 }
 
-internal class ShowCropAndBarrelTime : IDisposable
+internal class ShowTileTooltips : IDisposable
 {
   private const int MAX_TREE_GROWTH_STAGE = 5;
 
@@ -85,8 +86,9 @@ internal class ShowCropAndBarrelTime : IDisposable
   private readonly IModHelper _helper;
   private bool _showCropTooltip;
   private bool _showBarrelTooltip;
+  private bool _showFishPondTooltip;
 
-  public ShowCropAndBarrelTime(IModHelper helper)
+  public ShowTileTooltips(IModHelper helper)
   {
     _helper = helper;
   }
@@ -95,6 +97,7 @@ internal class ShowCropAndBarrelTime : IDisposable
   {
     ToggleCropOption(false);
     ToggleBarrelOption(false);
+    ToggleFishPondOption(false);
   }
 
   public void ToggleCropOption(bool showCropTooltip)
@@ -109,12 +112,18 @@ internal class ShowCropAndBarrelTime : IDisposable
     UpdateEventSubscriptions();
   }
 
+  public void ToggleFishPondOption(bool showFishPondTooltip)
+  {
+    _showFishPondTooltip = showFishPondTooltip;
+    UpdateEventSubscriptions();
+  }
+
   private void UpdateEventSubscriptions()
   {
     _helper.Events.Display.RenderingHud -= OnRenderingHud;
     _helper.Events.GameLoop.UpdateTicked -= OnUpdateTicked;
 
-    if (!_showCropTooltip && !_showBarrelTooltip)
+    if (!_showCropTooltip && !_showBarrelTooltip && !_showFishPondTooltip)
     {
       return;
     }
@@ -201,6 +210,15 @@ internal class ShowCropAndBarrelTime : IDisposable
         }
 
         Vector2 buildingTile = new(currentTileBuilding.tileX.Value, currentTileBuilding.tileY.Value);
+        tile = Utility.ModifyCoordinatesForUIScale(Game1.GlobalToLocal(buildingTile * Game1.tileSize));
+      }
+    }
+
+    if (_showFishPondTooltip && currentTileBuilding is FishPond fishPond)
+    {
+      if (DetailRenderers.FishPondRender(fishPond, lines))
+      {
+        Vector2 buildingTile = new(fishPond.tileX.Value, fishPond.tileY.Value);
         tile = Utility.ModifyCoordinatesForUIScale(Game1.GlobalToLocal(buildingTile * Game1.tileSize));
       }
     }
@@ -453,6 +471,60 @@ internal class ShowCropAndBarrelTime : IDisposable
       }
 
       return itemCounter;
+    }
+
+    public static bool FishPondRender(FishPond fishPond, List<HoverLine> entries)
+    {
+      if (fishPond.fishType.Value == null || fishPond.currentOccupants.Value <= 0)
+      {
+        return false;
+      }
+
+      // Fish name
+      string fishName = fishPond.GetFishObject().DisplayName;
+      entries.Add(fishName);
+
+      // Population: current/max
+      int current = fishPond.currentOccupants.Value;
+      int max = fishPond.maxOccupants.Value;
+      Color populationColor = current >= max ? ReadyColor : WaitingColor;
+      entries.Add(new HoverLine(I18n.FishPondPopulation(current, max: max), populationColor));
+
+      // Quest item needed
+      if (fishPond.neededItem.Value != null && fishPond.HasUnresolvedNeeds())
+      {
+        string itemName = fishPond.neededItem.Value.DisplayName;
+        int itemCount = fishPond.neededItemCount.Value;
+        entries.Add(new HoverLine(I18n.FishPondQuestItem(itemName, count: itemCount), WaitingColor));
+      }
+
+      // Next spawn / quest timing
+      FishPondData? pondData = fishPond.GetFishPondData();
+      if (pondData != null)
+      {
+        int daysUntilSpawn = pondData.SpawnTime - fishPond.daysSinceSpawn.Value;
+
+        if (current < max && !fishPond.hasSpawnedFish.Value && daysUntilSpawn > 0)
+        {
+          // Not at max — show days until next fish spawns
+          entries.Add(new HoverLine(I18n.FishPondNextSpawn(daysUntilSpawn), WaitingColor));
+        }
+        else if (current >= max && fishPond.neededItem.Value == null && daysUntilSpawn > 0
+                 && pondData.PopulationGates != null
+                 && pondData.PopulationGates.ContainsKey(max + 1))
+        {
+          // At max, no quest yet, but a gate exists — show days until quest appears
+          entries.Add(new HoverLine(I18n.FishPondNextQuest(daysUntilSpawn), WaitingColor));
+        }
+      }
+
+      // Golden Animal Cracker
+      if (fishPond.goldenAnimalCracker.Value)
+      {
+        entries.Add(new HoverLine(I18n.FishPondGoldenCracker(), new Color(218, 165, 32)));
+      }
+
+      return true;
     }
 
     public static bool BuildingOutput(Building? building, List<HoverLine> entries)

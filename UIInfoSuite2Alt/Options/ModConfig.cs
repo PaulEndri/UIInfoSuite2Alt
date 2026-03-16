@@ -29,6 +29,7 @@ public class ModConfig
   public bool ShowRainyDay { get; set; } = true;
   public bool ShowCropTooltip { get; set; } = true;
   public bool ShowBarrelTooltip { get; set; } = true;
+  public bool ShowFishPondTooltip { get; set; } = true;
   public bool ShowMachineProcessingIcons { get; set; } = true;
   public KeybindList ToggleMachineProcessingIcons { get; set; } = KeybindList.ForSingle(SButton.F10);
   public bool ShowBirthdayIcon { get; set; } = true;

@@ -92,7 +92,7 @@ internal class ModOptionsPageHandler : IDisposable
     var showBookseller = new ShowBookseller(helper);
     var showRainyDayIcon = new ShowRainyDayIcon(helper);
     var showMachineProcessingItem = new ShowMachineProcessingItem(helper);
-    var showCropAndBarrelTime = new ShowCropAndBarrelTime(helper);
+    var showTileTooltips = new ShowTileTooltips(helper);
     var showToolUpgradeStatus = new ShowToolUpgradeStatus(helper);
     var showRobinBuildingStatusIcon = new ShowRobinBuildingStatusIcon(helper);
     var showSeasonalBerry = new ShowSeasonalBerry(helper);
@@ -118,7 +118,7 @@ internal class ModOptionsPageHandler : IDisposable
       showBookseller,
       showRainyDayIcon,
       showMachineProcessingItem,
-      showCropAndBarrelTime,
+      showTileTooltips,
       showToolUpgradeStatus,
       showRobinBuildingStatusIcon,
       showSeasonalBerry,
@@ -396,7 +396,7 @@ internal class ModOptionsPageHandler : IDisposable
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.ShowCropTooltip)),
         whichOption++,
-        showCropAndBarrelTime.ToggleCropOption,
+        showTileTooltips.ToggleCropOption,
         () => config.ShowCropTooltip,
         Set(v => config.ShowCropTooltip = v)
       )
@@ -405,9 +405,18 @@ internal class ModOptionsPageHandler : IDisposable
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.ShowBarrelTooltip)),
         whichOption++,
-        showCropAndBarrelTime.ToggleBarrelOption,
+        showTileTooltips.ToggleBarrelOption,
         () => config.ShowBarrelTooltip,
         Set(v => config.ShowBarrelTooltip = v)
+      )
+    );
+    _optionsElements.Add(
+      new ModOptionsCheckbox(
+        _helper.SafeGetString(nameof(config.ShowFishPondTooltip)),
+        whichOption++,
+        showTileTooltips.ToggleFishPondOption,
+        () => config.ShowFishPondTooltip,
+        Set(v => config.ShowFishPondTooltip = v)
       )
     );
     _optionsElements.Add(

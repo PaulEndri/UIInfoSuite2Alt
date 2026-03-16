@@ -223,6 +223,7 @@ public class ModEntry : Mod
     Spacer();
     AddBool(nameof(ModConfig.ShowCropTooltip), () => ModConfig.ShowCropTooltip, v => ModConfig.ShowCropTooltip = v);
     AddBool(nameof(ModConfig.ShowBarrelTooltip), () => ModConfig.ShowBarrelTooltip, v => ModConfig.ShowBarrelTooltip = v);
+    AddBool(nameof(ModConfig.ShowFishPondTooltip), () => ModConfig.ShowFishPondTooltip, v => ModConfig.ShowFishPondTooltip = v);
     AddBool(nameof(ModConfig.ShowMachineProcessingIcons), () => ModConfig.ShowMachineProcessingIcons, v => ModConfig.ShowMachineProcessingIcons = v);
     configMenu.AddBoolOption(
       ModManifest,

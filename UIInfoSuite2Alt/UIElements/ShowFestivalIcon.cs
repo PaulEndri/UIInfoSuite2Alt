@@ -25,6 +25,11 @@ internal class ShowFestivalIcon : IDisposable
   private readonly PerScreen<FestivalType> _tomorrowType = new();
   private readonly PerScreen<string> _tomorrowHoverText = new();
 
+  // Deferred festival time loading — avoids content loads during DayStarted
+  // which can trigger Content Patcher token re-evaluation and cascading
+  // texture invalidations that break mods like CP Animations.
+  private readonly PerScreen<List<(string key, bool isToday)>> _pendingRegularFestivals = new(() => new());
+
   private readonly Texture2D _billboardTexture;
 
   // Flag icon for regular festivals (from Billboard spritesheet)
@@ -74,12 +79,14 @@ internal class ShowFestivalIcon : IDisposable
   {
     _helper.Events.Display.RenderingHud -= OnRenderingHud;
     _helper.Events.GameLoop.DayStarted -= OnDayStarted;
+    _helper.Events.GameLoop.UpdateTicked -= OnUpdateTicked;
 
     if (enabled)
     {
       CheckForFestival();
       _helper.Events.Display.RenderingHud += OnRenderingHud;
       _helper.Events.GameLoop.DayStarted += OnDayStarted;
+      _helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
     }
   }
   #endregion
@@ -92,6 +99,7 @@ internal class ShowFestivalIcon : IDisposable
     _todayHoverText.Value = "";
     _tomorrowType.Value = FestivalType.None;
     _tomorrowHoverText.Value = "";
+    _pendingRegularFestivals.Value.Clear();
 
     // Collect all festivals for today
     List<(string name, string time)> todayFestivals = new();
@@ -103,7 +111,8 @@ internal class ShowFestivalIcon : IDisposable
       Dictionary<string, string> festivalDates = DataLoader.Festivals_FestivalDates(Game1.temporaryContent);
       string todayKey = $"{Utility.getSeasonKey(Game1.season)}{Game1.dayOfMonth}";
       string name = festivalDates.TryGetValue(todayKey, out string? n) ? n : todayKey;
-      todayFestivals.Add((name, GetRegularFestivalTime(todayKey)));
+      todayFestivals.Add((name, ""));
+      _pendingRegularFestivals.Value.Add((todayKey, true));
     }
 
     foreach ((string id, PassiveFestivalData data) in GetActivePassiveFestivals(Game1.dayOfMonth, Game1.season))
@@ -149,7 +158,8 @@ internal class ShowFestivalIcon : IDisposable
       Dictionary<string, string> festivalDates = DataLoader.Festivals_FestivalDates(Game1.temporaryContent);
       string festivalKey = $"{Utility.getSeasonKey(tomorrowSeason)}{tomorrowDay}";
       string name = festivalDates.TryGetValue(festivalKey, out string? n) ? n : festivalKey;
-      tomorrowFestivals.Add((name, GetRegularFestivalTime(festivalKey)));
+      tomorrowFestivals.Add((name, ""));
+      _pendingRegularFestivals.Value.Add((festivalKey, false));
     }
 
     // Passive festivals — first day only for tomorrow
@@ -168,6 +178,40 @@ internal class ShowFestivalIcon : IDisposable
       _tomorrowHoverText.Value = string.Join(Environment.NewLine,
         tomorrowFestivals.ConvertAll(f => FormatFestivalEntry(I18n.FestivalTomorrow(), f.name, f.time)));
     }
+  }
+
+  /// <summary>
+  ///   Load regular festival times from individual festival data files and append
+  ///   them to the cached hover text. Deferred to avoid content loads during DayStarted
+  ///   which can trigger Content Patcher token re-evaluation and cascading texture
+  ///   invalidations that break mods like CP Animations.
+  /// </summary>
+  private void ResolvePendingFestivalTimes()
+  {
+    List<(string key, bool isToday)> pending = _pendingRegularFestivals.Value;
+    if (pending.Count == 0)
+    {
+      return;
+    }
+
+    foreach ((string festivalKey, bool isToday) in pending)
+    {
+      string time = GetRegularFestivalTime(festivalKey);
+      if (string.IsNullOrEmpty(time))
+      {
+        continue;
+      }
+
+      if (isToday && HasToday)
+      {
+        _todayHoverText.Value += Environment.NewLine + time;
+      }
+      else if (!isToday && HasTomorrow)
+      {
+        _tomorrowHoverText.Value += Environment.NewLine + time;
+      }
+    }
+    pending.Clear();
   }
 
   // Get all active passive festivals for a given day (including mid-festival)
@@ -226,10 +270,31 @@ internal class ShowFestivalIcon : IDisposable
 
   private static string GetRegularFestivalTime(string festivalKey)
   {
-    if (Event.tryToLoadFestivalData(festivalKey, out _, out _, out _, out int startTime, out int endTime))
+    try
     {
-      return string.Format(I18n.FestivalTimeRange(),
-        Game1.getTimeOfDayString(startTime), Game1.getTimeOfDayString(endTime));
+      // Load via Game1.temporaryContent (already used for FestivalDates in this method)
+      // instead of Event.tryToLoadFestivalData which creates a static FestivalReadContentLoader
+      // that persists for the session and may cause side effects with other mods' content patches.
+      string assetName = "Data\\Festivals\\" + festivalKey;
+      Dictionary<string, string> data = Game1.temporaryContent.Load<Dictionary<string, string>>(assetName);
+      if (data.TryGetValue("conditions", out string? conditions))
+      {
+        string[] parts = conditions.Split('/');
+        if (parts.Length >= 2)
+        {
+          string[] times = ArgUtility.SplitBySpace(parts[1]);
+          if (ArgUtility.TryGetInt(times, 0, out int startTime, out _)
+              && ArgUtility.TryGetInt(times, 1, out int endTime, out _))
+          {
+            return string.Format(I18n.FestivalTimeRange(),
+              Game1.getTimeOfDayString(startTime), Game1.getTimeOfDayString(endTime));
+          }
+        }
+      }
+    }
+    catch
+    {
+      // Festival data unavailable
     }
     return "";
   }
@@ -262,6 +327,14 @@ internal class ShowFestivalIcon : IDisposable
   private void OnDayStarted(object? sender, DayStartedEventArgs e)
   {
     CheckForFestival();
+  }
+
+  private void OnUpdateTicked(object? sender, UpdateTickedEventArgs e)
+  {
+    if (_pendingRegularFestivals.Value.Count > 0)
+    {
+      ResolvePendingFestivalTimes();
+    }
   }
 
   private void OnRenderingHud(object? sender, RenderingHudEventArgs e)

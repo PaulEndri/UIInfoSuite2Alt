@@ -30,9 +30,8 @@ internal class LuckOfDay : IDisposable
 
   private const int IconStyleDice = 1;
   private const int IconStyleTvFortune = 2;
-  private const int TvFrameWidth = 42;
-  private const int TvFrameHeight = 28;
-  private const float TvIconScale = 1.5f;
+  private const int TvFrameSize = 20;
+  private const float TvIconScale = Game1.pixelZoom / 2f;
 
   private readonly PerScreen<int> _tvFrame = new(() => 3);
 
@@ -60,7 +59,7 @@ internal class LuckOfDay : IDisposable
     );
     _tvLuckTexture = Texture2D.FromFile(
       Game1.graphics.GraphicsDevice,
-      Path.Combine(helper.DirectoryPath, "assets", "tv_luck.png")
+      Path.Combine(helper.DirectoryPath, "assets", "tv_group.png")
     );
     _icon = new PerScreen<ClickableTextureComponent>(() => CreateIcon());
   }
@@ -158,17 +157,16 @@ internal class LuckOfDay : IDisposable
 
   private void DrawTvIcon()
   {
-    int scaledW = (int)(TvFrameWidth * TvIconScale);
-    int scaledH = (int)(TvFrameHeight * TvIconScale);
+    int scaledSize = (int)(TvFrameSize * TvIconScale);
 
     IconHandler.Handler.EnqueueIcon(
       "Luck",
       (batch, pos) =>
       {
-        var sourceRect = new Rectangle(_tvFrame.Value * TvFrameWidth, 0, TvFrameWidth, TvFrameHeight);
-        var destRect = new Rectangle(pos.X, pos.Y, scaledW, scaledH);
+        var sourceRect = new Rectangle(_tvFrame.Value * TvFrameSize, 0, TvFrameSize, TvFrameSize);
+        var destRect = new Rectangle(pos.X, pos.Y, scaledSize, scaledSize);
 
-        batch.Draw(_tvLuckTexture, destRect, sourceRect, Color.White * 0.9f);
+        batch.Draw(_tvLuckTexture, destRect, sourceRect, Color.White);
 
         // Update icon bounds for hover detection
         ClickableTextureComponent icon = _icon.Value;
@@ -181,8 +179,7 @@ internal class LuckOfDay : IDisposable
         {
           IClickableMenu.drawHoverText(batch, _hoverText.Value, Game1.dialogueFont);
         }
-      },
-      scaledW
+      }
     );
   }
 
@@ -215,65 +212,74 @@ internal class LuckOfDay : IDisposable
     if (e.IsMultipleOf(30)) // half second
     {
       double luck = Game1.player.DailyLuck;
+      double sharedLuck = Game1.player.team.sharedDailyLuck.Value;
 
-      switch (luck)
+      // Shrine extremes use sharedDailyLuck (base value before Special Charm);
+      // all other tiers use DailyLuck (includes Special Charm) with the same
+      // thresholds the TV fortune teller uses: -0.07, -0.02, +0.02, +0.07
+      if (sharedLuck <= -0.12)
       {
-        // Min luck — includes shrine extremes
-        case <= -0.075:
-          _hoverText.Value = I18n.LuckStatus6();
-          _cloverFrame.Value = 0;
-          _diceColor.Value = Luck6Color;
-          _tvFrame.Value = 0;
-          break;
+        // Shrine extreme bad
+        _hoverText.Value = I18n.LuckStatus6();
+        _cloverFrame.Value = 0;
+        _diceColor.Value = Luck6Color;
+        _tvFrame.Value = 0;
+      }
+      else if (luck < -0.07)
+      {
         // Very bad luck
-        case < -0.07:
-          _hoverText.Value = I18n.LuckStatus6();
-          _cloverFrame.Value = 1;
-          _diceColor.Value = Luck6Color;
-          _tvFrame.Value = 1;
-          break;
+        _hoverText.Value = I18n.LuckStatus6();
+        _cloverFrame.Value = 1;
+        _diceColor.Value = Luck6Color;
+        _tvFrame.Value = 1;
+      }
+      else if (luck < -0.02)
+      {
         // Bad luck
-        case < -0.02:
-          _hoverText.Value = I18n.LuckStatus5();
-          _cloverFrame.Value = 2;
-          _diceColor.Value = Luck5Color;
-          _tvFrame.Value = 2;
-          break;
+        _hoverText.Value = I18n.LuckStatus5();
+        _cloverFrame.Value = 2;
+        _diceColor.Value = Luck5Color;
+        _tvFrame.Value = 2;
+      }
+      else if (luck == 0)
+      {
         // Absolutely neutral
-        case 0:
-          _hoverText.Value = I18n.LuckStatus4();
-          _cloverFrame.Value = 3;
-          _diceColor.Value = Luck4Color;
-          _tvFrame.Value = 3;
-          break;
+        _hoverText.Value = I18n.LuckStatus4();
+        _cloverFrame.Value = 3;
+        _diceColor.Value = Luck4Color;
+        _tvFrame.Value = 3;
+      }
+      else if (luck <= 0.02)
+      {
         // Near-neutral (non-zero, between -0.02 and +0.02)
-        case <= 0.02:
-          _hoverText.Value = I18n.LuckStatus3();
-          _cloverFrame.Value = 4;
-          _diceColor.Value = Luck3Color;
-          _tvFrame.Value = 3;
-          break;
+        _hoverText.Value = I18n.LuckStatus3();
+        _cloverFrame.Value = 4;
+        _diceColor.Value = Luck3Color;
+        _tvFrame.Value = 3;
+      }
+      else if (luck <= 0.07)
+      {
         // Good luck
-        case <= 0.07:
-          _hoverText.Value = I18n.LuckStatus2();
-          _cloverFrame.Value = 5;
-          _diceColor.Value = Luck2Color;
-          _tvFrame.Value = 4;
-          break;
+        _hoverText.Value = I18n.LuckStatus2();
+        _cloverFrame.Value = 5;
+        _diceColor.Value = Luck2Color;
+        _tvFrame.Value = 4;
+      }
+      else if (sharedLuck >= 0.12)
+      {
+        // Shrine extreme good
+        _hoverText.Value = I18n.LuckStatus1();
+        _cloverFrame.Value = 7;
+        _diceColor.Value = Luck1Color;
+        _tvFrame.Value = 6;
+      }
+      else
+      {
         // Very good luck
-        case < 0.1:
-          _hoverText.Value = I18n.LuckStatus1();
-          _cloverFrame.Value = 6;
-          _diceColor.Value = Luck1Color;
-          _tvFrame.Value = 5;
-          break;
-        // Max luck — includes shrine extremes
-        default:
-          _hoverText.Value = I18n.LuckStatus1();
-          _cloverFrame.Value = 7;
-          _diceColor.Value = Luck1Color;
-          _tvFrame.Value = 6;
-          break;
+        _hoverText.Value = I18n.LuckStatus1();
+        _cloverFrame.Value = 6;
+        _diceColor.Value = Luck1Color;
+        _tvFrame.Value = 5;
       }
 
       // Rewrite the text, but keep the frame/color
@@ -315,15 +321,14 @@ internal class LuckOfDay : IDisposable
 
     if (IconStyle == IconStyleTvFortune)
     {
-      int tvScaledW = (int)(TvFrameWidth * TvIconScale);
-      int tvScaledH = (int)(TvFrameHeight * TvIconScale);
+      int tvScaledSize = (int)(TvFrameSize * TvIconScale);
       return new ClickableTextureComponent(
         "",
-        new Rectangle(Tools.GetWidthInPlayArea() - 134, 290, tvScaledW, tvScaledH),
+        new Rectangle(Tools.GetWidthInPlayArea() - 134, 290, tvScaledSize, tvScaledSize),
         "",
         "",
         _tvLuckTexture,
-        new Rectangle(_tvFrame.Value * TvFrameWidth, 0, TvFrameWidth, TvFrameHeight),
+        new Rectangle(_tvFrame.Value * TvFrameSize, 0, TvFrameSize, TvFrameSize),
         TvIconScale
       );
     }

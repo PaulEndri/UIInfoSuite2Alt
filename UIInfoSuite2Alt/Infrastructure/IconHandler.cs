@@ -26,8 +26,7 @@ public sealed class IconHandler
     "Bookseller"
   };
 
-  private const int DefaultIconWidth = 40;
-  private const int IconGap = 8;
+  private const int IconGap = 48;
 
   private readonly PerScreen<List<QueuedIcon>> _queuedIcons = new(() => new());
   private readonly PerScreen<List<QueuedIcon>> _sortedCache = new(() => new());
@@ -49,7 +48,7 @@ public sealed class IconHandler
   public bool UseVerticalLayout { get; set; }
 
   /// <summary>Enqueue an icon to draw this frame, sorted by configured order.</summary>
-  public void EnqueueIcon(string iconKey, Action<SpriteBatch, Point> draw, Action<SpriteBatch>? drawHover = null, int iconWidth = 0)
+  public void EnqueueIcon(string iconKey, Action<SpriteBatch, Point> draw, Action<SpriteBatch>? drawHover = null)
   {
     int order = IconOrder.TryGetValue(iconKey, out int o) ? o : 99;
     _queuedIcons.Value.Add(new QueuedIcon
@@ -57,8 +56,7 @@ public sealed class IconHandler
       Draw = draw,
       DrawHover = drawHover,
       SortOrder = order,
-      RegistrationOrder = _queuedIcons.Value.Count,
-      IconWidth = iconWidth
+      RegistrationOrder = _queuedIcons.Value.Count
     });
   }
 
@@ -107,27 +105,13 @@ public sealed class IconHandler
       yPos -= 30;
     }
 
-    // Offset for wide first icon
-    if (!UseVerticalLayout)
-    {
-      int firstWidth = sorted[0].IconWidth > 0 ? sorted[0].IconWidth : DefaultIconWidth;
-      xBase -= Math.Max(0, firstWidth - DefaultIconWidth);
-    }
-
-    // Draw icons with variable-width spacing
-    int xOffset = 0;
+    // Draw icons with fixed spacing
     for (int i = 0; i < sorted.Count; i++)
     {
       Point pos = UseVerticalLayout
         ? new Point(xBase, yPos + 48 * i)
-        : new Point(xBase - xOffset, yPos);
+        : new Point(xBase - IconGap * i, yPos);
       sorted[i].Draw(batch, pos);
-
-      if (!UseVerticalLayout && i + 1 < sorted.Count)
-      {
-        int nextWidth = sorted[i + 1].IconWidth > 0 ? sorted[i + 1].IconWidth : DefaultIconWidth;
-        xOffset += IconGap + nextWidth;
-      }
     }
 
     // Draw hover text on top
@@ -152,6 +136,5 @@ public sealed class IconHandler
     public Action<SpriteBatch>? DrawHover { get; set; }
     public int SortOrder { get; set; }
     public int RegistrationOrder { get; set; }
-    public int IconWidth { get; set; }
   }
 }

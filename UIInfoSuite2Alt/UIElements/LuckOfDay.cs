@@ -68,6 +68,8 @@ internal class LuckOfDay : IDisposable
   public void Dispose()
   {
     ToggleOption(false);
+    _cloverTexture.Dispose();
+    _tvLuckTexture.Dispose();
   }
 
   public void ToggleOption(bool showLuckOfDay)

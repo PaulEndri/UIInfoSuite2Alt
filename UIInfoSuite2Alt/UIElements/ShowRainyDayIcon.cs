@@ -52,6 +52,10 @@ internal class ShowRainyDayIcon : IDisposable
     ToggleOption(false);
     _iconSheet.Dispose();
     _weatherBorderTexture.Dispose();
+    foreach (Texture2D texture in _customWeatherTextureCache.Values)
+    {
+      texture.Dispose();
+    }
     _customWeatherTextureCache.Clear();
   }
 

@@ -27,6 +27,7 @@
 
 - **v2.6.5**
   - Show a small item icon on machines that are currently processing, so you can see at a glance what each machine is working on without hovering (toggleable with F10 keybind)
+  - Show the fish species icon on fish ponds so you can easily see what fish is in each pond
   - Show fish pond tooltip on hover with population, spawn timing, quest countdown, and golden cracker status
 - **v2.6.4**
   - Add TV Fortune icon style for the luck HUD icon

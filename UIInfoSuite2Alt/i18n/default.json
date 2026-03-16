@@ -148,6 +148,7 @@
   "ShowFishPondTooltip": "Show fish pond tooltip",
   "ShowMachineProcessingIcons": "Show processing item on machines",
   "ToggleMachineProcessingIcons": "Toggle machine processing icons",
+  "ShowFishPondIcons": "Show fish species icon on ponds",
   "ShowItemEffectRanges": "Show scarecrow and sprinkler range",
   "ButtonControlShow": "Hold LCtrl to show current item range\nHold LCtrl+LAlt to show all item range",
   "ShowBombRange": "Show the bomb destroying range",

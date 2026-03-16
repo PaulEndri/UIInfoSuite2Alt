@@ -428,6 +428,15 @@ internal class ModOptionsPageHandler : IDisposable
         Set(v => config.ShowMachineProcessingIcons = v)
       )
     );
+    _optionsElements.Add(
+      new ModOptionsCheckbox(
+        _helper.SafeGetString(nameof(config.ShowFishPondIcons)),
+        whichOption++,
+        showMachineProcessingItem.ToggleFishPondOption,
+        () => config.ShowFishPondIcons,
+        Set(v => config.ShowFishPondIcons = v)
+      )
+    );
     var ScarecrowAndSprinklerRangeIcon = new ModOptionsCheckbox(
       I18n.ShowItemEffectRanges(),
       whichOption++,

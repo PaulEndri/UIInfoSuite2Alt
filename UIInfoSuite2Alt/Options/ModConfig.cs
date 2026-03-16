@@ -32,6 +32,7 @@ public class ModConfig
   public bool ShowFishPondTooltip { get; set; } = true;
   public bool ShowMachineProcessingIcons { get; set; } = true;
   public KeybindList ToggleMachineProcessingIcons { get; set; } = KeybindList.ForSingle(SButton.F10);
+  public bool ShowFishPondIcons { get; set; } = true;
   public bool ShowBirthdayIcon { get; set; } = true;
   public bool ShowAnimalsNeedPets { get; set; } = true;
   public bool HideAnimalPetOnMaxFriendship { get; set; } = true;

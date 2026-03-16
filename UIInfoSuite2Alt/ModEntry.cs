@@ -225,6 +225,7 @@ public class ModEntry : Mod
     AddBool(nameof(ModConfig.ShowBarrelTooltip), () => ModConfig.ShowBarrelTooltip, v => ModConfig.ShowBarrelTooltip = v);
     AddBool(nameof(ModConfig.ShowFishPondTooltip), () => ModConfig.ShowFishPondTooltip, v => ModConfig.ShowFishPondTooltip = v);
     AddBool(nameof(ModConfig.ShowMachineProcessingIcons), () => ModConfig.ShowMachineProcessingIcons, v => ModConfig.ShowMachineProcessingIcons = v);
+    AddBool(nameof(ModConfig.ShowFishPondIcons), () => ModConfig.ShowFishPondIcons, v => ModConfig.ShowFishPondIcons = v);
     configMenu.AddBoolOption(
       ModManifest,
       name: () => I18n.ShowItemEffectRanges(),

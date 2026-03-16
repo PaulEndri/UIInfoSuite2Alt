@@ -6,6 +6,7 @@ using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
 using StardewValley;
+using StardewValley.Buildings;
 using StardewValley.ItemTypeDefinitions;
 using Object = StardewValley.Object;
 
@@ -20,9 +21,11 @@ internal class ShowMachineProcessingItem : IDisposable
   };
 
   private readonly PerScreen<List<MachineIconData>> _visibleMachines = new(() => new List<MachineIconData>());
+  private readonly PerScreen<List<FishPondIconData>> _visibleFishPonds = new(() => new List<FishPondIconData>());
 
   private readonly IModHelper _helper;
-  private bool _enabled;
+  private bool _showMachineIcons;
+  private bool _showFishPondIcons;
 
   public ShowMachineProcessingItem(IModHelper helper)
   {
@@ -33,17 +36,28 @@ internal class ShowMachineProcessingItem : IDisposable
   public void Dispose()
   {
     ToggleOption(false);
+    ToggleFishPondOption(false);
     _helper.Events.Input.ButtonsChanged -= OnButtonsChanged;
   }
 
   public void ToggleOption(bool enabled)
   {
-    _enabled = enabled;
+    _showMachineIcons = enabled;
+    UpdateEventSubscriptions();
+  }
 
+  public void ToggleFishPondOption(bool enabled)
+  {
+    _showFishPondIcons = enabled;
+    UpdateEventSubscriptions();
+  }
+
+  private void UpdateEventSubscriptions()
+  {
     _helper.Events.Display.RenderedWorld -= OnRenderedWorld;
     _helper.Events.GameLoop.UpdateTicked -= OnUpdateTicked;
 
-    if (enabled)
+    if (_showMachineIcons || _showFishPondIcons)
     {
       _helper.Events.Display.RenderedWorld += OnRenderedWorld;
       _helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
@@ -59,7 +73,7 @@ internal class ShowMachineProcessingItem : IDisposable
     }
 
     _helper.Input.SuppressActiveKeybinds(keybind);
-    bool newValue = !_enabled;
+    bool newValue = !_showMachineIcons;
     ModEntry.ModConfig.ShowMachineProcessingIcons = newValue;
     ModEntry.SaveConfig();
     ToggleOption(newValue);
@@ -73,7 +87,9 @@ internal class ShowMachineProcessingItem : IDisposable
     }
 
     List<MachineIconData> machines = _visibleMachines.Value;
+    List<FishPondIconData> fishPonds = _visibleFishPonds.Value;
     machines.Clear();
+    fishPonds.Clear();
 
     if (Game1.currentLocation == null ||
         !UIElementUtils.IsRenderingNormally() ||
@@ -88,44 +104,75 @@ internal class ShowMachineProcessingItem : IDisposable
     int endX = (Game1.viewport.X + Game1.viewport.Width) / Game1.tileSize + 1;
     int endY = (Game1.viewport.Y + Game1.viewport.Height) / Game1.tileSize + 1;
 
-    foreach ((Vector2 tile, Object obj) in Game1.currentLocation.Objects.Pairs)
+    if (_showMachineIcons)
     {
-      int tileX = (int)tile.X;
-      int tileY = (int)tile.Y;
+      foreach ((Vector2 tile, Object obj) in Game1.currentLocation.Objects.Pairs)
+      {
+        int tileX = (int)tile.X;
+        int tileY = (int)tile.Y;
 
-      if (tileX < startX || tileX > endX || tileY < startY || tileY > endY)
+        if (tileX < startX || tileX > endX || tileY < startY || tileY > endY)
+        {
+          continue;
+        }
+
+        if (!obj.bigCraftable.Value ||
+            obj.heldObject.Value == null ||
+            obj.readyForHarvest.Value ||
+            obj.MinutesUntilReady <= 0 ||
+            obj.Name == "Heater")
+        {
+          continue;
+        }
+
+        // Prefer the input item (preservedParentSheetIndex) over the output (heldObject).
+        // For Wine/Juice/Jelly/Pickles, this shows the original fruit/vegetable instead of the output.
+        // For machines without a preserved parent (Furnace, etc.), fall back to the output item.
+        Object heldObject = obj.heldObject.Value;
+        string? preservedId = heldObject.preservedParentSheetIndex.Value;
+
+        ParsedItemData? itemData = !string.IsNullOrEmpty(preservedId)
+          ? ItemRegistry.GetData("(O)" + preservedId) ?? ItemRegistry.GetData(preservedId)
+          : ItemRegistry.GetData(heldObject.QualifiedItemId);
+
+        ParsedItemData? machineData = ItemRegistry.GetData(obj.QualifiedItemId);
+        if (itemData == null || machineData == null)
+        {
+          continue;
+        }
+
+        int machineSpriteHeight = machineData.GetSourceRect().Height;
+        CustomOffsets.TryGetValue(obj.Name, out Vector2 offset);
+        machines.Add(new MachineIconData(tile, itemData, machineSpriteHeight, offset));
+      }
+    }
+
+    // Fish ponds: show the fish species icon at the pond center
+    if (_showFishPondIcons)
+    {
+      foreach (Building building in Game1.currentLocation.buildings)
+    {
+      if (building is not FishPond fishPond ||
+          fishPond.fishType.Value == null ||
+          fishPond.currentOccupants.Value <= 0)
       {
         continue;
       }
 
-      if (!obj.bigCraftable.Value ||
-          obj.heldObject.Value == null ||
-          obj.readyForHarvest.Value ||
-          obj.MinutesUntilReady <= 0 ||
-          obj.Name == "Heater")
+      Vector2 centerTile = fishPond.GetCenterTile();
+      if (centerTile.X < startX || centerTile.X > endX || centerTile.Y < startY || centerTile.Y > endY)
       {
         continue;
       }
 
-      // Prefer the input item (preservedParentSheetIndex) over the output (heldObject).
-      // For Wine/Juice/Jelly/Pickles, this shows the original fruit/vegetable instead of the output.
-      // For machines without a preserved parent (Furnace, etc.), fall back to the output item.
-      Object heldObject = obj.heldObject.Value;
-      string? preservedId = heldObject.preservedParentSheetIndex.Value;
-
-      ParsedItemData? itemData = !string.IsNullOrEmpty(preservedId)
-        ? ItemRegistry.GetData("(O)" + preservedId) ?? ItemRegistry.GetData(preservedId)
-        : ItemRegistry.GetData(heldObject.QualifiedItemId);
-
-      ParsedItemData? machineData = ItemRegistry.GetData(obj.QualifiedItemId);
-      if (itemData == null || machineData == null)
+      ParsedItemData? fishData = ItemRegistry.GetData("(O)" + fishPond.fishType.Value);
+      if (fishData == null)
       {
         continue;
       }
 
-      int machineSpriteHeight = machineData.GetSourceRect().Height;
-      CustomOffsets.TryGetValue(obj.Name, out Vector2 offset);
-      machines.Add(new MachineIconData(tile, itemData, machineSpriteHeight, offset));
+      fishPonds.Add(new FishPondIconData(centerTile, fishData));
+      }
     }
   }
 
@@ -137,13 +184,37 @@ internal class ShowMachineProcessingItem : IDisposable
     }
 
     List<MachineIconData> machines = _visibleMachines.Value;
-    if (machines.Count == 0)
+    List<FishPondIconData> fishPonds = _visibleFishPonds.Value;
+    if (machines.Count == 0 && fishPonds.Count == 0)
     {
       return;
     }
 
     SpriteBatch spriteBatch = Game1.spriteBatch;
 
+    // Fish pond icons: draw fish species at pond center
+    foreach (FishPondIconData pond in fishPonds)
+    {
+      Vector2 screenPos = Game1.GlobalToLocal(
+        new Vector2(pond.CenterTile.X * Game1.tileSize, pond.CenterTile.Y * Game1.tileSize)
+      );
+
+      Texture2D texture = pond.FishData.GetTexture();
+      Rectangle sourceRect = pond.FishData.GetSourceRect();
+
+      // Center the icon on the tile
+      float iconSize = sourceRect.Width * Game1.pixelZoom;
+      Vector2 iconPos = new Vector2(
+        screenPos.X + Game1.tileSize / 2f - iconSize / 2f,
+        screenPos.Y + Game1.tileSize / 2f - iconSize / 2f
+      );
+
+      float outlineScale = Game1.pixelZoom + 2f / sourceRect.Width;
+      spriteBatch.Draw(texture, iconPos - new Vector2(1f, 1f), sourceRect, Color.Black * 0.5f, 0f, Vector2.Zero, outlineScale, SpriteEffects.None, 1f);
+      spriteBatch.Draw(texture, iconPos, sourceRect, Color.White * 0.9f, 0f, Vector2.Zero, Game1.pixelZoom, SpriteEffects.None, 1f);
+    }
+
+    // Machine icons: draw processing item on each machine
     foreach (MachineIconData machine in machines)
     {
       Vector2 screenPos = Game1.GlobalToLocal(
@@ -171,4 +242,5 @@ internal class ShowMachineProcessingItem : IDisposable
   }
 
   private readonly record struct MachineIconData(Vector2 Tile, ParsedItemData ItemData, int MachineSpriteHeight, Vector2 Offset);
+  private readonly record struct FishPondIconData(Vector2 CenterTile, ParsedItemData FishData);
 }

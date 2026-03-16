@@ -40,12 +40,12 @@ internal class ShowMachineProcessingItem : IDisposable
   {
     _enabled = enabled;
 
-    _helper.Events.Display.RenderingHud -= OnRenderingHud;
+    _helper.Events.Display.RenderedWorld -= OnRenderedWorld;
     _helper.Events.GameLoop.UpdateTicked -= OnUpdateTicked;
 
     if (enabled)
     {
-      _helper.Events.Display.RenderingHud += OnRenderingHud;
+      _helper.Events.Display.RenderedWorld += OnRenderedWorld;
       _helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
     }
   }
@@ -129,7 +129,7 @@ internal class ShowMachineProcessingItem : IDisposable
     }
   }
 
-  private void OnRenderingHud(object? sender, RenderingHudEventArgs e)
+  private void OnRenderedWorld(object? sender, RenderedWorldEventArgs e)
   {
     if (!UIElementUtils.IsRenderingNormally() || Game1.activeClickableMenu != null)
     {
@@ -155,8 +155,9 @@ internal class ShowMachineProcessingItem : IDisposable
       int spriteHeight = machine.MachineSpriteHeight * Game1.pixelZoom;
       float machineCenterX = screenPos.X + Game1.tileSize / 2f;
       float machineCenterY = screenPos.Y + Game1.tileSize - spriteHeight / 2f;
-      Vector2 iconPos = Utility.ModifyCoordinatesForUIScale(
-        new Vector2(machineCenterX - 16f + machine.Offset.X, machineCenterY - 16f + machine.Offset.Y)
+      Vector2 iconPos = new Vector2(
+        machineCenterX - 16f + machine.Offset.X,
+        machineCenterY - 16f + machine.Offset.Y
       );
 
       spriteBatch.Draw(
@@ -166,7 +167,7 @@ internal class ShowMachineProcessingItem : IDisposable
         Color.White * 0.9f,
         0f,
         Vector2.Zero,
-        Utility.ModifyCoordinateForUIScale(2f),
+        2f,
         SpriteEffects.None,
         1f
       );

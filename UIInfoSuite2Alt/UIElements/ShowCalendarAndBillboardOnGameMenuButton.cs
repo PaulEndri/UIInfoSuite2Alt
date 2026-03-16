@@ -48,6 +48,9 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
   private readonly bool _hasRidgesideVillage;
   private readonly bool _hasSunberryVillage;
   private readonly bool _hasEscasModdingPlugins;
+  private readonly bool _hasBiggerBackpack;
+  private readonly bool _hasFullInventoryView;
+  private readonly bool _hasCpCatValley;
 
   private readonly PerScreen<Item?> _hoverItem = new();
   private readonly PerScreen<Item?> _heldItem = new();
@@ -76,6 +79,9 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
     _hasRidgesideVillage = helper.ModRegistry.IsLoaded(ModCompat.RidgesideVillage);
     _hasSunberryVillage = helper.ModRegistry.IsLoaded(ModCompat.SunberryVillage);
     _hasEscasModdingPlugins = helper.ModRegistry.IsLoaded(ModCompat.EscasModdingPlugins);
+    _hasBiggerBackpack = helper.ModRegistry.IsLoaded("spacechase0.BiggerBackpack");
+    _hasFullInventoryView = helper.ModRegistry.IsLoaded("CpdnCristiano.FullInventoryView");
+    _hasCpCatValley = helper.ModRegistry.IsLoaded("RimeNovi.CatValley");
   }
 
   public void Dispose()
@@ -166,18 +172,15 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
     if (menu == null) return;
 
     // Mod compatibility offsets
-    bool biggerBackpack = _helper.ModRegistry.IsLoaded("spacechase0.BiggerBackpack");
-    bool fullInventoryView = _helper.ModRegistry.IsLoaded("CpdnCristiano.FullInventoryView");
-    bool cpCatValley = _helper.ModRegistry.IsLoaded("RimeNovi.CatValley");
     int offset = 294;
 
-    if (biggerBackpack)
+    if (_hasBiggerBackpack)
       offset -= 64;
 
-    if (fullInventoryView)
+    if (_hasFullInventoryView)
       offset -= 64;
 
-    if (cpCatValley)
+    if (_hasCpCatValley)
       offset -= 8;
 
     int baseX = menu.xPositionOnScreen + menu.width - 120;

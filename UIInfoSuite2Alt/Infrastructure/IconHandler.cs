@@ -30,6 +30,8 @@ public sealed class IconHandler
   private const int IconGap = 8;
 
   private readonly PerScreen<List<QueuedIcon>> _queuedIcons = new(() => new());
+  private readonly PerScreen<List<QueuedIcon>> _sortedCache = new(() => new());
+  private readonly PerScreen<int> _lastSortedCount = new(() => -1);
 
   private IconHandler() { }
 
@@ -76,8 +78,14 @@ public sealed class IconHandler
       return;
     }
 
-    // Stable sort: config order, then registration order
-    var sorted = icons.OrderBy(i => i.SortOrder).ThenBy(i => i.RegistrationOrder).ToList();
+    // Stable sort: config order, then registration order (cached to avoid per-frame allocation)
+    List<QueuedIcon> sorted = _sortedCache.Value;
+    if (_lastSortedCount.Value != icons.Count)
+    {
+      sorted.Clear();
+      sorted.AddRange(icons.OrderBy(i => i.SortOrder).ThenBy(i => i.RegistrationOrder));
+      _lastSortedCount.Value = icons.Count;
+    }
 
     int yPos = Game1.options.zoomButtons ? 290 : 260;
     int xBase = Tools.GetWidthInPlayArea() - 70;
@@ -129,11 +137,13 @@ public sealed class IconHandler
     }
 
     icons.Clear();
+    _lastSortedCount.Value = -1;
   }
 
   public void Reset(object? sender, EventArgs e)
   {
     _queuedIcons.Value.Clear();
+    _lastSortedCount.Value = -1;
   }
 
   private class QueuedIcon

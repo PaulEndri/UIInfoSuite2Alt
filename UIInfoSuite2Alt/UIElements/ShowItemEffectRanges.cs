@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
@@ -20,8 +19,6 @@ internal class ShowItemEffectRanges : IDisposable
   private readonly PerScreen<List<Point>> _effectiveAreaCurrent = new(() => new List<Point>());
   private readonly PerScreen<HashSet<Point>> _effectiveAreaOther = new(() => new HashSet<Point>());
   private readonly PerScreen<HashSet<Point>> _effectiveAreaIntersection = new(() => new HashSet<Point>());
-
-  private readonly Mutex _mutex = new();
 
   private readonly IModHelper _helper;
 
@@ -99,19 +96,9 @@ internal class ShowItemEffectRanges : IDisposable
       return;
     }
 
-    if (_mutex.WaitOne(100))
-    {
-      try
-      {
-        _effectiveAreaCurrent.Value.Clear();
-        _effectiveAreaOther.Value.Clear();
-        _effectiveAreaIntersection.Value.Clear();
-      }
-      finally
-      {
-        _mutex.ReleaseMutex();
-      }
-    }
+    _effectiveAreaCurrent.Value.Clear();
+    _effectiveAreaOther.Value.Clear();
+    _effectiveAreaIntersection.Value.Clear();
 
     if (Game1.activeClickableMenu == null && UIElementUtils.IsRenderingNormally())
     {
@@ -131,52 +118,42 @@ internal class ShowItemEffectRanges : IDisposable
 
   private void OnRenderingHud(object? sender, RenderingHudEventArgs e)
   {
-    if (_mutex.WaitOne(0))
+    foreach (Point point in _effectiveAreaOther.Value)
     {
-      try
-      {
-        foreach (Point point in _effectiveAreaOther.Value)
-        {
-          var position = new Vector2(
-            point.X * Utility.ModifyCoordinateFromUIScale(Game1.tileSize),
-            point.Y * Utility.ModifyCoordinateFromUIScale(Game1.tileSize)
-          );
-          e.SpriteBatch.Draw(
-            Game1.mouseCursors,
-            Utility.ModifyCoordinatesForUIScale(Game1.GlobalToLocal(Utility.ModifyCoordinatesForUIScale(position))),
-            new Rectangle(194, 388, 16, 16),
-            Color.White * 0.7f,
-            0.0f,
-            Vector2.Zero,
-            Utility.ModifyCoordinateForUIScale(Game1.pixelZoom),
-            SpriteEffects.None,
-            0.01f
-          );
-        }
+      var position = new Vector2(
+        point.X * Utility.ModifyCoordinateFromUIScale(Game1.tileSize),
+        point.Y * Utility.ModifyCoordinateFromUIScale(Game1.tileSize)
+      );
+      e.SpriteBatch.Draw(
+        Game1.mouseCursors,
+        Utility.ModifyCoordinatesForUIScale(Game1.GlobalToLocal(Utility.ModifyCoordinatesForUIScale(position))),
+        new Rectangle(194, 388, 16, 16),
+        Color.White * 0.7f,
+        0.0f,
+        Vector2.Zero,
+        Utility.ModifyCoordinateForUIScale(Game1.pixelZoom),
+        SpriteEffects.None,
+        0.01f
+      );
+    }
 
-        foreach (Point point in _effectiveAreaIntersection.Value)
-        {
-          var position = new Vector2(
-            point.X * Utility.ModifyCoordinateFromUIScale(Game1.tileSize),
-            point.Y * Utility.ModifyCoordinateFromUIScale(Game1.tileSize)
-          );
-          e.SpriteBatch.Draw(
-            Game1.mouseCursors,
-            Utility.ModifyCoordinatesForUIScale(Game1.GlobalToLocal(Utility.ModifyCoordinatesForUIScale(position))),
-            new Rectangle(194, 388, 16, 16),
-            Color.Red * 0.7f,
-            0.0f,
-            Vector2.Zero,
-            Utility.ModifyCoordinateForUIScale(Game1.pixelZoom),
-            SpriteEffects.None,
-            0.01f
-          );
-        }
-      }
-      finally
-      {
-        _mutex.ReleaseMutex();
-      }
+    foreach (Point point in _effectiveAreaIntersection.Value)
+    {
+      var position = new Vector2(
+        point.X * Utility.ModifyCoordinateFromUIScale(Game1.tileSize),
+        point.Y * Utility.ModifyCoordinateFromUIScale(Game1.tileSize)
+      );
+      e.SpriteBatch.Draw(
+        Game1.mouseCursors,
+        Utility.ModifyCoordinatesForUIScale(Game1.GlobalToLocal(Utility.ModifyCoordinatesForUIScale(position))),
+        new Rectangle(194, 388, 16, 16),
+        Color.Red * 0.7f,
+        0.0f,
+        Vector2.Zero,
+        Utility.ModifyCoordinateForUIScale(Game1.pixelZoom),
+        SpriteEffects.None,
+        0.01f
+      );
     }
   }
 
@@ -407,28 +384,18 @@ internal class ShowItemEffectRanges : IDisposable
 
   private void AddTilesToHighlightedArea(IEnumerable<Vector2> tiles, bool overlap, int xPos = 0, int yPos = 0)
   {
-    if (_mutex.WaitOne(100))
+    foreach (Vector2 tile in tiles)
     {
-      try
+      var point = tile.ToPoint();
+      point.X += xPos;
+      point.Y += yPos;
+      if (overlap)
       {
-        foreach (Vector2 tile in tiles)
-        {
-          var point = tile.ToPoint();
-          point.X += xPos;
-          point.Y += yPos;
-          if (overlap)
-          {
-            _effectiveAreaCurrent.Value.Add(point);
-          }
-          else
-          {
-            _effectiveAreaOther.Value.Add(point);
-          }
-        }
+        _effectiveAreaCurrent.Value.Add(point);
       }
-      finally
+      else
       {
-        _mutex.ReleaseMutex();
+        _effectiveAreaOther.Value.Add(point);
       }
     }
   }
@@ -437,32 +404,22 @@ internal class ShowItemEffectRanges : IDisposable
   {
     int xOffset = tileMap.Length / 2;
 
-    if (_mutex.WaitOne(100))
+    for (var i = 0; i < tileMap.Length; ++i)
     {
-      try
+      int yOffset = tileMap[i].Length / 2;
+      for (var j = 0; j < tileMap[i].Length; ++j)
       {
-        for (var i = 0; i < tileMap.Length; ++i)
+        if (tileMap[i][j] == 1)
         {
-          int yOffset = tileMap[i].Length / 2;
-          for (var j = 0; j < tileMap[i].Length; ++j)
+          if (overlap)
           {
-            if (tileMap[i][j] == 1)
-            {
-              if (overlap)
-              {
-                _effectiveAreaCurrent.Value.Add(new Point(xPos + i - xOffset, yPos + j - yOffset));
-              }
-              else
-              {
-                _effectiveAreaOther.Value.Add(new Point(xPos + i - xOffset, yPos + j - yOffset));
-              }
-            }
+            _effectiveAreaCurrent.Value.Add(new Point(xPos + i - xOffset, yPos + j - yOffset));
+          }
+          else
+          {
+            _effectiveAreaOther.Value.Add(new Point(xPos + i - xOffset, yPos + j - yOffset));
           }
         }
-      }
-      finally
-      {
-        _mutex.ReleaseMutex();
       }
     }
   }
@@ -473,12 +430,11 @@ internal class ShowItemEffectRanges : IDisposable
 
     if (!string.IsNullOrEmpty(nameContains))
     {
-      nameContains = nameContains.ToLower();
       OverlaidDictionary? objects = Game1.currentLocation.Objects;
 
       foreach (Object? nextThing in objects.Values)
       {
-        if (nextThing.name.ToLower().Contains(nameContains))
+        if (nextThing.name.Contains(nameContains, StringComparison.OrdinalIgnoreCase))
         {
           result.Add(nextThing);
         }

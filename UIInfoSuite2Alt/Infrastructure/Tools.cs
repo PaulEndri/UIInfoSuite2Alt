@@ -23,9 +23,9 @@ public static class Tools
     {
       int right = Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Right;
       int totalWidth = Game1.currentLocation.map.Layers[0].LayerWidth * Game1.tileSize;
-      int someOtherWidth = Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Right - totalWidth;
+      int viewportPadding = Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Right - totalWidth;
 
-      return right - someOtherWidth / 2;
+      return right - viewportPadding / 2;
     }
 
     return Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Right;
@@ -141,7 +141,7 @@ public static class Tools
       return;
     }
 
-    var emptyColor = new Color(0, 0, 0, 0);
+    var emptyColor = Color.Transparent;
     var srcIdx = 0;
     for (var yOffset = 0; yOffset < destBounds.Height; yOffset++)
     {
@@ -193,7 +193,7 @@ public static class Tools
       );
     }
 
-    var emptyColor = new Color(0, 0, 0, 0);
+    var emptyColor = Color.Transparent;
     var sourceData = new Color[sourceRectangle.Width * sourceRectangle.Height];
     sourceTexture.GetData(0, sourceRectangle, sourceData, 0, sourceData.Length);
 

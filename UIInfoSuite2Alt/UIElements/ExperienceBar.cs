@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewModdingAPI.Enums;
@@ -14,7 +15,7 @@ using UIInfoSuite2Alt.UIElements.ExperienceElements;
 
 namespace UIInfoSuite2Alt.UIElements;
 
-public partial class ExperienceBar
+public partial class ExperienceBar : IDisposable
 {
   #region Properties
   private readonly PerScreen<Item> _previousItem = new();
@@ -147,6 +148,10 @@ public partial class ExperienceBar
   public void ToggleLevelUpAnimation(bool levelUpAnimationEnabled)
   {
     ToggleOption(ExperienceBarEnabled, ExperienceBarFadeoutEnabled, ExperienceGainTextEnabled, levelUpAnimationEnabled);
+  }
+  public void Dispose()
+  {
+    ToggleOption(false, false, false, false);
   }
   #endregion Lifecycle
 

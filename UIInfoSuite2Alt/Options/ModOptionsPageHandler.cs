@@ -126,7 +126,8 @@ internal class ModOptionsPageHandler : IDisposable
       showQuestCount,
       showBuffTimers,
       showFestivalIcon,
-      showFishOnCatch
+      showFishOnCatch,
+      experienceBar
     };
 
     var whichOption = 1;

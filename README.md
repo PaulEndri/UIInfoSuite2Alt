@@ -25,13 +25,13 @@
 
 ❤️ Big **THANK YOU** to All Translators that make this mod available in so many different languages! ❤️
 
-- ![cn](https://www.nexusmods.com/assets/images/flags/cn.gif) [Mandarin](https://www.nexusmods.com/stardewvalley/mods/43147) - passersby10086
-- ![pt](https://www.nexusmods.com/assets/images/flags/pt.gif) [Portuguese](https://www.nexusmods.com/stardewvalley/mods/43172) ([#1](https://www.nexusmods.com/stardewvalley/mods/43172), [#2](https://www.nexusmods.com/stardewvalley/mods/43142)) - Maatsuki, Necromante96Official
-- ![ru](https://www.nexusmods.com/assets/images/flags/ru.gif) [Russian](https://www.nexusmods.com/stardewvalley/mods/43168) - ReyRoyce
-- ![vn](https://upload.wikimedia.org/wikipedia/commons/f/f1/Icons-flag-vn.png) [Vietnamese](https://www.nexusmods.com/stardewvalley/mods/43168) - toiviethoamodkoaichoi
-- ![jp](https://www.nexusmods.com/assets/images/flags/jp.gif) [Japanese](https://www.nexusmods.com/stardewvalley/mods/43335) - tchuks
-- ![tr](https://www.nexusmods.com/assets/images/flags/tr.gif) [Turkish](https://www.nexusmods.com/stardewvalley/mods/43359) - Bortakbosna
-- ![kr](https://www.nexusmods.com/assets/images/flags/kr.gif) [Korean](https://www.nexusmods.com/stardewvalley/mods/43452) - jjongleee
+- [Mandarin](https://www.nexusmods.com/stardewvalley/mods/43147) - passersby10086
+- [Portuguese](https://www.nexusmods.com/stardewvalley/mods/43172) ([#1](https://www.nexusmods.com/stardewvalley/mods/43172), [#2](https://www.nexusmods.com/stardewvalley/mods/43142)) - Maatsuki, Necromante96Official
+- [Russian](https://www.nexusmods.com/stardewvalley/mods/43168) - ReyRoyce
+- [Vietnamese](https://www.nexusmods.com/stardewvalley/mods/43168) - toiviethoamodkoaichoi
+- [Japanese](https://www.nexusmods.com/stardewvalley/mods/43335) - tchuks
+- [Turkish](https://www.nexusmods.com/stardewvalley/mods/43359) - Bortakbosna
+- [Korean](https://www.nexusmods.com/stardewvalley/mods/43452) - jjongleee
 
 ![New features](.github/assets/patch-notes.png)
 

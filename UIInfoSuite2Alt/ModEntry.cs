@@ -274,24 +274,23 @@ public class ModEntry : Mod
     foreach (string key in IconHandler.IconKeys)
     {
       string capturedKey = key;
-      string label = key switch
-      {
-        "Luck" => I18n.IconOrder_Luck(),
-        "Weather" => I18n.IconOrder_Weather(),
-        "Birthday" => I18n.IconOrder_Birthday(),
-        "Festival" => I18n.IconOrder_Festival(),
-        "QueenOfSauce" => I18n.IconOrder_QueenOfSauce(),
-        "ToolUpgrade" => I18n.IconOrder_ToolUpgrade(),
-        "RobinBuilding" => I18n.IconOrder_RobinBuilding(),
-        "SeasonalBerry" => I18n.IconOrder_SeasonalBerry(),
-        "TravelingMerchant" => I18n.IconOrder_TravelingMerchant(),
-        "Bookseller" => I18n.IconOrder_Bookseller(),
-        _ => key
-      };
 
       configMenu.AddNumberOption(
         ModManifest,
-        name: () => label,
+        name: () => capturedKey switch
+        {
+          "Luck" => I18n.IconOrder_Luck(),
+          "Weather" => I18n.IconOrder_Weather(),
+          "Birthday" => I18n.IconOrder_Birthday(),
+          "Festival" => I18n.IconOrder_Festival(),
+          "QueenOfSauce" => I18n.IconOrder_QueenOfSauce(),
+          "ToolUpgrade" => I18n.IconOrder_ToolUpgrade(),
+          "RobinBuilding" => I18n.IconOrder_RobinBuilding(),
+          "SeasonalBerry" => I18n.IconOrder_SeasonalBerry(),
+          "TravelingMerchant" => I18n.IconOrder_TravelingMerchant(),
+          "Bookseller" => I18n.IconOrder_Bookseller(),
+          _ => capturedKey
+        },
         getValue: () => ModConfig.IconOrder.TryGetValue(capturedKey, out int v) ? v : 99,
         setValue: v => ModConfig.IconOrder[capturedKey] = v,
         min: 1,

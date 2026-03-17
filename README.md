@@ -26,7 +26,9 @@
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
 - **v2.6.7**
-  - Fix tooltip for bushes in green houses
+  - Machine icons now have a mode selector (Off, Toggle, Hold) with hold-to-show keybind support
+  - Fix tooltip text for bushes in green houses to ignore season checks
+  - Fix experience bar settings not being applied after game launch
 - **v2.6.6**
   - Hotfix for custom weather icons using Cloudy Skies framework
 - **v2.6.5**

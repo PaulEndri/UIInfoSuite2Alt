@@ -420,13 +420,19 @@ internal class ModOptionsPageHandler : IDisposable
         Set(v => config.ShowFishPondTooltip = v)
       )
     );
+    showMachineProcessingItem.SetMode(config.MachineProcessingIconsMode);
     _optionsElements.Add(
-      new ModOptionsCheckbox(
-        _helper.SafeGetString(nameof(config.ShowMachineProcessingIcons)),
+      new ModOptionsDropdown(
+        _helper.SafeGetString(nameof(config.MachineProcessingIconsMode)),
         whichOption++,
-        showMachineProcessingItem.ToggleOption,
-        () => config.ShowMachineProcessingIcons,
-        Set(v => config.ShowMachineProcessingIcons = v)
+        new List<string>
+        {
+          I18n.MachineProcessingMode_Off(),
+          I18n.MachineProcessingMode_Toggle(),
+          I18n.MachineProcessingMode_Hold()
+        },
+        () => config.MachineProcessingIconsMode,
+        v => { config.MachineProcessingIconsMode = v; saveConfig(); showMachineProcessingItem.SetMode(v); }
       )
     );
     _optionsElements.Add(

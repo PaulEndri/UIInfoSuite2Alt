@@ -26,11 +26,14 @@ internal class ShowMachineProcessingItem : IDisposable
   private readonly IModHelper _helper;
   private bool _showMachineIcons;
   private bool _showFishPondIcons;
+  private bool _toggleState;
 
   public ShowMachineProcessingItem(IModHelper helper)
   {
     _helper = helper;
+    _toggleState = ModEntry.ModConfig.MachineProcessingIconsVisible;
     _helper.Events.Input.ButtonsChanged += OnButtonsChanged;
+    _helper.Events.GameLoop.Saving += OnSaving;
   }
 
   public void Dispose()
@@ -38,6 +41,18 @@ internal class ShowMachineProcessingItem : IDisposable
     ToggleOption(false);
     ToggleFishPondOption(false);
     _helper.Events.Input.ButtonsChanged -= OnButtonsChanged;
+    _helper.Events.GameLoop.Saving -= OnSaving;
+  }
+
+  public void SetMode(int mode)
+  {
+    _showMachineIcons = mode switch
+    {
+      1 => _toggleState,
+      2 => true,
+      _ => false
+    };
+    UpdateEventSubscriptions();
   }
 
   public void ToggleOption(bool enabled)
@@ -72,11 +87,21 @@ internal class ShowMachineProcessingItem : IDisposable
       return;
     }
 
+    // Keybind only works in Toggle mode (temporary hide/show)
+    if (ModEntry.ModConfig.MachineProcessingIconsMode != 1)
+    {
+      return;
+    }
+
     _helper.Input.SuppressActiveKeybinds(keybind);
-    bool newValue = !_showMachineIcons;
-    ModEntry.ModConfig.ShowMachineProcessingIcons = newValue;
+    _toggleState = !_toggleState;
+    ToggleOption(_toggleState);
+  }
+
+  private void OnSaving(object? sender, SavingEventArgs e)
+  {
+    ModEntry.ModConfig.MachineProcessingIconsVisible = _toggleState;
     ModEntry.SaveConfig();
-    ToggleOption(newValue);
   }
 
   private void OnUpdateTicked(object? sender, UpdateTickedEventArgs e)
@@ -91,6 +116,11 @@ internal class ShowMachineProcessingItem : IDisposable
     machines.Clear();
     fishPonds.Clear();
 
+    // Hold mode: show only while keybind is held; Toggle mode: use current toggle state
+    bool showMachines = ModEntry.ModConfig.MachineProcessingIconsMode == 2
+      ? ModEntry.ModConfig.ToggleMachineProcessingIcons.IsDown()
+      : _showMachineIcons;
+
     if (Game1.currentLocation == null ||
         !UIElementUtils.IsRenderingNormally() ||
         Game1.activeClickableMenu != null)
@@ -104,7 +134,7 @@ internal class ShowMachineProcessingItem : IDisposable
     int endX = (Game1.viewport.X + Game1.viewport.Width) / Game1.tileSize + 1;
     int endY = (Game1.viewport.Y + Game1.viewport.Height) / Game1.tileSize + 1;
 
-    if (_showMachineIcons)
+    if (showMachines)
     {
       foreach ((Vector2 tile, Object obj) in Game1.currentLocation.Objects.Pairs)
       {

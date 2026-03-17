@@ -645,9 +645,9 @@ internal class ShowTileTooltips : IDisposable
         Crop crop = hoeDirt.crop;
         var daysLeft = 0;
 
-        if (hoeDirt.crop.fullyGrown.Value && hoeDirt.crop.dayOfCurrentPhase.Value > 0)
+        if (hoeDirt.crop.fullyGrown.Value)
         {
-          daysLeft = hoeDirt.crop.dayOfCurrentPhase.Value;
+          daysLeft = Math.Max(0, hoeDirt.crop.dayOfCurrentPhase.Value);
         }
         else
         {

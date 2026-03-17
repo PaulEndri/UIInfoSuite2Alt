@@ -152,3 +152,11 @@ All mods listed here are **optional** and not required for UI Info Suite 2 Alter
 - [Ferngill Simple Economy](https://www.nexusmods.com/stardewvalley/mods/21414)
 - [Stardew Aquarium](https://www.nexusmods.com/stardewvalley/mods/6372)
 - [The Love of Cooking](https://www.nexusmods.com/stardewvalley/mods/6830)
+
+<p align="center">
+  <a href="https://ko-fi.com/dazuki89" target="_BLANK">
+    <img src=".github/assets/kofi-icon.png" alt="Donate a Ko-fi!">
+  </a>
+  <br />
+  If you like what i do, consider a donation for a cup of coffe ☕☺️
+</p>

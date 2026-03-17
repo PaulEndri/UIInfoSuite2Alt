@@ -759,7 +759,7 @@ internal class ShowTileTooltips : IDisposable
       }
 
       var ageToMature = 20;
-      bool willProduceThisSeason = Game1.season != Season.Winter;
+      bool willProduceThisSeason = Game1.season != Season.Winter || bush.IsSheltered();
       string bushName = ItemRegistry.GetData("(O)251").DisplayName;
       bool inProductionPeriod = Game1.dayOfMonth >= 22;
       int daysUntilProductionPeriod = inProductionPeriod ? 0 : 22 - Game1.dayOfMonth;
@@ -779,7 +779,7 @@ internal class ShowTileTooltips : IDisposable
         if (customBushApi.TryGetCustomBush(bush, out ICustomBush? customBushData, out string? id))
         {
           droppedItems.Clear();
-          willProduceThisSeason = customBushData.Seasons.Contains(Game1.season);
+          willProduceThisSeason = customBushData.Seasons.Contains(Game1.season) || bush.IsSheltered();
           string displayName = customBushData.DisplayName;
           if (displayName.Contains("LocalizedText"))
           {

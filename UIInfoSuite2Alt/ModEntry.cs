@@ -176,14 +176,19 @@ public class ModEntry : Mod
     AddBool(nameof(ModConfig.ShowLuckIcon), () => ModConfig.ShowLuckIcon, v => ModConfig.ShowLuckIcon = v);
 
     string[] luckIconStyles = { "0", "1", "2" };
-    string[] luckIconLabels = { I18n.LuckIconStyle_Clover(), I18n.LuckIconStyle_Dice(), I18n.LuckIconStyle_TvFortune() };
     configMenu.AddTextOption(
       ModManifest,
       name: () => "- " + Helper.SafeGetString(nameof(ModConfig.LuckIconStyle)),
       getValue: () => ModConfig.LuckIconStyle.ToString(),
       setValue: v => ModConfig.LuckIconStyle = int.Parse(v),
       allowedValues: luckIconStyles,
-      formatAllowedValue: v => luckIconLabels[int.Parse(v)]
+      formatAllowedValue: v => int.Parse(v) switch
+      {
+        0 => I18n.LuckIconStyle_Clover(),
+        1 => I18n.LuckIconStyle_Dice(),
+        2 => I18n.LuckIconStyle_TvFortune(),
+        _ => v
+      }
     );
     AddSubBool(nameof(ModConfig.ShowExactValue), () => ModConfig.ShowExactValue, v => ModConfig.ShowExactValue = v);
     AddSubBool(nameof(ModConfig.RequireTvForLuck), () => ModConfig.RequireTvForLuck, v => ModConfig.RequireTvForLuck = v);

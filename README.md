@@ -25,6 +25,8 @@
 
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
+- **v2.6.6**
+  - Hotfix for custom weather icons using Cloudy Skies framework
 - **v2.6.5**
   - Show a small item icon on machines that are currently processing, so you can see at a glance what each machine is working on without hovering (toggleable with F10 keybind)
   - Show the fish species icon on fish ponds so you can easily see what fish is in each pond

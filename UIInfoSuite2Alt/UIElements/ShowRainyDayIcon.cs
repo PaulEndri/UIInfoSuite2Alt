@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.Xna.Framework;
@@ -33,7 +32,6 @@ internal class ShowRainyDayIcon : IDisposable
   private const int WeatherSheetWidth = 15 * 4 + 18 * 3;
   private const int WeatherSheetHeight = 18;
 
-  private readonly Dictionary<string, Texture2D> _customWeatherTextureCache = new();
   private Texture2D _weatherBorderTexture = null!;
 
   private bool _requireTv;
@@ -52,11 +50,6 @@ internal class ShowRainyDayIcon : IDisposable
     ToggleOption(false);
     _iconSheet.Dispose();
     _weatherBorderTexture.Dispose();
-    foreach (Texture2D texture in _customWeatherTextureCache.Values)
-    {
-      texture.Dispose();
-    }
-    _customWeatherTextureCache.Clear();
   }
 
   public void ToggleRequireTvOption(bool requireTv)
@@ -320,22 +313,19 @@ internal class ShowRainyDayIcon : IDisposable
       return;
     }
 
-    if (!_customWeatherTextureCache.TryGetValue(data.IconTexture, out Texture2D? texture))
+    Texture2D? texture;
+    try
     {
-      try
-      {
-        texture = _helper.GameContent.Load<Texture2D>(data.IconTexture);
-        _customWeatherTextureCache[data.IconTexture] = texture;
-      }
-      catch (Exception ex)
-      {
-        ModEntry.MonitorObject.Log(
-          $"Failed to load weather icon texture '{data.IconTexture}' for weather '{weatherId}': {ex.Message}",
-          LogLevel.Warn
-        );
-        weather.IsRainyTomorrow = false;
-        return;
-      }
+      texture = _helper.GameContent.Load<Texture2D>(data.IconTexture);
+    }
+    catch (Exception ex)
+    {
+      ModEntry.MonitorObject.Log(
+        $"Failed to load weather icon texture '{data.IconTexture}' for weather '{weatherId}': {ex.Message}",
+        LogLevel.Warn
+      );
+      weather.IsRainyTomorrow = false;
+      return;
     }
 
     weather.IsRainyTomorrow = true;

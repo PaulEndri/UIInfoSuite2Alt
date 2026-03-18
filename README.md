@@ -41,7 +41,7 @@
   - Changed the "Show crop and tree times" option into two new separate options:
     - "Show crop tooltip"
     - "Show tree tooltip"
-  - Fix old upstream bug for regrowable crop tooltip showing incorrect days remaining when the crop was ready to harvest but left unpicked for more than 1 day
+  - Fix old upstream bug for regrowable crop tooltip showing incorrect days remaining when the crop was ready to harvest but left unpicked
   - Add machine options dropdown to GMCM
 - **v2.6.8**
   - Fix translations not being applied to Icon Orders & Icon Style Dropdown text

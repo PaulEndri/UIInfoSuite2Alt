@@ -28,6 +28,7 @@ public class ModConfig
   public bool ShowBookseller { get; set; } = true;
   public bool ShowRainyDay { get; set; } = true;
   public bool ShowCropTooltip { get; set; } = true;
+  public bool ShowTreeTooltip { get; set; } = true;
   public bool ShowBarrelTooltip { get; set; } = true;
   public bool ShowFishPondTooltip { get; set; } = true;
   public int MachineProcessingIconsMode { get; set; } = 1;

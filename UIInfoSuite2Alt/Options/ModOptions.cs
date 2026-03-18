@@ -16,6 +16,7 @@ internal record ModOptions
   public bool ShowBookseller { get; set; } = true;
   public bool ShowRainyDay { get; set; } = true;
   public bool ShowCropTooltip { get; set; } = true;
+  public bool ShowTreeTooltip { get; set; } = true;
   public bool ShowBarrelTooltip { get; set; } = true;
   public bool ShowBirthdayIcon { get; set; } = true;
   public bool ShowAnimalsNeedPets { get; set; } = true;

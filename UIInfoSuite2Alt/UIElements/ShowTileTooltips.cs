@@ -74,9 +74,14 @@ internal class ShowTileTooltips : IDisposable
     DetailRenderers.MachineTime
   };
 
-  private static readonly List<Func<TerrainFeature?, List<HoverLine>, bool>> TerrainDetailRenderers = new()
+  private static readonly List<Func<TerrainFeature?, List<HoverLine>, bool>> CropDetailRenderers = new()
   {
-    DetailRenderers.CropRender, DetailRenderers.TreeRender, DetailRenderers.FruitTreeRender, DetailRenderers.TeaBush
+    DetailRenderers.CropRender
+  };
+
+  private static readonly List<Func<TerrainFeature?, List<HoverLine>, bool>> TreeDetailRenderers = new()
+  {
+    DetailRenderers.TreeRender, DetailRenderers.FruitTreeRender, DetailRenderers.TeaBush
   };
 
   private readonly PerScreen<TerrainFeature?> _currentTerrain = new();
@@ -85,6 +90,7 @@ internal class ShowTileTooltips : IDisposable
 
   private readonly IModHelper _helper;
   private bool _showCropTooltip;
+  private bool _showTreeTooltip;
   private bool _showBarrelTooltip;
   private bool _showFishPondTooltip;
 
@@ -96,6 +102,7 @@ internal class ShowTileTooltips : IDisposable
   public void Dispose()
   {
     ToggleCropOption(false);
+    ToggleTreeOption(false);
     ToggleBarrelOption(false);
     ToggleFishPondOption(false);
   }
@@ -103,6 +110,12 @@ internal class ShowTileTooltips : IDisposable
   public void ToggleCropOption(bool showCropTooltip)
   {
     _showCropTooltip = showCropTooltip;
+    UpdateEventSubscriptions();
+  }
+
+  public void ToggleTreeOption(bool showTreeTooltip)
+  {
+    _showTreeTooltip = showTreeTooltip;
     UpdateEventSubscriptions();
   }
 
@@ -123,7 +136,7 @@ internal class ShowTileTooltips : IDisposable
     _helper.Events.Display.RenderingHud -= OnRenderingHud;
     _helper.Events.GameLoop.UpdateTicked -= OnUpdateTicked;
 
-    if (!_showCropTooltip && !_showBarrelTooltip && !_showFishPondTooltip)
+    if (!_showCropTooltip && !_showTreeTooltip && !_showBarrelTooltip && !_showFishPondTooltip)
     {
       return;
     }
@@ -238,9 +251,20 @@ internal class ShowTileTooltips : IDisposable
 
     if (_showCropTooltip && terrain is not null)
     {
-      foreach (Func<TerrainFeature?, List<HoverLine>, bool> terrainDetailRenderer in TerrainDetailRenderers)
+      foreach (Func<TerrainFeature?, List<HoverLine>, bool> cropDetailRenderer in CropDetailRenderers)
       {
-        if (terrainDetailRenderer(terrain, lines))
+        if (cropDetailRenderer(terrain, lines))
+        {
+          tile = Utility.ModifyCoordinatesForUIScale(Game1.GlobalToLocal(terrain.Tile * Game1.tileSize));
+        }
+      }
+    }
+
+    if (_showTreeTooltip && terrain is not null)
+    {
+      foreach (Func<TerrainFeature?, List<HoverLine>, bool> treeDetailRenderer in TreeDetailRenderers)
+      {
+        if (treeDetailRenderer(terrain, lines))
         {
           tile = Utility.ModifyCoordinatesForUIScale(Game1.GlobalToLocal(terrain.Tile * Game1.tileSize));
         }

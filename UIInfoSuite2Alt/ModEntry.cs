@@ -227,6 +227,7 @@ public class ModEntry : Mod
     AddSubBool(nameof(ModConfig.HideAnimalPetOnMaxFriendship), () => ModConfig.HideAnimalPetOnMaxFriendship, v => ModConfig.HideAnimalPetOnMaxFriendship = v);
     Spacer();
     AddBool(nameof(ModConfig.ShowCropTooltip), () => ModConfig.ShowCropTooltip, v => ModConfig.ShowCropTooltip = v);
+    AddBool(nameof(ModConfig.ShowTreeTooltip), () => ModConfig.ShowTreeTooltip, v => ModConfig.ShowTreeTooltip = v);
     AddBool(nameof(ModConfig.ShowBarrelTooltip), () => ModConfig.ShowBarrelTooltip, v => ModConfig.ShowBarrelTooltip = v);
     AddBool(nameof(ModConfig.ShowFishPondTooltip), () => ModConfig.ShowFishPondTooltip, v => ModConfig.ShowFishPondTooltip = v);
     string[] machineIconModes = { "0", "1", "2" };

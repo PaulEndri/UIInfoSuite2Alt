@@ -404,6 +404,15 @@ internal class ModOptionsPageHandler : IDisposable
     );
     _optionsElements.Add(
       new ModOptionsCheckbox(
+        _helper.SafeGetString(nameof(config.ShowTreeTooltip)),
+        whichOption++,
+        showTileTooltips.ToggleTreeOption,
+        () => config.ShowTreeTooltip,
+        Set(v => config.ShowTreeTooltip = v)
+      )
+    );
+    _optionsElements.Add(
+      new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.ShowBarrelTooltip)),
         whichOption++,
         showTileTooltips.ToggleBarrelOption,

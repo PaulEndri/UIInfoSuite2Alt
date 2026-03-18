@@ -95,6 +95,7 @@ internal class ShowMachineProcessingItem : IDisposable
 
     _helper.Input.SuppressActiveKeybinds(keybind);
     _toggleState = !_toggleState;
+    ModEntry.ModConfig.MachineProcessingIconsVisible = _toggleState;
     ToggleOption(_toggleState);
   }
 

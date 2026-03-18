@@ -229,6 +229,21 @@ public class ModEntry : Mod
     AddBool(nameof(ModConfig.ShowCropTooltip), () => ModConfig.ShowCropTooltip, v => ModConfig.ShowCropTooltip = v);
     AddBool(nameof(ModConfig.ShowBarrelTooltip), () => ModConfig.ShowBarrelTooltip, v => ModConfig.ShowBarrelTooltip = v);
     AddBool(nameof(ModConfig.ShowFishPondTooltip), () => ModConfig.ShowFishPondTooltip, v => ModConfig.ShowFishPondTooltip = v);
+    string[] machineIconModes = { "0", "1", "2" };
+    configMenu.AddTextOption(
+      ModManifest,
+      name: () => Helper.SafeGetString(nameof(ModConfig.MachineProcessingIconsMode)),
+      getValue: () => ModConfig.MachineProcessingIconsMode.ToString(),
+      setValue: v => ModConfig.MachineProcessingIconsMode = int.Parse(v),
+      allowedValues: machineIconModes,
+      formatAllowedValue: v => int.Parse(v) switch
+      {
+        0 => I18n.MachineProcessingMode_Off(),
+        1 => I18n.MachineProcessingMode_Toggle(),
+        2 => I18n.MachineProcessingMode_Hold(),
+        _ => v
+      }
+    );
     AddBool(nameof(ModConfig.ShowFishPondIcons), () => ModConfig.ShowFishPondIcons, v => ModConfig.ShowFishPondIcons = v);
     configMenu.AddBoolOption(
       ModManifest,

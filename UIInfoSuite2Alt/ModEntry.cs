@@ -71,6 +71,7 @@ public class ModEntry : Mod
 
     // Register mod compatibility APIs
     var configMenu = ApiManager.TryRegisterApi<IGenericModConfigMenuApi>(Helper, ModCompat.Gmcm, "1.6.0");
+    ApiManager.TryRegisterApi<IContentPatcherAPI>(Helper, ModCompat.ContentPatcher, "2.9.0");
     ApiManager.TryRegisterApi<ICustomBushApi>(Helper, ModCompat.CustomBush, "1.2.1", true);
     ApiManager.TryRegisterApi<ICloudySkiesApi>(Helper, ModCompat.CloudySkies);
     ApiManager.TryRegisterApi<IBetterGameMenuApi>(Helper, ModCompat.BetterGameMenu);

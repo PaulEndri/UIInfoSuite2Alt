@@ -181,19 +181,23 @@ internal class ShowItemEffectRanges : IDisposable
     int[][] arrayToUse;
     List<Object> similarObjects;
 
-    // Junimo Hut (building, not object)
-    if (_showItemEffectRanges)
+    if (_showItemEffectRanges && ButtonControlShow && (ButtonShowOneRange || ButtonShowAllRanges))
     {
       Building building = Game1.currentLocation.getBuildingAt(Game1.GetPlacementGrabTile());
 
-      if (building is JunimoHut)
+      if (building is JunimoHut hoveredHut)
       {
         arrayToUse = GetDistanceArray(ObjectsWithDistance.JunimoHut);
-        foreach (Building? nextBuilding in Game1.currentLocation.buildings)
+        AddTilesToHighlightedArea(arrayToUse, true, hoveredHut.tileX.Value + 1, hoveredHut.tileY.Value + 1);
+
+        if (ButtonShowAllRanges)
         {
-          if (nextBuilding is JunimoHut nextHut)
+          foreach (Building? nextBuilding in Game1.currentLocation.buildings)
           {
-            AddTilesToHighlightedArea(arrayToUse, false, nextHut.tileX.Value + 1, nextHut.tileY.Value + 1);
+            if (nextBuilding is JunimoHut nextHut && nextHut != hoveredHut)
+            {
+              AddTilesToHighlightedArea(arrayToUse, false, nextHut.tileX.Value + 1, nextHut.tileY.Value + 1);
+            }
           }
         }
       }

@@ -65,6 +65,7 @@ public class ModConfig
   public bool ShowFishOnCatch { get; set; } = false;
   public bool ShowFishQualityStar { get; set; } = true;
   public bool ShowBuffTimers { get; set; } = true;
+  public bool PlayBuffExpireSound { get; set; } = true;
   public Dictionary<string, bool> ShowLocationOfFriends { get; set; } = new();
   public Dictionary<string, int> IconOrder { get; set; } = new()
   {

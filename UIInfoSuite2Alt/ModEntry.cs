@@ -220,6 +220,8 @@ public class ModEntry : Mod
     AddBool(nameof(ModConfig.ShowTodaysGifts), () => ModConfig.ShowTodaysGifts, v => ModConfig.ShowTodaysGifts = v);
     AddBool(nameof(ModConfig.ShowQuestCount), () => ModConfig.ShowQuestCount, v => ModConfig.ShowQuestCount = v);
     AddBool(nameof(ModConfig.ShowBuffTimers), () => ModConfig.ShowBuffTimers, v => ModConfig.ShowBuffTimers = v);
+    AddSubBool(nameof(ModConfig.PlayBuffExpireSound), () => ModConfig.PlayBuffExpireSound, v => ModConfig.PlayBuffExpireSound = v);
+    Spacer();
 
     // --- Farm & Field ---
     configMenu.AddSectionTitle(ModManifest, text: () => I18n.Section_FarmAndField());

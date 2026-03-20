@@ -194,6 +194,7 @@
   "ShowFishOnCatch": "Always show fish identity when reeling in",
   "ShowFishQualityStar": "Show quality star",
   "ShowBuffTimers": "Show buff duration timers",
+  "PlayBuffExpireSound": "Play sound when buff expires",
   "FestivalToday": "Today: {0}",
   "FestivalTomorrow": "Tomorrow: {0}",
   "FestivalTimeRange": "{0} - {1}",

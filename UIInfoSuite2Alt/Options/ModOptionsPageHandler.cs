@@ -360,13 +360,22 @@ internal class ModOptionsPageHandler : IDisposable
         Set(v => { config.ShowQuestCount = v; IconHandler.Handler.ShowQuestCount = v; })
       )
     );
+    var buffTimersCheckbox = new ModOptionsCheckbox(
+      _helper.SafeGetString(nameof(config.ShowBuffTimers)),
+      whichOption++,
+      showBuffTimers.ToggleOption,
+      () => config.ShowBuffTimers,
+      Set(v => config.ShowBuffTimers = v)
+    );
+    _optionsElements.Add(buffTimersCheckbox);
     _optionsElements.Add(
       new ModOptionsCheckbox(
-        _helper.SafeGetString(nameof(config.ShowBuffTimers)),
+        _helper.SafeGetString(nameof(config.PlayBuffExpireSound)),
         whichOption++,
-        showBuffTimers.ToggleOption,
-        () => config.ShowBuffTimers,
-        Set(v => config.ShowBuffTimers = v)
+        showBuffTimers.ToggleExpireSound,
+        () => config.PlayBuffExpireSound,
+        Set(v => config.PlayBuffExpireSound = v),
+        buffTimersCheckbox
       )
     );
 

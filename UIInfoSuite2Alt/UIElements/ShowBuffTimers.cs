@@ -6,6 +6,7 @@ using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Menus;
+using UIInfoSuite2Alt.Infrastructure;
 
 namespace UIInfoSuite2Alt.UIElements;
 
@@ -24,6 +25,8 @@ internal class ShowBuffTimers : IDisposable
   private static readonly Color FadingDotColor = FadeColor * 0.9f;
 
   private readonly IModHelper _helper;
+  private readonly HashSet<string> _previousBuffIds = new();
+  private bool _playExpireSound;
 
   public ShowBuffTimers(IModHelper helper)
   {
@@ -38,10 +41,55 @@ internal class ShowBuffTimers : IDisposable
   public void ToggleOption(bool showBuffTimers)
   {
     _helper.Events.Display.RenderedHud -= OnRenderedHud;
+    _helper.Events.GameLoop.UpdateTicked -= OnUpdateTicked;
 
     if (showBuffTimers)
     {
       _helper.Events.Display.RenderedHud += OnRenderedHud;
+      _helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
+    }
+  }
+
+  public void ToggleExpireSound(bool playExpireSound)
+  {
+    _playExpireSound = playExpireSound;
+  }
+
+  private void OnUpdateTicked(object? sender, UpdateTickedEventArgs e)
+  {
+    if (!Context.IsWorldReady)
+    {
+      _previousBuffIds.Clear();
+      return;
+    }
+
+    var currentBuffIds = new HashSet<string>();
+    foreach (KeyValuePair<string, Buff> pair in Game1.player.buffs.AppliedBuffs)
+    {
+      // Only track non-permanent buffs
+      if (pair.Value.millisecondsDuration != -2)
+      {
+        currentBuffIds.Add(pair.Key);
+      }
+    }
+
+    // Play sound for each buff that was present last tick but is now gone
+    if (_playExpireSound && _previousBuffIds.Count > 0)
+    {
+      foreach (string id in _previousBuffIds)
+      {
+        if (!currentBuffIds.Contains(id))
+        {
+          SoundHelper.Play(Sounds.BuffExpired);
+          break; // one sound even if multiple buffs expire simultaneously
+        }
+      }
+    }
+
+    _previousBuffIds.Clear();
+    foreach (string id in currentBuffIds)
+    {
+      _previousBuffIds.Add(id);
     }
   }
 

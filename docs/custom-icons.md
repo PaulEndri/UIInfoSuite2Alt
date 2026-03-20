@@ -6,7 +6,7 @@ Add your own HUD icons to UI Info Suite 2 Alternative using Content Patcher. Ico
 
 1. Create a **20x20 pixel** icon image in your `assets/` folder.
 
-![My amazing icon](.github/assets/test-icon.png)
+![My amazing icon](../.github/assets/test-icon.png)
 
 2. Load the texture and add your icon in `content.json`:
 
@@ -50,7 +50,7 @@ Add your own HUD icons to UI Info Suite 2 Alternative using Content Patcher. Ico
 
 4. See you icon appear on Spring 15:
 
-![My Custom Icon](.github/assets/custom-icon-2.7.0.png)
+![My Custom Icon](../.github/assets/custom-icon-2.7.0.png)
 
 If UI Info Suite 2 Alternative isn't installed, the patch is silently ignored.
 

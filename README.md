@@ -51,6 +51,11 @@
 
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
+- **v2.7.1**
+  - HUD icons now wrap to a new row/column when there are many icons active
+    - Added "Icons before wrapping" dropdown option (1–10) to control how many icons appear per row/column
+  - Improved positioning of custom CP icons and birthday icons a bit
+  - Boosted SFX when a buff expires (+8 db)
 - **v2.7.0**
   - Content Patcher mods can now add custom HUD icons via the [Custom Icons API](docs/custom-icons.md)
   - Plays a sound effect when a buff expires (toggleable option)

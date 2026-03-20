@@ -69,11 +69,14 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
   private FieldInfo? _rsvDailyTownQuestField;
   private List<(string BoardType, string DisplayName)>? _cachedModQuestBoards;
   private int _cachedModQuestBoardsDay = -1;
+
+  private static ShowCalendarAndBillboardOnGameMenuButton? _instance;
   #endregion
 
   #region Lifecycle
   public ShowCalendarAndBillboardOnGameMenuButton(IModHelper helper)
   {
+    _instance = this;
     _helper = helper;
     _townTexture = helper.GameContent.Load<Texture2D>("Maps/spring_town");
     _hasRidgesideVillage = helper.ModRegistry.IsLoaded(ModCompat.RidgesideVillage);
@@ -585,6 +588,34 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
 
     Game1.activeClickableMenu = new Billboard(dailyQuest: isQuest);
     return true;
+  }
+
+  public static void OpenQuestBoardFromKeybind()
+  {
+    if (_instance == null)
+    {
+      Game1.RefreshQuestOfTheDay();
+      Game1.activeClickableMenu = new Billboard(true);
+      return;
+    }
+
+    List<(string BoardType, string DisplayName)> modQuestBoards = _instance.GetAvailableModQuestBoards();
+    if (modQuestBoards.Count > 0)
+    {
+      var viewedTypes = new HashSet<string>();
+      if (!Game1.CanAcceptDailyQuest())
+        viewedTypes.Add("");
+      foreach ((string boardType, _) in modQuestBoards)
+      {
+        if (!_instance.HasRsvUnacceptedQuest(boardType))
+          viewedTypes.Add(boardType);
+      }
+      Game1.activeClickableMenu = new QuestBoardSelector(modQuestBoards, _instance.OnQuestBoardSelected, viewedTypes);
+      return;
+    }
+
+    Game1.RefreshQuestOfTheDay();
+    Game1.activeClickableMenu = new Billboard(true);
   }
 
   #region RSV Quest Board Support

@@ -52,7 +52,9 @@
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
 - **v2.7.2**
+  - Quest board keybind now opens the board selector when Ridgeside Village is installed instead of only opening vanilla billboard
   - Add "Open GMCM Options" button to in-game options tab for quick access to Generic Mod Config Menu
+    - Shows a red notice text if GMCM is not installed
   - Show wild tree seed spread range (7x7) when using item range keybinds on Farm locations
   - Fix Junimo Hut to now properly follow the "Show current/all item range"-keybinds
 - **v2.7.1**

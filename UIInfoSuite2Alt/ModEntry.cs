@@ -456,8 +456,7 @@ public class ModEntry : Mod
     else if (Context.IsPlayerFree && ModConfig.OpenQuestBoardKeybind.JustPressed())
     {
       helper.Input.SuppressActiveKeybinds(ModConfig.OpenQuestBoardKeybind);
-      Game1.RefreshQuestOfTheDay();
-      Game1.activeClickableMenu = new Billboard(true);
+      ShowCalendarAndBillboardOnGameMenuButton.OpenQuestBoardFromKeybind();
     }
   }
 

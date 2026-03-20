@@ -61,7 +61,7 @@ public class ModConfig
   public bool HideBirthdayIfFullFriendShip { get; set; } = true;
   public bool ShowQuestCount { get; set; } = true;
   public bool UseVerticalIconLayout { get; set; } = false;
-  public int IconsPerRow { get; set; } = 7;
+  public int IconsPerRow { get; set; } = 10;
   public bool ShowFestivalIcon { get; set; } = true;
   public bool ShowFishOnCatch { get; set; } = false;
   public bool ShowFishQualityStar { get; set; } = true;

@@ -29,7 +29,7 @@ public sealed class IconHandler
 
   private const int IconGap = 48;
   /// <summary>How many icons per row (horizontal) or column (vertical) before wrapping.</summary>
-  public int IconsPerRow { get; set; } = 7;
+  public int IconsPerRow { get; set; } = 10;
 
   private readonly PerScreen<List<QueuedIcon>> _queuedIcons = new(() => new());
   private readonly PerScreen<List<QueuedIcon>> _sortedCache = new(() => new());

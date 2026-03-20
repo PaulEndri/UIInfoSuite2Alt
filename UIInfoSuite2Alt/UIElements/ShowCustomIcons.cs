@@ -146,20 +146,17 @@ internal class ShowCustomIcons : IDisposable
       return;
     }
 
-    // Always draw at 40x40 regardless of source size, centered in the 48px icon slot
+    // Draw at 40x40 to match weather/bookseller icon positioning
     const int drawnSize = 40;
-    const int slotSize = 48;
     float scaleX = drawnSize / (float)iconData.SourceRect.Width;
     float scaleY = drawnSize / (float)iconData.SourceRect.Height;
     float scale = Math.Min(scaleX, scaleY);
     int drawWidth = (int)(iconData.SourceRect.Width * scale);
     int drawHeight = (int)(iconData.SourceRect.Height * scale);
-    int offsetX = (slotSize - drawWidth) / 2;
-    int offsetY = (slotSize - drawHeight) / 2;
 
     batch.Draw(
       texture,
-      new Vector2(pos.X + offsetX, pos.Y + offsetY),
+      new Vector2(pos.X, pos.Y),
       iconData.SourceRect,
       Color.White,
       0f,
@@ -175,7 +172,7 @@ internal class ShowCustomIcons : IDisposable
       _iconComponents.Value[key] = comp;
     }
 
-    comp.bounds = new Rectangle(pos.X + offsetX, pos.Y + offsetY, drawWidth, drawHeight);
+    comp.bounds = new Rectangle(pos.X, pos.Y, drawWidth, drawHeight);
   }
 
   private void DrawHover(SpriteBatch batch, string key, string hoverText)

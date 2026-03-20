@@ -185,7 +185,7 @@ internal class ShowBirthdayIcon : IDisposable
         {
           batch.Draw(
             Game1.mouseCursors,
-            new Vector2(pos.X, pos.Y),
+            new Vector2(pos.X, pos.Y - 3),
             BirthdayBackgroundSource,
             Color.White,
             0.0f,
@@ -195,7 +195,7 @@ internal class ShowBirthdayIcon : IDisposable
             1f
           );
 
-          icons[capturedI].bounds = new Rectangle(pos.X - 7, pos.Y - 2, (int)(16.0 * scale), (int)(16.0 * scale));
+          icons[capturedI].bounds = new Rectangle(pos.X - 7, pos.Y - 5, (int)(16.0 * scale), (int)(16.0 * scale));
           icons[capturedI].sourceRect = npcs[capturedI].GetHeadShot();
           icons[capturedI].draw(batch);
         },

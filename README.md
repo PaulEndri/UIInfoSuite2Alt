@@ -21,6 +21,20 @@
   <a href="https://github.com/dazuki/UIInfoSuite2Alt/releases/latest"><strong>Download Latest Release</strong></a>
 </h2>
 
+<p align="center">
+  <img src=".github/assets/custom-icons-2.7.0.png" alt="Custom Icons API" />
+</p>
+
+<p align="center">
+  <h3 align="center">Custom Icon API</h3>
+</p>
+
+<p align="center">
+  <b>If you're a Content Patcher mod author take a look at:<br>
+  <a href="docs/custom-icons.md">API Documentation</a></b>
+</p>
+
+
 ![translations](https://raw.githubusercontent.com/dazuki/UIInfoSuite2Alt/master/.github/assets/translations.png)
 
 ❤️ Big **THANK YOU** to All Translators that make this mod available in so many different languages! ❤️

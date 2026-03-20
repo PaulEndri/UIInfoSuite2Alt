@@ -190,6 +190,7 @@
   "ShowSeasonalBerryHazelnut": "Show hazelnuts on trees",
   "ShowQuestCount": "Show quest count under journal icon",
   "UseVerticalIconLayout": "Stack icons vertically",
+  "IconsPerRow": "Icons before wrapping",
   "ShowFestivalIcon": "Show festival reminder",
   "ShowFishOnCatch": "Always show fish identity when reeling in",
   "ShowFishQualityStar": "Show quality star",

@@ -178,6 +178,15 @@ public class ModEntry : Mod
     // --- HUD Icons ---
     configMenu.AddSectionTitle(ModManifest, text: () => I18n.Section_HudIcons());
 
+    string[] iconsPerRowValues = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" };
+    configMenu.AddTextOption(
+      ModManifest,
+      name: () => Helper.SafeGetString(nameof(ModConfig.IconsPerRow)),
+      getValue: () => ModConfig.IconsPerRow.ToString(),
+      setValue: v => ModConfig.IconsPerRow = int.Parse(v),
+      allowedValues: iconsPerRowValues
+    );
+
     AddBool(nameof(ModConfig.UseVerticalIconLayout), () => ModConfig.UseVerticalIconLayout, v => ModConfig.UseVerticalIconLayout = v);
     AddBool(nameof(ModConfig.ShowLuckIcon), () => ModConfig.ShowLuckIcon, v => ModConfig.ShowLuckIcon = v);
 
@@ -375,6 +384,7 @@ public class ModEntry : Mod
 
     IconHandler.Handler.IconOrder = ModConfig.IconOrder;
     IconHandler.Handler.UseVerticalLayout = ModConfig.UseVerticalIconLayout;
+    IconHandler.Handler.IconsPerRow = ModConfig.IconsPerRow;
     IconHandler.Handler.ShowQuestCount = ModConfig.ShowQuestCount;
     _modOptionsPageHandler?.Dispose();
     _modOptionsPageHandler = new ModOptionsPageHandler(Helper, ModConfig, SaveConfig);

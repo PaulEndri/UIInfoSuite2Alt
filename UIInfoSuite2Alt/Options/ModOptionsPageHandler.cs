@@ -137,6 +137,15 @@ internal class ModOptionsPageHandler : IDisposable
     _optionsElements.Add(new ModOptionsElement(I18n.Section_HudIcons()));
 
     _optionsElements.Add(
+      new ModOptionsDropdown(
+        _helper.SafeGetString(nameof(config.IconsPerRow)),
+        whichOption++,
+        new List<string> { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" },
+        () => config.IconsPerRow - 1,
+        SetInt(v => { config.IconsPerRow = v + 1; IconHandler.Handler.IconsPerRow = v + 1; })
+      )
+    );
+    _optionsElements.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.UseVerticalIconLayout)),
         whichOption++,

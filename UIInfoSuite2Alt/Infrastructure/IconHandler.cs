@@ -28,6 +28,8 @@ public sealed class IconHandler
   };
 
   private const int IconGap = 48;
+  /// <summary>How many icons per row (horizontal) or column (vertical) before wrapping.</summary>
+  public int IconsPerRow { get; set; } = 7;
 
   private readonly PerScreen<List<QueuedIcon>> _queuedIcons = new(() => new());
   private readonly PerScreen<List<QueuedIcon>> _sortedCache = new(() => new());
@@ -106,12 +108,14 @@ public sealed class IconHandler
       yPos -= 30;
     }
 
-    // Draw icons with fixed spacing
+    // Draw icons with fixed spacing, wrapping after IconsPerRow
     for (int i = 0; i < sorted.Count; i++)
     {
+      int col = i % IconsPerRow;
+      int row = i / IconsPerRow;
       Point pos = UseVerticalLayout
-        ? new Point(xBase, yPos + 48 * i)
-        : new Point(xBase - IconGap * i, yPos);
+        ? new Point(xBase - IconGap * row, yPos + IconGap * col)
+        : new Point(xBase - IconGap * col, yPos + IconGap * row);
       sorted[i].Draw(batch, pos);
     }
 

@@ -17,8 +17,10 @@ public class ModOptionsElement
   protected readonly ModOptionsElement? _parent;
   private readonly int _whichOption;
   private readonly bool _isSubtitle;
+  private readonly bool _isSmallText;
+  private readonly Color? _textColor;
 
-  public ModOptionsElement(string label, int whichOption = -1, ModOptionsElement? parent = null, bool isSubtitle = false)
+  public ModOptionsElement(string label, int whichOption = -1, ModOptionsElement? parent = null, bool isSubtitle = false, bool isSmallText = false, Color? textColor = null)
   {
     int x = DefaultX * Game1.pixelZoom;
     int y = DefaultY * Game1.pixelZoom;
@@ -36,6 +38,8 @@ public class ModOptionsElement
 
     _parent = parent;
     _isSubtitle = isSubtitle;
+    _isSmallText = isSmallText;
+    _textColor = textColor;
   }
 
   public Rectangle Bounds { get; protected set; }
@@ -50,7 +54,19 @@ public class ModOptionsElement
 
   public virtual void Draw(SpriteBatch batch, int slotX, int slotY)
   {
-    if (_isSubtitle)
+    if (_isSmallText)
+    {
+      Utility.drawTextWithShadow(
+        batch,
+        _label,
+        Game1.smallFont,
+        new Vector2(slotX + Bounds.X, slotY + Bounds.Y),
+        _textColor ?? Game1.textColor,
+        1f,
+        0.1f
+      );
+    }
+    else if (_isSubtitle)
     {
       Utility.drawTextWithShadow(
         batch,

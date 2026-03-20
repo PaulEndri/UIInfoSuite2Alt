@@ -1,6 +1,6 @@
 ﻿{
   // GUI - Game Menu
-  "OptionsTabTooltip": "UI Info Suite 2 Options",
+  "OptionsTabTooltip": "UI Info Suite Options",
   "OpenSettings": "Open Settings",
   // some config options
   "Bool.ShowOptionsTabInMenu.DisplayedName": "Show options in in-game menu",
@@ -15,8 +15,8 @@
   "Keybinds.OpenModOptionsKeybind.Tooltip": "Opens the UI Info Suite options page directly.",
   "Keybinds.OpenMonsterEradicationKeybind.DisplayedName": "Monster eradication keybind",
   "Keybinds.OpenMonsterEradicationKeybind.Tooltip": "Opens the Monster Eradication list page directly.",
-  "Keybinds.Subtitle.ShowRange.displayedName": "Show item effect ranges",
-  "Keybinds.Subtitle.ShowRange.Tooltip": "Such: scarecrow, sprinkler, Junimo Hut, bee house, mushroom log and mossy seed.",
+  "Keybinds.ToggleMachineProcessingIcons.DisplayedName": "Toggle machine icons",
+  "Keybinds.ToggleMachineProcessingIcons.Tooltip": "Toggles the display of machine processing icons. Shows the input item on machines like Kegs (e.g. the grape for wine) and Preserve Jars (e.g. the fruit for jelly), or the output item on machines like Furnaces and Crystalariums.",
   "Keybinds.ShowOneRange.DisplayedName": "Show current item range",
   "Keybinds.ShowOneRange.Tooltip": "When the mouse moves over the item you want to show, show range.",
   "Keybinds.ShowAllRange.DisplayedName": "Show all item range",
@@ -129,7 +129,13 @@
   "LuckStatus4": "The spirits feel absolutely neutral today",
   "LuckStatus5": "Luck will not be on your side today",
   "LuckStatus6": "Maybe you should stay home today...",
+  //Settings - Paragraphs
+  "Paragraph.KeybindsInGmcm": "Keybinds can be found in Generic Mod Config Menu.",
+  //Settings - Buttons
+  "Button.OpenGmcmOptions": "Open GMCM Options",
+  "SmallText.GmcmMissing": "Generic Mod Config Menu is not installed.",
   //Settings - Section headers
+  "Section.Keybinds": "Keybinds",
   "Section.HudIcons": "HUD Icons",
   "Section.FarmAndField": "Farm & Field",
   "Section.ExperienceAndSkills": "Experience & Skills",
@@ -150,7 +156,6 @@
   "MachineProcessingMode.Off": "-- Off --",
   "MachineProcessingMode.Toggle": "Toggle",
   "MachineProcessingMode.Hold": "Hold",
-  "ToggleMachineProcessingIcons": "Toggle machine icons",
   "ShowFishPondIcons": "Show fish species icon on ponds",
   "ShowItemEffectRanges": "Show scarecrow and sprinkler range",
   "ButtonControlShow": "Hold LCtrl to show current item range\nHold LCtrl+LAlt to show all item range",

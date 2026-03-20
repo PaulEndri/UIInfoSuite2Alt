@@ -52,7 +52,9 @@
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
 - **v2.7.2**
-  - Fix Junimo Hut now properly follows the "Show current/all item range"-keybinds instead of showing when hover over
+  - Add "Open GMCM Options" button to in-game options tab for quick access to Generic Mod Config Menu
+  - Show wild tree seed spread range (7x7) when using item range keybinds on Farm locations
+  - Fix Junimo Hut to now properly follow the "Show current/all item range"-keybinds
 - **v2.7.1**
   - HUD icons now wrap to a new row/column when there are many icons active
     - Added "Icons before wrapping" dropdown option (1–10) to control how many icons appear per row/column

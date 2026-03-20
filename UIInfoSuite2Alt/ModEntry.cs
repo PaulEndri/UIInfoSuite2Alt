@@ -106,6 +106,10 @@ public class ModEntry : Mod
       getValue: () => ModConfig.ShowOptionsTabInMenu,
       setValue: value => ModConfig.ShowOptionsTabInMenu = value
     );
+
+    // Keybinds
+    configMenu.AddSectionTitle(ModManifest, text: () => I18n.Section_Keybinds());
+
     configMenu.AddKeybindList(
       ModManifest,
       name: () => I18n.Keybinds_OpenCalendarKeybind_DisplayedName(),
@@ -136,16 +140,11 @@ public class ModEntry : Mod
     );
     configMenu.AddKeybindList(
       ModManifest,
-      name: () => Helper.SafeGetString(nameof(ModConfig.ToggleMachineProcessingIcons)),
+      name: () => I18n.Keybinds_ToggleMachineProcessingIcons_DisplayedName(),
+      tooltip: () => I18n.Keybinds_ToggleMachineProcessingIcons_Tooltip(),
       getValue: () => ModConfig.ToggleMachineProcessingIcons,
       setValue: value => ModConfig.ToggleMachineProcessingIcons = value
     );
-    // Range keybinds
-    configMenu.AddSectionTitle(
-      ModManifest,
-      text: () => I18n.Keybinds_Subtitle_ShowRange_DisplayedName(),
-      tooltip: () => I18n.Keybinds_Subtitle_ShowRange_Tooltip()
-      );
     configMenu.AddKeybindList(
       ModManifest,
       name: () => I18n.Keybinds_ShowOneRange_DisplayedName(),
@@ -160,6 +159,9 @@ public class ModEntry : Mod
       getValue: () => ModConfig.ShowAllRange,
       setValue: value => ModConfig.ShowAllRange = value
       );
+
+    // The HR™ Line
+    configMenu.AddSectionTitle(ModManifest, text: () => "------------------------------------------------");
 
     RegisterGmcmFeatureToggles(configMenu);
   }

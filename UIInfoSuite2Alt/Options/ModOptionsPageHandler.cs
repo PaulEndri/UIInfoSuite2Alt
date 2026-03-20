@@ -132,6 +132,26 @@ internal class ModOptionsPageHandler : IDisposable
 
     var whichOption = 1;
     _optionsElements.Add(new ModOptionsElement($"UI Info Suite 2 Alt. {GetVersionString(helper)}"));
+    _optionsElements.Add(new ModOptionsElement(I18n.Paragraph_KeybindsInGmcm(), isSmallText: true));
+
+    if (ApiManager.GetApi<IGenericModConfigMenuApi>(ModCompat.Gmcm, out var gmcm))
+    {
+      IModInfo? modInfo = helper.ModRegistry.Get(helper.ModRegistry.ModID);
+      if (modInfo != null)
+      {
+        _optionsElements.Add(
+          new ModOptionsSmallButton(
+            I18n.Button_OpenGmcmOptions(),
+            whichOption++,
+            () => gmcm.OpenModMenu(modInfo.Manifest)
+          )
+        );
+      }
+    }
+    else
+    {
+      _optionsElements.Add(new ModOptionsElement(I18n.SmallText_GmcmMissing(), isSmallText: true, textColor: Color.Red));
+    }
 
     // --- HUD Icons ---
     _optionsElements.Add(new ModOptionsElement(I18n.Section_HudIcons()));

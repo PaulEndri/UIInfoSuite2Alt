@@ -80,7 +80,6 @@ internal class ModOptionsPageHandler : IDisposable
     var luckOfDay = new LuckOfDay(helper);
     var showBirthdayIcon = new ShowBirthdayIcon(helper);
     var showAccurateHearts = new ShowAccurateHearts(helper.Events);
-    var locationOfTownsfolk = new LocationOfTownsfolk(helper);
     var showWhenAnimalNeedsPet = new ShowWhenAnimalNeedsPet(helper);
     var showCalendarAndBillboardOnGameMenuButton = new ShowCalendarAndBillboardOnGameMenuButton(helper);
     var showScarecrowAndSprinklerRange = new ShowItemEffectRanges(helper);
@@ -107,7 +106,6 @@ internal class ModOptionsPageHandler : IDisposable
       luckOfDay,
       showBirthdayIcon,
       showAccurateHearts,
-      locationOfTownsfolk,
       showWhenAnimalNeedsPet,
       showCalendarAndBillboardOnGameMenuButton,
       showScarecrowAndSprinklerRange,
@@ -564,18 +562,6 @@ internal class ModOptionsPageHandler : IDisposable
     // --- NPC & Social ---
     _optionsElements.Add(new ModOptionsElement(I18n.Section_NpcAndSocial()));
 
-    if (!_helper.ModRegistry.IsLoaded("Bouhm.NPCMapLocations"))
-    {
-      _optionsElements.Add(
-        new ModOptionsCheckbox(
-          _helper.SafeGetString(nameof(config.ShowLocationOfTownsPeople)),
-          whichOption++,
-          locationOfTownsfolk.ToggleShowNPCLocationsOnMap,
-          () => config.ShowLocationOfTownsPeople,
-          Set(v => config.ShowLocationOfTownsPeople = v)
-        )
-      );
-    }
     _optionsElements.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.ShowHeartFills)),

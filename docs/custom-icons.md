@@ -6,6 +6,8 @@ Add your own HUD icons to UI Info Suite 2 Alternative using Content Patcher. Ico
 
 1. Create a **20x20 pixel** icon image in your `assets/` folder.
 
+![My amazing icon](.github/assets/test-icon.png)
+
 2. Load the texture and add your icon in `content.json`:
 
 ```json

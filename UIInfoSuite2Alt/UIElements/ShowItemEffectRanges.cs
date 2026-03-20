@@ -9,6 +9,7 @@ using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Buildings;
 using StardewValley.Network;
+using StardewValley.TerrainFeatures;
 using Object = StardewValley.Object;
 
 namespace UIInfoSuite2Alt.UIElements;
@@ -128,7 +129,7 @@ internal class ShowItemEffectRanges : IDisposable
         Game1.mouseCursors,
         Utility.ModifyCoordinatesForUIScale(Game1.GlobalToLocal(Utility.ModifyCoordinatesForUIScale(position))),
         new Rectangle(194, 388, 16, 16),
-        Color.White * 0.7f,
+        Color.LimeGreen * 0.8f,
         0.0f,
         Vector2.Zero,
         Utility.ModifyCoordinateForUIScale(Game1.pixelZoom),
@@ -197,6 +198,36 @@ internal class ShowItemEffectRanges : IDisposable
             if (nextBuilding is JunimoHut nextHut && nextHut != hoveredHut)
             {
               AddTilesToHighlightedArea(arrayToUse, false, nextHut.tileX.Value + 1, nextHut.tileY.Value + 1);
+            }
+          }
+        }
+      }
+    }
+
+    // Wild tree seed spread — only on Farm locations (matches game's seed spread logic)
+    if (_showItemEffectRanges && ButtonControlShow && (ButtonShowOneRange || ButtonShowAllRanges)
+        && Game1.currentLocation is Farm)
+    {
+      Vector2 gamepadTile = Game1.player.CurrentTool != null
+        ? Utility.snapToInt(Game1.player.GetToolLocation() / Game1.tileSize)
+        : Utility.snapToInt(Game1.player.GetGrabTile());
+      Vector2 mouseTile = Game1.currentCursorTile;
+      Vector2 treeTile = Game1.options.gamepadControls && Game1.timerUntilMouseFade <= 0 ? gamepadTile : mouseTile;
+
+      if (Game1.currentLocation.terrainFeatures.TryGetValue(treeTile, out TerrainFeature? feature)
+          && feature is Tree tree && tree.growthStage.Value >= 5 && !tree.stump.Value)
+      {
+        arrayToUse = GetDistanceArray(ObjectsWithDistance.WildTreeSeedSpread);
+        AddTilesToHighlightedArea(arrayToUse, false, (int)treeTile.X, (int)treeTile.Y);
+
+        if (ButtonShowAllRanges)
+        {
+          foreach (KeyValuePair<Vector2, TerrainFeature> pair in Game1.currentLocation.terrainFeatures.Pairs)
+          {
+            if (pair.Value is Tree otherTree && otherTree != tree
+                && otherTree.growthStage.Value >= 5 && !otherTree.stump.Value)
+            {
+              AddTilesToHighlightedArea(arrayToUse, false, (int)pair.Key.X, (int)pair.Key.Y);
             }
           }
         }
@@ -470,6 +501,7 @@ internal class ShowItemEffectRanges : IDisposable
     PrismaticSprinkler,
     MushroomLog,
     MossySeed,
+    WildTreeSeedSpread,
     CherryBomb,
     Bomb,
     MegaBomb
@@ -503,6 +535,8 @@ internal class ShowItemEffectRanges : IDisposable
         return GetCircularMask(100, maxDisplaySquareRadius: 3);
       case ObjectsWithDistance.MossySeed:
         return GetCircularMask(100, maxDisplaySquareRadius: 2);
+      case ObjectsWithDistance.WildTreeSeedSpread:
+        return GetCircularMask(100, maxDisplaySquareRadius: 3);
       case ObjectsWithDistance.CherryBomb:
         return GetCircularMask(3.39);
       case ObjectsWithDistance.Bomb:

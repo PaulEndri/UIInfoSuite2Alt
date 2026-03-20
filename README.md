@@ -51,6 +51,8 @@
 
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
+- **v2.7.2**
+  - Fix Junimo Hut now properly follows the "Show current/all item range"-keybinds instead of showing when hover over
 - **v2.7.1**
   - HUD icons now wrap to a new row/column when there are many icons active
     - Added "Icons before wrapping" dropdown option (1–10) to control how many icons appear per row/column

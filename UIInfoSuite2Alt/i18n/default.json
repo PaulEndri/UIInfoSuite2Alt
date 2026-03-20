@@ -195,6 +195,7 @@
   "ShowFishQualityStar": "Show quality star",
   "ShowBuffTimers": "Show buff duration timers",
   "PlayBuffExpireSound": "Play sound when buff expires",
+  "ShowCustomIcons": "Show custom mod icons",
   "FestivalToday": "Today: {0}",
   "FestivalTomorrow": "Tomorrow: {0}",
   "FestivalTimeRange": "{0} - {1}",
@@ -212,6 +213,7 @@
   "IconOrder.SeasonalBerry": "Seasonal Berry",
   "IconOrder.TravelingMerchant": "Traveling Merchant",
   "IconOrder.Bookseller": "Bookseller",
+  "IconOrder.CustomIcons": "Custom Icons",
   //Others
   "LevelUp": "Level Up",
   "TrackOnMap": "Track on map"

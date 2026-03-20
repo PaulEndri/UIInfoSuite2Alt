@@ -99,6 +99,7 @@ internal class ModOptionsPageHandler : IDisposable
     var showQuestCount = new ShowQuestCount(helper);
     var showFestivalIcon = new ShowFestivalIcon(helper);
     var showBuffTimers = new ShowBuffTimers(helper);
+    var showCustomIcons = new ShowCustomIcons(helper);
     var showFishOnCatch = new ShowFishOnCatch();
 
     _elementsToDispose = new List<IDisposable>
@@ -124,6 +125,7 @@ internal class ModOptionsPageHandler : IDisposable
       showQuestCount,
       showBuffTimers,
       showFestivalIcon,
+      showCustomIcons,
       showFishOnCatch,
       experienceBar
     };
@@ -379,6 +381,16 @@ internal class ModOptionsPageHandler : IDisposable
       )
     );
 
+    _optionsElements.Add(
+      new ModOptionsCheckbox(
+        _helper.SafeGetString(nameof(config.ShowCustomIcons)),
+        whichOption++,
+        showCustomIcons.ToggleOption,
+        () => config.ShowCustomIcons,
+        Set(v => config.ShowCustomIcons = v)
+      )
+    );
+
     // --- Farm & Field ---
     _optionsElements.Add(new ModOptionsElement(I18n.Section_FarmAndField()));
 
@@ -608,6 +620,7 @@ internal class ModOptionsPageHandler : IDisposable
         "SeasonalBerry" => I18n.IconOrder_SeasonalBerry(),
         "TravelingMerchant" => I18n.IconOrder_TravelingMerchant(),
         "Bookseller" => I18n.IconOrder_Bookseller(),
+        "CustomIcons" => I18n.IconOrder_CustomIcons(),
         _ => key
       };
 

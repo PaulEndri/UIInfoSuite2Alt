@@ -62,23 +62,23 @@ internal class ShowSeasonalBerry : IDisposable
     int day = Game1.dayOfMonth;
 
     if (season == "spring" && day is >= 15 and <= 18)
-      AddIcon("Salmonberry", new Rectangle(128, 193, 15, 15), I18n.CanFindSalmonberry(), 8 / 3f);
+      AddIcon("SeasonalBerry", new Rectangle(128, 193, 15, 15), I18n.CanFindSalmonberry(), 8 / 3f);
 
     else if (season == "summer" && day is >= 12 and <= 14)
-      AddIcon("BeachForage", new Rectangle(144, 256, 16, 16), I18n.CanFindBeachForage(), 20 / 8f);
+      AddIcon("SeasonalBerry", new Rectangle(144, 256, 16, 16), I18n.CanFindBeachForage(), 20 / 8f);
 
     else if (season == "fall" && day is >= 8 and <= 11)
-      AddIcon("Blackberry", new Rectangle(32, 272, 16, 16), I18n.CanFindBlackberry(), 20 / 8f);
+      AddIcon("SeasonalBerry", new Rectangle(32, 272, 16, 16), I18n.CanFindBlackberry(), 20 / 8f);
 
     else if (season == "fall" && day >= 15 && ShowHazelnut)
-      AddIcon("Hazelnut", new Rectangle(1, 274, 14, 14), I18n.CanFindHazelnut(), 20 / 7f);
+      AddIcon("SeasonalBerry", new Rectangle(1, 274, 14, 14), I18n.CanFindHazelnut(), 20 / 7f);
 
     if (season == "spring" && day == 17)
     {
       if (IsPotOfGoldStillThere())
       {
         AddIcon(
-            "PotOfGold",
+            "SeasonalBerry",
             new Rectangle(131, 0, 16, 16),
             I18n.CanFindPotOfGold(),
             20 / 8f,

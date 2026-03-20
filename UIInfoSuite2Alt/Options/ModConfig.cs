@@ -66,6 +66,7 @@ public class ModConfig
   public bool ShowFishQualityStar { get; set; } = true;
   public bool ShowBuffTimers { get; set; } = true;
   public bool PlayBuffExpireSound { get; set; } = true;
+  public bool ShowCustomIcons { get; set; } = true;
   public Dictionary<string, bool> ShowLocationOfFriends { get; set; } = new();
   public Dictionary<string, int> IconOrder { get; set; } = new()
   {
@@ -78,6 +79,7 @@ public class ModConfig
     { "RobinBuilding", 7 },
     { "SeasonalBerry", 8 },
     { "TravelingMerchant", 9 },
-    { "Bookseller", 10 }
+    { "Bookseller", 10 },
+    { "CustomIcons", 11 }
   };
 }

@@ -37,6 +37,11 @@
 
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
+- **v2.7.0**
+  - Content Patcher mods can now add custom HUD icons via the [Custom Icons API](docs/custom-icons.md)
+  - Plays a sound effect when a buff expires (toggleable option)
+  - Removed built-in `Show location of townsfolk`-option. Use the much better [NPC Map Locations](https://www.nexusmods.com/stardewvalley/mods/239) by Bouhm instead
+  - Fix seasonal berry icon not respecting icon order setting
 - **v2.6.9**
   - Changed the "Show crop and tree times" option into two new separate options:
     - "Show crop tooltip"
@@ -161,6 +166,7 @@ All mods listed here are **optional** and not required for UI Info Suite 2 Alter
 - [Sunberry Village](https://www.nexusmods.com/stardewvalley/mods/11111)
 - [Visit Mount Vapius](https://www.nexusmods.com/stardewvalley/mods/9600)
 - [Better Game Menu](https://www.nexusmods.com/stardewvalley/mods/12667)
+- [Content Patcher](https://www.nexusmods.com/stardewvalley/mods/1915) (Custom Icons API)
 - [Cloudy Skies](https://www.nexusmods.com/stardewvalley/mods/23868)
 - [Custom Bush](https://www.nexusmods.com/stardewvalley/mods/20619)
 - [Deluxe Journal](https://www.nexusmods.com/stardewvalley/mods/11436)

@@ -23,7 +23,8 @@ public sealed class IconHandler
     "RobinBuilding",
     "SeasonalBerry",
     "TravelingMerchant",
-    "Bookseller"
+    "Bookseller",
+    "CustomIcons"
   };
 
   private const int IconGap = 48;

@@ -8,8 +8,10 @@ using UIInfoSuite2Alt.AdditionalFeatures;
 using UIInfoSuite2Alt.Compatibility;
 using UIInfoSuite2Alt.Compatibility.CustomBush;
 using HarmonyLib;
+using System.Collections.Generic;
 using UIInfoSuite2Alt.Infrastructure;
 using UIInfoSuite2Alt.Infrastructure.Extensions;
+using UIInfoSuite2Alt.Infrastructure.Structures;
 using UIInfoSuite2Alt.Options;
 using UIInfoSuite2Alt.UIElements;
 
@@ -27,6 +29,8 @@ public class ModEntry : Mod
   private ModOptionsPageHandler? _modOptionsPageHandler;
 
   public static IReflectionHelper Reflection { get; private set; } = null!;
+
+  internal const string CustomIconsAssetName = "Mods/DazUki.UIInfoSuite2Alt/CustomIcons";
 
   public static IMonitor MonitorObject { get; private set; } = null!;
 
@@ -51,6 +55,7 @@ public class ModEntry : Mod
     _skipIntro = new SkipIntro(helper.Events);
     ModConfig = Helper.ReadConfig<Options.ModConfig>();
 
+    helper.Events.Content.AssetRequested += OnAssetRequested;
     helper.Events.GameLoop.ReturnedToTitle += OnReturnedToTitle;
     helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
     helper.Events.GameLoop.DayStarted += OnDayStarted;
@@ -222,6 +227,7 @@ public class ModEntry : Mod
     AddBool(nameof(ModConfig.ShowBuffTimers), () => ModConfig.ShowBuffTimers, v => ModConfig.ShowBuffTimers = v);
     AddSubBool(nameof(ModConfig.PlayBuffExpireSound), () => ModConfig.PlayBuffExpireSound, v => ModConfig.PlayBuffExpireSound = v);
     Spacer();
+    AddBool(nameof(ModConfig.ShowCustomIcons), () => ModConfig.ShowCustomIcons, v => ModConfig.ShowCustomIcons = v);
 
     // --- Farm & Field ---
     configMenu.AddSectionTitle(ModManifest, text: () => I18n.Section_FarmAndField());
@@ -313,6 +319,7 @@ public class ModEntry : Mod
           "SeasonalBerry" => I18n.IconOrder_SeasonalBerry(),
           "TravelingMerchant" => I18n.IconOrder_TravelingMerchant(),
           "Bookseller" => I18n.IconOrder_Bookseller(),
+          "CustomIcons" => I18n.IconOrder_CustomIcons(),
           _ => capturedKey
         },
         getValue: () => ModConfig.IconOrder.TryGetValue(capturedKey, out int v) ? v : 99,
@@ -395,6 +402,17 @@ public class ModEntry : Mod
     }
 
     Monitor.Log($"Renamed {jsonFiles.Length} legacy settings file(s) to .json.old — settings are now global in config.json", LogLevel.Info);
+  }
+
+  private void OnAssetRequested(object? sender, AssetRequestedEventArgs e)
+  {
+    if (e.NameWithoutLocale.IsEquivalentTo(CustomIconsAssetName))
+    {
+      e.LoadFrom(
+        () => new Dictionary<string, CustomIconData>(),
+        AssetLoadPriority.Low
+      );
+    }
   }
 
   private static void OnRenderedHud(object? sender, RenderedHudEventArgs e)

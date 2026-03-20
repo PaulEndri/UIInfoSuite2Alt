@@ -22,7 +22,6 @@ public class ModConfig
   public bool ShowLevelUpAnimation { get; set; } = true;
   public bool ShowHeartFills { get; set; } = true;
   public bool ShowExtraItemInformation { get; set; } = true;
-  public bool ShowLocationOfTownsPeople { get; set; } = true;
   public bool ShowLuckIcon { get; set; } = true;
   public bool ShowTravelingMerchant { get; set; } = true;
   public bool ShowBookseller { get; set; } = true;

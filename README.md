@@ -17,11 +17,14 @@
   Thanks to <a href="https://github.com/Annosz">Annosz</a>, <a href="https://github.com/tqdv">tqdv</a>, <a href="https://github.com/drewhoener">drewhoener</a>, <a href="https://github.com/cdaragorn">cdaragorn</a>, and all the contributors who built and maintained UIInfoSuite over the years. Their work made this mod what it is today.
 </p>
 
-<h2 align="center">
-  <a href="https://github.com/dazuki/UIInfoSuite2Alt/releases/latest"><strong>Download Latest Release</strong></a>
-</h2>
+<p align="center">
+  <a href="https://github.com/dazuki/UIInfoSuite2Alt/releases/latest"><img src=".github/assets/download-latest-release.png" alt="Download Latest Release"></a>
+</p>
+
+<hr />
 
 <p align="center">
+  <img src=".github/assets/make-custom-icons-for-your-content-patcher-mods.png" alt="Custom Icons For Content Patcher" />
   <img src=".github/assets/custom-icons-2.7.0.png" alt="Custom Icons API" />
 </p>
 
@@ -34,6 +37,7 @@
   <a href="docs/custom-icons.md">API Documentation</a></b>
 </p>
 
+<hr />
 
 ![translations](https://raw.githubusercontent.com/dazuki/UIInfoSuite2Alt/master/.github/assets/translations.png)
 

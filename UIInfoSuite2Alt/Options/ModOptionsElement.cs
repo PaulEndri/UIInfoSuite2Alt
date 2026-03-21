@@ -84,7 +84,7 @@ public class ModOptionsElement
         batch,
         _label,
         slotX + Bounds.X,
-        slotY + Bounds.Y + Game1.pixelZoom * 3,
+        slotY + Bounds.Y,
         999,
         -1,
         999,

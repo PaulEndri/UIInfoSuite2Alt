@@ -60,6 +60,9 @@
   "ReachableTiles": "{{count}} Reachable Tiles",
   "CoveredTiles": "{{count}} Covered Tiles",
   "OverlappingTiles": "{{count}} Overlapping Tiles",
+  "WildTree": "Wild Tree",
+  "SeedRange": "Seed Range",
+  "LocationNotFarm": "Seeds only spread on the farm",
   //Tree
   "Stump": "stump",
   // This space is required for languages that use a space between words, delete otherwise (e.g. Korean)

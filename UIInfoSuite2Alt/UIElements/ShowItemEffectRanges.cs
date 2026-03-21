@@ -45,6 +45,8 @@ internal class ShowItemEffectRanges : IDisposable
     public bool ShowingAll;
     public int OccupiedTiles;
     public int RawTotalTiles;
+    public string? SubHeader;
+    public string? WarningMessage;
   }
   #endregion
 
@@ -130,6 +132,14 @@ internal class ShowItemEffectRanges : IDisposable
     {
       UpdateEffectiveArea();
       GetOverlapValue();
+
+      // When overlap tracking is off (e.g. wild trees), merge intersection back into
+      // the normal area so all tiles render green instead of red.
+      if (_rangeTooltipInfo.Value is { TrackOverlap: false } && _effectiveAreaIntersection.Value.Count > 0)
+      {
+        _effectiveAreaOther.Value.UnionWith(_effectiveAreaIntersection.Value);
+        _effectiveAreaIntersection.Value.Clear();
+      }
       if (ButtonShowOneRange)
       {
         ButtonShowOneRange = false;
@@ -227,16 +237,28 @@ internal class ShowItemEffectRanges : IDisposable
 
     var lines = new List<(string text, Color color)> { (header, Game1.textColor) };
 
-    lines.Add((I18n.ReachableTiles(count: reachableTiles), Tools.TooltipBlue));
-
-    if (info.ShowingAll && info.TrackOverlap)
+    if (info.SubHeader != null)
     {
-      lines.Add((I18n.CoveredTiles(count: coveredTiles), Tools.TooltipGreen));
+      lines.Add((info.SubHeader, Tools.TooltipGreen));
     }
 
-    if (info.TrackOverlap && overlapTiles > 0)
+    if (info.WarningMessage != null)
     {
-      lines.Add((I18n.OverlappingTiles(count: overlapTiles), Tools.TooltipRed));
+      lines.Add((info.WarningMessage, Tools.TooltipYellow));
+    }
+    else
+    {
+      lines.Add((I18n.ReachableTiles(count: reachableTiles), Tools.TooltipBlue));
+
+      if (info.ShowingAll && info.TrackOverlap)
+      {
+        lines.Add((I18n.CoveredTiles(count: coveredTiles), Tools.TooltipGreen));
+      }
+
+      if (info.TrackOverlap && overlapTiles > 0)
+      {
+        lines.Add((I18n.OverlappingTiles(count: overlapTiles), Tools.TooltipRed));
+      }
     }
 
     // Calculate dimensions
@@ -332,9 +354,8 @@ internal class ShowItemEffectRanges : IDisposable
       }
     }
 
-    // Wild tree seed spread — only on Farm locations (matches game's seed spread logic)
-    if (_showItemEffectRanges && ButtonControlShow && (ButtonShowOneRange || ButtonShowAllRanges)
-        && Game1.currentLocation is Farm)
+    // Wild tree seed spread — seed spread only occurs on Farm locations
+    if (_showItemEffectRanges && ButtonControlShow && (ButtonShowOneRange || ButtonShowAllRanges))
     {
       Vector2 gamepadTile = Game1.player.CurrentTool != null
         ? Utility.snapToInt(Game1.player.GetToolLocation() / Game1.tileSize)
@@ -345,34 +366,47 @@ internal class ShowItemEffectRanges : IDisposable
       if (Game1.currentLocation.terrainFeatures.TryGetValue(treeTile, out TerrainFeature? feature)
           && feature is Tree tree && tree.growthStage.Value >= 5 && !tree.stump.Value)
       {
-        arrayToUse = GetDistanceArray(ObjectsWithDistance.WildTreeSeedSpread);
-        int treeTiles = CountTilesInArray(arrayToUse);
-
-        _rangeTooltipInfo.Value = new RangeTooltipInfo
+        if (Game1.currentLocation is Farm)
         {
-          ObjectName = I18n.TileRange(),
-          TrackOverlap = false,
-          ObjectCount = 1,
-          ShowingAll = ButtonShowAllRanges,
-          OccupiedTiles = 1,
-          RawTotalTiles = treeTiles
-        };
+          arrayToUse = GetDistanceArray(ObjectsWithDistance.WildTreeSeedSpread);
+          int treeTiles = CountTilesInArray(arrayToUse);
 
-        AddTilesToHighlightedArea(arrayToUse, false, (int)treeTile.X, (int)treeTile.Y);
-
-        if (ButtonShowAllRanges)
-        {
-          foreach (KeyValuePair<Vector2, TerrainFeature> pair in Game1.currentLocation.terrainFeatures.Pairs)
+          _rangeTooltipInfo.Value = new RangeTooltipInfo
           {
-            if (pair.Value is Tree otherTree && otherTree != tree
-                && otherTree.growthStage.Value >= 5 && !otherTree.stump.Value)
+            ObjectName = I18n.WildTree(),
+            SubHeader = I18n.SeedRange(),
+            TrackOverlap = false,
+            ObjectCount = 1,
+            ShowingAll = ButtonShowAllRanges,
+            OccupiedTiles = 1,
+            RawTotalTiles = treeTiles
+          };
+
+          AddTilesToHighlightedArea(arrayToUse, false, (int)treeTile.X, (int)treeTile.Y);
+
+          if (ButtonShowAllRanges)
+          {
+            foreach (KeyValuePair<Vector2, TerrainFeature> pair in Game1.currentLocation.terrainFeatures.Pairs)
             {
-              _rangeTooltipInfo.Value.ObjectCount++;
-              _rangeTooltipInfo.Value.OccupiedTiles++;
-              _rangeTooltipInfo.Value.RawTotalTiles += treeTiles;
-              AddTilesToHighlightedArea(arrayToUse, false, (int)pair.Key.X, (int)pair.Key.Y);
+              if (pair.Value is Tree otherTree && otherTree != tree
+                  && otherTree.growthStage.Value >= 5 && !otherTree.stump.Value)
+              {
+                _rangeTooltipInfo.Value.ObjectCount++;
+                _rangeTooltipInfo.Value.OccupiedTiles++;
+                _rangeTooltipInfo.Value.RawTotalTiles += treeTiles;
+                AddTilesToHighlightedArea(arrayToUse, false, (int)pair.Key.X, (int)pair.Key.Y);
+              }
             }
           }
+        }
+        else
+        {
+          string treeName = ShowTileTooltips.GetTreeTypeName(tree.treeType.Value) + I18n.Tree();
+          _rangeTooltipInfo.Value = new RangeTooltipInfo
+          {
+            ObjectName = treeName,
+            WarningMessage = I18n.LocationNotFarm()
+          };
         }
       }
     }

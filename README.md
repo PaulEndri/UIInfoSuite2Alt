@@ -60,7 +60,7 @@
   - Polish and improve layout for both in-game mod options page and GMCM options
   - Reworked item range display when using the keybinds to check tile coverage
     - Add range tooltip showing reachable tiles, covered tiles, and overlap count (toggleable sub-option)
-    - Show wild tree seed spread range(Only on locations considered a "Farm")
+    - Show wild tree seed spread range on farms, with informational tooltip outside farm locations
     - Fix Junimo Hut to now properly follow the "Show current/all item range"-keybinds
   - Quest board keybind now opens the board selector when Ridgeside Village is installed instead of only opening vanilla "Help Wanted!"
   - Add "Open GMCM Options" button to in-game options tab for quick access to Generic Mod Config Menu to, for example, change keybindings

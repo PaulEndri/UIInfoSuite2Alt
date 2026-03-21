@@ -394,7 +394,7 @@ internal class ShowTileTooltips : IDisposable
   }
 
   // See: stardewvalleywiki.com/Trees
-  private static string GetTreeTypeName(string treeType)
+  internal static string GetTreeTypeName(string treeType)
   {
     switch (treeType)
     {

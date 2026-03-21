@@ -17,6 +17,13 @@ namespace UIInfoSuite2Alt.Infrastructure;
 
 public static class Tools
 {
+  #region Tooltip Colors
+  public static readonly Color TooltipGreen = new(45, 100, 5);
+  public static readonly Color TooltipYellow = new(110, 70, 25);
+  public static readonly Color TooltipBlue = new(25, 85, 145);
+  public static readonly Color TooltipRed = new(165, 25, 25);
+  #endregion
+
   public static int GetWidthInPlayArea()
   {
     if (Game1.isOutdoorMapSmallerThanViewport())

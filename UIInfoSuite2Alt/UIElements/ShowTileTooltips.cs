@@ -17,6 +17,7 @@ using StardewValley.TerrainFeatures;
 using StardewValley.TokenizableStrings;
 using UIInfoSuite2Alt.Compatibility;
 using UIInfoSuite2Alt.Compatibility.CustomBush;
+using UIInfoSuite2Alt.Infrastructure;
 using UIInfoSuite2Alt.Infrastructure.Extensions;
 using UIInfoSuite2Alt.Infrastructure.Helpers;
 using Object = StardewValley.Object;
@@ -59,10 +60,10 @@ internal class ShowTileTooltips : IDisposable
   private const int MAX_TREE_GROWTH_STAGE = 5;
 
   // Colors for the different tooltip text
-  private static readonly Color ReadyColor = new(45, 100, 5);
-  private static readonly Color WaitingColor = new(110, 70, 25);
-  private static readonly Color WateredColor = new(25, 85, 145);
-  private static readonly Color NotWateredColor = new(165, 25, 25);
+  private static readonly Color ReadyColor = Tools.TooltipGreen;
+  private static readonly Color WaitingColor = Tools.TooltipYellow;
+  private static readonly Color WateredColor = Tools.TooltipBlue;
+  private static readonly Color NotWateredColor = Tools.TooltipRed;
 
   private static readonly List<Func<Building?, List<HoverLine>, bool>> BuildingDetailRenderers = new()
   {

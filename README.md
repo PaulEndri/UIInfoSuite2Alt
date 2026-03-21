@@ -43,24 +43,27 @@
 
 ❤️ Big **THANK YOU** to All Translators that make this mod available in so many different languages! ❤️
 
-- [Mandarin](https://www.nexusmods.com/stardewvalley/mods/43147) - passersby10086
-- [Portuguese](https://www.nexusmods.com/stardewvalley/mods/43172) ([#1](https://www.nexusmods.com/stardewvalley/mods/43172), [#2](https://www.nexusmods.com/stardewvalley/mods/43142)) - Maatsuki, Necromante96Official
-- [Russian](https://www.nexusmods.com/stardewvalley/mods/43168) - ReyRoyce
-- [Vietnamese](https://www.nexusmods.com/stardewvalley/mods/43168) - toiviethoamodkoaichoi
-- [Japanese](https://www.nexusmods.com/stardewvalley/mods/43335) - tchuks
-- [Turkish](https://www.nexusmods.com/stardewvalley/mods/43359) - Bortakbosna
-- [Korean](https://www.nexusmods.com/stardewvalley/mods/43452) - jjongleee
+- [中文](https://www.nexusmods.com/stardewvalley/mods/43147) - passersby10086
+- [Português](https://www.nexusmods.com/stardewvalley/mods/43172) ([#1](https://www.nexusmods.com/stardewvalley/mods/43172), [#2](https://www.nexusmods.com/stardewvalley/mods/43142)) - Maatsuki, Necromante96Official
+- [Русский](https://www.nexusmods.com/stardewvalley/mods/43168) - ReyRoyce
+- [Tiếng Việt](https://www.nexusmods.com/stardewvalley/mods/43168) - toiviethoamodkoaichoi
+- [日本語](https://www.nexusmods.com/stardewvalley/mods/43335) - tchuks
+- [Türkçe](https://www.nexusmods.com/stardewvalley/mods/43359) - Bortakbosna
+- [한국어](https://www.nexusmods.com/stardewvalley/mods/43452) - jjongleee
+- [Española](https://www.nexusmods.com/stardewvalley/mods/43900) - SrNemoa
 
 ![New features](.github/assets/patch-notes.png)
 
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
 - **v2.7.2**
-  - Quest board keybind now opens the board selector when Ridgeside Village is installed instead of only opening vanilla billboard
-  - Add "Open GMCM Options" button to in-game options tab for quick access to Generic Mod Config Menu
+  - Reworked item range display when using the keybinds to check tile coverage
+    - Add range tooltip showing reachable tiles, covered tiles, and overlap count
+    - Show wild tree seed spread range(Only on locations considered a "Farm")
+    - Fix Junimo Hut to now properly follow the "Show current/all item range"-keybinds
+  - Quest board keybind now opens the board selector when Ridgeside Village is installed instead of only opening vanilla "Help Wanted!"
+  - Add "Open GMCM Options" button to in-game options tab for quick access to Generic Mod Config Menu to, for example, change keybindings
     - Shows a red notice text if GMCM is not installed
-  - Show wild tree seed spread range (7x7) when using item range keybinds on Farm locations
-  - Fix Junimo Hut to now properly follow the "Show current/all item range"-keybinds
 - **v2.7.1**
   - HUD icons now wrap to a new row/column when there are many icons active
     - Added "Icons before wrapping" dropdown option (1–10) to control how many icons appear per row/column

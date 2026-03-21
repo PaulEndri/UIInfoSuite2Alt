@@ -16,6 +16,7 @@ public static class ModCompat
   public const string RidgesideVillage = "Rafseazz.RidgesideVillage";
   public const string SunberryVillage = "SunberryTeam.SBVSMAPI";
   public const string EscasModdingPlugins = "Esca.EMP";
+  public const string NpcMapLocations = "Bouhm.NPCMapLocations";
 }
 
 public static class ApiManager

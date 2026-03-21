@@ -96,11 +96,11 @@ public sealed class IconHandler
       if (UseVerticalLayout)
       {
         xBase -= 16;
-        yPos += ShowQuestCount ? 55 : 20;
+        yPos += ShowQuestCount ? 50 : 20;
       }
       else
       {
-        xBase -= 65;
+        xBase -= 67;
       }
     }
     else if (UseVerticalLayout)

@@ -75,12 +75,14 @@ public class ModEntry : Mod
     SoundHelper.Instance.Initialize(Helper);
 
     // Register mod compatibility APIs
-    var configMenu = ApiManager.TryRegisterApi<IGenericModConfigMenuApi>(Helper, ModCompat.Gmcm, "1.6.0");
+    var configMenu = ApiManager.TryRegisterApi<IGenericModConfigMenuApi>(Helper, ModCompat.Gmcm, "1.16.0");
     ApiManager.TryRegisterApi<IContentPatcherAPI>(Helper, ModCompat.ContentPatcher, "2.9.0");
     ApiManager.TryRegisterApi<ICustomBushApi>(Helper, ModCompat.CustomBush, "1.2.1", true);
     ApiManager.TryRegisterApi<ICloudySkiesApi>(Helper, ModCompat.CloudySkies);
     ApiManager.TryRegisterApi<IBetterGameMenuApi>(Helper, ModCompat.BetterGameMenu);
     ApiManager.TryRegisterApi<IFerngillSimpleEconomyApi>(Helper, ModCompat.FerngillEconomy);
+
+    LogModRecommendations(Helper);
 
     if (configMenu is null)
     {
@@ -339,6 +341,27 @@ public class ModEntry : Mod
         min: 1,
         max: 20
       );
+    }
+  }
+  #endregion
+
+  #region Mod recommendations
+  private static void LogModRecommendations(IModHelper helper)
+  {
+    var recommendations = new (string ModId, string Name, int NexusId, string Reason)[]
+    {
+      (ModCompat.Gmcm, "Generic Mod Config Menu", 5098,
+        "Required to Change Keybinds in-game"),
+      (ModCompat.NpcMapLocations, "NPC Map Locations", 239,
+        "NPC map tracking was Removed in v2.7.0 - Use this mod instead"),
+    };
+
+    foreach (var (modId, name, nexusId, reason) in recommendations)
+    {
+      if (!helper.ModRegistry.IsLoaded(modId))
+      {
+        MonitorObject.Log($"Recommended mod not installed: {name} [Nexus:{nexusId}] - {reason}.", LogLevel.Info);
+      }
     }
   }
   #endregion

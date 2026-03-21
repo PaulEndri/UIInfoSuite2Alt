@@ -272,12 +272,6 @@ public class ModEntry : Mod
       getValue: () => ModConfig.ShowItemEffectRanges,
       setValue: v => ModConfig.ShowItemEffectRanges = v
     );
-    configMenu.AddBoolOption(
-      ModManifest,
-      name: () => "- " + I18n.ButtonControlShow(),
-      getValue: () => ModConfig.ButtonControlShow,
-      setValue: v => ModConfig.ButtonControlShow = v
-    );
     Spacer();
     configMenu.AddBoolOption(
       ModManifest,
@@ -285,6 +279,14 @@ public class ModEntry : Mod
       getValue: () => ModConfig.ShowBombRange,
       setValue: v => ModConfig.ShowBombRange = v
     );
+    Spacer();
+    configMenu.AddBoolOption(
+      ModManifest,
+      name: () => I18n.EnableItemRangeKeybinds(),
+      getValue: () => ModConfig.ButtonControlShow,
+      setValue: v => ModConfig.ButtonControlShow = v
+    );
+    configMenu.AddParagraph(ModManifest, text: () => $"{ModConfig.ShowOneRange} / {ModConfig.ShowAllRange}");
 
     // --- Experience & Skills ---
     configMenu.AddSectionTitle(ModManifest, text: () => I18n.Section_ExperienceAndSkills());

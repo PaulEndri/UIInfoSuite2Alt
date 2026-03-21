@@ -501,22 +501,13 @@ internal class ModOptionsPageHandler : IDisposable
         Set(v => config.ShowFishPondIcons = v)
       )
     );
-    var ScarecrowAndSprinklerRangeIcon = new ModOptionsCheckbox(
-      I18n.ShowItemEffectRanges(),
-      whichOption++,
-      showScarecrowAndSprinklerRange.ToggleOption,
-      () => config.ShowItemEffectRanges,
-      Set(v => config.ShowItemEffectRanges = v)
-    );
-    _optionsElements.Add(ScarecrowAndSprinklerRangeIcon);
     _optionsElements.Add(
       new ModOptionsCheckbox(
-        I18n.ButtonControlShow(),
+        I18n.ShowItemEffectRanges(),
         whichOption++,
-        showScarecrowAndSprinklerRange.ToggleButtonControlShowOption,
-        () => config.ButtonControlShow,
-        Set(v => config.ButtonControlShow = v),
-        ScarecrowAndSprinklerRangeIcon
+        showScarecrowAndSprinklerRange.ToggleOption,
+        () => config.ShowItemEffectRanges,
+        Set(v => config.ShowItemEffectRanges = v)
       )
     );
     _optionsElements.Add(
@@ -528,6 +519,16 @@ internal class ModOptionsPageHandler : IDisposable
         Set(v => config.ShowBombRange = v)
       )
     );
+    _optionsElements.Add(
+      new ModOptionsCheckbox(
+        I18n.EnableItemRangeKeybinds(),
+        whichOption++,
+        showScarecrowAndSprinklerRange.ToggleButtonControlShowOption,
+        () => config.ButtonControlShow,
+        Set(v => config.ButtonControlShow = v)
+      )
+    );
+    _optionsElements.Add(new ModOptionsElement($"[{config.ShowOneRange}]   =   [{config.ShowAllRange}]", isSmallText: true));
 
     // --- Experience & Skills ---
     _optionsElements.Add(new ModOptionsElement(I18n.Section_ExperienceAndSkills()));

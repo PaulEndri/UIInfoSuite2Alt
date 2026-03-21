@@ -328,7 +328,7 @@ internal class ShowItemEffectRanges : IDisposable
 
         _rangeTooltipInfo.Value = new RangeTooltipInfo
         {
-          ObjectName = I18n.TileRange(),
+          ObjectName = I18n.ObjectRange(),
           TrackOverlap = true,
           ObjectCount = 1,
           ShowingAll = ButtonShowAllRanges,
@@ -446,7 +446,7 @@ internal class ShowItemEffectRanges : IDisposable
 
             _rangeTooltipInfo.Value = new RangeTooltipInfo
             {
-              ObjectName = I18n.TileRange(),
+              ObjectName = I18n.ObjectRange(),
               TrackOverlap = true,
               ObjectCount = 1,
               ShowingAll = ButtonShowAllRanges,
@@ -483,7 +483,7 @@ internal class ShowItemEffectRanges : IDisposable
 
             _rangeTooltipInfo.Value = new RangeTooltipInfo
             {
-              ObjectName = I18n.TileRange(),
+              ObjectName = I18n.ObjectRange(),
               TrackOverlap = true,
               ObjectCount = 1,
               ShowingAll = ButtonShowAllRanges,
@@ -520,7 +520,7 @@ internal class ShowItemEffectRanges : IDisposable
             arrayToUse = GetDistanceArray(ObjectsWithDistance.Beehouse);
             _rangeTooltipInfo.Value = new RangeTooltipInfo
             {
-              ObjectName = I18n.TileRange(),
+              ObjectName = I18n.ObjectRange(),
               TrackOverlap = false,
               ObjectCount = 1,
               OccupiedTiles = 1,
@@ -534,7 +534,7 @@ internal class ShowItemEffectRanges : IDisposable
             arrayToUse = GetDistanceArray(ObjectsWithDistance.MushroomLog);
             _rangeTooltipInfo.Value = new RangeTooltipInfo
             {
-              ObjectName = I18n.TileRange(),
+              ObjectName = I18n.ObjectRange(),
               TrackOverlap = false,
               ObjectCount = 1,
               OccupiedTiles = 1,
@@ -548,7 +548,7 @@ internal class ShowItemEffectRanges : IDisposable
             arrayToUse = GetDistanceArray(ObjectsWithDistance.MossySeed);
             _rangeTooltipInfo.Value = new RangeTooltipInfo
             {
-              ObjectName = I18n.TileRange(),
+              ObjectName = I18n.ObjectRange(),
               TrackOverlap = false,
               ObjectCount = 1,
               OccupiedTiles = 1,

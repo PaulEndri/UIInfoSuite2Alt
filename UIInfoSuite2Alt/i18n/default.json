@@ -56,7 +56,7 @@
   "NotWatered": "Not Watered",
   "DoesNotProduceThisSeason": "Does not produce this season",
   //Item Range Tooltip
-  "TileRange": "Tile Range",
+  "ObjectRange": "Object Range",
   "ReachableTiles": "{{count}} Reachable Tiles",
   "CoveredTiles": "{{count}} Covered Tiles",
   "OverlappingTiles": "{{count}} Overlapping Tiles",

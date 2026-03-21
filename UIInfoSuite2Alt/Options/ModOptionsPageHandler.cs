@@ -44,6 +44,14 @@ internal class ModOptionsPageHandler : IDisposable
   private readonly PerScreen<int?> _modOptionsTabPageNumber = new();
 
   private readonly List<ModOptionsElement> _optionsElements = new();
+
+  private void OptionsSpacer(int rows = 1)
+  {
+    for (int i = 0; i < rows; i++)
+    {
+      _optionsElements.Add(new ModOptionsElement(""));
+    }
+  }
   private readonly PerScreen<ModOptionsPageState?> _savedPageState = new();
   private bool ShowPersonalConfigButton => ModEntry.ModConfig.ShowOptionsTabInMenu;
 
@@ -131,8 +139,8 @@ internal class ModOptionsPageHandler : IDisposable
     };
 
     var whichOption = 1;
-    _optionsElements.Add(new ModOptionsElement($"UI Info Suite 2 Alt. {GetVersionString(helper)}"));
-    _optionsElements.Add(new ModOptionsElement(I18n.Paragraph_KeybindsInGmcm(), isSmallText: true));
+    _optionsElements.Add(new ModOptionsElement($"UI Info Suite 2 Alt. {GetVersionString(helper)}", isCentered: true));
+    _optionsElements.Add(new ModOptionsElement(I18n.Paragraph_KeybindsInGmcm(), isSmallText: true, isCentered: true));
 
     if (ApiManager.GetApi<IGenericModConfigMenuApi>(ModCompat.Gmcm, out var gmcm))
     {
@@ -143,14 +151,15 @@ internal class ModOptionsPageHandler : IDisposable
           new ModOptionsSmallButton(
             I18n.Button_OpenGmcmOptions(),
             whichOption++,
-            () => gmcm.OpenModMenu(modInfo.Manifest)
+            () => gmcm.OpenModMenu(modInfo.Manifest),
+            isCentered: true
           )
         );
       }
     }
     else
     {
-      _optionsElements.Add(new ModOptionsElement(I18n.SmallText_GmcmMissing(), isSmallText: true, textColor: Color.Red));
+      _optionsElements.Add(new ModOptionsElement(I18n.SmallText_GmcmMissing(), isSmallText: true, isCentered: true, textColor: Color.Red));
     }
 
     // --- HUD Icons ---
@@ -519,16 +528,33 @@ internal class ModOptionsPageHandler : IDisposable
         Set(v => config.ShowBombRange = v)
       )
     );
+    var enableItemRangeKeybinds = new ModOptionsCheckbox(
+      I18n.EnableItemRangeKeybinds(),
+      whichOption++,
+      showScarecrowAndSprinklerRange.ToggleButtonControlShowOption,
+      () => config.ButtonControlShow,
+      Set(v => config.ButtonControlShow = v)
+    );
+    _optionsElements.Add(enableItemRangeKeybinds);
     _optionsElements.Add(
       new ModOptionsCheckbox(
-        I18n.EnableItemRangeKeybinds(),
+        I18n.ShowRangeTooltip(),
         whichOption++,
-        showScarecrowAndSprinklerRange.ToggleButtonControlShowOption,
-        () => config.ButtonControlShow,
-        Set(v => config.ButtonControlShow = v)
+        showScarecrowAndSprinklerRange.ToggleShowRangeTooltipOption,
+        () => config.ShowRangeTooltip,
+        Set(v => config.ShowRangeTooltip = v),
+        enableItemRangeKeybinds
       )
     );
-    _optionsElements.Add(new ModOptionsElement($"[{config.ShowOneRange}]   =   [{config.ShowAllRange}]", isSmallText: true));
+    _optionsElements.Add(new ModOptionsElement(
+        $"{I18n.EnableItemRangeKeybinds()}\n"
+      + $"  {I18n.Keybinds_ShowOneRange_DisplayedName()}:\n"
+      + $"    > {config.ShowOneRange}\n"
+      + $"  {I18n.Keybinds_ShowAllRange_DisplayedName()}:\n"
+      + $"    > {config.ShowAllRange}",
+      isSmallText: true
+    ));
+    OptionsSpacer();
 
     // --- Experience & Skills ---
     _optionsElements.Add(new ModOptionsElement(I18n.Section_ExperienceAndSkills()));
@@ -634,7 +660,7 @@ internal class ModOptionsPageHandler : IDisposable
 
     // --- Icon Order ---
     _optionsElements.Add(new ModOptionsElement(I18n.Section_IconOrder()));
-    _optionsElements.Add(new ModOptionsElement(I18n.Section_IconOrder_Subtitle(), isSubtitle: true));
+    _optionsElements.Add(new ModOptionsElement(I18n.Section_IconOrder_Subtitle(), isSmallText: true));
 
     foreach (string key in IconHandler.IconKeys)
     {

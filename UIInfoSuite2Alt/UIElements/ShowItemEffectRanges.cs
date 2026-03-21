@@ -29,6 +29,7 @@ internal class ShowItemEffectRanges : IDisposable
   private bool _showItemEffectRanges;
 
   private bool ButtonControlShow { get; set; }
+  private bool ShowRangeTooltip { get; set; } = true;
   private bool ShowBombRange { get; set; }
 
   private bool ButtonShowOneRange { get; set; }
@@ -77,6 +78,11 @@ internal class ShowItemEffectRanges : IDisposable
     }
 
     UpdateEventSubscriptions();
+  }
+
+  public void ToggleShowRangeTooltipOption(bool showRangeTooltip)
+  {
+    ShowRangeTooltip = showRangeTooltip;
   }
 
   public void ToggleShowBombRangeOption(bool showBombRange)
@@ -195,6 +201,11 @@ internal class ShowItemEffectRanges : IDisposable
 
   private void OnRenderedHud(object? sender, RenderedHudEventArgs e)
   {
+    if (!ShowRangeTooltip)
+    {
+      return;
+    }
+
     RangeTooltipInfo? info = _rangeTooltipInfo.Value;
     if (info == null)
     {

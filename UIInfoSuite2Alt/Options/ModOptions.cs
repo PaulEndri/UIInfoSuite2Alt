@@ -22,6 +22,7 @@ internal record ModOptions
   public bool HideAnimalPetOnMaxFriendship { get; set; } = true;
   public bool ShowItemEffectRanges { get; set; } = true;
   public bool ButtonControlShow { get; set; } = false;
+  public bool ShowRangeTooltip { get; set; } = true;
   public bool ShowBombRange { get; set; } = false;
   public bool ShowHarvestPricesInShop { get; set; } = true;
   public bool DisplayCalendarAndBillboard { get; set; } = true;

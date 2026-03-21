@@ -18,9 +18,10 @@ public class ModOptionsElement
   private readonly int _whichOption;
   private readonly bool _isSubtitle;
   private readonly bool _isSmallText;
+  private readonly bool _isCentered;
   private readonly Color? _textColor;
 
-  public ModOptionsElement(string label, int whichOption = -1, ModOptionsElement? parent = null, bool isSubtitle = false, bool isSmallText = false, Color? textColor = null)
+  public ModOptionsElement(string label, int whichOption = -1, ModOptionsElement? parent = null, bool isSubtitle = false, bool isSmallText = false, bool isCentered = false, Color? textColor = null)
   {
     int x = DefaultX * Game1.pixelZoom;
     int y = DefaultY * Game1.pixelZoom;
@@ -32,6 +33,11 @@ public class ModOptionsElement
       x += DefaultX * 2 * Game1.pixelZoom;
     }
 
+    if (isSmallText)
+    {
+      y -= Game1.pixelZoom * 3;
+    }
+
     Bounds = new Rectangle(x, y, width, height);
     _label = label;
     _whichOption = whichOption;
@@ -39,6 +45,7 @@ public class ModOptionsElement
     _parent = parent;
     _isSubtitle = isSubtitle;
     _isSmallText = isSmallText;
+    _isCentered = isCentered;
     _textColor = textColor;
   }
 
@@ -56,11 +63,19 @@ public class ModOptionsElement
   {
     if (_isSmallText)
     {
+      float drawX = slotX + Bounds.X;
+      if (_isCentered)
+      {
+        float textWidth = Game1.smallFont.MeasureString(_label).X;
+        int slotWidth = Game1.activeClickableMenu?.width ?? Game1.uiViewport.Width;
+        drawX = slotX + (slotWidth - Game1.tileSize / 2 - textWidth) / 2f;
+      }
+
       Utility.drawTextWithShadow(
         batch,
         _label,
         Game1.smallFont,
-        new Vector2(slotX + Bounds.X, slotY + Bounds.Y),
+        new Vector2(drawX, slotY + Bounds.Y),
         _textColor ?? Game1.textColor,
         1f,
         0.1f
@@ -80,10 +95,18 @@ public class ModOptionsElement
     }
     else if (_whichOption < 0)
     {
+      int drawX = slotX + Bounds.X;
+      if (_isCentered)
+      {
+        int textWidth = SpriteText.getWidthOfString(_label);
+        int slotWidth = Game1.activeClickableMenu?.width ?? Game1.uiViewport.Width;
+        drawX = slotX + (slotWidth - Game1.tileSize / 2 - textWidth) / 2;
+      }
+
       SpriteText.drawString(
         batch,
         _label,
-        slotX + Bounds.X,
+        drawX,
         slotY + Bounds.Y,
         999,
         -1,

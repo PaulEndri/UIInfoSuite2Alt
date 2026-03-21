@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
@@ -39,12 +39,13 @@ internal class ModOptionsNumberPicker : ModOptionsElement
     int arrowH = 11 * scale;
     int numberW = 12 * scale;
 
-    _leftArrowBounds = new Rectangle(Bounds.X, Bounds.Y, arrowW, arrowH);
-    _valueBounds = new Rectangle(Bounds.X + arrowW + 4, Bounds.Y, numberW, arrowH);
-    _rightArrowBounds = new Rectangle(Bounds.X + arrowW + 4 + numberW + 4, Bounds.Y, arrowW, arrowH);
+    int y = Bounds.Y - Game1.pixelZoom * 3;
+    _leftArrowBounds = new Rectangle(Bounds.X, y, arrowW, arrowH);
+    _valueBounds = new Rectangle(Bounds.X + arrowW + 4, y, numberW, arrowH);
+    _rightArrowBounds = new Rectangle(Bounds.X + arrowW + 4 + numberW + 4, y, arrowW, arrowH);
 
     // Expand Bounds so the gate check in ModOptionsPage covers all sub-elements
-    Bounds = new Rectangle(Bounds.X, Bounds.Y, _rightArrowBounds.Right - Bounds.X, arrowH);
+    Bounds = new Rectangle(Bounds.X, y, _rightArrowBounds.Right - Bounds.X, arrowH);
   }
 
   public override void ReceiveLeftClick(int x, int y)

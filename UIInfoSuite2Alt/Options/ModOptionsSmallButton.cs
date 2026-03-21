@@ -9,15 +9,18 @@ namespace UIInfoSuite2Alt.Options;
 internal class ModOptionsSmallButton : ModOptionsElement
 {
   private readonly Action _onClick;
+  private readonly bool _isCentered;
   private bool _boundsInitialized;
 
   public ModOptionsSmallButton(
     string label,
     int whichOption,
-    Action onClick
+    Action onClick,
+    bool isCentered = false
   ) : base(label, whichOption)
   {
     _onClick = onClick;
+    _isCentered = isCentered;
   }
 
   private void EnsureBounds()
@@ -29,10 +32,19 @@ internal class ModOptionsSmallButton : ModOptionsElement
 
     _boundsInitialized = true;
     var textSize = Game1.smallFont.MeasureString(_label);
+    int buttonWidth = (int)textSize.X + 64;
+    int buttonX = Bounds.X;
+
+    if (_isCentered)
+    {
+      int slotWidth = Game1.activeClickableMenu?.width ?? Game1.uiViewport.Width;
+      buttonX = (slotWidth - Game1.tileSize / 2 - buttonWidth) / 2;
+    }
+
     Bounds = new Rectangle(
-      Bounds.X,
-      Bounds.Y - Game1.pixelZoom * 4,
-      (int)textSize.X + 64,
+      buttonX,
+      Bounds.Y - Game1.pixelZoom * 7,
+      buttonWidth,
       (int)textSize.Y + 20
     );
   }

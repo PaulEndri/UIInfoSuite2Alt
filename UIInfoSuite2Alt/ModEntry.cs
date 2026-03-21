@@ -175,7 +175,7 @@ public class ModEntry : Mod
       configMenu.AddBoolOption(ModManifest, name: () => Helper.SafeGetString(key), getValue: get, setValue: set);
 
     void AddSubBool(string key, Func<bool> get, Action<bool> set) =>
-      configMenu.AddBoolOption(ModManifest, name: () => "- " + Helper.SafeGetString(key), getValue: get, setValue: set);
+      configMenu.AddBoolOption(ModManifest, name: () => "  > " + Helper.SafeGetString(key), getValue: get, setValue: set);
 
     void Spacer() => configMenu.AddParagraph(ModManifest, text: () => "");
 
@@ -197,7 +197,7 @@ public class ModEntry : Mod
     string[] luckIconStyles = { "0", "1", "2" };
     configMenu.AddTextOption(
       ModManifest,
-      name: () => "- " + Helper.SafeGetString(nameof(ModConfig.LuckIconStyle)),
+      name: () => "  > " + Helper.SafeGetString(nameof(ModConfig.LuckIconStyle)),
       getValue: () => ModConfig.LuckIconStyle.ToString(),
       setValue: v => ModConfig.LuckIconStyle = int.Parse(v),
       allowedValues: luckIconStyles,
@@ -221,7 +221,7 @@ public class ModEntry : Mod
     AddBool(nameof(ModConfig.ShowTravelingMerchant), () => ModConfig.ShowTravelingMerchant, v => ModConfig.ShowTravelingMerchant = v);
     AddSubBool(nameof(ModConfig.HideMerchantWhenVisited), () => ModConfig.HideMerchantWhenVisited, v => ModConfig.HideMerchantWhenVisited = v);
     AddSubBool(nameof(ModConfig.ShowMerchantBundleIcon), () => ModConfig.ShowMerchantBundleIcon, v => ModConfig.ShowMerchantBundleIcon = v);
-    configMenu.AddBoolOption(ModManifest, name: () => "  - " + Helper.SafeGetString(nameof(ModConfig.ShowMerchantBundleItemNames)), getValue: () => ModConfig.ShowMerchantBundleItemNames, setValue: v => ModConfig.ShowMerchantBundleItemNames = v);
+    AddSubBool(nameof(ModConfig.ShowMerchantBundleItemNames), () => ModConfig.ShowMerchantBundleItemNames, v => ModConfig.ShowMerchantBundleItemNames = v);
     Spacer();
     AddBool(nameof(ModConfig.ShowBookseller), () => ModConfig.ShowBookseller, v => ModConfig.ShowBookseller = v);
     AddSubBool(nameof(ModConfig.HideBooksellerWhenVisited), () => ModConfig.HideBooksellerWhenVisited, v => ModConfig.HideBooksellerWhenVisited = v);
@@ -288,7 +288,21 @@ public class ModEntry : Mod
       getValue: () => ModConfig.ButtonControlShow,
       setValue: v => ModConfig.ButtonControlShow = v
     );
-    configMenu.AddParagraph(ModManifest, text: () => $"{ModConfig.ShowOneRange} / {ModConfig.ShowAllRange}");
+    AddSubBool(nameof(ModConfig.ShowRangeTooltip), () => ModConfig.ShowRangeTooltip, v => ModConfig.ShowRangeTooltip = v);
+    configMenu.AddComplexOption(
+      ModManifest,
+      name: () => "",
+      draw: (spriteBatch, pos) =>
+      {
+        string text =
+            $"{I18n.Keybinds_ShowOneRange_DisplayedName()}:\n"
+          + $"  > {ModConfig.ShowOneRange}\n"
+          + $"{I18n.Keybinds_ShowAllRange_DisplayedName()}:\n"
+          + $"  > {ModConfig.ShowAllRange}";
+        Utility.drawTextWithShadow(spriteBatch, text, Game1.smallFont, pos, Game1.textColor);
+      },
+      height: () => (int)(Game1.smallFont.MeasureString("T").Y * 5)
+    );
 
     // --- Experience & Skills ---
     configMenu.AddSectionTitle(ModManifest, text: () => I18n.Section_ExperienceAndSkills());

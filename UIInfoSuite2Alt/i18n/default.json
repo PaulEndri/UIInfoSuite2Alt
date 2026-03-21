@@ -3,7 +3,7 @@
   "OptionsTabTooltip": "UI Info Suite Options",
   "OpenSettings": "Open Settings",
   // some config options
-  "Bool.ShowOptionsTabInMenu.DisplayedName": "Show options in in-game menu",
+  "Bool.ShowOptionsTabInMenu.DisplayedName": "Show options tab in-game",
   "Bool.ShowOptionsTabInMenu.Tooltip": "Enables an extra tab in the in-game menu where you can configure every options for this mod.",
   "Text.ApplyDefaultSettingsFromThisSave.DisplayedName": "Apply default settings from this save",
   "Text.ApplyDefaultSettingsFromThisSave.Tooltip": "New characters will inherit the settings for the mod from this save file.",
@@ -164,6 +164,7 @@
   "ShowFishPondIcons": "Show fish species icon on ponds",
   "ShowItemEffectRanges": "Show held item placement range",
   "EnableItemRangeKeybinds": "Enable item range keybinds",
+  "ShowRangeTooltip": "Show range tooltip",
   "ShowBombRange": "Show bomb destroying range",
   "ShowExtraItemInformation": "Show item hover information",
   "ShowHarvestPricesInShop": "Show shop harvest prices",

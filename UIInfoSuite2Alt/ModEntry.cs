@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
@@ -161,10 +163,6 @@ public class ModEntry : Mod
       getValue: () => ModConfig.ShowAllRange,
       setValue: value => ModConfig.ShowAllRange = value
       );
-
-    // The HR™ Line
-    configMenu.AddSectionTitle(ModManifest, text: () => "------------------------------------------------");
-
     RegisterGmcmFeatureToggles(configMenu);
   }
 
@@ -181,6 +179,9 @@ public class ModEntry : Mod
 
     // --- HUD Icons ---
     configMenu.AddSectionTitle(ModManifest, text: () => I18n.Section_HudIcons());
+    configMenu.AddImage(ModManifest, () => Helper.ModContent.Load<Texture2D>("assets/banner_hud.png"), scale: 1);
+
+    AddBool(nameof(ModConfig.UseVerticalIconLayout), () => ModConfig.UseVerticalIconLayout, v => ModConfig.UseVerticalIconLayout = v);
 
     string[] iconsPerRowValues = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" };
     configMenu.AddTextOption(
@@ -191,7 +192,6 @@ public class ModEntry : Mod
       allowedValues: iconsPerRowValues
     );
 
-    AddBool(nameof(ModConfig.UseVerticalIconLayout), () => ModConfig.UseVerticalIconLayout, v => ModConfig.UseVerticalIconLayout = v);
     AddBool(nameof(ModConfig.ShowLuckIcon), () => ModConfig.ShowLuckIcon, v => ModConfig.ShowLuckIcon = v);
 
     string[] luckIconStyles = { "0", "1", "2" };
@@ -244,6 +244,7 @@ public class ModEntry : Mod
 
     // --- Farm & Field ---
     configMenu.AddSectionTitle(ModManifest, text: () => I18n.Section_FarmAndField());
+    configMenu.AddImage(ModManifest, () => Helper.ModContent.Load<Texture2D>("assets/banner_ffield.png"), scale: 1);
 
     AddBool(nameof(ModConfig.ShowAnimalsNeedPets), () => ModConfig.ShowAnimalsNeedPets, v => ModConfig.ShowAnimalsNeedPets = v);
     AddSubBool(nameof(ModConfig.HideAnimalPetOnMaxFriendship), () => ModConfig.HideAnimalPetOnMaxFriendship, v => ModConfig.HideAnimalPetOnMaxFriendship = v);
@@ -306,6 +307,7 @@ public class ModEntry : Mod
 
     // --- Experience & Skills ---
     configMenu.AddSectionTitle(ModManifest, text: () => I18n.Section_ExperienceAndSkills());
+    configMenu.AddImage(ModManifest, () => Helper.ModContent.Load<Texture2D>("assets/banner_exp.png"), scale: 1);
 
     AddBool(nameof(ModConfig.ShowLevelUpAnimation), () => ModConfig.ShowLevelUpAnimation, v => ModConfig.ShowLevelUpAnimation = v);
     AddBool(nameof(ModConfig.ShowExperienceBar), () => ModConfig.ShowExperienceBar, v => ModConfig.ShowExperienceBar = v);
@@ -316,12 +318,14 @@ public class ModEntry : Mod
 
     // --- Items & Shopping ---
     configMenu.AddSectionTitle(ModManifest, text: () => I18n.Section_ItemsAndShopping());
+    configMenu.AddImage(ModManifest, () => Helper.ModContent.Load<Texture2D>("assets/banner_items.png"), scale: 1);
 
     AddBool(nameof(ModConfig.ShowExtraItemInformation), () => ModConfig.ShowExtraItemInformation, v => ModConfig.ShowExtraItemInformation = v);
     AddBool(nameof(ModConfig.ShowHarvestPricesInShop), () => ModConfig.ShowHarvestPricesInShop, v => ModConfig.ShowHarvestPricesInShop = v);
 
     // --- NPC & Social ---
     configMenu.AddSectionTitle(ModManifest, text: () => I18n.Section_NpcAndSocial());
+    configMenu.AddImage(ModManifest, () => Helper.ModContent.Load<Texture2D>("assets/banner_npc.png"), scale: 1);
 
     AddBool(nameof(ModConfig.ShowHeartFills), () => ModConfig.ShowHeartFills, v => ModConfig.ShowHeartFills = v);
     AddBool(nameof(ModConfig.DisplayCalendarAndBillboard), () => ModConfig.DisplayCalendarAndBillboard, v => ModConfig.DisplayCalendarAndBillboard = v);

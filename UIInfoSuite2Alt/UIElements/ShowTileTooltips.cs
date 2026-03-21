@@ -546,7 +546,7 @@ internal class ShowTileTooltips : IDisposable
       // Golden Animal Cracker
       if (fishPond.goldenAnimalCracker.Value)
       {
-        entries.Add(new HoverLine(I18n.FishPondGoldenCracker(), new Color(218, 165, 32)));
+        entries.Add(new HoverLine(I18n.FishPondGoldenCracker(), WaitingColor));
       }
 
       return true;

@@ -43,7 +43,7 @@ internal class ModOptionsSmallButton : ModOptionsElement
 
     Bounds = new Rectangle(
       buttonX,
-      Bounds.Y - Game1.pixelZoom * 7,
+      Bounds.Y,
       buttonWidth,
       (int)textSize.Y + 20
     );

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
@@ -52,6 +53,12 @@ internal class ModOptionsPageHandler : IDisposable
       _optionsElements.Add(new ModOptionsElement(""));
     }
   }
+
+  private void OptionsHR()
+  {
+    _optionsElements.Add(new ModOptionsElement("------------------------------------------------------------------------", isCentered: true, isVertCentered: true, isSmallText: true));
+  }
+
   private readonly PerScreen<ModOptionsPageState?> _savedPageState = new();
   private bool ShowPersonalConfigButton => ModEntry.ModConfig.ShowOptionsTabInMenu;
 
@@ -140,7 +147,7 @@ internal class ModOptionsPageHandler : IDisposable
 
     var whichOption = 1;
     _optionsElements.Add(new ModOptionsElement($"UI Info Suite 2 Alt. {GetVersionString(helper)}", isCentered: true));
-    _optionsElements.Add(new ModOptionsElement(I18n.Paragraph_KeybindsInGmcm(), isSmallText: true, isCentered: true));
+    _optionsElements.Add(new ModOptionsElement(I18n.Paragraph_KeybindsInGmcm(), isSmallText: true, isCentered: true, isVertCentered: true));
 
     if (ApiManager.GetApi<IGenericModConfigMenuApi>(ModCompat.Gmcm, out var gmcm))
     {
@@ -159,21 +166,16 @@ internal class ModOptionsPageHandler : IDisposable
     }
     else
     {
-      _optionsElements.Add(new ModOptionsElement(I18n.SmallText_GmcmMissing(), isSmallText: true, isCentered: true, textColor: Color.Red));
+      _optionsElements.Add(new ModOptionsElement(I18n.SmallText_GmcmMissing(), isSmallText: true, isCentered: true, isVertCentered: true, textColor: Color.Red));
     }
+    OptionsHR();
 
     // --- HUD Icons ---
-    _optionsElements.Add(new ModOptionsElement(I18n.Section_HudIcons()));
-
+    _optionsElements.Add(new ModOptionsElement(I18n.Section_HudIcons(), isVertCentered: true));
     _optionsElements.Add(
-      new ModOptionsDropdown(
-        _helper.SafeGetString(nameof(config.IconsPerRow)),
-        whichOption++,
-        new List<string> { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" },
-        () => config.IconsPerRow - 1,
-        SetInt(v => { config.IconsPerRow = v + 1; IconHandler.Handler.IconsPerRow = v + 1; })
-      )
+      new ModOptionsImage(() => _helper.ModContent.Load<Texture2D>("assets/banner_hud.png"), scale: 1)
     );
+
     _optionsElements.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.UseVerticalIconLayout)),
@@ -183,7 +185,15 @@ internal class ModOptionsPageHandler : IDisposable
         Set(v => config.UseVerticalIconLayout = v)
       )
     );
-
+    _optionsElements.Add(
+      new ModOptionsDropdown(
+        _helper.SafeGetString(nameof(config.IconsPerRow)),
+        whichOption++,
+        new List<string> { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" },
+        () => config.IconsPerRow - 1,
+        SetInt(v => { config.IconsPerRow = v + 1; IconHandler.Handler.IconsPerRow = v + 1; })
+      )
+    );
     var luckIcon = new ModOptionsCheckbox(
       _helper.SafeGetString(nameof(config.ShowLuckIcon)),
       whichOption++,
@@ -430,7 +440,10 @@ internal class ModOptionsPageHandler : IDisposable
     );
 
     // --- Farm & Field ---
-    _optionsElements.Add(new ModOptionsElement(I18n.Section_FarmAndField()));
+    _optionsElements.Add(new ModOptionsElement(I18n.Section_FarmAndField(), isVertCentered: true));
+    _optionsElements.Add(
+      new ModOptionsImage(() => _helper.ModContent.Load<Texture2D>("assets/banner_ffield.png"), scale: 1)
+    );
 
     var animalPetIcon = new ModOptionsCheckbox(
       _helper.SafeGetString(nameof(config.ShowAnimalsNeedPets)),
@@ -557,7 +570,10 @@ internal class ModOptionsPageHandler : IDisposable
     OptionsSpacer();
 
     // --- Experience & Skills ---
-    _optionsElements.Add(new ModOptionsElement(I18n.Section_ExperienceAndSkills()));
+    _optionsElements.Add(new ModOptionsElement(I18n.Section_ExperienceAndSkills(), isVertCentered: true));
+    _optionsElements.Add(
+      new ModOptionsImage(() => _helper.ModContent.Load<Texture2D>("assets/banner_exp.png"), scale: 1)
+    );
 
     _optionsElements.Add(
       new ModOptionsCheckbox(
@@ -615,7 +631,10 @@ internal class ModOptionsPageHandler : IDisposable
     );
 
     // --- Items & Shopping ---
-    _optionsElements.Add(new ModOptionsElement(I18n.Section_ItemsAndShopping()));
+    _optionsElements.Add(new ModOptionsElement(I18n.Section_ItemsAndShopping(), isVertCentered: true));
+    _optionsElements.Add(
+      new ModOptionsImage(() => _helper.ModContent.Load<Texture2D>("assets/banner_items.png"), scale: 1)
+    );
 
     _optionsElements.Add(
       new ModOptionsCheckbox(
@@ -637,7 +656,10 @@ internal class ModOptionsPageHandler : IDisposable
     );
 
     // --- NPC & Social ---
-    _optionsElements.Add(new ModOptionsElement(I18n.Section_NpcAndSocial()));
+    _optionsElements.Add(new ModOptionsElement(I18n.Section_NpcAndSocial(), isVertCentered: true));
+    _optionsElements.Add(
+      new ModOptionsImage(() => _helper.ModContent.Load<Texture2D>("assets/banner_npc.png"), scale: 1)
+    );
 
     _optionsElements.Add(
       new ModOptionsCheckbox(

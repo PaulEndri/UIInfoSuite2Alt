@@ -56,15 +56,15 @@
 
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
-- **v2.7.2**
-  - Polish and improve layout for both in-game mod options page and GMCM options
+- **v2.8.0**
   - Reworked item range display when using the keybinds to check tile coverage
     - Add range tooltip showing reachable tiles, covered tiles, and overlap count (toggleable sub-option)
     - Show wild tree seed spread range on farms, with informational tooltip outside farm locations
     - Fix Junimo Hut to now properly follow the "Show current/all item range"-keybinds
-  - Quest board keybind now opens the board selector when Ridgeside Village is installed instead of only opening vanilla "Help Wanted!"
+  - Polish and improve layout for both in-game mod options page and GMCM options
   - Add "Open GMCM Options" button to in-game options tab for quick access to Generic Mod Config Menu to, for example, change keybindings
     - Shows a red notice text if GMCM is not installed
+  - Quest board keybind now opens the board selector when Ridgeside Village is installed instead of only opening vanilla "Help Wanted!"
   - Output recommended mods to SMAPI console if they are not installed(GMCM, NPC Map Locations)
 - **v2.7.1**
   - HUD icons now wrap to a new row/column when there are many icons active

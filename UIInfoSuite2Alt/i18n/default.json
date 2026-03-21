@@ -55,6 +55,11 @@
   "Watered": "Watered",
   "NotWatered": "Not Watered",
   "DoesNotProduceThisSeason": "Does not produce this season",
+  //Item Range Tooltip
+  "TileRange": "Tile Range",
+  "ReachableTiles": "{{count}} Reachable Tiles",
+  "CoveredTiles": "{{count}} Covered Tiles",
+  "OverlappingTiles": "{{count}} Overlapping Tiles",
   //Tree
   "Stump": "stump",
   // This space is required for languages that use a space between words, delete otherwise (e.g. Korean)
@@ -157,9 +162,9 @@
   "MachineProcessingMode.Toggle": "Toggle",
   "MachineProcessingMode.Hold": "Hold",
   "ShowFishPondIcons": "Show fish species icon on ponds",
-  "ShowItemEffectRanges": "Show scarecrow and sprinkler range",
-  "ButtonControlShow": "Hold LCtrl to show current item range\nHold LCtrl+LAlt to show all item range",
-  "ShowBombRange": "Show the bomb destroying range",
+  "ShowItemEffectRanges": "Show held item placement range",
+  "EnableItemRangeKeybinds": "Enable item range keybinds",
+  "ShowBombRange": "Show bomb destroying range",
   "ShowExtraItemInformation": "Show item hover information",
   "ShowHarvestPricesInShop": "Show shop harvest prices",
   //Settings - Tabs info

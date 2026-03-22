@@ -285,13 +285,123 @@ internal class ShowTileTooltips : IDisposable
       overrideY = (int)(tile.Y + Utility.ModifyCoordinateForUIScale(32));
     }
 
-    DrawColoredHoverText(Game1.spriteBatch, lines, Game1.smallFont, overrideX, overrideY);
+    (Texture2D? spriteTexture, Rectangle? spriteSourceRect) = GetTooltipSprite(currentTile, currentTileBuilding, terrain);
+    DrawColoredHoverText(Game1.spriteBatch, lines, Game1.smallFont, overrideX, overrideY, spriteTexture, spriteSourceRect);
+  }
+
+  private static (Texture2D? Texture, Rectangle? SourceRect) GetTooltipSprite(
+    Object? tileObject, Building? building, TerrainFeature? terrain)
+  {
+    // Machine: show the output item (e.g. Wine, Juice) - complements the machine icon which shows the input
+    if (tileObject != null && tileObject.bigCraftable.Value &&
+        tileObject.heldObject.Value != null && tileObject.MinutesUntilReady > 0)
+    {
+      return FromItemData(ItemRegistry.GetData(tileObject.heldObject.Value.QualifiedItemId));
+    }
+
+    // Building: prefer output item (e.g. Flour from a Mill), fall back to first input
+    if (building != null && building is not FishPond)
+    {
+      List<Item?> inputItems = new();
+      List<Item?> outputItems = new();
+      MachineHelper.GetBuildingChestItems(building, inputItems, outputItems);
+      Item? firstItem = outputItems.FirstOrDefault(i => i != null) ?? inputItems.FirstOrDefault(i => i != null);
+      if (firstItem != null)
+      {
+        return FromItemData(ItemRegistry.GetData(firstItem.QualifiedItemId));
+      }
+    }
+
+    // Fish pond: show the fish
+    if (building is FishPond fishPond && fishPond.fishType.Value != null && fishPond.currentOccupants.Value > 0)
+    {
+      return FromItemData(ItemRegistry.GetData(fishPond.GetFishObject().QualifiedItemId));
+    }
+
+    if (terrain == null)
+    {
+      return (null, null);
+    }
+
+    // Crop: show harvest item
+    if (terrain is HoeDirt hoeDirt && hoeDirt.crop is { dead.Value: false })
+    {
+      Crop crop = hoeDirt.crop;
+      if (crop.forageCrop.Value)
+      {
+        string forageCropItemId = crop.whichForageCrop.Value switch
+        {
+          "1" => "(O)399",
+          "2" => "(O)829",
+          _ => $"(O){crop.whichForageCrop.Value}"
+        };
+        return FromItemData(ItemRegistry.GetData(forageCropItemId));
+      }
+
+      if (crop.indexOfHarvest.Value != null)
+      {
+        string itemId = crop.isWildSeedCrop() ? crop.whichForageCrop.Value : crop.indexOfHarvest.Value;
+        return FromItemData(ItemRegistry.GetData($"(O){itemId}"));
+      }
+    }
+
+    // Fruit tree: show the sapling sprite
+    if (terrain is FruitTree fruitTree)
+    {
+      return FromItemData(ItemRegistry.GetData(fruitTree.treeId.Value));
+    }
+
+    // Wild tree: generic tree icon from cursors (trimmed 4px right whitespace)
+    if (terrain is Tree)
+    {
+      return (Game1.mouseCursors, new Rectangle(0, 656, 12, 16));
+    }
+
+    // Tea/custom bush: show drop item
+    if (terrain is Bush bush && bush.size.Value == Bush.greenTeaBush)
+    {
+      if (ApiManager.GetApi(ModCompat.CustomBush, out ICustomBushApi? customBushApi) &&
+          customBushApi.TryGetCustomBush(bush, out ICustomBush? customBushData, out string? id))
+      {
+        if (customBushData.GetShakeOffItemIfReady(bush, out ParsedItemData? shakeOffItemData))
+        {
+          return FromItemData(shakeOffItemData);
+        }
+
+        List<PossibleDroppedItem> drops = customBushApi.GetCustomBushDropItems(customBushData, id);
+        if (drops.Count > 0)
+        {
+          return FromItemData(drops[0].Item);
+        }
+      }
+      else
+      {
+        return FromItemData(ItemRegistry.GetData("(O)815")); // Tea Leaves
+      }
+    }
+
+    return (null, null);
+
+    static (Texture2D? Texture, Rectangle? SourceRect) FromItemData(ParsedItemData? data)
+    {
+      return data != null ? (data.GetTexture(), data.GetSourceRect()) : (null, null);
+    }
   }
 
   private static void DrawColoredHoverText(
-    SpriteBatch b, List<HoverLine> lines, SpriteFont font, int overrideX = -1, int overrideY = -1)
+    SpriteBatch b, List<HoverLine> lines, SpriteFont font,
+    int overrideX = -1, int overrideY = -1,
+    Texture2D? spriteTexture = null, Rectangle? spriteSourceRect = null)
   {
+    const int spriteSize = 32;
+    const int spritePadding = 4;
+    bool hasSprite = spriteTexture != null && spriteSourceRect != null;
+    float spriteScale = hasSprite ? spriteSize / (float)Math.Max(spriteSourceRect!.Value.Width, spriteSourceRect.Value.Height) : 0;
+    int renderedSpriteWidth = hasSprite ? (int)(spriteSourceRect!.Value.Width * spriteScale) : 0;
+    int spriteSpace = hasSprite ? renderedSpriteWidth + spritePadding : 0;
+
     float maxWidth = 0;
+    bool isFirstLine = true;
     foreach (HoverLine line in lines)
     {
       float lineWidth = 0;
@@ -301,6 +411,13 @@ internal class ShowTileTooltips : IDisposable
         {
           lineWidth += font.MeasureString(segment.Text).X;
         }
+      }
+
+      // First line needs extra room for the sprite
+      if (isFirstLine)
+      {
+        lineWidth += spriteSpace;
+        isFirstLine = false;
       }
 
       maxWidth = Math.Max(maxWidth, lineWidth);
@@ -349,10 +466,18 @@ internal class ShowTileTooltips : IDisposable
     Color defaultColor = Game1.textColor;
     Color shadowColor = Game1.textShadowColor;
     float lineY = y + 16 + 4;
+    bool isFirst = true;
 
     foreach (HoverLine line in lines)
     {
       float segX = x + 16;
+
+      // Indent first line to leave room for the sprite
+      if (isFirst && hasSprite)
+      {
+        segX += spriteSpace;
+      }
+
       foreach (HoverSegment segment in line.Segments)
       {
         if (segment.Text.Length > 0)
@@ -365,6 +490,17 @@ internal class ShowTileTooltips : IDisposable
           b.DrawString(font, segment.Text, pos, segColor * 0.9f);
           segX += font.MeasureString(segment.Text).X;
         }
+      }
+
+      // Draw sprite on the first line, vertically centered with the text
+      if (isFirst && hasSprite)
+      {
+        Rectangle sourceRect = spriteSourceRect!.Value;
+        float scale = spriteSize / (float)Math.Max(sourceRect.Width, sourceRect.Height);
+        float spriteCenterY = lineY + font.LineSpacing / 2f - (sourceRect.Height * scale) / 2f - 2f;
+        Vector2 spritePos = new(x + 16, spriteCenterY);
+        b.Draw(spriteTexture!, spritePos, sourceRect, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0.9f);
+        isFirst = false;
       }
 
       lineY += font.LineSpacing;

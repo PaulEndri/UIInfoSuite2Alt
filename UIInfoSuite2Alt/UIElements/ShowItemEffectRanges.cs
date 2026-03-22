@@ -54,6 +54,18 @@ internal class ShowItemEffectRanges : IDisposable
     public string? SubHeader;
     public string? WarningMessage;
     public Color TileColor = Color.LawnGreen;
+    public Texture2D? SpriteTexture;
+    public Rectangle? SpriteSourceRect;
+
+    public void SetSpriteFromObject(Object obj)
+    {
+      var itemData = ItemRegistry.GetData(obj.QualifiedItemId);
+      if (itemData != null)
+      {
+        SpriteTexture = itemData.GetTexture();
+        SpriteSourceRect = itemData.GetSourceRect();
+      }
+    }
   }
   #endregion
 
@@ -165,7 +177,7 @@ internal class ShowItemEffectRanges : IDisposable
   private void OnRenderingHud(object? sender, RenderingHudEventArgs e)
   {
     Color tileColor = _isBombRange.Value ? Color.Lime : _rangeTooltipInfo.Value?.TileColor ?? Color.LawnGreen;
-    float tileOpacity = _isBombRange.Value ? 0.3f : 0.4f;
+    float tileOpacity = _isBombRange.Value ? 0.3f : 0.5f;
     Texture2D texture = _isBombRange.Value ? _tileBombTexture.Value : _tileTexture.Value;
 
     foreach (Point point in _effectiveAreaOther.Value)
@@ -241,8 +253,6 @@ internal class ShowItemEffectRanges : IDisposable
     int coveredTiles = _effectiveAreaOther.Value.Count + overlapTiles - info.OccupiedTiles;
 
     SpriteFont font = Game1.smallFont;
-    int padding = 16;
-    int lineHeight = (int)font.MeasureString("T").Y + 4;
 
     // Build tooltip lines
     string header = info.ShowingAll
@@ -275,19 +285,34 @@ internal class ShowItemEffectRanges : IDisposable
       }
     }
 
+    // Sprite dimensions (same layout as ShowTileTooltips.DrawColoredHoverText)
+    const int spriteSize = 32;
+    const int spritePadding = 4;
+    bool hasSprite = info.SpriteTexture != null && info.SpriteSourceRect != null;
+    float spriteScale = hasSprite ? spriteSize / (float)Math.Max(info.SpriteSourceRect!.Value.Width, info.SpriteSourceRect.Value.Height) : 0;
+    int renderedSpriteWidth = hasSprite ? (int)(info.SpriteSourceRect!.Value.Width * spriteScale) : 0;
+    int spriteSpace = hasSprite ? renderedSpriteWidth + spritePadding : 0;
+
     // Calculate dimensions
     float maxWidth = 0;
+    bool isFirstLine = true;
     foreach ((string text, Color _) in lines)
     {
       float w = font.MeasureString(text).X;
+      if (isFirstLine)
+      {
+        w += spriteSpace;
+        isFirstLine = false;
+      }
+
       if (w > maxWidth)
       {
         maxWidth = w;
       }
     }
 
-    int boxWidth = (int)maxWidth + padding * 2;
-    int boxHeight = lines.Count * lineHeight + padding * 2 - 4;
+    int boxWidth = (int)maxWidth + 32;
+    int boxHeight = Math.Max(60, lines.Count * font.LineSpacing + 32);
 
     // Position near mouse, keep on screen
     int x = Game1.getMouseX() + 32;
@@ -303,22 +328,42 @@ internal class ShowItemEffectRanges : IDisposable
       y = Game1.uiViewport.Height - boxHeight;
     }
 
+    boxWidth += 4;
+
     // Draw tooltip box
     IClickableMenu.drawTextureBox(
       e.SpriteBatch, Game1.menuTexture, new Rectangle(0, 256, 60, 60),
       x, y, boxWidth, boxHeight, Color.White);
 
-    // Draw text lines with soft shadow (same style as crop tooltips)
+    // Draw text lines with soft shadow (same layout as ShowTileTooltips)
     Color shadowColor = Game1.textShadowColor;
-    int textY = y + padding;
+    float lineY = y + 16 + 4;
+    bool isFirst = true;
     foreach ((string text, Color color) in lines)
     {
-      var pos = new Vector2(x + padding, textY);
+      float segX = x + 16;
+      if (isFirst && hasSprite)
+      {
+        segX += spriteSpace;
+      }
+
+      var pos = new Vector2(segX, lineY);
       e.SpriteBatch.DrawString(font, text, pos + new Vector2(2f, 2f), shadowColor);
       e.SpriteBatch.DrawString(font, text, pos + new Vector2(0f, 2f), shadowColor);
       e.SpriteBatch.DrawString(font, text, pos + new Vector2(2f, 0f), shadowColor);
       e.SpriteBatch.DrawString(font, text, pos, color * 0.9f);
-      textY += lineHeight;
+
+      // Draw sprite on the first line, vertically centered with the text
+      if (isFirst && hasSprite)
+      {
+        Rectangle sourceRect = info.SpriteSourceRect!.Value;
+        float spriteCenterY = lineY + font.LineSpacing / 2f - (sourceRect.Height * spriteScale) / 2f - 2f;
+        Vector2 spritePos = new(x + 16, spriteCenterY);
+        e.SpriteBatch.Draw(info.SpriteTexture!, spritePos, sourceRect, Color.White, 0f, Vector2.Zero, spriteScale, SpriteEffects.None, 0.9f);
+        isFirst = false;
+      }
+
+      lineY += font.LineSpacing;
     }
   }
   #endregion
@@ -388,7 +433,9 @@ internal class ShowItemEffectRanges : IDisposable
           _rangeTooltipInfo.Value = new RangeTooltipInfo
           {
             ObjectName = treeName,
-            WarningMessage = I18n.NoSeedSpread()
+            WarningMessage = I18n.NoSeedSpread(),
+            SpriteTexture = Game1.mouseCursors,
+            SpriteSourceRect = new Rectangle(0, 656, 12, 16)
           };
         }
         else if (Game1.currentLocation is Farm)
@@ -411,7 +458,9 @@ internal class ShowItemEffectRanges : IDisposable
             ObjectCount = 1,
             ShowingAll = ButtonShowAllRanges,
             OccupiedTiles = 0,
-            RawTotalTiles = reachableTiles
+            RawTotalTiles = reachableTiles,
+            SpriteTexture = Game1.mouseCursors,
+            SpriteSourceRect = new Rectangle(0, 656, 12, 16)
           };
 
           if (ButtonShowAllRanges)
@@ -436,7 +485,9 @@ internal class ShowItemEffectRanges : IDisposable
           _rangeTooltipInfo.Value = new RangeTooltipInfo
           {
             ObjectName = treeName,
-            WarningMessage = I18n.LocationNotFarm()
+            WarningMessage = I18n.LocationNotFarm(),
+            SpriteTexture = Game1.mouseCursors,
+            SpriteSourceRect = new Rectangle(0, 656, 12, 16)
           };
         }
       }
@@ -488,6 +539,7 @@ internal class ShowItemEffectRanges : IDisposable
               OccupiedTiles = 0,
               RawTotalTiles = reachableTiles
             };
+            _rangeTooltipInfo.Value.SetSpriteFromObject(currentObject);
 
             if (ButtonShowAllRanges)
             {
@@ -531,6 +583,7 @@ internal class ShowItemEffectRanges : IDisposable
               OccupiedTiles = 0,
               RawTotalTiles = reachableTiles
             };
+            _rangeTooltipInfo.Value.SetSpriteFromObject(currentObject);
 
             if (ButtonShowAllRanges)
             {
@@ -558,6 +611,7 @@ internal class ShowItemEffectRanges : IDisposable
               OccupiedTiles = 1,
               RawTotalTiles = CountTilesInArray(arrayToUse)
             };
+            _rangeTooltipInfo.Value.SetSpriteFromObject(currentObject);
 
             AddTilesToHighlightedArea(arrayToUse, false, (int)validTile.X, (int)validTile.Y);
           }
@@ -572,6 +626,7 @@ internal class ShowItemEffectRanges : IDisposable
               OccupiedTiles = 1,
               RawTotalTiles = CountTilesInArray(arrayToUse)
             };
+            _rangeTooltipInfo.Value.SetSpriteFromObject(currentObject);
 
             AddTilesToHighlightedArea(arrayToUse, false, (int)validTile.X, (int)validTile.Y);
           }
@@ -586,6 +641,7 @@ internal class ShowItemEffectRanges : IDisposable
               OccupiedTiles = 1,
               RawTotalTiles = CountTilesInArray(arrayToUse)
             };
+            _rangeTooltipInfo.Value.SetSpriteFromObject(currentObject);
 
             AddTilesToHighlightedArea(arrayToUse, false, (int)validTile.X, (int)validTile.Y);
           }

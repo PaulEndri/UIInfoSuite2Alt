@@ -57,6 +57,8 @@
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
 - **v2.8.2**
+  - Show item icon on world tooltips (crops, trees, machines, fish ponds, bushes, buildings) and item range tooltips (sprinklers, scarecrows, bee houses, mushroom logs, wild trees)
+  - Add keybind to open Special Orders board directly (Default: J), with mod board selector support
   - Fix blinding tile highlight for bombs and lowered opacity for all items showing tile highlights
   - Fix Ridgeside Village quest board not appearing in Billboard icon selector until Special Orders board event was seen
 - **v2.8.1**

@@ -10,6 +10,7 @@ public class ModConfig
   public bool ShowOptionsTabInMenu { get; set; } = true;
   public KeybindList OpenCalendarKeybind { get; set; } = KeybindList.ForSingle(SButton.B);
   public KeybindList OpenQuestBoardKeybind { get; set; } = KeybindList.ForSingle(SButton.H);
+  public KeybindList OpenSpecialOrdersBoardKeybind { get; set; } = KeybindList.ForSingle(SButton.J);
   public KeybindList ShowOneRange { get; set; } = KeybindList.ForSingle(SButton.LeftControl);
   public KeybindList ShowAllRange { get; set; } = KeybindList.Parse("LeftControl + LeftAlt");
   public KeybindList OpenModOptionsKeybind { get; set; } = KeybindList.ForSingle(SButton.F8);

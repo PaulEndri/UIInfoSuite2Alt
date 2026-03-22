@@ -130,6 +130,13 @@ public class ModEntry : Mod
     );
     configMenu.AddKeybindList(
       ModManifest,
+      name: () => I18n.Keybinds_OpenSpecialOrdersBoardKeybind_DisplayedName(),
+      tooltip: () => I18n.Keybinds_OpenSpecialOrdersBoardKeybind_Tooltip(),
+      getValue: () => ModConfig.OpenSpecialOrdersBoardKeybind,
+      setValue: value => ModConfig.OpenSpecialOrdersBoardKeybind = value
+    );
+    configMenu.AddKeybindList(
+      ModManifest,
       name: () => I18n.Keybinds_OpenModOptionsKeybind_DisplayedName(),
       tooltip: () => I18n.Keybinds_OpenModOptionsKeybind_Tooltip(),
       getValue: () => ModConfig.OpenModOptionsKeybind,
@@ -500,6 +507,11 @@ public class ModEntry : Mod
     {
       helper.Input.SuppressActiveKeybinds(ModConfig.OpenQuestBoardKeybind);
       ShowCalendarAndBillboardOnGameMenuButton.OpenQuestBoardFromKeybind();
+    }
+    else if (Context.IsPlayerFree && ModConfig.OpenSpecialOrdersBoardKeybind.JustPressed())
+    {
+      helper.Input.SuppressActiveKeybinds(ModConfig.OpenSpecialOrdersBoardKeybind);
+      ShowCalendarAndBillboardOnGameMenuButton.OpenSpecialOrdersBoardFromKeybind();
     }
   }
 

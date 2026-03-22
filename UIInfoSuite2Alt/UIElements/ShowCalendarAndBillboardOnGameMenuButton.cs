@@ -618,6 +618,33 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
     Game1.activeClickableMenu = new Billboard(true);
   }
 
+  public static void OpenSpecialOrdersBoardFromKeybind()
+  {
+    if (_instance == null)
+    {
+      Game1.activeClickableMenu = new SpecialOrdersBoard();
+      return;
+    }
+
+    List<(string BoardType, string DisplayName)> modBoards = _instance.GetAvailableModBoards();
+    if (modBoards.Count > 0)
+    {
+      var viewedTypes = new HashSet<string>();
+      if (!HasUnviewedOrders(""))
+        viewedTypes.Add("");
+      foreach ((string boardType, _) in modBoards)
+      {
+        if (!HasUnviewedOrders(boardType))
+          viewedTypes.Add(boardType);
+      }
+      Game1.activeClickableMenu = new SpecialOrdersBoardSelector(modBoards, _instance.OnBoardSelected, viewedTypes);
+      return;
+    }
+
+    MarkBoardViewed("");
+    Game1.activeClickableMenu = new SpecialOrdersBoard();
+  }
+
   #region RSV Quest Board Support
   private void InitRsvQuestReflection()
   {

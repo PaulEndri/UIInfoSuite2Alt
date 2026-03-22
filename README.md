@@ -57,6 +57,7 @@
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
 - **v2.8.2**
+  - Fix blinding tile highlight for bombs and lowered opacity for all items showing tile highlights
   - Fix Ridgeside Village quest board not appearing in Billboard icon selector until Special Orders board event was seen
 - **v2.8.1**
   - Item range tiles now only highlight valid tiles (skip non-tillable, occupied, and map-blocked tiles for sprinklers/scarecrows; skip occupied tiles for wild trees)

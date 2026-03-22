@@ -25,6 +25,7 @@ internal class ShowItemEffectRanges : IDisposable
   private readonly PerScreen<HashSet<Point>> _seenTiles = new(() => new HashSet<Point>());
 
   private readonly IModHelper _helper;
+  private readonly Lazy<Texture2D> _tileTexture;
 
   private bool _showItemEffectRanges;
 
@@ -37,6 +38,9 @@ internal class ShowItemEffectRanges : IDisposable
 
   private readonly PerScreen<RangeTooltipInfo?> _rangeTooltipInfo = new(() => null);
 
+  /// <summary>Whether the range tooltip is currently visible. Used by ShowTileTooltips to avoid overlapping tooltips.</summary>
+  public bool IsRangeTooltipActive => ShowRangeTooltip && _rangeTooltipInfo.Value != null;
+
   private sealed class RangeTooltipInfo
   {
     public string ObjectName = "";
@@ -47,6 +51,7 @@ internal class ShowItemEffectRanges : IDisposable
     public int RawTotalTiles;
     public string? SubHeader;
     public string? WarningMessage;
+    public Color TileColor = Color.LawnGreen;
   }
   #endregion
 
@@ -55,6 +60,7 @@ internal class ShowItemEffectRanges : IDisposable
   public ShowItemEffectRanges(IModHelper helper)
   {
     _helper = helper;
+    _tileTexture = new Lazy<Texture2D>(() => _helper.ModContent.Load<Texture2D>("assets/tile.png"));
   }
 
   public void Dispose()
@@ -154,6 +160,8 @@ internal class ShowItemEffectRanges : IDisposable
 
   private void OnRenderingHud(object? sender, RenderingHudEventArgs e)
   {
+    Color tileColor = _rangeTooltipInfo.Value?.TileColor ?? Color.LawnGreen;
+
     foreach (Point point in _effectiveAreaOther.Value)
     {
       var position = new Vector2(
@@ -161,10 +169,10 @@ internal class ShowItemEffectRanges : IDisposable
         point.Y * Utility.ModifyCoordinateFromUIScale(Game1.tileSize)
       );
       e.SpriteBatch.Draw(
-        Game1.mouseCursors,
+        _tileTexture.Value,
         Utility.ModifyCoordinatesForUIScale(Game1.GlobalToLocal(Utility.ModifyCoordinatesForUIScale(position))),
-        new Rectangle(194, 388, 16, 16),
-        Color.LimeGreen * 0.8f,
+        null,
+        tileColor * 0.6f,
         0.0f,
         Vector2.Zero,
         Utility.ModifyCoordinateForUIScale(Game1.pixelZoom),
@@ -180,10 +188,10 @@ internal class ShowItemEffectRanges : IDisposable
         point.Y * Utility.ModifyCoordinateFromUIScale(Game1.tileSize)
       );
       e.SpriteBatch.Draw(
-        Game1.mouseCursors,
+        _tileTexture.Value,
         Utility.ModifyCoordinatesForUIScale(Game1.GlobalToLocal(Utility.ModifyCoordinatesForUIScale(position))),
-        new Rectangle(194, 388, 16, 16),
-        Color.Red * 0.7f,
+        null,
+        Color.DarkOrange * 0.7f,
         0.0f,
         Vector2.Zero,
         Utility.ModifyCoordinateForUIScale(Game1.pixelZoom),
@@ -257,7 +265,7 @@ internal class ShowItemEffectRanges : IDisposable
 
       if (info.TrackOverlap && overlapTiles > 0)
       {
-        lines.Add((I18n.OverlappingTiles(count: overlapTiles), Tools.TooltipRed));
+        lines.Add((I18n.OverlappingTiles(count: overlapTiles), Tools.TooltipYellow));
       }
     }
 
@@ -328,7 +336,7 @@ internal class ShowItemEffectRanges : IDisposable
 
         _rangeTooltipInfo.Value = new RangeTooltipInfo
         {
-          ObjectName = I18n.ObjectRange(),
+          ObjectName = I18n.JunimoHuts(),
           TrackOverlap = true,
           ObjectCount = 1,
           ShowingAll = ButtonShowAllRanges,
@@ -366,35 +374,52 @@ internal class ShowItemEffectRanges : IDisposable
       if (Game1.currentLocation.terrainFeatures.TryGetValue(treeTile, out TerrainFeature? feature)
           && feature is Tree tree && tree.growthStage.Value >= 5 && !tree.stump.Value)
       {
-        if (Game1.currentLocation is Farm)
+        float seedSpreadChance = tree.GetData()?.SeedSpreadChance ?? 0.15f;
+
+        if (seedSpreadChance <= 0f)
+        {
+          string treeName = ShowTileTooltips.GetTreeTypeName(tree.treeType.Value) + I18n.Tree();
+          _rangeTooltipInfo.Value = new RangeTooltipInfo
+          {
+            ObjectName = treeName,
+            WarningMessage = I18n.NoSeedSpread()
+          };
+        }
+        else if (Game1.currentLocation is Farm)
         {
           arrayToUse = GetDistanceArray(ObjectsWithDistance.WildTreeSeedSpread);
-          int treeTiles = CountTilesInArray(arrayToUse);
+
+          string treeName = ButtonShowAllRanges
+            ? I18n.WildTree()
+            : ShowTileTooltips.GetTreeTypeName(tree.treeType.Value) + I18n.Tree();
+
+          int tilesBeforeAdd = _effectiveAreaOther.Value.Count;
+          AddTilesToHighlightedArea(arrayToUse, false, (int)treeTile.X, (int)treeTile.Y, skipOccupied: true);
+          int reachableTiles = _effectiveAreaOther.Value.Count - tilesBeforeAdd;
 
           _rangeTooltipInfo.Value = new RangeTooltipInfo
           {
-            ObjectName = I18n.WildTree(),
+            ObjectName = treeName,
             SubHeader = I18n.SeedRange(),
             TrackOverlap = false,
             ObjectCount = 1,
             ShowingAll = ButtonShowAllRanges,
-            OccupiedTiles = 1,
-            RawTotalTiles = treeTiles
+            OccupiedTiles = 0,
+            RawTotalTiles = reachableTiles
           };
-
-          AddTilesToHighlightedArea(arrayToUse, false, (int)treeTile.X, (int)treeTile.Y);
 
           if (ButtonShowAllRanges)
           {
             foreach (KeyValuePair<Vector2, TerrainFeature> pair in Game1.currentLocation.terrainFeatures.Pairs)
             {
               if (pair.Value is Tree otherTree && otherTree != tree
-                  && otherTree.growthStage.Value >= 5 && !otherTree.stump.Value)
+                  && otherTree.growthStage.Value >= 5 && !otherTree.stump.Value
+                  && (otherTree.GetData()?.SeedSpreadChance ?? 0.15f) > 0f)
               {
                 _rangeTooltipInfo.Value.ObjectCount++;
-                _rangeTooltipInfo.Value.OccupiedTiles++;
-                _rangeTooltipInfo.Value.RawTotalTiles += treeTiles;
-                AddTilesToHighlightedArea(arrayToUse, false, (int)pair.Key.X, (int)pair.Key.Y);
+                tilesBeforeAdd = _effectiveAreaOther.Value.Count;
+                AddTilesToHighlightedArea(arrayToUse, false, (int)pair.Key.X, (int)pair.Key.Y, skipOccupied: true);
+                _rangeTooltipInfo.Value.RawTotalTiles += _effectiveAreaOther.Value.Count - tilesBeforeAdd;
               }
             }
           }
@@ -444,17 +469,19 @@ internal class ShowItemEffectRanges : IDisposable
               ? GetDistanceArray(ObjectsWithDistance.DeluxeScarecrow, false, currentObject)
               : GetDistanceArray(ObjectsWithDistance.Scarecrow, false, currentObject);
 
+            int tilesBeforeAdd = _effectiveAreaOther.Value.Count + _effectiveAreaCurrent.Value.Count;
+            AddTilesToHighlightedArea(arrayToUse, !ButtonShowAllRanges, (int)validTile.X, (int)validTile.Y, skipNonTillable: true);
+            int reachableTiles = _effectiveAreaOther.Value.Count + _effectiveAreaCurrent.Value.Count - tilesBeforeAdd;
+
             _rangeTooltipInfo.Value = new RangeTooltipInfo
             {
-              ObjectName = I18n.ObjectRange(),
+              ObjectName = ButtonShowAllRanges ? I18n.Scarecrows() : currentObject.DisplayName,
               TrackOverlap = true,
               ObjectCount = 1,
               ShowingAll = ButtonShowAllRanges,
-              OccupiedTiles = 1,
-              RawTotalTiles = CountTilesInArray(arrayToUse)
+              OccupiedTiles = 0,
+              RawTotalTiles = reachableTiles
             };
-
-            AddTilesToHighlightedArea(arrayToUse, !ButtonShowAllRanges, (int)validTile.X, (int)validTile.Y);
 
             if (ButtonShowAllRanges)
             {
@@ -464,15 +491,12 @@ internal class ShowItemEffectRanges : IDisposable
                 if (!next.Equals(currentObject))
                 {
                   _rangeTooltipInfo.Value.ObjectCount++;
-                  _rangeTooltipInfo.Value.OccupiedTiles++;
                   int[][] arrayToUse_ = next.Name.IndexOf("eluxe", StringComparison.OrdinalIgnoreCase) >= 0
                     ? GetDistanceArray(ObjectsWithDistance.DeluxeScarecrow, false, next)
                     : GetDistanceArray(ObjectsWithDistance.Scarecrow, false, next);
-                  _rangeTooltipInfo.Value.RawTotalTiles += CountTilesInArray(arrayToUse_);
-                  if (!arrayToUse_.SequenceEqual(arrayToUse))
-                  {
-                    AddTilesToHighlightedArea(arrayToUse, false, (int)next.TileLocation.X, (int)next.TileLocation.Y);
-                  }
+                  tilesBeforeAdd = _effectiveAreaOther.Value.Count;
+                  AddTilesToHighlightedArea(arrayToUse_, false, (int)next.TileLocation.X, (int)next.TileLocation.Y, skipNonTillable: true);
+                  _rangeTooltipInfo.Value.RawTotalTiles += _effectiveAreaOther.Value.Count - tilesBeforeAdd;
                 }
               }
             }
@@ -481,16 +505,6 @@ internal class ShowItemEffectRanges : IDisposable
           {
             List<Vector2> sprinklerTilesList = currentObject.GetSprinklerTiles();
 
-            _rangeTooltipInfo.Value = new RangeTooltipInfo
-            {
-              ObjectName = I18n.ObjectRange(),
-              TrackOverlap = true,
-              ObjectCount = 1,
-              ShowingAll = ButtonShowAllRanges,
-              OccupiedTiles = 1,
-              RawTotalTiles = sprinklerTilesList.Count
-            };
-
             IEnumerable<Vector2> unplacedSprinklerTiles = sprinklerTilesList;
             if (currentObject.TileLocation != validTile)
             {
@@ -498,7 +512,19 @@ internal class ShowItemEffectRanges : IDisposable
                 unplacedSprinklerTiles.Select(tile => tile - currentObject.TileLocation + validTile);
             }
 
-            AddTilesToHighlightedArea(unplacedSprinklerTiles, !ButtonShowAllRanges);
+            int tilesBeforeAdd = _effectiveAreaOther.Value.Count;
+            AddTilesToHighlightedArea(unplacedSprinklerTiles, !ButtonShowAllRanges, skipNonTillable: true);
+            int reachableTiles = _effectiveAreaOther.Value.Count + _effectiveAreaCurrent.Value.Count - tilesBeforeAdd;
+
+            _rangeTooltipInfo.Value = new RangeTooltipInfo
+            {
+              ObjectName = ButtonShowAllRanges ? I18n.Sprinklers() : currentObject.DisplayName,
+              TrackOverlap = true,
+              ObjectCount = 1,
+              ShowingAll = ButtonShowAllRanges,
+              OccupiedTiles = 0,
+              RawTotalTiles = reachableTiles
+            };
 
             if (ButtonShowAllRanges)
             {
@@ -508,9 +534,9 @@ internal class ShowItemEffectRanges : IDisposable
                 if (!next.Equals(currentObject))
                 {
                   _rangeTooltipInfo.Value.ObjectCount++;
-                  _rangeTooltipInfo.Value.OccupiedTiles++;
-                  _rangeTooltipInfo.Value.RawTotalTiles += next.GetSprinklerTiles().Count;
-                  AddTilesToHighlightedArea(next.GetSprinklerTiles(), false);
+                  tilesBeforeAdd = _effectiveAreaOther.Value.Count;
+                  AddTilesToHighlightedArea(next.GetSprinklerTiles(), false, skipNonTillable: true);
+                  _rangeTooltipInfo.Value.RawTotalTiles += _effectiveAreaOther.Value.Count - tilesBeforeAdd;
                 }
               }
             }
@@ -520,7 +546,7 @@ internal class ShowItemEffectRanges : IDisposable
             arrayToUse = GetDistanceArray(ObjectsWithDistance.Beehouse);
             _rangeTooltipInfo.Value = new RangeTooltipInfo
             {
-              ObjectName = I18n.ObjectRange(),
+              ObjectName = currentObject.DisplayName,
               TrackOverlap = false,
               ObjectCount = 1,
               OccupiedTiles = 1,
@@ -534,7 +560,7 @@ internal class ShowItemEffectRanges : IDisposable
             arrayToUse = GetDistanceArray(ObjectsWithDistance.MushroomLog);
             _rangeTooltipInfo.Value = new RangeTooltipInfo
             {
-              ObjectName = I18n.ObjectRange(),
+              ObjectName = currentObject.DisplayName,
               TrackOverlap = false,
               ObjectCount = 1,
               OccupiedTiles = 1,
@@ -548,7 +574,7 @@ internal class ShowItemEffectRanges : IDisposable
             arrayToUse = GetDistanceArray(ObjectsWithDistance.MossySeed);
             _rangeTooltipInfo.Value = new RangeTooltipInfo
             {
-              ObjectName = I18n.ObjectRange(),
+              ObjectName = currentObject.DisplayName,
               TrackOverlap = false,
               ObjectCount = 1,
               OccupiedTiles = 1,
@@ -585,7 +611,7 @@ internal class ShowItemEffectRanges : IDisposable
           arrayToUse = itemName.Contains("eluxe")
             ? GetDistanceArray(ObjectsWithDistance.DeluxeScarecrow, false, currentItem)
             : GetDistanceArray(ObjectsWithDistance.Scarecrow, false, currentItem);
-          AddTilesToHighlightedArea(arrayToUse, true, (int)validTile.X, (int)validTile.Y);
+          AddTilesToHighlightedArea(arrayToUse, true, (int)validTile.X, (int)validTile.Y, skipNonTillable: true);
 
           similarObjects = GetSimilarObjectsInLocation("arecrow");
           foreach (Object next in similarObjects)
@@ -593,7 +619,7 @@ internal class ShowItemEffectRanges : IDisposable
             arrayToUse = next.Name.IndexOf("eluxe", StringComparison.OrdinalIgnoreCase) >= 0
               ? GetDistanceArray(ObjectsWithDistance.DeluxeScarecrow, false, next)
               : GetDistanceArray(ObjectsWithDistance.Scarecrow, false, next);
-            AddTilesToHighlightedArea(arrayToUse, false, (int)next.TileLocation.X, (int)next.TileLocation.Y);
+            AddTilesToHighlightedArea(arrayToUse, false, (int)next.TileLocation.X, (int)next.TileLocation.Y, skipNonTillable: true);
           }
         }
         else if (itemName.IndexOf("sprinkler", StringComparison.OrdinalIgnoreCase) >= 0)
@@ -605,12 +631,12 @@ internal class ShowItemEffectRanges : IDisposable
             unplacedSprinklerTiles = unplacedSprinklerTiles.Select(tile => tile - currentItem.TileLocation + validTile);
           }
 
-          AddTilesToHighlightedArea(unplacedSprinklerTiles, true);
+          AddTilesToHighlightedArea(unplacedSprinklerTiles, true, skipNonTillable: true);
 
           similarObjects = GetSimilarObjectsInLocation("sprinkler");
           foreach (Object next in similarObjects)
           {
-            AddTilesToHighlightedArea(next.GetSprinklerTiles(), false);
+            AddTilesToHighlightedArea(next.GetSprinklerTiles(), false, skipNonTillable: true);
           }
         }
         else if (itemName.IndexOf("bee house", StringComparison.OrdinalIgnoreCase) >= 0)
@@ -650,13 +676,27 @@ internal class ShowItemEffectRanges : IDisposable
     }
   }
 
-  private void AddTilesToHighlightedArea(IEnumerable<Vector2> tiles, bool overlap, int xPos = 0, int yPos = 0)
+  private void AddTilesToHighlightedArea(IEnumerable<Vector2> tiles, bool overlap, int xPos = 0, int yPos = 0, bool skipNonTillable = false)
   {
+    GameLocation? location = skipNonTillable ? Game1.currentLocation : null;
+
     foreach (Vector2 tile in tiles)
     {
       var point = tile.ToPoint();
       point.X += xPos;
       point.Y += yPos;
+
+      if (location != null)
+      {
+        var tileVec = new Vector2(point.X, point.Y);
+        bool isTillable = location.doesTileHaveProperty(point.X, point.Y, "Diggable", "Back") != null
+                          || location.isTileHoeDirt(tileVec);
+        if (!isTillable || IsTileBlocked(location, tileVec))
+        {
+          continue;
+        }
+      }
+
       if (overlap)
       {
         _effectiveAreaCurrent.Value.Add(point);
@@ -673,9 +713,10 @@ internal class ShowItemEffectRanges : IDisposable
     }
   }
 
-  private void AddTilesToHighlightedArea(int[][] tileMap, bool overlap, int xPos = 0, int yPos = 0)
+  private void AddTilesToHighlightedArea(int[][] tileMap, bool overlap, int xPos = 0, int yPos = 0, bool skipOccupied = false, bool skipNonTillable = false)
   {
     int xOffset = tileMap.Length / 2;
+    GameLocation? location = (skipOccupied || skipNonTillable) ? Game1.currentLocation : null;
 
     for (var i = 0; i < tileMap.Length; ++i)
     {
@@ -685,6 +726,29 @@ internal class ShowItemEffectRanges : IDisposable
         if (tileMap[i][j] == 1)
         {
           var point = new Point(xPos + i - xOffset, yPos + j - yOffset);
+
+          if (location != null)
+          {
+            var tileVec = new Vector2(point.X, point.Y);
+
+            if (skipNonTillable)
+            {
+              bool isTillable = location.doesTileHaveProperty(point.X, point.Y, "Diggable", "Back") != null
+                                || location.isTileHoeDirt(tileVec);
+              if (!isTillable || IsTileBlocked(location, tileVec))
+              {
+                continue;
+              }
+            }
+            else if (skipOccupied)
+            {
+              if (location.IsTileOccupiedBy(tileVec, ignorePassables: CollisionMask.Farmers) || !location.isTileLocationOpen(tileVec))
+              {
+                continue;
+              }
+            }
+          }
+
           if (overlap)
           {
             _effectiveAreaCurrent.Value.Add(point);
@@ -718,6 +782,65 @@ internal class ShowItemEffectRanges : IDisposable
     }
 
     return count;
+  }
+
+  /// <summary>
+  /// Checks if a tile is blocked by objects, buildings, furniture, characters, or large terrain features.
+  /// Ignores farmers and HoeDirt (tilled soil with or without crops).
+  /// </summary>
+  private static bool IsTileBlocked(GameLocation location, Vector2 tile)
+  {
+    // Map layout (cliffs, built-in fences, walls on Buildings layer)
+    if (!location.isTilePassable(tile))
+    {
+      return true;
+    }
+
+    // Objects (fences, crafted items, etc.)
+    if (location.Objects.TryGetValue(tile, out Object? obj) && !obj.isPassable())
+    {
+      return true;
+    }
+
+    // Furniture
+    if (location.GetFurnitureAt(tile) is { } furniture && !furniture.isPassable())
+    {
+      return true;
+    }
+
+    // Buildings
+    if (location.IsTileOccupiedBy(tile, CollisionMask.Buildings))
+    {
+      return true;
+    }
+
+    // Terrain features - allow HoeDirt (including trellis crops), block flooring/paths and non-passable features
+    if (location.terrainFeatures.TryGetValue(tile, out TerrainFeature? tf) && tf is not HoeDirt)
+    {
+      if (tf is Flooring || !tf.isPassable())
+      {
+        return true;
+      }
+    }
+
+    // Large terrain features (bushes) and resource clumps
+    foreach (LargeTerrainFeature ltf in location.largeTerrainFeatures)
+    {
+      if (ltf.getBoundingBox().Contains((int)tile.X * 64 + 32, (int)tile.Y * 64 + 32) && !ltf.isPassable())
+      {
+        return true;
+      }
+    }
+
+    foreach (ResourceClump clump in location.resourceClumps)
+    {
+      if (clump.occupiesTile((int)tile.X, (int)tile.Y))
+      {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   private List<Object> GetSimilarObjectsInLocation(string nameContains)

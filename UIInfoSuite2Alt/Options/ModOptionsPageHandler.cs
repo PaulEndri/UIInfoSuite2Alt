@@ -106,7 +106,7 @@ internal class ModOptionsPageHandler : IDisposable
     var showBookseller = new ShowBookseller(helper);
     var showRainyDayIcon = new ShowRainyDayIcon(helper);
     var showMachineProcessingItem = new ShowMachineProcessingItem(helper);
-    var showTileTooltips = new ShowTileTooltips(helper);
+    var showTileTooltips = new ShowTileTooltips(helper, showScarecrowAndSprinklerRange);
     var showToolUpgradeStatus = new ShowToolUpgradeStatus(helper);
     var showRobinBuildingStatusIcon = new ShowRobinBuildingStatusIcon(helper);
     var showSeasonalBerry = new ShowSeasonalBerry(helper);

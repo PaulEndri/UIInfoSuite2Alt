@@ -90,14 +90,16 @@ internal class ShowTileTooltips : IDisposable
   private readonly PerScreen<Building?> _currentTileBuilding = new();
 
   private readonly IModHelper _helper;
+  private readonly ShowItemEffectRanges _itemEffectRanges;
   private bool _showCropTooltip;
   private bool _showTreeTooltip;
   private bool _showBarrelTooltip;
   private bool _showFishPondTooltip;
 
-  public ShowTileTooltips(IModHelper helper)
+  public ShowTileTooltips(IModHelper helper, ShowItemEffectRanges itemEffectRanges)
   {
     _helper = helper;
+    _itemEffectRanges = itemEffectRanges;
   }
 
   public void Dispose()
@@ -237,7 +239,7 @@ internal class ShowTileTooltips : IDisposable
       }
     }
 
-    if (_showBarrelTooltip && currentTile is not null)
+    if (_showBarrelTooltip && currentTile is not null && !_itemEffectRanges.IsRangeTooltipActive)
     {
       foreach (Func<Object?, List<HoverLine>, bool> machineDetailRenderer in MachineDetailRenderers)
       {
@@ -261,7 +263,7 @@ internal class ShowTileTooltips : IDisposable
       }
     }
 
-    if (_showTreeTooltip && terrain is not null)
+    if (_showTreeTooltip && terrain is not null && !_itemEffectRanges.IsRangeTooltipActive)
     {
       foreach (Func<TerrainFeature?, List<HoverLine>, bool> treeDetailRenderer in TreeDetailRenderers)
       {

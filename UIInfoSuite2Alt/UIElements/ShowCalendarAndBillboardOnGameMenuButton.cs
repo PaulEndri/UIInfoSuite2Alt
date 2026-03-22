@@ -728,7 +728,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
       return _cachedModQuestBoards;
 
     var boards = new List<(string, string)>();
-    if (_hasRidgesideVillage && Game1.player.eventsSeen.Contains("75160207"))
+    if (_hasRidgesideVillage)
       boards.Add(("VillageQuestBoard", I18n.SpecialOrdersRSVTown()));
 
     _cachedModQuestBoards = boards;

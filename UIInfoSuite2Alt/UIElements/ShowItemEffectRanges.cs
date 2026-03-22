@@ -197,7 +197,7 @@ internal class ShowItemEffectRanges : IDisposable
         texture,
         Utility.ModifyCoordinatesForUIScale(Game1.GlobalToLocal(Utility.ModifyCoordinatesForUIScale(position))),
         null,
-        Color.DarkOrange * tileOpacity,
+        Color.DarkOrange * (tileOpacity + 0.2f),
         0.0f,
         Vector2.Zero,
         Utility.ModifyCoordinateForUIScale(Game1.pixelZoom),

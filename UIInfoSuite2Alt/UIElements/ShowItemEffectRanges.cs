@@ -26,6 +26,8 @@ internal class ShowItemEffectRanges : IDisposable
 
   private readonly IModHelper _helper;
   private readonly Lazy<Texture2D> _tileTexture;
+  private readonly Lazy<Texture2D> _tileBombTexture;
+  private readonly PerScreen<bool> _isBombRange = new(() => false);
 
   private bool _showItemEffectRanges;
 
@@ -61,6 +63,7 @@ internal class ShowItemEffectRanges : IDisposable
   {
     _helper = helper;
     _tileTexture = new Lazy<Texture2D>(() => _helper.ModContent.Load<Texture2D>("assets/tile.png"));
+    _tileBombTexture = new Lazy<Texture2D>(() => _helper.ModContent.Load<Texture2D>("assets/tile_nolines.png"));
   }
 
   public void Dispose()
@@ -133,6 +136,7 @@ internal class ShowItemEffectRanges : IDisposable
     _effectiveAreaOther.Value.Clear();
     _effectiveAreaIntersection.Value.Clear();
     _seenTiles.Value.Clear();
+    _isBombRange.Value = false;
 
     if (Game1.activeClickableMenu == null && UIElementUtils.IsRenderingNormally())
     {
@@ -160,7 +164,9 @@ internal class ShowItemEffectRanges : IDisposable
 
   private void OnRenderingHud(object? sender, RenderingHudEventArgs e)
   {
-    Color tileColor = _rangeTooltipInfo.Value?.TileColor ?? Color.LawnGreen;
+    Color tileColor = _isBombRange.Value ? Color.Lime : _rangeTooltipInfo.Value?.TileColor ?? Color.LawnGreen;
+    float tileOpacity = _isBombRange.Value ? 0.3f : 0.4f;
+    Texture2D texture = _isBombRange.Value ? _tileBombTexture.Value : _tileTexture.Value;
 
     foreach (Point point in _effectiveAreaOther.Value)
     {
@@ -169,10 +175,10 @@ internal class ShowItemEffectRanges : IDisposable
         point.Y * Utility.ModifyCoordinateFromUIScale(Game1.tileSize)
       );
       e.SpriteBatch.Draw(
-        _tileTexture.Value,
+        texture,
         Utility.ModifyCoordinatesForUIScale(Game1.GlobalToLocal(Utility.ModifyCoordinatesForUIScale(position))),
         null,
-        tileColor * 0.6f,
+        tileColor * tileOpacity,
         0.0f,
         Vector2.Zero,
         Utility.ModifyCoordinateForUIScale(Game1.pixelZoom),
@@ -188,10 +194,10 @@ internal class ShowItemEffectRanges : IDisposable
         point.Y * Utility.ModifyCoordinateFromUIScale(Game1.tileSize)
       );
       e.SpriteBatch.Draw(
-        _tileTexture.Value,
+        texture,
         Utility.ModifyCoordinatesForUIScale(Game1.GlobalToLocal(Utility.ModifyCoordinatesForUIScale(position))),
         null,
-        Color.DarkOrange * 0.7f,
+        Color.DarkOrange * tileOpacity,
         0.0f,
         Vector2.Zero,
         Utility.ModifyCoordinateForUIScale(Game1.pixelZoom),
@@ -672,6 +678,7 @@ internal class ShowItemEffectRanges : IDisposable
         }
 
         AddTilesToHighlightedArea(arrayToUse, false, (int)validTile.X, (int)validTile.Y);
+        _isBombRange.Value = true;
       }
     }
   }

@@ -9,6 +9,7 @@ using StardewValley;
 using StardewValley.Menus;
 using UIInfoSuite2Alt.Compatibility;
 using UIInfoSuite2Alt.Infrastructure;
+using UIInfoSuite2Alt.Patches;
 
 namespace UIInfoSuite2Alt.UIElements;
 

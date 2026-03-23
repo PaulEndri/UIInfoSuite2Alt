@@ -7,7 +7,7 @@ using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Menus;
 
-namespace UIInfoSuite2Alt.UIElements;
+namespace UIInfoSuite2Alt.Patches;
 
 internal class ShowFishOnCatch : IDisposable
 {

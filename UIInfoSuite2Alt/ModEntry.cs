@@ -13,6 +13,7 @@ using HarmonyLib;
 using System.Collections.Generic;
 using UIInfoSuite2Alt.Infrastructure;
 using UIInfoSuite2Alt.Infrastructure.Extensions;
+using UIInfoSuite2Alt.Patches;
 using UIInfoSuite2Alt.Infrastructure.Structures;
 using UIInfoSuite2Alt.Options;
 using UIInfoSuite2Alt.UIElements;
@@ -22,7 +23,7 @@ namespace UIInfoSuite2Alt;
 public class ModEntry : Mod
 {
   private static SkipIntro _skipIntro = null!; // Needed so GC won't throw away object with subscriptions
-  public static Options.ModConfig ModConfig { get; set; } = null!;
+  public static ModConfig ModConfig { get; set; } = null!;
 
   private static EventHandler<ButtonsChangedEventArgs>? _calendarAndQuestKeyBindingsHandler;
   private static EventHandler<ButtonsChangedEventArgs>? _monsterEradicationKeyBindingsHandler;
@@ -53,9 +54,10 @@ public class ModEntry : Mod
     var harmony = new Harmony(ModManifest.UniqueID);
     TvChannelWatcher.Initialize(harmony, helper);
     ShowFishOnCatch.Initialize(harmony);
+    HudMessagePatch.Initialize(harmony, helper.ModRegistry.IsLoaded(ModCompat.SpaceCore));
 
     _skipIntro = new SkipIntro(helper.Events);
-    ModConfig = Helper.ReadConfig<Options.ModConfig>();
+    ModConfig = Helper.ReadConfig<ModConfig>();
 
     helper.Events.Content.AssetRequested += OnAssetRequested;
     helper.Events.GameLoop.ReturnedToTitle += OnReturnedToTitle;
@@ -78,11 +80,15 @@ public class ModEntry : Mod
 
     // Register mod compatibility APIs
     var configMenu = ApiManager.TryRegisterApi<IGenericModConfigMenuApi>(Helper, ModCompat.Gmcm, "1.16.0");
+
     ApiManager.TryRegisterApi<IContentPatcherAPI>(Helper, ModCompat.ContentPatcher, "2.9.0");
-    ApiManager.TryRegisterApi<ICustomBushApi>(Helper, ModCompat.CustomBush, "1.2.1", true);
+    ApiManager.TryRegisterApi<ISpaceCoreApi>(Helper, ModCompat.SpaceCore, "1.28.4");
+    ApiManager.TryRegisterApi<ICustomBushApi>(Helper, ModCompat.CustomBush, "1.2.1");
     ApiManager.TryRegisterApi<ICloudySkiesApi>(Helper, ModCompat.CloudySkies);
     ApiManager.TryRegisterApi<IBetterGameMenuApi>(Helper, ModCompat.BetterGameMenu);
     ApiManager.TryRegisterApi<IFerngillSimpleEconomyApi>(Helper, ModCompat.FerngillEconomy);
+
+    ApiManager.LogLoadedApis();
 
     LogModRecommendations(Helper);
 
@@ -421,7 +427,7 @@ public class ModEntry : Mod
     }
 
     // Re-read config (may have been edited externally)
-    ModConfig = Helper.ReadConfig<Options.ModConfig>();
+    ModConfig = Helper.ReadConfig<ModConfig>();
     ApplyFeatures();
   }
 

@@ -6,12 +6,12 @@ namespace UIInfoSuite2Alt.UIElements.ExperienceElements;
 
 public class DisplayedLevelUpMessage
 {
-  public void Draw(Rectangle levelUpIconRectangle, string levelUpMessage)
+  public void Draw(Rectangle levelUpIconRectangle, string levelUpMessage, Texture2D? iconTexture = null)
   {
     Vector2 playerLocalPosition = Game1.player.getLocalPosition(Game1.viewport);
 
     Game1.spriteBatch.Draw(
-      Game1.mouseCursors,
+      iconTexture ?? Game1.mouseCursors,
       Utility.ModifyCoordinatesForUIScale(new Vector2(playerLocalPosition.X - 74, playerLocalPosition.Y - 130)),
       levelUpIconRectangle,
       Color.White,

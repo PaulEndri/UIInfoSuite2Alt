@@ -75,6 +75,27 @@ public partial class ExperienceBar : IDisposable
   private bool LevelUpAnimationEnabled { get; set; } = true;
   private bool ExperienceBarEnabled { get; set; } = true;
 
+  // SpaceCore custom skill state
+  private readonly ISpaceCoreApi? _spaceCoreApi;
+  private readonly PerScreen<Dictionary<string, int>> _currentCustomExperience = new(() => new());
+  private readonly PerScreen<Dictionary<string, int>> _currentCustomLevels = new(() => new());
+  private readonly PerScreen<string?> _activeCustomSkillId = new();
+  private readonly PerScreen<Texture2D?> _customSkillIconTexture = new();
+
+  // Stacked secondary bars for concurrent XP gains (e.g., Combat + custom skill from one kill)
+  private readonly PerScreen<List<ExperienceBarState>> _secondaryBars = new(() => new());
+  private const int BarStackOffset = 66;
+
+  // Accumulated XP "combo counter" shown on the bar while visible
+  private readonly PerScreen<int> _accumulatedExperience = new();
+  private readonly PerScreen<int> _comboTimer = new();
+  private readonly PerScreen<int> _comboShakeTicks = new();
+  private const int ComboVisibleTicks = 480; // 8 seconds total (6s solid + 2s fade)
+  private const int ComboFadeTicks = 120; // last 2 seconds = fade
+
+  // Static bar visibility for HudMessagePatch to offset vanilla notifications
+  private static readonly PerScreen<int> _visibleBarCount = new();
+
   private readonly IModHelper _helper;
   private readonly ILevelExtender? _levelExtenderApi;
   #endregion Properties
@@ -87,6 +108,11 @@ public partial class ExperienceBar : IDisposable
     if (_helper.ModRegistry.IsLoaded("DevinLematty.LevelExtender"))
     {
       _levelExtenderApi = _helper.ModRegistry.GetApi<ILevelExtender>("DevinLematty.LevelExtender");
+    }
+
+    if (_helper.ModRegistry.IsLoaded(ModCompat.SpaceCore))
+    {
+      _spaceCoreApi = _helper.ModRegistry.GetApi<ISpaceCoreApi>(ModCompat.SpaceCore);
     }
   }
 
@@ -181,6 +207,7 @@ public partial class ExperienceBar : IDisposable
     if (e.IsLocalPlayer)
     {
       _displayedExperienceValues.Value.Clear();
+      _secondaryBars.Value.Clear();
     }
   }
 
@@ -204,6 +231,31 @@ public partial class ExperienceBar : IDisposable
     {
       UpdateExperience(currentLevelIndex, skillChanged);
     }
+
+    // Check SpaceCore custom skills - may show as secondary bar if vanilla also changed
+    List<string> changedCustomSkills = GetChangedCustomSkills();
+    if (changedCustomSkills.Count > 0)
+    {
+      if (skillChanged)
+      {
+        // Vanilla bar is primary - show custom skills as stacked secondary bars
+        for (int i = 0; i < changedCustomSkills.Count; ++i)
+        {
+          AddOrUpdateSecondaryBar(changedCustomSkills[i], (i + 1) * 24);
+        }
+      }
+      else
+      {
+        // First custom skill is primary bar (no delay)
+        UpdateCustomSkillExperience(changedCustomSkills[0], true);
+
+        // Additional custom skills as secondary bars with cascading delay
+        for (int i = 1; i < changedCustomSkills.Count; ++i)
+        {
+          AddOrUpdateSecondaryBar(changedCustomSkills[i], i * 24);
+        }
+      }
+    }
   }
 
   public void OnUpdateTicked_HandleTimers(object? sender, UpdateTickedEventArgs e)
@@ -217,19 +269,69 @@ public partial class ExperienceBar : IDisposable
     {
       _experienceBarVisibleTimer.Value--;
     }
+
+    if (_comboTimer.Value > 0)
+    {
+      _comboTimer.Value--;
+    }
+
+    if (_comboShakeTicks.Value > 0)
+    {
+      _comboShakeTicks.Value--;
+    }
+
+    // Secondary bar timers
+    for (int i = _secondaryBars.Value.Count - 1; i >= 0; --i)
+    {
+      if (_secondaryBars.Value[i].VisibleTimer > 0)
+      {
+        _secondaryBars.Value[i].VisibleTimer--;
+      }
+
+      if (_secondaryBars.Value[i].ComboTimer > 0)
+      {
+        _secondaryBars.Value[i].ComboTimer--;
+      }
+
+      if (_secondaryBars.Value[i].ComboShakeTicks > 0)
+      {
+        _secondaryBars.Value[i].ComboShakeTicks--;
+      }
+
+      if (_secondaryBars.Value[i].VisibleTimer <= 0 && ExperienceBarFadeoutEnabled)
+      {
+        _secondaryBars.Value.RemoveAt(i);
+      }
+    }
   }
 
   private void OnRenderingHud(object? sender, RenderingHudEventArgs e)
   {
     if (!UIElementUtils.IsRenderingNormally())
     {
+      _visibleBarCount.Value = 0;
       return;
     }
+
+    // Count visible secondary (stacked) bars for HudMessagePatch notification offset
+    int barCount = 0;
+    foreach (ExperienceBarState bar in _secondaryBars.Value)
+    {
+      if (bar.VisibleTimer > 0 || !ExperienceBarFadeoutEnabled)
+      {
+        barCount++;
+      }
+    }
+    _visibleBarCount.Value = barCount;
 
     // Level up text
     if (LevelUpAnimationEnabled && _levelUpVisibleTimer.Value != 0)
     {
-      _displayedLevelUpMessage.Value.Draw(_levelUpIconRectangle.Value, I18n.LevelUp());
+      _displayedLevelUpMessage.Value.Draw(
+        _levelUpIconRectangle.Value,
+        I18n.LevelUp(),
+        _customSkillIconTexture.Value
+      );
     }
 
     // Experience values
@@ -248,23 +350,63 @@ public partial class ExperienceBar : IDisposable
       }
     }
 
-    // Experience bar
+    // Primary experience bar
     if (ExperienceBarEnabled &&
         (_experienceBarVisibleTimer.Value != 0 || !ExperienceBarFadeoutEnabled) &&
         _experienceRequiredToLevel.Value > 0)
     {
+      Texture2D? barIconTexture = _isMasteryActive.Value
+        ? Game1.mouseCursors_1_6
+        : _customSkillIconTexture.Value;
+
+      float comboAlpha = _comboTimer.Value > ComboFadeTicks
+        ? 1f
+        : _comboTimer.Value / (float)ComboFadeTicks;
+
       _displayedExperienceBar.Value.Draw(
         _experienceFillColor.Value,
         _experienceIconRectangle.Value,
         _experienceEarnedThisLevel.Value,
         _experienceRequiredToLevel.Value - _experienceFromPreviousLevels.Value,
         _currentSkillLevel.Value,
-        _isMasteryActive.Value ? Game1.mouseCursors_1_6 : null,
+        barIconTexture,
         _isMasteryActive.Value,
-        _isMasteryActive.Value ? (29f / 11f) : 2.9f
+        _isMasteryActive.Value ? (29f / 11f) : 2.9f,
+        0,
+        _accumulatedExperience.Value,
+        comboAlpha,
+        _comboShakeTicks.Value
       );
     }
+
+    // Secondary bars stacked above primary
+    for (int i = 0; i < _secondaryBars.Value.Count; ++i)
+    {
+      ExperienceBarState bar = _secondaryBars.Value[i];
+      if (bar.VisibleTimer > 0 || !ExperienceBarFadeoutEnabled)
+      {
+        float barComboAlpha = bar.ComboTimer > ComboFadeTicks
+          ? 1f
+          : bar.ComboTimer / (float)ComboFadeTicks;
+
+        _displayedExperienceBar.Value.Draw(
+          bar.FillColor,
+          bar.IconRectangle,
+          bar.EarnedThisLevel,
+          bar.DifferenceBetweenLevels,
+          bar.SkillLevel,
+          bar.IconTexture,
+          bar.IsMastery,
+          bar.IconScale,
+          (i + 1) * BarStackOffset,
+          bar.AccumulatedExperience,
+          barComboAlpha,
+          bar.ComboShakeTicks
+        );
+      }
+    }
   }
+
   #endregion Event subscriptions
 
   #region Logic
@@ -284,6 +426,28 @@ public partial class ExperienceBar : IDisposable
     }
 
     _previousMasteryExperience.Value = (int)Game1.stats.Get("MasteryExp");
+
+    InitializeCustomSkills();
+  }
+
+  private void InitializeCustomSkills()
+  {
+    _currentCustomExperience.Value.Clear();
+    _currentCustomLevels.Value.Clear();
+    _activeCustomSkillId.Value = null;
+
+    if (_spaceCoreApi == null)
+    {
+      return;
+    }
+
+    foreach (string skillId in _spaceCoreApi.GetCustomSkills())
+    {
+      _currentCustomExperience.Value[skillId] =
+        _spaceCoreApi.GetExperienceForCustomSkill(Game1.player, skillId);
+      _currentCustomLevels.Value[skillId] =
+        _spaceCoreApi.GetLevelForCustomSkill(Game1.player, skillId);
+    }
   }
 
   private bool TryGetCurrentLevelIndexFromSkillChange(out int currentLevelIndex)
@@ -317,7 +481,19 @@ public partial class ExperienceBar : IDisposable
 
   private void UpdateExperience(int currentLevelIndex, bool displayExperience)
   {
+    _activeCustomSkillId.Value = null;
+    _customSkillIconTexture.Value = null;
+
+    if (_experienceBarVisibleTimer.Value == 0)
+    {
+      _accumulatedExperience.Value = 0;
+    }
     _experienceBarVisibleTimer.Value = ExperienceBarVisibleTicks;
+
+    if (_comboTimer.Value == 0)
+    {
+      _accumulatedExperience.Value = 0;
+    }
 
     _experienceIconRectangle.Value = SkillIconRectangles[(SkillType)currentLevelIndex];
     _experienceFillColor.Value = ExperienceFillColor[(SkillType)currentLevelIndex];
@@ -382,6 +558,12 @@ public partial class ExperienceBar : IDisposable
 
         if (experienceGain > 0)
         {
+          if (_accumulatedExperience.Value > 0)
+          {
+            _comboShakeTicks.Value = 15;
+          }
+          _accumulatedExperience.Value += experienceGain;
+          _comboTimer.Value = ComboVisibleTicks;
           _displayedExperienceValues.Value.Add(
             new DisplayedExperienceValue(experienceGain, Game1.player.getLocalPosition(Game1.viewport))
           );
@@ -402,6 +584,195 @@ public partial class ExperienceBar : IDisposable
     }
   }
 
+  private List<string> GetChangedCustomSkills()
+  {
+    var changed = new List<string>();
+    if (_spaceCoreApi == null)
+    {
+      return changed;
+    }
+
+    foreach (KeyValuePair<string, int> kvp in _currentCustomExperience.Value)
+    {
+      int currentXp = _spaceCoreApi.GetExperienceForCustomSkill(Game1.player, kvp.Key);
+      if (currentXp != kvp.Value)
+      {
+        changed.Add(kvp.Key);
+      }
+    }
+
+    return changed;
+  }
+
+  private void UpdateCustomSkillExperience(string skillId, bool displayExperience)
+  {
+    _activeCustomSkillId.Value = skillId;
+
+    if (_experienceBarVisibleTimer.Value == 0)
+    {
+      _accumulatedExperience.Value = 0;
+    }
+
+    if (_comboTimer.Value == 0)
+    {
+      _accumulatedExperience.Value = 0;
+    }
+    _experienceBarVisibleTimer.Value = ExperienceBarVisibleTicks;
+
+    CachedCustomSkillInfo info = SpaceCoreHelper.GetSkillInfo(_spaceCoreApi!, skillId);
+
+    int currentLevel = _spaceCoreApi!.GetLevelForCustomSkill(Game1.player, skillId);
+    int currentXp = _spaceCoreApi.GetExperienceForCustomSkill(Game1.player, skillId);
+
+    // Level-up detection
+    if (LevelUpAnimationEnabled &&
+        _currentCustomLevels.Value.TryGetValue(skillId, out int prevLevel) &&
+        currentLevel > prevLevel)
+    {
+      _levelUpVisibleTimer.Value = LevelUpVisibleTicks;
+      _customSkillIconTexture.Value = info.Icon;
+      _levelUpIconRectangle.Value = new Rectangle(0, 0, info.Icon.Width, info.Icon.Height);
+      _experienceBarVisibleTimer.Value = ExperienceBarVisibleTicks;
+      SoundHelper.Play(Sounds.LevelUp);
+    }
+
+    // Set bar state
+    _customSkillIconTexture.Value = info.Icon;
+    _experienceIconRectangle.Value = new Rectangle(0, 0, info.Icon.Width, info.Icon.Height);
+    _experienceFillColor.Value = info.BarColor;
+    _currentSkillLevel.Value = currentLevel;
+    _isMasteryActive.Value = false;
+
+    int xpForCurrentLevel = SpaceCoreHelper.GetExperienceRequiredForLevel(info, currentLevel - 1);
+    int xpForNextLevel = SpaceCoreHelper.GetExperienceRequiredForLevel(info, currentLevel);
+
+    if (xpForNextLevel <= 0)
+    {
+      // Skill is maxed
+      _experienceRequiredToLevel.Value = -1;
+    }
+    else
+    {
+      _experienceRequiredToLevel.Value = xpForNextLevel;
+      _experienceFromPreviousLevels.Value = xpForCurrentLevel;
+      _experienceEarnedThisLevel.Value = currentXp - xpForCurrentLevel;
+    }
+
+    // XP gain text
+    if (displayExperience && ExperienceGainTextEnabled && _experienceRequiredToLevel.Value > 0)
+    {
+      int previousXp = _currentCustomExperience.Value.GetValueOrDefault(skillId, 0);
+      int gain = currentXp - previousXp;
+
+      if (gain > 0)
+      {
+        if (_accumulatedExperience.Value > 0)
+        {
+          _comboShakeTicks.Value = 15;
+        }
+        _accumulatedExperience.Value += gain;
+        _comboTimer.Value = ComboVisibleTicks;
+        _displayedExperienceValues.Value.Add(
+          new DisplayedExperienceValue(gain, Game1.player.getLocalPosition(Game1.viewport), info.BarColor)
+        );
+      }
+    }
+
+    // Update cached state
+    _currentCustomExperience.Value[skillId] = currentXp;
+    _currentCustomLevels.Value[skillId] = currentLevel;
+  }
+
+  private void AddOrUpdateSecondaryBar(string skillId, int delayTicks = 24)
+  {
+    CachedCustomSkillInfo info = SpaceCoreHelper.GetSkillInfo(_spaceCoreApi!, skillId);
+
+    int currentLevel = _spaceCoreApi!.GetLevelForCustomSkill(Game1.player, skillId);
+    int currentXp = _spaceCoreApi.GetExperienceForCustomSkill(Game1.player, skillId);
+
+    int xpForCurrentLevel = SpaceCoreHelper.GetExperienceRequiredForLevel(info, currentLevel - 1);
+    int xpForNextLevel = SpaceCoreHelper.GetExperienceRequiredForLevel(info, currentLevel);
+
+    if (xpForNextLevel <= 0)
+    {
+      // Skill is maxed, don't show a bar
+      _currentCustomExperience.Value[skillId] = currentXp;
+      _currentCustomLevels.Value[skillId] = currentLevel;
+      return;
+    }
+
+    // Level-up detection
+    if (LevelUpAnimationEnabled &&
+        _currentCustomLevels.Value.TryGetValue(skillId, out int prevLevel) &&
+        currentLevel > prevLevel)
+    {
+      _levelUpVisibleTimer.Value = LevelUpVisibleTicks;
+      _customSkillIconTexture.Value = info.Icon;
+      _levelUpIconRectangle.Value = new Rectangle(0, 0, info.Icon.Width, info.Icon.Height);
+      SoundHelper.Play(Sounds.LevelUp);
+    }
+
+    // XP gain text
+    if (ExperienceGainTextEnabled)
+    {
+      int previousXp = _currentCustomExperience.Value.GetValueOrDefault(skillId, 0);
+      int gain = currentXp - previousXp;
+
+      if (gain > 0)
+      {
+        _displayedExperienceValues.Value.Add(
+          new DisplayedExperienceValue(gain, Game1.player.getLocalPosition(Game1.viewport), info.BarColor, delayTicks)
+        );
+      }
+    }
+
+    // Find existing secondary bar for this skill or create new
+    ExperienceBarState? existing = null;
+    foreach (ExperienceBarState bar in _secondaryBars.Value)
+    {
+      if (bar.IconTexture == info.Icon)
+      {
+        existing = bar;
+        break;
+      }
+    }
+
+    if (existing == null)
+    {
+      existing = new ExperienceBarState();
+      _secondaryBars.Value.Add(existing);
+    }
+
+    int xpGain = currentXp - _currentCustomExperience.Value.GetValueOrDefault(skillId, 0);
+    if (xpGain > 0)
+    {
+      if (existing.ComboTimer == 0)
+      {
+        existing.AccumulatedExperience = 0;
+      }
+      else if (existing.AccumulatedExperience > 0)
+      {
+        existing.ComboShakeTicks = 15;
+      }
+      existing.AccumulatedExperience += xpGain;
+      existing.ComboTimer = ComboVisibleTicks;
+    }
+
+    existing.FillColor = info.BarColor;
+    existing.IconRectangle = new Rectangle(0, 0, info.Icon.Width, info.Icon.Height);
+    existing.IconTexture = info.Icon;
+    existing.EarnedThisLevel = currentXp - xpForCurrentLevel;
+    existing.DifferenceBetweenLevels = xpForNextLevel - xpForCurrentLevel;
+    existing.SkillLevel = currentLevel;
+    existing.IsMastery = false;
+    existing.IconScale = 2.9f;
+    existing.VisibleTimer = ExperienceBarVisibleTicks;
+
+    // Update cached state
+    _currentCustomExperience.Value[skillId] = currentXp;
+    _currentCustomLevels.Value[skillId] = currentLevel;
+  }
+
   private static bool IsMasteryUnlocked()
   {
     return Game1.player.farmingLevel.Value >= 10
@@ -409,6 +780,12 @@ public partial class ExperienceBar : IDisposable
         && Game1.player.foragingLevel.Value >= 10
         && Game1.player.miningLevel.Value >= 10
         && Game1.player.combatLevel.Value >= 10;
+  }
+
+  /// <summary>Returns pixel offset for vanilla HUD notifications when experience bars are visible.</summary>
+  internal static int GetNotificationOffset()
+  {
+    return _visibleBarCount.Value * BarStackOffset;
   }
 
   private static int GetExperienceRequiredToLevel(int currentLevel)
@@ -429,4 +806,22 @@ public partial class ExperienceBar : IDisposable
     };
   }
   #endregion Logic
+
+  #region Inner types
+  private class ExperienceBarState
+  {
+    public Color FillColor;
+    public Rectangle IconRectangle;
+    public Texture2D? IconTexture;
+    public int EarnedThisLevel;
+    public int DifferenceBetweenLevels;
+    public int SkillLevel;
+    public bool IsMastery;
+    public float IconScale;
+    public int VisibleTimer;
+    public int AccumulatedExperience;
+    public int ComboTimer;
+    public int ComboShakeTicks;
+  }
+  #endregion
 }

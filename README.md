@@ -59,7 +59,7 @@
 - **v2.8.3**
   - Add SpaceCore custom skill support for experience bar (shows bar with skill icon, color, level, and XP progress)
   - Add Vanilla Plus Professions compatibility for extended skill levels (11-20) and Mastery unlock threshold
-  - Add accumulated XP combo counter on the experience bar that stacks gains while the bar is visible
+  - Add accumulated XP combo counter on the experience bar that stacks gains while the bar is visible(resets after exp bar disappears ~8sec)
   - Fix experience bar showing wrong skill inside FarmHouse
 - **v2.8.2**
   - Show item icon on world tooltips (crops, trees, machines, fish ponds, bushes, buildings) and item range tooltips (sprinklers, scarecrows, bee houses, mushroom logs, wild trees)

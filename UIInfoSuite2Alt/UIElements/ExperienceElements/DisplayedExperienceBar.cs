@@ -97,9 +97,13 @@ public class DisplayedExperienceBar
     }
     else
     {
+      string levelText = currentLevel.ToString();
+      float levelTextWidth = Game1.smallFont.MeasureString(levelText).X;
+      float iconX = leftSide + 38 + levelTextWidth;
+
       Game1.spriteBatch.Draw(
         iconTexture ?? Game1.mouseCursors,
-        new Vector2(leftSide + 58, bottom - 62),
+        new Vector2(iconX, bottom - 62),
         experienceIconPosition,
         Color.White,
         0,
@@ -110,7 +114,6 @@ public class DisplayedExperienceBar
       );
 
       Vector2 levelPos = new Vector2(leftSide + 36, bottom - 62);
-      string levelText = currentLevel.ToString();
 
       // Shadow
       Game1.spriteBatch.DrawString(

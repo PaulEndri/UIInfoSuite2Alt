@@ -6,6 +6,7 @@ using StardewModdingAPI.Enums;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
 using StardewValley;
+using StardewValley.Locations;
 using StardewValley.Tools;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley.Menus;
@@ -86,6 +87,10 @@ public partial class ExperienceBar : IDisposable
   private readonly PerScreen<List<ExperienceBarState>> _secondaryBars = new(() => new());
   private const int BarStackOffset = 66;
 
+  // Tracks which skill the primary bar is showing, to reset combo on skill change
+  // Vanilla skills: "0"-"5", custom skills: their string ID
+  private readonly PerScreen<string?> _primaryBarSkillId = new();
+
   // Accumulated XP "combo counter" shown on the bar while visible
   private readonly PerScreen<int> _accumulatedExperience = new();
   private readonly PerScreen<int> _comboTimer = new();
@@ -98,6 +103,7 @@ public partial class ExperienceBar : IDisposable
 
   private readonly IModHelper _helper;
   private readonly ILevelExtender? _levelExtenderApi;
+  private readonly IVanillaPlusProfessions? _vppApi;
   #endregion Properties
 
   #region Lifecycle
@@ -113,6 +119,11 @@ public partial class ExperienceBar : IDisposable
     if (_helper.ModRegistry.IsLoaded(ModCompat.SpaceCore))
     {
       _spaceCoreApi = _helper.ModRegistry.GetApi<ISpaceCoreApi>(ModCompat.SpaceCore);
+    }
+
+    if (_helper.ModRegistry.IsLoaded(ModCompat.VanillaPlusProfessions))
+    {
+      _vppApi = _helper.ModRegistry.GetApi<IVanillaPlusProfessions>(ModCompat.VanillaPlusProfessions);
     }
   }
 
@@ -474,7 +485,7 @@ public partial class ExperienceBar : IDisposable
       FishingRod => (int)SkillType.Fishing,
       Pickaxe => (int)SkillType.Mining,
       MeleeWeapon weapon when weapon.Name != "Scythe" => (int)SkillType.Combat,
-      _ when Game1.currentLocation is Farm && currentItem is not Axe => (int)SkillType.Farming,
+      _ when Game1.currentLocation is Farm or FarmHouse && currentItem is not Axe => (int)SkillType.Farming,
       _ => (int)SkillType.Foraging
     };
   }
@@ -513,9 +524,10 @@ public partial class ExperienceBar : IDisposable
                                          _experienceFromPreviousLevels.Value;
     }
 
-    // Mastery experience bar when skill is maxed and all skills are at level 10
+    // Mastery experience bar when skill is maxed and all skills meet the required level
     _isMasteryActive.Value = false;
-    if (_experienceRequiredToLevel.Value <= 0 && _currentSkillLevel.Value >= 10 && IsMasteryUnlocked())
+    int masteryMinLevel = _vppApi?.MasteryCaveChanges ?? 10;
+    if (_experienceRequiredToLevel.Value <= 0 && _currentSkillLevel.Value >= masteryMinLevel && IsMasteryUnlocked())
     {
       int currentMasteryLevel = MasteryTrackerMenu.getCurrentMasteryLevel();
       if (currentMasteryLevel < 5)
@@ -529,6 +541,17 @@ public partial class ExperienceBar : IDisposable
           (int)Game1.stats.Get("MasteryExp") - _experienceFromPreviousLevels.Value;
         _currentSkillLevel.Value = currentMasteryLevel;
       }
+    }
+
+    // Reset combo when the displayed skill changes.
+    // Mastery uses a shared identity so switching between maxed tools preserves the combo.
+    // Custom skill IDs never collide with vanilla indices, so custom->vanilla always resets.
+    string skillId = _isMasteryActive.Value ? "mastery" : currentLevelIndex.ToString();
+    if (_primaryBarSkillId.Value != skillId)
+    {
+      _accumulatedExperience.Value = 0;
+      _comboTimer.Value = 0;
+      _primaryBarSkillId.Value = skillId;
     }
 
     if (displayExperience)
@@ -607,6 +630,13 @@ public partial class ExperienceBar : IDisposable
   private void UpdateCustomSkillExperience(string skillId, bool displayExperience)
   {
     _activeCustomSkillId.Value = skillId;
+
+    if (_primaryBarSkillId.Value != skillId)
+    {
+      _accumulatedExperience.Value = 0;
+      _comboTimer.Value = 0;
+    }
+    _primaryBarSkillId.Value = skillId;
 
     if (_experienceBarVisibleTimer.Value == 0)
     {
@@ -773,13 +803,14 @@ public partial class ExperienceBar : IDisposable
     _currentCustomLevels.Value[skillId] = currentLevel;
   }
 
-  private static bool IsMasteryUnlocked()
+  private bool IsMasteryUnlocked()
   {
-    return Game1.player.farmingLevel.Value >= 10
-        && Game1.player.fishingLevel.Value >= 10
-        && Game1.player.foragingLevel.Value >= 10
-        && Game1.player.miningLevel.Value >= 10
-        && Game1.player.combatLevel.Value >= 10;
+    int maxLevel = _vppApi?.MasteryCaveChanges ?? 10;
+    return Game1.player.farmingLevel.Value >= maxLevel
+        && Game1.player.fishingLevel.Value >= maxLevel
+        && Game1.player.foragingLevel.Value >= maxLevel
+        && Game1.player.miningLevel.Value >= maxLevel
+        && Game1.player.combatLevel.Value >= maxLevel;
   }
 
   /// <summary>Returns pixel offset for vanilla HUD notifications when experience bars are visible.</summary>
@@ -788,7 +819,7 @@ public partial class ExperienceBar : IDisposable
     return _visibleBarCount.Value * BarStackOffset;
   }
 
-  private static int GetExperienceRequiredToLevel(int currentLevel)
+  private int GetExperienceRequiredToLevel(int currentLevel)
   {
     return currentLevel switch
     {
@@ -802,8 +833,30 @@ public partial class ExperienceBar : IDisposable
       7 => 6900,
       8 => 10000,
       9 => 15000,
-      _ => -1
+      _ => GetVppExperienceRequiredToLevel(currentLevel)
     };
+  }
+
+  /// <summary>
+  /// Returns the cumulative XP required for VPP extended levels (10-19).
+  /// VPP's LevelExperiences array: index 0 = level 11, index 9 = level 20.
+  /// We receive currentLevel 10-19 (asking for XP to reach level 11-20).
+  /// </summary>
+  private int GetVppExperienceRequiredToLevel(int currentLevel)
+  {
+    if (_vppApi == null)
+    {
+      return -1;
+    }
+
+    int[] levelXp = _vppApi.LevelExperiences;
+    int index = currentLevel - 10; // level 10 -> index 0, level 19 -> index 9
+    if (index < 0 || index >= levelXp.Length)
+    {
+      return -1;
+    }
+
+    return levelXp[index];
   }
   #endregion Logic
 

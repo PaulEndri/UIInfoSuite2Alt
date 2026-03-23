@@ -8,6 +8,7 @@ using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Menus;
 using UIInfoSuite2Alt.Infrastructure;
+using UIInfoSuite2Alt.Patches;
 
 namespace UIInfoSuite2Alt.UIElements;
 

@@ -13,6 +13,7 @@ using HarmonyLib;
 using System.Collections.Generic;
 using UIInfoSuite2Alt.Infrastructure;
 using UIInfoSuite2Alt.Infrastructure.Extensions;
+using UIInfoSuite2Alt.Patches;
 using UIInfoSuite2Alt.Infrastructure.Structures;
 using UIInfoSuite2Alt.Options;
 using UIInfoSuite2Alt.UIElements;
@@ -53,6 +54,7 @@ public class ModEntry : Mod
     var harmony = new Harmony(ModManifest.UniqueID);
     TvChannelWatcher.Initialize(harmony, helper);
     ShowFishOnCatch.Initialize(harmony);
+    HudMessagePatch.Initialize(harmony, helper.ModRegistry.IsLoaded(ModCompat.SpaceCore));
 
     _skipIntro = new SkipIntro(helper.Events);
     ModConfig = Helper.ReadConfig<Options.ModConfig>();

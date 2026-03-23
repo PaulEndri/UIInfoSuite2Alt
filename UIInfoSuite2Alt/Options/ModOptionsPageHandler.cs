@@ -11,6 +11,7 @@ using StardewValley.Menus;
 using UIInfoSuite2Alt.Compatibility;
 using UIInfoSuite2Alt.Infrastructure;
 using UIInfoSuite2Alt.Infrastructure.Extensions;
+using UIInfoSuite2Alt.Patches;
 using UIInfoSuite2Alt.UIElements;
 
 namespace UIInfoSuite2Alt.Options;

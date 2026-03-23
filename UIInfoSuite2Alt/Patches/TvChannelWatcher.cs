@@ -5,7 +5,7 @@ using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Objects;
 
-namespace UIInfoSuite2Alt.Infrastructure;
+namespace UIInfoSuite2Alt.Patches;
 
 internal static class TvChannelWatcher
 {

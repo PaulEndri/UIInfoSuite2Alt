@@ -56,6 +56,11 @@
 
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
+- **v2.8.3**
+  - Add SpaceCore custom skill support for experience bar (shows bar with skill icon, color, level, and XP progress)
+  - Add Vanilla Plus Professions compatibility for extended skill levels (11-20) and Mastery unlock threshold
+  - Add accumulated XP combo counter on the experience bar that stacks gains while the bar is visible
+  - Fix experience bar showing wrong skill inside FarmHouse
 - **v2.8.2**
   - Show item icon on world tooltips (crops, trees, machines, fish ponds, bushes, buildings) and item range tooltips (sprinklers, scarecrows, bee houses, mushroom logs, wild trees)
   - Add keybind to open Special Orders board directly (Default: J), with mod board selector support
@@ -217,6 +222,8 @@ All mods listed here are **optional** and not required for UI Info Suite 2 Alter
 - [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098)
 - [NPC Map Locations](https://www.nexusmods.com/stardewvalley/mods/239)
 - [Bigger Backpack](https://www.nexusmods.com/stardewvalley/mods/1845)
+- [SpaceCore](https://www.nexusmods.com/stardewvalley/mods/1348)
+- [Vanilla Plus Professions](https://www.nexusmods.com/stardewvalley/mods/20956)
 - [Level Extender](https://www.nexusmods.com/stardewvalley/mods/1471)
 - [Better Farm Animal Variety](https://www.nexusmods.com/stardewvalley/mods/3273)
 - [Ferngill Simple Economy](https://www.nexusmods.com/stardewvalley/mods/21414)

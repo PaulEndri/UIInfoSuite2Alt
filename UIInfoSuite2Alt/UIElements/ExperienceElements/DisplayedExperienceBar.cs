@@ -7,9 +7,9 @@ namespace UIInfoSuite2Alt.UIElements.ExperienceElements;
 
 public class DisplayedExperienceBar
 {
-  private const int DefaultBoxWidth = 240;
+  // private const int DefaultBoxWidth = 240;
   private const int WideBoxWidth = 310;
-  private const int DefaultMaxBarWidth = 175;
+  // private const int DefaultMaxBarWidth = 175;
   private const int WideMaxBarWidth = 245;
 
   public void Draw(
@@ -27,8 +27,10 @@ public class DisplayedExperienceBar
     int comboShakeTicks = 0
   )
   {
-    int maxBarWidth = isWide ? WideMaxBarWidth : DefaultMaxBarWidth;
-    int boxWidth = isWide ? WideBoxWidth : DefaultBoxWidth;
+    //int maxBarWidth = isWide ? WideMaxBarWidth : DefaultMaxBarWidth;
+    int maxBarWidth = WideMaxBarWidth;
+    //int boxWidth = isWide ? WideBoxWidth : DefaultBoxWidth;
+    int boxWidth = WideBoxWidth;
     int barWidth = GetBarWidth(experienceEarnedThisLevel, experienceDifferenceBetweenLevels, maxBarWidth);
     float leftSide = GetExperienceBarLeftSide();
     int bottom = Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Bottom - yOffset;
@@ -44,7 +46,7 @@ public class DisplayedExperienceBar
 
     Game1.spriteBatch.Draw(
       Game1.staminaRect,
-      new Rectangle((int)leftSide + 32, bottom - 63, barWidth, 31),
+      new Rectangle((int)leftSide + 32, bottom - 64, barWidth, 31),
       experienceFillColor
     );
 
@@ -52,7 +54,7 @@ public class DisplayedExperienceBar
       Game1.staminaRect,
       new Rectangle(
         (int)leftSide + 32,
-        bottom - 63,
+        bottom - 64,
         Math.Min(4, barWidth),
         31
       ),
@@ -61,7 +63,7 @@ public class DisplayedExperienceBar
 
     Game1.spriteBatch.Draw(
       Game1.staminaRect,
-      new Rectangle((int)leftSide + 32, bottom - 63, barWidth, 4),
+      new Rectangle((int)leftSide + 32, bottom - 64, barWidth, 4),
       experienceFillColor
     );
 

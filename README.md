@@ -56,6 +56,10 @@
 
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
+- **v2.8.4**
+  - Fix Special Orders keybind opening the board before it's unlocked
+  - Check for conflicting UIInfoSuite mod variants
+  - Update CustomBush API to v1.5.2
 - **v2.8.3**
   - Add SpaceCore custom skill support for experience bar (shows bar with skill icon, color, level, and XP progress)
   - Add Vanilla Plus Professions compatibility for extended skill levels (11-20) and Mastery unlock threshold

@@ -620,6 +620,9 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
 
   public static void OpenSpecialOrdersBoardFromKeybind()
   {
+    if (!SpecialOrder.IsSpecialOrdersBoardUnlocked())
+      return;
+
     if (_instance == null)
     {
       Game1.activeClickableMenu = new SpecialOrdersBoard();

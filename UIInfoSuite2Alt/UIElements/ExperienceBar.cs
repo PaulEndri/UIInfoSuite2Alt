@@ -21,7 +21,6 @@ public partial class ExperienceBar : IDisposable
   #region Properties
   private readonly PerScreen<Item> _previousItem = new();
   private readonly PerScreen<int[]> _currentExperience = new(() => new int[5]);
-  private readonly PerScreen<int[]> _currentLevelExtenderExperience = new(() => new int[5]);
   private readonly PerScreen<int> _currentSkillLevel = new(() => 0);
   private readonly PerScreen<int> _experienceRequiredToLevel = new(() => -1);
   private readonly PerScreen<int> _experienceFromPreviousLevels = new(() => -1);
@@ -102,7 +101,6 @@ public partial class ExperienceBar : IDisposable
   private static readonly PerScreen<int> _visibleBarCount = new();
 
   private readonly IModHelper _helper;
-  private readonly ILevelExtender? _levelExtenderApi;
   private readonly IVanillaPlusProfessions? _vppApi;
   #endregion Properties
 
@@ -110,11 +108,6 @@ public partial class ExperienceBar : IDisposable
   public ExperienceBar(IModHelper helper)
   {
     _helper = helper;
-
-    if (_helper.ModRegistry.IsLoaded("DevinLematty.LevelExtender"))
-    {
-      _levelExtenderApi = _helper.ModRegistry.GetApi<ILevelExtender>("DevinLematty.LevelExtender");
-    }
 
     ApiManager.GetApi(ModCompat.SpaceCore, out _spaceCoreApi);
 
@@ -425,14 +418,6 @@ public partial class ExperienceBar : IDisposable
       _currentExperience.Value[i] = Game1.player.experiencePoints[i];
     }
 
-    if (_levelExtenderApi != null)
-    {
-      for (var i = 0; i < _currentLevelExtenderExperience.Value.Length; ++i)
-      {
-        _currentLevelExtenderExperience.Value[i] = _levelExtenderApi.CurrentXP()[i];
-      }
-    }
-
     _previousMasteryExperience.Value = (int)Game1.stats.Get("MasteryExp");
 
     InitializeCustomSkills();
@@ -464,8 +449,7 @@ public partial class ExperienceBar : IDisposable
 
     for (var i = 0; i < _currentExperience.Value.Length; ++i)
     {
-      if (_currentExperience.Value[i] != Game1.player.experiencePoints[i] ||
-          (_levelExtenderApi != null && _currentLevelExtenderExperience.Value[i] != _levelExtenderApi.CurrentXP()[i]))
+      if (_currentExperience.Value[i] != Game1.player.experiencePoints[i])
       {
         currentLevelIndex = i;
         break;
@@ -512,15 +496,6 @@ public partial class ExperienceBar : IDisposable
     _experienceEarnedThisLevel.Value =
       Game1.player.experiencePoints[currentLevelIndex] - _experienceFromPreviousLevels.Value;
 
-    if (_experienceRequiredToLevel.Value <= 0 && _levelExtenderApi != null)
-    {
-      _experienceEarnedThisLevel.Value = _levelExtenderApi.CurrentXP()[currentLevelIndex];
-      _experienceFromPreviousLevels.Value =
-        _currentExperience.Value[currentLevelIndex] - _experienceEarnedThisLevel.Value;
-      _experienceRequiredToLevel.Value = _levelExtenderApi.RequiredXP()[currentLevelIndex] +
-                                         _experienceFromPreviousLevels.Value;
-    }
-
     // Mastery experience bar when skill is maxed and all skills meet the required level
     _isMasteryActive.Value = false;
     int masteryMinLevel = _vppApi?.MasteryCaveChanges ?? 10;
@@ -563,11 +538,6 @@ public partial class ExperienceBar : IDisposable
           currentExperienceToUse = (int)Game1.stats.Get("MasteryExp");
           previousExperienceToUse = _previousMasteryExperience.Value;
         }
-        else if (_levelExtenderApi != null && _currentSkillLevel.Value > 9)
-        {
-          currentExperienceToUse = _levelExtenderApi.CurrentXP()[currentLevelIndex];
-          previousExperienceToUse = _currentLevelExtenderExperience.Value[currentLevelIndex];
-        }
         else
         {
           currentExperienceToUse = Game1.player.experiencePoints[currentLevelIndex];
@@ -591,11 +561,6 @@ public partial class ExperienceBar : IDisposable
       }
 
       _currentExperience.Value[currentLevelIndex] = Game1.player.experiencePoints[currentLevelIndex];
-
-      if (_levelExtenderApi != null)
-      {
-        _currentLevelExtenderExperience.Value[currentLevelIndex] = _levelExtenderApi.CurrentXP()[currentLevelIndex];
-      }
 
       if (_isMasteryActive.Value)
       {

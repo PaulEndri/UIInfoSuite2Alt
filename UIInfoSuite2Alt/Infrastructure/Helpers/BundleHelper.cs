@@ -25,12 +25,6 @@ internal static class BundleHelper
     return BundleIdToBundleKeyDataMap.GetValueOrDefault(bundleIdx);
   }
 
-  public static int GetBundleColorFromIndex(int bundleIdx, bool forceRefresh = false)
-  {
-    PopulateBundleNameMappings(forceRefresh);
-    return BundleIdToBundleKeyDataMap.GetValueOrDefault(bundleIdx)?.Color ?? 0;
-  }
-
   public static Color? GetRealColorFromIndex(int bundleIdx, bool forceRefresh = false)
   {
     PopulateBundleNameMappings(forceRefresh);

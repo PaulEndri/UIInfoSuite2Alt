@@ -22,9 +22,4 @@ public static class CollectionExtensions
     return dictionary.TryGetValue(key, out TValue? foundDictValue) ? foundDictValue : defaultValue;
   }
 
-  public static TValue GetOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
-    where TValue : unmanaged
-  {
-    return dictionary.GetOrDefault(key, default);
-  }
 }

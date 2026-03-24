@@ -79,10 +79,9 @@ public class ModEntry : Mod
     SoundHelper.Instance.Initialize(Helper);
 
     // Register mod compatibility APIs
-    var configMenu = ApiManager.TryRegisterApi<IGenericModConfigMenuApi>(Helper, ModCompat.Gmcm, "1.16.0");
+    var configMenu = ApiManager.TryRegisterApi<IGenericModConfigMenuApi>(Helper, ModCompat.Gmcm);
 
-    ApiManager.TryRegisterApi<IContentPatcherAPI>(Helper, ModCompat.ContentPatcher, "2.9.0");
-    ApiManager.TryRegisterApi<ISpaceCoreApi>(Helper, ModCompat.SpaceCore, "1.28.4");
+    ApiManager.TryRegisterApi<ISpaceCoreApi>(Helper, ModCompat.SpaceCore);
     ApiManager.TryRegisterApi<ICustomBushApi>(Helper, ModCompat.CustomBush, "1.2.1");
     ApiManager.TryRegisterApi<ICloudySkiesApi>(Helper, ModCompat.CloudySkies);
     ApiManager.TryRegisterApi<IBetterGameMenuApi>(Helper, ModCompat.BetterGameMenu);

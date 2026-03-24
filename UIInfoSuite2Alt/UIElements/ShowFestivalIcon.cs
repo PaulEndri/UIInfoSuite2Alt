@@ -30,7 +30,7 @@ internal class ShowFestivalIcon : IDisposable
   // texture invalidations that break mods like CP Animations.
   private readonly PerScreen<List<(string key, bool isToday)>> _pendingRegularFestivals = new(() => new());
 
-  private readonly Texture2D _billboardTexture;
+  private Texture2D? _billboardTexture;
 
   // Flag icon for regular festivals (from Billboard spritesheet)
   private static readonly Rectangle FlagSourceRect = new(1, 399, 13, 11);
@@ -67,7 +67,6 @@ internal class ShowFestivalIcon : IDisposable
   public ShowFestivalIcon(IModHelper helper)
   {
     _helper = helper;
-    _billboardTexture = helper.GameContent.Load<Texture2D>("LooseSprites/Billboard");
   }
 
   public void Dispose()
@@ -366,6 +365,7 @@ internal class ShowFestivalIcon : IDisposable
         icon.scale = 40 / 11f;
         break;
       default:
+        _billboardTexture ??= _helper.GameContent.Load<Texture2D>("LooseSprites/Billboard");
         icon.texture = _billboardTexture;
         icon.sourceRect = FlagSourceRect;
         icon.scale = 40 / 13f;

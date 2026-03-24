@@ -25,16 +25,16 @@
 
 <p align="center">
   <img src=".github/assets/make-custom-icons-for-your-content-patcher-mods.png" alt="Custom Icons For Content Patcher" />
-  <img src=".github/assets/custom-icons-2.7.0.png" alt="Custom Icons API" />
+  <img src=".github/assets/custom-icons-2.7.0.png" alt="Custom Icons" />
 </p>
 
 <p align="center">
-  <h3 align="center">Custom Icon API</h3>
+  <h3 align="center">Custom Icons</h3>
 </p>
 
 <p align="center">
   <b>If you're a Content Patcher mod author take a look at:<br>
-  <a href="docs/custom-icons.md">API Documentation</a></b>
+  <a href="docs/custom-icons.md">Custom Icons Documentation</a></b>
 </p>
 
 <hr />
@@ -87,7 +87,7 @@
   - Improved positioning of custom CP icons and birthday icons a bit
   - Boosted SFX when a buff expires (+8 db)
 - **v2.7.0**
-  - Content Patcher mods can now add custom HUD icons via the [Custom Icons API](docs/custom-icons.md)
+  - Content Patcher mods can now add [Custom HUD Icons](docs/custom-icons.md)
   - Plays a sound effect when a buff expires (toggleable option)
   - Removed built-in `Show location of townsfolk`-option. Use the much better [NPC Map Locations](https://www.nexusmods.com/stardewvalley/mods/239) by Bouhm instead
   - Fix seasonal berry icon not respecting icon order setting
@@ -215,7 +215,7 @@ All mods listed here are **optional** and not required for UI Info Suite 2 Alter
 - [Sunberry Village](https://www.nexusmods.com/stardewvalley/mods/11111)
 - [Visit Mount Vapius](https://www.nexusmods.com/stardewvalley/mods/9600)
 - [Better Game Menu](https://www.nexusmods.com/stardewvalley/mods/12667)
-- [Content Patcher](https://www.nexusmods.com/stardewvalley/mods/1915) (Custom Icons API)
+- [Content Patcher](https://www.nexusmods.com/stardewvalley/mods/1915) (Custom Icons)
 - [Cloudy Skies](https://www.nexusmods.com/stardewvalley/mods/23868)
 - [Custom Bush](https://www.nexusmods.com/stardewvalley/mods/20619)
 - [Deluxe Journal](https://www.nexusmods.com/stardewvalley/mods/11436)

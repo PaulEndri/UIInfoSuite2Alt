@@ -44,7 +44,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
     new ClickableComponent(Rectangle.Empty, "qiOrders") { myID = QiOrdersSnapId });
 
   private readonly IModHelper _helper;
-  private readonly Texture2D _townTexture;
+  private Texture2D? _townTexture;
   private readonly bool _hasRidgesideVillage;
   private readonly bool _hasSunberryVillage;
   private readonly bool _hasEscasModdingPlugins;
@@ -78,7 +78,6 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
   {
     _instance = this;
     _helper = helper;
-    _townTexture = helper.GameContent.Load<Texture2D>("Maps/spring_town");
     _hasRidgesideVillage = helper.ModRegistry.IsLoaded(ModCompat.RidgesideVillage);
     _hasSunberryVillage = helper.ModRegistry.IsLoaded(ModCompat.SunberryVillage);
     _hasEscasModdingPlugins = helper.ModRegistry.IsLoaded(ModCompat.EscasModdingPlugins);
@@ -231,6 +230,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
       );
       _specialOrdersBounds.Value = specialOrdersDest;
 
+      _townTexture ??= _helper.GameContent.Load<Texture2D>("Maps/spring_town");
       b.Draw(
         _townTexture, specialOrdersDest,
         new Rectangle(480, 1001, 17, 13), Color.White

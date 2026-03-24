@@ -32,7 +32,8 @@ internal class ShowItemHoverInformation : IDisposable
   private readonly PerScreen<Item?> _hoverItem = new();
   private readonly ClickableTextureComponent _museumIcon;
 
-  private readonly ClickableTextureComponent? _aquariumIcon;
+  private ClickableTextureComponent? _aquariumIcon;
+  private bool _aquariumIconInitialized;
 
   private readonly ClickableTextureComponent _shippingBottomIcon = new(
     new Rectangle(0, 0, Game1.tileSize, Game1.tileSize),
@@ -72,27 +73,6 @@ internal class ShowItemHoverInformation : IDisposable
     );
 
     AquariumHelper.Initialize(helper);
-
-    if (AquariumHelper.IsModLoaded)
-    {
-      try
-      {
-        Texture2D curatorTexture = helper.GameContent.Load<Texture2D>("Characters/Curator");
-        _aquariumIcon = new ClickableTextureComponent(
-          new Rectangle(0, 0, Game1.tileSize, Game1.tileSize),
-          curatorTexture,
-          new Rectangle(0, 1, 16, 16),
-          Game1.pixelZoom
-        );
-      }
-      catch (Exception)
-      {
-        ModEntry.MonitorObject.Log(
-          $"{GetType().Name}: Stardew Aquarium is installed but could not load Curator sprite.",
-          LogLevel.Warn
-        );
-      }
-    }
   }
 
   public void Dispose()
@@ -114,6 +94,40 @@ internal class ShowItemHoverInformation : IDisposable
       _helper.Events.Display.RenderedHud += OnRenderedHud;
       _helper.Events.Display.Rendering += OnRendering;
     }
+  }
+
+  private ClickableTextureComponent? GetAquariumIcon()
+  {
+    if (_aquariumIconInitialized)
+    {
+      return _aquariumIcon;
+    }
+
+    _aquariumIconInitialized = true;
+    if (!AquariumHelper.IsModLoaded)
+    {
+      return null;
+    }
+
+    try
+    {
+      Texture2D curatorTexture = _helper.GameContent.Load<Texture2D>("Characters/Curator");
+      _aquariumIcon = new ClickableTextureComponent(
+        new Rectangle(0, 0, Game1.tileSize, Game1.tileSize),
+        curatorTexture,
+        new Rectangle(0, 1, 16, 16),
+        Game1.pixelZoom
+      );
+    }
+    catch (Exception)
+    {
+      ModEntry.MonitorObject.Log(
+        $"{GetType().Name}: Stardew Aquarium is installed but could not load Curator sprite.",
+        LogLevel.Warn
+      );
+    }
+
+    return _aquariumIcon;
   }
 
   private void OnRendering(object? sender, EventArgs e)
@@ -370,15 +384,15 @@ internal class ShowItemHoverInformation : IDisposable
         );
       }
 
-      if (notDonatedToAquarium && _aquariumIcon != null)
+      if (notDonatedToAquarium && GetAquariumIcon() is { } aquariumIcon)
       {
         spriteBatch.Draw(
-          _aquariumIcon.texture,
+          aquariumIcon.texture,
           windowPos + new Vector2(2, windowHeight + 8),
-          _aquariumIcon.sourceRect,
+          aquariumIcon.sourceRect,
           Color.White,
           0f,
-          new Vector2(_aquariumIcon.sourceRect.Width / 2, _aquariumIcon.sourceRect.Height),
+          new Vector2(aquariumIcon.sourceRect.Width / 2, aquariumIcon.sourceRect.Height),
           2,
           SpriteEffects.None,
           0.86f

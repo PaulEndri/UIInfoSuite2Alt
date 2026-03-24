@@ -39,7 +39,7 @@ public static class ApiManager
     if (minimumVersion != null && modInfo.Manifest.Version.IsOlderThan(minimumVersion))
     {
       ModEntry.MonitorObject.Log(
-          $"Requested version {minimumVersion} for mod {modId}, but got {modInfo.Manifest.Version} istället.",
+          $"Requested version {minimumVersion} for mod {modId}, but got {modInfo.Manifest.Version} instead.",
           LogLevel.Warn
       );
       return null;

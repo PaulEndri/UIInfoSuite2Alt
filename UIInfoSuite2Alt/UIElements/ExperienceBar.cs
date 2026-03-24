@@ -77,7 +77,7 @@ public partial class ExperienceBar : IDisposable
   private bool ExperienceBarEnabled { get; set; } = true;
 
   // SpaceCore custom skill state
-  private readonly ISpaceCoreApi? _spaceCoreApi;
+  private ISpaceCoreApi? _spaceCoreApi;
   private readonly PerScreen<Dictionary<string, int>> _currentCustomExperience = new(() => new());
   private readonly PerScreen<Dictionary<string, int>> _currentCustomLevels = new(() => new());
   private readonly PerScreen<string?> _activeCustomSkillId = new();
@@ -116,10 +116,7 @@ public partial class ExperienceBar : IDisposable
       _levelExtenderApi = _helper.ModRegistry.GetApi<ILevelExtender>("DevinLematty.LevelExtender");
     }
 
-    if (_helper.ModRegistry.IsLoaded(ModCompat.SpaceCore))
-    {
-      _spaceCoreApi = _helper.ModRegistry.GetApi<ISpaceCoreApi>(ModCompat.SpaceCore);
-    }
+    ApiManager.GetApi(ModCompat.SpaceCore, out _spaceCoreApi);
 
     if (_helper.ModRegistry.IsLoaded(ModCompat.VanillaPlusProfessions))
     {

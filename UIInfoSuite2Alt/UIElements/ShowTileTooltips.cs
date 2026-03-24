@@ -16,7 +16,6 @@ using StardewValley.Objects;
 using StardewValley.TerrainFeatures;
 using StardewValley.TokenizableStrings;
 using UIInfoSuite2Alt.Compatibility;
-using UIInfoSuite2Alt.Compatibility.CustomBush;
 using UIInfoSuite2Alt.Infrastructure;
 using UIInfoSuite2Alt.Infrastructure.Extensions;
 using UIInfoSuite2Alt.Infrastructure.Helpers;
@@ -361,11 +360,11 @@ internal class ShowTileTooltips : IDisposable
     if (terrain is Bush bush && bush.size.Value == Bush.greenTeaBush)
     {
       if (ApiManager.GetApi(ModCompat.CustomBush, out ICustomBushApi? customBushApi) &&
-          customBushApi.TryGetCustomBush(bush, out ICustomBush? customBushData, out string? id))
+          customBushApi.TryGetBush(bush, out ICustomBushData? customBushData, out string? id))
       {
-        if (customBushData.GetShakeOffItemIfReady(bush, out ParsedItemData? shakeOffItemData))
+        if (customBushApi.TryGetShakeOffItem(bush, out Item? shakeOffItem))
         {
-          return FromItemData(shakeOffItemData);
+          return FromItemData(ItemRegistry.GetData(shakeOffItem.QualifiedItemId));
         }
 
         List<PossibleDroppedItem> drops = customBushApi.GetCustomBushDropItems(customBushData, id);
@@ -939,10 +938,10 @@ internal class ShowTileTooltips : IDisposable
 
       if (ApiManager.GetApi(ModCompat.CustomBush, out ICustomBushApi? customBushApi))
       {
-        if (customBushApi.TryGetCustomBush(bush, out ICustomBush? customBushData, out string? id))
+        if (customBushApi.TryGetBush(bush, out ICustomBushData? customBushData, out string? id))
         {
           droppedItems.Clear();
-          willProduceThisSeason = customBushData.Seasons.Contains(Game1.season) || bush.IsSheltered();
+          willProduceThisSeason = customBushApi.IsInSeason(bush);
           string displayName = customBushData.DisplayName;
           if (displayName.Contains("LocalizedText"))
           {
@@ -953,9 +952,9 @@ internal class ShowTileTooltips : IDisposable
           inProductionPeriod = Game1.dayOfMonth >= customBushData.DayToBeginProducing;
           daysUntilProductionPeriod = inProductionPeriod ? 0 : 22 - Game1.dayOfMonth;
 
-          if (customBushData.GetShakeOffItemIfReady(bush, out ParsedItemData? shakeOffItemData))
+          if (customBushApi.TryGetShakeOffItem(bush, out Item? shakeOffItem))
           {
-            droppedItems.Add(new PossibleDroppedItem(Game1.dayOfMonth, shakeOffItemData, 1.0f, id));
+            droppedItems.Add(new PossibleDroppedItem(Game1.dayOfMonth, ItemRegistry.GetData(shakeOffItem.QualifiedItemId), 1.0f, id));
           }
           else
           {

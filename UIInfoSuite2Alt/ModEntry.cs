@@ -61,6 +61,32 @@ public partial class ModEntry : Mod
     RegisterMonsterEradicationKeyBindings(helper, true);
 
     IconHandler.Handler.IsQuestLogPermanent = helper.ModRegistry.IsLoaded("MolsonCAD.DeluxeJournal");
+
+    CheckForConflictingMods(helper);
+  }
+  #endregion
+
+  #region Conflict detection
+  private void CheckForConflictingMods(IModHelper helper)
+  {
+    var conflicts = new (string ModId, string Name)[]
+    {
+      (ModCompat.UIInfoSuite2, "UI Info Suite 2"),
+      (ModCompat.UIInfoSuite, "UI Info Suite"),
+    };
+
+    foreach (var (modId, name) in conflicts)
+    {
+      if (helper.ModRegistry.IsLoaded(modId))
+      {
+        Monitor.Log(
+          $"Detected '{name}' ({modId}) installed alongside UI Info Suite 2 Alternative. " +
+          "Both mods provide the same features and will conflict. " +
+          "Please remove one to avoid issues.",
+          LogLevel.Alert
+        );
+      }
+    }
   }
   #endregion
 

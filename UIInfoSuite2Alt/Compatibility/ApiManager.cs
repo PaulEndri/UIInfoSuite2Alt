@@ -18,6 +18,10 @@ public static class ModCompat
   public const string NpcMapLocations = "Bouhm.NPCMapLocations";
   public const string SpaceCore = "spacechase0.SpaceCore";
   public const string VanillaPlusProfessions = "KediDili.VanillaPlusProfessions";
+
+  // original UIInfoSuite variants
+  public const string UIInfoSuite2 = "Annosz.UiInfoSuite2";
+  public const string UIInfoSuite = "Cdaragorn.UiInfoSuite";
 }
 
 public static class ApiManager

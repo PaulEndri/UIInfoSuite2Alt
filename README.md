@@ -58,6 +58,8 @@
 
 - **v2.8.5**
   - Show mail count on the mailbox bubble so you can see how many letters are waiting (toggable option)
+  - Add Golden Walnut tracker on Ginger Island with hover panel showing collection progress by area (toggable options)
+  - Improved the performance when showing item range highlights (sprinklers, scarecrows, etc.)
 - **v2.8.4**
   - Fix Special Orders keybind opening the board before it's unlocked
   - Check for conflicting UIInfoSuite mod variants

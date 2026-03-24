@@ -62,6 +62,9 @@ public class ModConfig
   public bool ShowTodaysGifts { get; set; } = true;
   public bool HideBirthdayIfFullFriendShip { get; set; } = true;
   public bool ShowQuestCount { get; set; } = true;
+  public bool ShowGoldenWalnutCount { get; set; } = true;
+  public bool ShowGoldenWalnutAnywhere { get; set; } = false;
+  public bool GoldenWalnutFadeOut { get; set; } = false;
   public bool UseVerticalIconLayout { get; set; } = false;
   public int IconsPerRow { get; set; } = 10;
   public bool ShowFestivalIcon { get; set; } = true;

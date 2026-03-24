@@ -187,6 +187,10 @@ public partial class ModEntry
     Spacer();
     AddBool(nameof(ModConfig.ShowTodaysGifts), () => ModConfig.ShowTodaysGifts, v => ModConfig.ShowTodaysGifts = v);
     AddBool(nameof(ModConfig.ShowQuestCount), () => ModConfig.ShowQuestCount, v => ModConfig.ShowQuestCount = v);
+    AddBool(nameof(ModConfig.ShowGoldenWalnutCount), () => ModConfig.ShowGoldenWalnutCount, v => ModConfig.ShowGoldenWalnutCount = v);
+    AddSubBool(nameof(ModConfig.ShowGoldenWalnutAnywhere), () => ModConfig.ShowGoldenWalnutAnywhere, v => ModConfig.ShowGoldenWalnutAnywhere = v);
+    AddSubBool(nameof(ModConfig.GoldenWalnutFadeOut), () => ModConfig.GoldenWalnutFadeOut, v => ModConfig.GoldenWalnutFadeOut = v);
+    Spacer();
     AddBool(nameof(ModConfig.ShowBuffTimers), () => ModConfig.ShowBuffTimers, v => ModConfig.ShowBuffTimers = v);
     AddSubBool(nameof(ModConfig.PlayBuffExpireSound), () => ModConfig.PlayBuffExpireSound, v => ModConfig.PlayBuffExpireSound = v);
     Spacer();

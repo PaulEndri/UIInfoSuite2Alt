@@ -113,6 +113,7 @@ internal class ModOptionsPageHandler : IDisposable
     var showSeasonalBerry = new ShowSeasonalBerry(helper);
     var showTodaysGift = new ShowTodaysGifts(helper);
     var showQuestCount = new ShowQuestCount(helper);
+    var showGoldenWalnutCount = new ShowGoldenWalnutCount(helper);
     var showFestivalIcon = new ShowFestivalIcon(helper);
     var showBuffTimers = new ShowBuffTimers(helper);
     var showCustomIcons = new ShowCustomIcons(helper);
@@ -139,6 +140,7 @@ internal class ModOptionsPageHandler : IDisposable
       showSeasonalBerry,
       showTodaysGift,
       showQuestCount,
+      showGoldenWalnutCount,
       showBuffTimers,
       showFestivalIcon,
       showCustomIcons,
@@ -409,6 +411,34 @@ internal class ModOptionsPageHandler : IDisposable
         showQuestCount.ToggleOption,
         () => config.ShowQuestCount,
         Set(v => { config.ShowQuestCount = v; IconHandler.Handler.ShowQuestCount = v; })
+      )
+    );
+    var walnutCheckbox = new ModOptionsCheckbox(
+      _helper.SafeGetString(nameof(config.ShowGoldenWalnutCount)),
+      whichOption++,
+      showGoldenWalnutCount.ToggleOption,
+      () => config.ShowGoldenWalnutCount,
+      Set(v => config.ShowGoldenWalnutCount = v)
+    );
+    _optionsElements.Add(walnutCheckbox);
+    _optionsElements.Add(
+      new ModOptionsCheckbox(
+        _helper.SafeGetString(nameof(config.ShowGoldenWalnutAnywhere)),
+        whichOption++,
+        showGoldenWalnutCount.ToggleShowAnywhere,
+        () => config.ShowGoldenWalnutAnywhere,
+        Set(v => config.ShowGoldenWalnutAnywhere = v),
+        walnutCheckbox
+      )
+    );
+    _optionsElements.Add(
+      new ModOptionsCheckbox(
+        _helper.SafeGetString(nameof(config.GoldenWalnutFadeOut)),
+        whichOption++,
+        showGoldenWalnutCount.ToggleFadeOut,
+        () => config.GoldenWalnutFadeOut,
+        Set(v => config.GoldenWalnutFadeOut = v),
+        walnutCheckbox
       )
     );
     var buffTimersCheckbox = new ModOptionsCheckbox(

@@ -22,6 +22,9 @@ public static class Tools
   public static readonly Color TooltipYellow = new(110, 70, 25);
   public static readonly Color TooltipBlue = new(25, 85, 145);
   public static readonly Color TooltipRed = new(165, 25, 25);
+  public static readonly Color TooltipWalnutYellow = new(128, 106, 0);
+  public static readonly Color TooltipWalnutRed = new(128, 21, 0);
+  public static readonly Color TooltipWalnutGreen = new(25, 77, 0);
   #endregion
 
   public static int GetWidthInPlayArea()

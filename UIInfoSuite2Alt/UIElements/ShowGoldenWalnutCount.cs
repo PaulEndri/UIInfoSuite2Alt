@@ -1,0 +1,493 @@
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using StardewModdingAPI;
+using StardewModdingAPI.Events;
+using StardewValley;
+using UIInfoSuite2Alt.Infrastructure;
+
+namespace UIInfoSuite2Alt.UIElements;
+
+internal class ShowGoldenWalnutCount : IDisposable
+{
+  #region Properties
+  private const float TextScale = 1f;
+  private const float IconScale = 2f;
+  private const float PanelScale = 2f;
+  private const int IconSize = 16; // walnut sprite is 16x16
+  private const int TotalWalnuts = 130;
+  private const int QiDoorThreshold = 100;
+  private const int PaddingX = 8;
+  private const int PaddingY = 3;
+  private const int PanelGap = 8;
+
+  /// <summary>9-slice source on Cursors (10x10 box with 2px corners).</summary>
+  private static readonly Rectangle PanelSource = new(267, 256, 10, 10);
+  private const int PanelCornerSize = 2;
+
+  /// <summary>Golden Walnut sprite on objectSpriteSheet (item 73).</summary>
+  private static readonly Rectangle WalnutSourceRect = new(16, 48, 16, 16);
+
+  /// <summary>Qi Gem sprite on objectSpriteSheet.</summary>
+  private static readonly Rectangle QiGemSourceRect = new(288, 561, 15, 14);
+  private const float QiGemScale = 2f;
+
+  /// <summary>Ticks before fade starts after mouse leaves counter panel.</summary>
+  private const int FadeDelayTicks = 60; // 1 second at 60fps
+  /// <summary>Ticks for the fade-out animation.</summary>
+  private const int FadeDurationTicks = 60; // 1 second
+  private const float MinFadeAlpha = 0f;
+
+  private readonly IModHelper _helper;
+  private readonly Dictionary<string, WalnutInfo> _walnutData;
+  private bool _showAnywhere;
+  private bool _fadeOutEnabled;
+  private int _fadeTimer;
+  private bool _isHovering;
+  #endregion
+
+  #region Area Definitions
+  /// <summary>Walnut tracking keys grouped by island area, matching stardew.app categories.</summary>
+  private static readonly AreaDefinition[] Areas =
+  {
+    new("Island Jungle", new[]
+    {
+      "Bush_IslandEast_17_37", "Bush_IslandShrine_23_34",
+      "BananaShrine", "IslandShrinePuzzle", "TreeNut"
+    }),
+    new("Island South", new[]
+    {
+      "Bush_IslandSouth_31_5",
+      "Buried_IslandSouthEast_25_17", "Buried_IslandSouthEastCave_36_26",
+      "StardropPool", "Mermaid", "Darts"
+    }),
+    new("Island North", new[]
+    {
+      "Bush_IslandNorth_13_33", "Bush_IslandNorth_5_30", "Bush_IslandNorth_4_42",
+      "Bush_IslandNorth_45_38", "Bush_IslandNorth_47_40", "Bush_IslandNorth_20_26",
+      "Bush_IslandNorth_9_84", "Bush_IslandNorth_56_27",
+      "Buried_IslandNorth_57_79", "Buried_IslandNorth_19_39", "Buried_IslandNorth_19_13",
+      "Buried_IslandNorth_54_21", "Buried_IslandNorth_42_77", "Buried_IslandNorth_62_54",
+      "Buried_IslandNorth_26_81",
+      "TreeNutShot", "Island_N_BuriedTreasureNut"
+    }),
+    new("Island West", new[]
+    {
+      "Bush_IslandWest_104_3", "Bush_IslandWest_31_24", "Bush_IslandWest_38_56",
+      "Bush_IslandWest_75_29", "Bush_IslandWest_64_30", "Bush_IslandWest_54_18",
+      "Bush_IslandWest_25_30", "Bush_IslandWest_15_3", "Bush_CaptainRoom_2_4",
+      "Buried_IslandWest_21_81", "Buried_IslandWest_62_76", "Buried_IslandWest_39_24",
+      "Buried_IslandWest_88_14", "Buried_IslandWest_43_74", "Buried_IslandWest_30_75",
+      "IslandWestCavePuzzle", "SandDuggy", "TigerSlimeNut",
+      "Island_W_BuriedTreasureNut", "Island_W_BuriedTreasureNut2", "MusselStone"
+    }),
+    new("Volcano", new[]
+    {
+      "Bush_Caldera_28_36", "Bush_Caldera_9_34",
+      "VolcanoNormalChest", "VolcanoRareChest",
+      "VolcanoBarrel", "VolcanoMining", "VolcanoMonsterDrop"
+    }),
+    new("Fishing", new[]
+    {
+      "IslandFishing"
+    }),
+    new("Farming", new[]
+    {
+      "IslandFarming"
+    }),
+    new("Golden Coconut", new[]
+    {
+      "GoldenCoconut"
+    }),
+    new("The Pirate's Wife", new[]
+    {
+      "Birdie"
+    }),
+    new("Gourmand Frog", new[]
+    {
+      "IslandGourmand1", "IslandGourmand2", "IslandGourmand3",
+    }),
+    new("Field Office", new[]
+    {
+      "IslandLeftPlantRestored", "IslandRightPlantRestored",
+      "IslandCenterSkeletonRestored", "IslandSnakeRestored",
+      "IslandBatRestored", "IslandFrogRestored"
+    })
+  };
+
+  private record WalnutInfo(int Count, string Name, string Description);
+  private record AreaDefinition(string Name, string[] Keys);
+  #endregion
+
+  #region Lifecycle
+  public ShowGoldenWalnutCount(IModHelper helper)
+  {
+    _helper = helper;
+    _walnutData = helper.Data.ReadJsonFile<Dictionary<string, WalnutInfo>>("assets/walnuts.json")
+                  ?? new Dictionary<string, WalnutInfo>();
+  }
+
+  public void Dispose()
+  {
+    ToggleOption(false);
+  }
+
+  public void ToggleOption(bool enabled)
+  {
+    _helper.Events.Display.RenderedHud -= OnRenderedHud;
+    _helper.Events.GameLoop.UpdateTicked -= OnUpdateTicked;
+
+    if (enabled)
+    {
+      _helper.Events.Display.RenderedHud += OnRenderedHud;
+      _helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
+    }
+  }
+
+  public void ToggleShowAnywhere(bool enabled)
+  {
+    _showAnywhere = enabled;
+  }
+
+  public void ToggleFadeOut(bool enabled)
+  {
+    _fadeOutEnabled = enabled;
+    if (!enabled)
+    {
+      _fadeTimer = 0;
+    }
+  }
+  #endregion
+
+  #region Event subscriptions
+  private void OnUpdateTicked(object? sender, UpdateTickedEventArgs e)
+  {
+    if (!_fadeOutEnabled || _isHovering)
+    {
+      return;
+    }
+
+    if (_fadeTimer < FadeDelayTicks + FadeDurationTicks)
+    {
+      _fadeTimer++;
+    }
+  }
+
+  private void OnRenderedHud(object? sender, RenderedHudEventArgs e)
+  {
+    if (!UIElementUtils.IsRenderingNormally())
+    {
+      return;
+    }
+
+    // Only show after first parrot walnut has been given
+    if (!Game1.MasterPlayer.hasOrWillReceiveMail("Island_FirstParrot"))
+    {
+      return;
+    }
+
+    // Only show on Ginger Island unless "show anywhere" is enabled
+    if (!_showAnywhere && Game1.currentLocation?.GetLocationContextId() != "Island")
+    {
+      return;
+    }
+
+    int found = Game1.netWorldState.Value.GoldenWalnutsFound;
+
+    // Always compute counter rect for hover detection, even when fully faded
+    float alpha = GetCurrentAlpha();
+    Rectangle counterRect = DrawCounterPanel(e.SpriteBatch, found, alpha);
+
+    // Track hover state for fade logic
+    bool hovering = counterRect.Contains(Game1.getOldMouseX(), Game1.getOldMouseY());
+    if (hovering)
+    {
+      _isHovering = true;
+      _fadeTimer = 0;
+
+      // Redraw at full opacity if it was faded
+      if (alpha < 1f)
+      {
+        DrawCounterPanel(e.SpriteBatch, found, 1f);
+      }
+
+      DrawInfoPanel(e.SpriteBatch, found, counterRect);
+    }
+    else
+    {
+      _isHovering = false;
+    }
+  }
+
+  private float GetCurrentAlpha()
+  {
+    if (!_fadeOutEnabled)
+    {
+      return 1f;
+    }
+
+    if (_fadeTimer < FadeDelayTicks)
+    {
+      return 1f;
+    }
+
+    int fadeTicks = _fadeTimer - FadeDelayTicks;
+    if (fadeTicks >= FadeDurationTicks)
+    {
+      return MinFadeAlpha;
+    }
+
+    return 1f - (float)fadeTicks / FadeDurationTicks;
+  }
+  #endregion
+
+  #region Logic
+  private int GetWalnutCount(string key)
+  {
+    return _walnutData.TryGetValue(key, out WalnutInfo? info) ? info.Count : 1;
+  }
+
+  private int GetAreaTotal(AreaDefinition area)
+  {
+    int total = 0;
+    foreach (string key in area.Keys)
+    {
+      total += GetWalnutCount(key);
+    }
+    return total;
+  }
+
+  private int GetCollectedForArea(AreaDefinition area)
+  {
+    var tracker = Game1.player.team.collectedNutTracker;
+    var limitedDrops = Game1.player.team.limitedNutDrops;
+    int count = 0;
+
+    foreach (string key in area.Keys)
+    {
+      if (tracker.Contains(key))
+      {
+        // limitedNutDrops tracks actual count for repeatable activities
+        if (limitedDrops.TryGetValue(key, out int dropCount))
+        {
+          count += dropCount;
+        }
+        else
+        {
+          count += GetWalnutCount(key);
+        }
+      }
+      else if (limitedDrops.TryGetValue(key, out int dropCount))
+      {
+        // Some limited drops aren't in collectedNutTracker
+        count += dropCount;
+      }
+    }
+
+    return Math.Min(count, GetAreaTotal(area));
+  }
+  #endregion
+
+  #region Rendering
+  private Rectangle DrawCounterPanel(SpriteBatch batch, int found, float alpha)
+  {
+    string text = $"{found}/{TotalWalnuts}";
+    Vector2 textSize = Game1.smallFont.MeasureString(text) * TextScale;
+
+    int scaledIconSize = (int)(IconSize * IconScale);
+    int gap = 4;
+    int contentWidth = scaledIconSize + gap + (int)textSize.X;
+    int contentHeight = Math.Max(scaledIconSize, (int)textSize.Y);
+    int panelWidth = contentWidth + PaddingX * 2;
+    int panelHeight = contentHeight + PaddingY * 2 + 2;
+
+    // Top-left corner with margin
+    float panelX = 8f;
+    float panelY = 8f;
+
+    // Draw 9-slice background
+    var dest = new Rectangle((int)panelX, (int)panelY, panelWidth, panelHeight);
+    NineSlice.Draw(batch, Game1.mouseCursors, PanelSource, dest, PanelCornerSize, PanelScale, 0.89f, Color.White * 0.9f * alpha);
+
+    // Draw walnut icon (vertically centered in panel)
+    float iconX = panelX + PaddingX;
+    float iconY = panelY + PaddingY + (contentHeight - scaledIconSize) / 2f;
+    batch.Draw(
+      Game1.objectSpriteSheet,
+      new Vector2(iconX, iconY),
+      WalnutSourceRect,
+      Color.White * alpha,
+      0f,
+      Vector2.Zero,
+      IconScale,
+      SpriteEffects.None,
+      0.9f
+    );
+
+    // Draw text with smallFont (vertically centered + 3px down), with 1px shadow
+    float textX = iconX + scaledIconSize + gap;
+    float textY = panelY + PaddingY + (contentHeight - textSize.Y) / 2f + 3f;
+    DrawTextWithShadow(batch, text, new Vector2(textX, textY), Game1.textColor * alpha);
+
+    return dest;
+  }
+
+  private void DrawInfoPanel(SpriteBatch batch, int found, Rectangle counterRect)
+  {
+    // Qi's door uses found - 1 (first walnut not counted)
+    int qiCount = Math.Max(0, found - 1);
+
+    // Qi's Walnut Room line
+    float qiGemWidth = QiGemSourceRect.Width * QiGemScale + 4; // gem + gap
+    string qiLabel = "Qi's Walnut Room";
+    bool qiComplete = qiCount >= QiDoorThreshold;
+    Color qiCountColor = qiComplete ? Tools.TooltipWalnutGreen : Tools.TooltipWalnutYellow;
+    string qiCollectedText = $"{qiCount}";
+    string qiTotalText = $"/{QiDoorThreshold}";
+    float qiNameWidth = qiGemWidth + Game1.smallFont.MeasureString(qiLabel).X * TextScale;
+    float qiCountWidth = qiComplete
+      ? Game1.smallFont.MeasureString(qiCollectedText).X * TextScale
+      : (Game1.smallFont.MeasureString(qiCollectedText).X + Game1.smallFont.MeasureString(qiTotalText).X) * TextScale;
+
+    // Area breakdowns
+    var areaLines = new List<(string name, string collectedText, string totalText, Color countColor, bool complete)>();
+    float maxNameWidth = qiNameWidth;
+    float maxCountWidth = qiCountWidth;
+
+    foreach (AreaDefinition area in Areas)
+    {
+      int areaTotal = GetAreaTotal(area);
+      int collected = GetCollectedForArea(area);
+      bool complete = collected >= areaTotal;
+      Color countColor = complete ? Tools.TooltipWalnutGreen : Tools.TooltipWalnutYellow;
+      string collectedText = $"{collected}";
+      string totalText = $"/{areaTotal}";
+      string namePrefix = complete ? "= " : "";
+      float nameWidth = Game1.smallFont.MeasureString(namePrefix + area.Name).X * TextScale;
+      float countWidth = complete
+        ? Game1.smallFont.MeasureString(collectedText).X * TextScale
+        : (Game1.smallFont.MeasureString(collectedText).X + Game1.smallFont.MeasureString(totalText).X) * TextScale;
+      areaLines.Add((area.Name, collectedText, totalText, countColor, complete));
+      maxNameWidth = Math.Max(maxNameWidth, nameWidth);
+      maxCountWidth = Math.Max(maxCountWidth, countWidth);
+    }
+
+    float lineHeight = Game1.smallFont.MeasureString("X").Y * TextScale;
+    int lineSpacing = 4;
+    int columnGap = 12;
+    float maxLineWidth = maxNameWidth + columnGap + maxCountWidth;
+    float totalLineHeight = lineHeight + (areaLines.Count * lineHeight) + ((areaLines.Count) * lineSpacing);
+
+    int panelWidth = (int)maxLineWidth + PaddingX * 2 + 8;
+    int panelHeight = (int)totalLineHeight + PaddingY * 2 + 2;
+
+    float panelX = counterRect.X;
+    float panelY = counterRect.Bottom + PanelGap;
+
+    // Draw 9-slice background
+    var dest = new Rectangle((int)panelX, (int)panelY, panelWidth, panelHeight);
+    NineSlice.Draw(batch, Game1.mouseCursors, PanelSource, dest, PanelCornerSize, PanelScale, 0.89f, Color.White * 0.9f);
+
+    float rightEdge = panelX + PaddingX + maxLineWidth;
+
+    // Draw Qi line: [gem] Qi's Walnut Room    (color)X(/black)/100
+    float lineY = panelY + PaddingY + 3f;
+    float segX = panelX + PaddingX;
+    float gemY = lineY + (lineHeight - QiGemSourceRect.Height * QiGemScale) / 2f - 2f;
+    batch.Draw(
+      Game1.objectSpriteSheet,
+      new Vector2(segX, gemY),
+      QiGemSourceRect,
+      Color.White,
+      0f,
+      Vector2.Zero,
+      QiGemScale,
+      SpriteEffects.None,
+      0.9f
+    );
+    segX += qiGemWidth;
+    DrawText(batch, qiLabel, new Vector2(segX, lineY), Game1.textColor);
+
+    if (qiComplete)
+    {
+      float cw = Game1.smallFont.MeasureString(qiCollectedText).X * TextScale;
+      DrawText(batch, qiCollectedText, new Vector2(rightEdge - cw, lineY), qiCountColor);
+    }
+    else
+    {
+      float fw = (Game1.smallFont.MeasureString(qiCollectedText).X + Game1.smallFont.MeasureString(qiTotalText).X) * TextScale;
+      float cx = rightEdge - fw;
+      DrawText(batch, qiCollectedText, new Vector2(cx, lineY), qiCountColor);
+      cx += Game1.smallFont.MeasureString(qiCollectedText).X * TextScale;
+      DrawText(batch, qiTotalText, new Vector2(cx, lineY), Game1.textColor);
+    }
+    lineY += lineHeight + lineSpacing;
+
+    // Draw area lines: name left-aligned, count right-aligned
+    foreach ((string name, string collectedText, string totalText, Color countColor, bool complete) in areaLines)
+    {
+      string displayName = complete ? $"= {name}" : name;
+      DrawText(batch, displayName, new Vector2(panelX + PaddingX, lineY), Game1.textColor);
+
+      if (complete)
+      {
+        float countWidth = Game1.smallFont.MeasureString(collectedText).X * TextScale;
+        DrawText(batch, collectedText, new Vector2(rightEdge - countWidth, lineY), countColor);
+      }
+      else
+      {
+        float fullWidth = (Game1.smallFont.MeasureString(collectedText).X + Game1.smallFont.MeasureString(totalText).X) * TextScale;
+        float countX = rightEdge - fullWidth;
+        DrawText(batch, collectedText, new Vector2(countX, lineY), countColor);
+        countX += Game1.smallFont.MeasureString(collectedText).X * TextScale;
+        DrawText(batch, totalText, new Vector2(countX, lineY), Game1.textColor);
+      }
+
+      lineY += lineHeight + lineSpacing;
+    }
+  }
+
+  private static void DrawText(SpriteBatch batch, string text, Vector2 position, Color color)
+  {
+    batch.DrawString(
+      Game1.smallFont,
+      text,
+      position,
+      color,
+      0f,
+      Vector2.Zero,
+      TextScale,
+      SpriteEffects.None,
+      0.9f
+    );
+  }
+
+  private static void DrawTextWithShadow(SpriteBatch batch, string text, Vector2 position, Color color)
+  {
+    float alphaRatio = color.A / 255f;
+    batch.DrawString(
+      Game1.smallFont,
+      text,
+      position + new Vector2(1f, 1f),
+      new Color(0, 0, 0, (int)(120 * alphaRatio)),
+      0f,
+      Vector2.Zero,
+      TextScale,
+      SpriteEffects.None,
+      0.89f
+    );
+    batch.DrawString(
+      Game1.smallFont,
+      text,
+      position,
+      color,
+      0f,
+      Vector2.Zero,
+      TextScale,
+      SpriteEffects.None,
+      0.9f
+    );
+  }
+  #endregion
+}

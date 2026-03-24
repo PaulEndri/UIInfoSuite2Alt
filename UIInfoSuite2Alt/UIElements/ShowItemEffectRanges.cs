@@ -180,8 +180,20 @@ internal class ShowItemEffectRanges : IDisposable
     float tileOpacity = _isBombRange.Value ? 0.3f : 0.5f;
     Texture2D texture = _isBombRange.Value ? _tileBombTexture.Value : _tileTexture.Value;
 
+    // Compute visible tile bounds to skip off-screen draw calls
+    xTile.Dimensions.Rectangle viewport = Game1.viewport;
+    int minTileX = viewport.X / Game1.tileSize - 1;
+    int minTileY = viewport.Y / Game1.tileSize - 1;
+    int maxTileX = (viewport.X + viewport.Width) / Game1.tileSize + 1;
+    int maxTileY = (viewport.Y + viewport.Height) / Game1.tileSize + 1;
+
     foreach (Point point in _effectiveAreaOther.Value)
     {
+      if (point.X < minTileX || point.X > maxTileX || point.Y < minTileY || point.Y > maxTileY)
+      {
+        continue;
+      }
+
       var position = new Vector2(
         point.X * Utility.ModifyCoordinateFromUIScale(Game1.tileSize),
         point.Y * Utility.ModifyCoordinateFromUIScale(Game1.tileSize)
@@ -201,6 +213,11 @@ internal class ShowItemEffectRanges : IDisposable
 
     foreach (Point point in _effectiveAreaIntersection.Value)
     {
+      if (point.X < minTileX || point.X > maxTileX || point.Y < minTileY || point.Y > maxTileY)
+      {
+        continue;
+      }
+
       var position = new Vector2(
         point.X * Utility.ModifyCoordinateFromUIScale(Game1.tileSize),
         point.Y * Utility.ModifyCoordinateFromUIScale(Game1.tileSize)
@@ -743,11 +760,23 @@ internal class ShowItemEffectRanges : IDisposable
   {
     GameLocation? location = skipNonTillable ? Game1.currentLocation : null;
 
+    // Viewport culling bounds
+    xTile.Dimensions.Rectangle vp = Game1.viewport;
+    int minTileX = vp.X / Game1.tileSize - 1;
+    int minTileY = vp.Y / Game1.tileSize - 1;
+    int maxTileX = (vp.X + vp.Width) / Game1.tileSize + 1;
+    int maxTileY = (vp.Y + vp.Height) / Game1.tileSize + 1;
+
     foreach (Vector2 tile in tiles)
     {
       var point = tile.ToPoint();
       point.X += xPos;
       point.Y += yPos;
+
+      if (point.X < minTileX || point.X > maxTileX || point.Y < minTileY || point.Y > maxTileY)
+      {
+        continue;
+      }
 
       if (location != null)
       {
@@ -781,6 +810,13 @@ internal class ShowItemEffectRanges : IDisposable
     int xOffset = tileMap.Length / 2;
     GameLocation? location = (skipOccupied || skipNonTillable) ? Game1.currentLocation : null;
 
+    // Viewport culling bounds
+    xTile.Dimensions.Rectangle vp = Game1.viewport;
+    int minTileX = vp.X / Game1.tileSize - 1;
+    int minTileY = vp.Y / Game1.tileSize - 1;
+    int maxTileX = (vp.X + vp.Width) / Game1.tileSize + 1;
+    int maxTileY = (vp.Y + vp.Height) / Game1.tileSize + 1;
+
     for (var i = 0; i < tileMap.Length; ++i)
     {
       int yOffset = tileMap[i].Length / 2;
@@ -789,6 +825,11 @@ internal class ShowItemEffectRanges : IDisposable
         if (tileMap[i][j] == 1)
         {
           var point = new Point(xPos + i - xOffset, yPos + j - yOffset);
+
+          if (point.X < minTileX || point.X > maxTileX || point.Y < minTileY || point.Y > maxTileY)
+          {
+            continue;
+          }
 
           if (location != null)
           {
@@ -936,11 +977,26 @@ internal class ShowItemEffectRanges : IDisposable
       return;
     }
 
-    // Show-one mode: compute overlap between hovered (current) and others
-    _effectiveAreaIntersection.Value = _effectiveAreaOther.Value.Intersect(_effectiveAreaCurrent.Value).ToHashSet();
-    HashSet<Point> temp = _effectiveAreaCurrent.Value.Except(_effectiveAreaOther.Value).ToHashSet();
-    _effectiveAreaOther.Value = _effectiveAreaOther.Value.Except(_effectiveAreaCurrent.Value).ToHashSet();
-    _effectiveAreaOther.Value = _effectiveAreaOther.Value.Union(temp).ToHashSet();
+    // Show-one mode: compute overlap between hovered (current) and others using in-place set operations
+    var currentSet = new HashSet<Point>(_effectiveAreaCurrent.Value);
+    _effectiveAreaIntersection.Value.Clear();
+    foreach (Point p in currentSet)
+    {
+      if (_effectiveAreaOther.Value.Contains(p))
+      {
+        _effectiveAreaIntersection.Value.Add(p);
+      }
+    }
+
+    // Other = (Other - Current) + (Current - Other) = symmetric difference
+    // Current tiles not in Other get added; shared tiles get removed from Other
+    foreach (Point p in currentSet)
+    {
+      if (!_effectiveAreaOther.Value.Remove(p))
+      {
+        _effectiveAreaOther.Value.Add(p);
+      }
+    }
   }
 
   #region Distance map

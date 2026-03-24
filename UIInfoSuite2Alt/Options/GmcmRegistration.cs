@@ -277,6 +277,7 @@ public partial class ModEntry
     configMenu.AddSectionTitle(ModManifest, text: () => I18n.Section_NpcAndSocial());
     configMenu.AddImage(ModManifest, () => Helper.ModContent.Load<Texture2D>("assets/banner_npc.png"), scale: 1);
 
+    AddBool(nameof(ModConfig.ShowMailboxCount), () => ModConfig.ShowMailboxCount, v => ModConfig.ShowMailboxCount = v);
     AddBool(nameof(ModConfig.ShowHeartFills), () => ModConfig.ShowHeartFills, v => ModConfig.ShowHeartFills = v);
     AddBool(nameof(ModConfig.DisplayCalendarAndBillboard), () => ModConfig.DisplayCalendarAndBillboard, v => ModConfig.DisplayCalendarAndBillboard = v);
 

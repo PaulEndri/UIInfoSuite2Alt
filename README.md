@@ -56,6 +56,8 @@
 
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
+- **v2.8.5**
+  - Show mail count on the mailbox bubble so you can see how many letters are waiting (toggable option)
 - **v2.8.4**
   - Fix Special Orders keybind opening the board before it's unlocked
   - Check for conflicting UIInfoSuite mod variants

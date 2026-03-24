@@ -43,6 +43,7 @@ public class ModConfig
   public bool ShowRangeTooltip { get; set; } = true;
   public bool ShowBombRange { get; set; } = false;
   public bool ShowHarvestPricesInShop { get; set; } = true;
+  public bool ShowMailboxCount { get; set; } = true;
   public bool DisplayCalendarAndBillboard { get; set; } = true;
   public bool ShowWhenNewRecipesAreAvailable { get; set; } = true;
   public bool ShowRecipeItemIcon { get; set; } = true;

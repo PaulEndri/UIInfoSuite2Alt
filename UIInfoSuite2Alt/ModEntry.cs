@@ -48,6 +48,7 @@ public partial class ModEntry : Mod
     TvChannelWatcher.Initialize(harmony, helper);
     ShowFishOnCatch.Initialize(harmony);
     HudMessagePatch.Initialize(harmony, helper.ModRegistry.IsLoaded(ModCompat.SpaceCore));
+    MailboxCountPatch.Initialize(harmony);
 
     ModConfig = Helper.ReadConfig<ModConfig>();
 

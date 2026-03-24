@@ -664,6 +664,15 @@ internal class ModOptionsPageHandler : IDisposable
 
     _optionsElements.Add(
       new ModOptionsCheckbox(
+        _helper.SafeGetString(nameof(config.ShowMailboxCount)),
+        whichOption++,
+        enabled => MailboxCountPatch.Enabled = enabled,
+        () => config.ShowMailboxCount,
+        Set(v => config.ShowMailboxCount = v)
+      )
+    );
+    _optionsElements.Add(
+      new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.ShowHeartFills)),
         whichOption++,
         showAccurateHearts.ToggleOption,

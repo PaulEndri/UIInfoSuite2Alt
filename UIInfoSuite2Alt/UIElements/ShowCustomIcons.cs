@@ -17,8 +17,8 @@ internal class ShowCustomIcons : IDisposable
   private const int MaxVisibleIcons = 5;
 
   private readonly IModHelper _helper;
-  private readonly PerScreen<Dictionary<string, CustomIconData>> _activeIcons = new(() => new());
-  private readonly PerScreen<Dictionary<string, ClickableTextureComponent>> _iconComponents = new(() => new());
+  private readonly PerScreen<Dictionary<string, CustomIconData>> _activeIcons = new(() => []);
+  private readonly PerScreen<Dictionary<string, ClickableTextureComponent>> _iconComponents = new(() => []);
   private readonly PerScreen<bool> _needsReload = new(() => true);
 
   public ShowCustomIcons(IModHelper helper)

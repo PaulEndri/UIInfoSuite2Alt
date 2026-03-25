@@ -27,7 +27,7 @@ public record FruitTreeInfo(string TreeName, List<PossibleDroppedItem> Items);
 
 public static class DropsHelper
 {
-  private static readonly Dictionary<string, string> CropNamesCache = new();
+  private static readonly Dictionary<string, string> CropNamesCache = [];
 
   public static int? GetNextDay(string? condition, bool includeToday)
   {

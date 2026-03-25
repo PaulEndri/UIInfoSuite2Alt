@@ -17,7 +17,7 @@ internal class ShowFishOnCatch : IDisposable
   public static void Initialize(Harmony harmony)
   {
     harmony.Patch(
-      original: AccessTools.Method(typeof(BobberBar), nameof(BobberBar.draw), new[] { typeof(SpriteBatch) }),
+      original: AccessTools.Method(typeof(BobberBar), nameof(BobberBar.draw), [typeof(SpriteBatch)]),
       prefix: new HarmonyMethod(typeof(ShowFishOnCatch), nameof(BeforeDraw)),
       postfix: new HarmonyMethod(typeof(ShowFishOnCatch), nameof(AfterDraw))
     );

@@ -678,7 +678,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
 
       _rsvQuestBoardCtor = questBoardType.GetConstructor(
         BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,
-        null, new[] { questDataType, typeof(string) }, null);
+        null, [questDataType, typeof(string)], null);
 
       _rsvAcceptedDailyQuestField = questDataType.GetField("acceptedDailyQuest",
         BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
@@ -738,7 +738,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
       object? questData = GetRsvQuestData();
       if (questData == null) return false;
 
-      object? board = _rsvQuestBoardCtor.Invoke(new[] { questData, boardType });
+      object? board = _rsvQuestBoardCtor.Invoke([questData, boardType]);
       if (board is IClickableMenu menu)
       {
         Game1.activeClickableMenu = menu;

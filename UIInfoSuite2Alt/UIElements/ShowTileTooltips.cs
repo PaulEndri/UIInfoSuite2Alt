@@ -23,16 +23,10 @@ using Object = StardewValley.Object;
 
 namespace UIInfoSuite2Alt.UIElements;
 
-internal readonly struct HoverSegment
+internal readonly struct HoverSegment(string text, Color? color = null)
 {
-  public string Text { get; }
-  public Color? Color { get; }
-
-  public HoverSegment(string text, Color? color = null)
-  {
-    Text = text;
-    Color = color;
-  }
+  public string Text { get; } = text;
+  public Color? Color { get; } = color;
 
   public static implicit operator HoverSegment(string text) => new(text);
 }
@@ -43,7 +37,7 @@ internal readonly struct HoverLine
 
   public HoverLine(string text, Color? color = null)
   {
-    Segments = new[] { new HoverSegment(text, color) };
+    Segments = [new HoverSegment(text, color)];
   }
 
   public HoverLine(params HoverSegment[] segments)

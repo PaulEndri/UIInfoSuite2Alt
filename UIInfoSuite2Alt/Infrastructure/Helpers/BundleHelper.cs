@@ -21,8 +21,8 @@ public record BundleKeyData(string Name, int Color, string TexturePath, int Spri
 
 internal static class BundleHelper
 {
-  private static readonly Dictionary<int, BundleKeyData> BundleIdToBundleKeyDataMap = new();
-  private static readonly BundleIngredientsCache AllBundleIngredients = new();
+  private static readonly Dictionary<int, BundleKeyData> BundleIdToBundleKeyDataMap = [];
+  private static readonly BundleIngredientsCache AllBundleIngredients = [];
 
   public static BundleKeyData? GetBundleKeyDataFromIndex(int bundleIdx, bool forceRefresh = false)
   {

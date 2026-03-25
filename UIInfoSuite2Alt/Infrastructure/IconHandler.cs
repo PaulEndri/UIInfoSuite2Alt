@@ -13,7 +13,7 @@ namespace UIInfoSuite2Alt.Infrastructure;
 public sealed class IconHandler
 {
   public static readonly string[] IconKeys =
-  {
+  [
     "Luck",
     "Weather",
     "Birthday",
@@ -25,14 +25,14 @@ public sealed class IconHandler
     "TravelingMerchant",
     "Bookseller",
     "CustomIcons"
-  };
+  ];
 
   private const int IconGap = 48;
   /// <summary>How many icons per row (horizontal) or column (vertical) before wrapping.</summary>
   public int IconsPerRow { get; set; } = 10;
 
-  private readonly PerScreen<List<QueuedIcon>> _queuedIcons = new(() => new());
-  private readonly PerScreen<List<QueuedIcon>> _sortedCache = new(() => new());
+  private readonly PerScreen<List<QueuedIcon>> _queuedIcons = new(() => []);
+  private readonly PerScreen<List<QueuedIcon>> _sortedCache = new(() => []);
   private readonly PerScreen<int> _lastSortedCount = new(() => -1);
 
   private IconHandler() { }
@@ -45,7 +45,7 @@ public sealed class IconHandler
   public bool ShowQuestCount { get; set; } = true;
 
   /// <summary>The configured icon order, keyed by icon key. Lower = more right.</summary>
-  public Dictionary<string, int> IconOrder { get; set; } = new();
+  public Dictionary<string, int> IconOrder { get; set; } = [];
 
   /// <summary>When true, icons stack vertically downward instead of horizontally to the left.</summary>
   public bool UseVerticalLayout { get; set; }

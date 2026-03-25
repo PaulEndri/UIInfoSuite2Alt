@@ -26,9 +26,9 @@ public static class ModCompat
 
 public static class ApiManager
 {
-  private static readonly Dictionary<string, object> RegisteredApis = new();
+  private static readonly Dictionary<string, object> RegisteredApis = [];
 
-  private static readonly List<string> SuccessfullyLoadedModIds = new();
+  private static readonly List<string> SuccessfullyLoadedModIds = [];
 
   public static T? TryRegisterApi<T>(
         IModHelper helper,

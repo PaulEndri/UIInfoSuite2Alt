@@ -20,8 +20,8 @@ internal class ShowMachineProcessingItem : IDisposable
     { "Cask", new Vector2(0f, -20f) }
   };
 
-  private readonly PerScreen<List<MachineIconData>> _visibleMachines = new(() => new List<MachineIconData>());
-  private readonly PerScreen<List<FishPondIconData>> _visibleFishPonds = new(() => new List<FishPondIconData>());
+  private readonly PerScreen<List<MachineIconData>> _visibleMachines = new(() => []);
+  private readonly PerScreen<List<FishPondIconData>> _visibleFishPonds = new(() => []);
 
   private readonly IModHelper _helper;
   private bool _showMachineIcons;

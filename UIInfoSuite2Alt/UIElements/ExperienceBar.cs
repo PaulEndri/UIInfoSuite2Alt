@@ -32,7 +32,7 @@ public partial class ExperienceBar : IDisposable
     new(() => new DisplayedLevelUpMessage());
 
   private readonly PerScreen<List<DisplayedExperienceValue>> _displayedExperienceValues =
-    new(() => new List<DisplayedExperienceValue>());
+    new(() => []);
 
   private const int LevelUpVisibleTicks = 120;
   private readonly PerScreen<int> _levelUpVisibleTimer = new();
@@ -77,13 +77,13 @@ public partial class ExperienceBar : IDisposable
 
   // SpaceCore custom skill state
   private ISpaceCoreApi? _spaceCoreApi;
-  private readonly PerScreen<Dictionary<string, int>> _currentCustomExperience = new(() => new());
-  private readonly PerScreen<Dictionary<string, int>> _currentCustomLevels = new(() => new());
+  private readonly PerScreen<Dictionary<string, int>> _currentCustomExperience = new(() => []);
+  private readonly PerScreen<Dictionary<string, int>> _currentCustomLevels = new(() => []);
   private readonly PerScreen<string?> _activeCustomSkillId = new();
   private readonly PerScreen<Texture2D?> _customSkillIconTexture = new();
 
   // Stacked secondary bars for concurrent XP gains (e.g., Combat + custom skill from one kill)
-  private readonly PerScreen<List<ExperienceBarState>> _secondaryBars = new(() => new());
+  private readonly PerScreen<List<ExperienceBarState>> _secondaryBars = new(() => []);
   private const int BarStackOffset = 66;
 
   // Tracks which skill the primary bar is showing, to reset combo on skill change

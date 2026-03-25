@@ -13,7 +13,7 @@ internal static class MailboxCountPatch
   public static void Initialize(Harmony harmony)
   {
     harmony.Patch(
-      original: AccessTools.Method(typeof(Farm), nameof(Farm.draw), new[] { typeof(SpriteBatch) }),
+      original: AccessTools.Method(typeof(Farm), nameof(Farm.draw), [typeof(SpriteBatch)]),
       postfix: new HarmonyMethod(typeof(MailboxCountPatch), nameof(AfterDraw))
     );
   }

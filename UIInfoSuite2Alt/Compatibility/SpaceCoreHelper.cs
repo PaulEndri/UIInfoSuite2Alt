@@ -8,27 +8,19 @@ using StardewModdingAPI;
 
 namespace UIInfoSuite2Alt.Compatibility;
 
-public class CachedCustomSkillInfo
+public class CachedCustomSkillInfo(Texture2D icon, Color barColor, int[] experienceCurve, string displayName)
 {
-  public Texture2D Icon { get; }
-  public Color BarColor { get; }
-  public int[] ExperienceCurve { get; }
-  public string DisplayName { get; }
-
-  public CachedCustomSkillInfo(Texture2D icon, Color barColor, int[] experienceCurve, string displayName)
-  {
-    Icon = icon;
-    BarColor = barColor;
-    ExperienceCurve = experienceCurve;
-    DisplayName = displayName;
-  }
+  public Texture2D Icon { get; } = icon;
+  public Color BarColor { get; } = barColor;
+  public int[] ExperienceCurve { get; } = experienceCurve;
+  public string DisplayName { get; } = displayName;
 }
 
 public static class SpaceCoreHelper
 {
   private static readonly Color DefaultBarColor = new(148, 103, 198, 0.63f);
 
-  private static readonly Dictionary<string, CachedCustomSkillInfo> SkillCache = new();
+  private static readonly Dictionary<string, CachedCustomSkillInfo> SkillCache = [];
   private static MethodInfo? _getSkillMethod;
   private static bool _reflectionAttempted;
 
@@ -43,7 +35,7 @@ public static class SpaceCoreHelper
     string displayName = api.GetDisplayNameOfCustomSkill(skillId);
 
     Color barColor = DefaultBarColor;
-    int[] experienceCurve = Array.Empty<int>();
+    int[] experienceCurve = [];
 
     // Reflection to get ExperienceBarColor and ExperienceCurve from internal Skill object
     object? skillObject = GetSkillObject(skillId);
@@ -113,7 +105,7 @@ public static class SpaceCoreHelper
           "GetSkill",
           BindingFlags.Public | BindingFlags.Static,
           null,
-          new[] { typeof(string) },
+          [typeof(string)],
           null
         );
       }
@@ -133,7 +125,7 @@ public static class SpaceCoreHelper
 
     try
     {
-      return _getSkillMethod.Invoke(null, new object[] { skillId });
+      return _getSkillMethod.Invoke(null, [skillId]);
     }
     catch
     {

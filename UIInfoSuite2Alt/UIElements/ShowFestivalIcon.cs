@@ -18,7 +18,7 @@ internal class ShowFestivalIcon : IDisposable
   #region Properties
   private enum FestivalType { None, Regular, Passive, FishingDerby }
 
-  private static readonly HashSet<string> FishingDerbyIds = new() { "TroutDerby", "SquidFest" };
+  private static readonly HashSet<string> FishingDerbyIds = ["TroutDerby", "SquidFest"];
 
   private readonly PerScreen<FestivalType> _todayType = new();
   private readonly PerScreen<string> _todayHoverText = new();
@@ -28,7 +28,7 @@ internal class ShowFestivalIcon : IDisposable
   // Deferred festival time loading — avoids content loads during DayStarted
   // which can trigger Content Patcher token re-evaluation and cascading
   // texture invalidations that break mods like CP Animations.
-  private readonly PerScreen<List<(string key, bool isToday)>> _pendingRegularFestivals = new(() => new());
+  private readonly PerScreen<List<(string key, bool isToday)>> _pendingRegularFestivals = new(() => []);
 
   private Texture2D? _billboardTexture;
 

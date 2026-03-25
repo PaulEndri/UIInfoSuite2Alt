@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.ItemTypeDefinitions;
@@ -16,7 +17,7 @@ using BundleIngredientsCache = Dictionary<string, List<List<int>>>;
 
 public record BundleRequiredItem(string Name, int BannerWidth, int Id, string QualifiedId, int Quality);
 
-public record BundleKeyData(string Name, int Color);
+public record BundleKeyData(string Name, int Color, string TexturePath, int SpriteIndex);
 
 internal static class BundleHelper
 {
@@ -41,9 +42,40 @@ internal static class BundleHelper
     return Bundle.getColorFromColorIndex(bundleData.Color);
   }
 
+  private const string DefaultBundleTexture = "LooseSprites\\JunimoNote";
+  private const int BundleSpriteSize = 32;
+
+  /// <summary>
+  /// Gets the bundle icon texture and source rectangle for a bundle.
+  /// Loads the texture fresh each call (no caching) since CP mods can invalidate textures.
+  /// The default JunimoNote sheet has a Y offset of 180; custom textures start at Y=0.
+  /// </summary>
+  public static (Texture2D texture, Rectangle sourceRect)? GetBundleSpriteInfo(int bundleIdx)
+  {
+    BundleKeyData? data = GetBundleKeyDataFromIndex(bundleIdx);
+    if (data == null)
+    {
+      return null;
+    }
+
+    try
+    {
+      Texture2D texture = Game1.content.Load<Texture2D>(data.TexturePath);
+      bool isDefaultSheet = data.TexturePath == DefaultBundleTexture;
+      int yOffset = isDefaultSheet ? 180 : 0;
+      int x = data.SpriteIndex * BundleSpriteSize % texture.Width;
+      int y = yOffset + BundleSpriteSize * (data.SpriteIndex * BundleSpriteSize / texture.Width);
+      return (texture, new Rectangle(x, y, BundleSpriteSize, BundleSpriteSize));
+    }
+    catch (Exception)
+    {
+      return null;
+    }
+  }
+
   private static int GetBundleBannerWidthForName(string bundleName)
   {
-    return 68 + (int)Game1.dialogueFont.MeasureString(bundleName).X;
+    return 45 + (int)Game1.dialogueFont.MeasureString(bundleName).X;
   }
 
   public static BundleRequiredItem? GetBundleItemIfNotDonated(Item item)
@@ -150,10 +182,28 @@ internal static class BundleHelper
         int bundleIdx = Convert.ToInt32(bundleLocationInfo[1]);
         string[] bundleContentsData = bundleInfo.Value.Split('/');
 
-        // Populate name/color map
+        // Populate name/color/sprite map
         string localizedName = bundleContentsData[6];
         int color = Convert.ToInt32(bundleContentsData[3]);
-        BundleIdToBundleKeyDataMap[bundleIdx] = new BundleKeyData(localizedName, color);
+
+        // Parse sprite field (index 5): either "Index" (default sheet) or "TexturePath:Index"
+        string texturePath = "LooseSprites\\JunimoNote";
+        int spriteIndex = bundleIdx;
+        if (!string.IsNullOrWhiteSpace(bundleContentsData[5]))
+        {
+          string[] spriteParts = bundleContentsData[5].Split(':', 2);
+          if (spriteParts.Length == 2)
+          {
+            texturePath = spriteParts[0];
+            int.TryParse(spriteParts[1], out spriteIndex);
+          }
+          else
+          {
+            int.TryParse(bundleContentsData[5], out spriteIndex);
+          }
+        }
+
+        BundleIdToBundleKeyDataMap[bundleIdx] = new BundleKeyData(localizedName, color, texturePath, spriteIndex);
 
         // Populate ingredients cache for all undonated items (no area-unlock filter)
         string[] itemEntries = ArgUtility.SplitBySpace(bundleContentsData[2]);

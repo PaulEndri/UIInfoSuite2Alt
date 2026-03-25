@@ -40,6 +40,6 @@ internal static class MailboxCountPatch
       )
     );
 
-    Utility.drawTinyDigits(count, b, numberPos, 3f, layerDepth, Color.White * 0.8f);
+    Utility.drawTinyDigits(count, b, numberPos, 4f, layerDepth, Color.White * 0.8f);
   }
 }

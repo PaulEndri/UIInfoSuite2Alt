@@ -68,6 +68,19 @@
   "SeedRange": "Seed Range",
   "LocationNotFarm": "Seeds only spread on the farm",
   "NoSeedSpread": "This tree does not spread seeds",
+  //Golden Walnut Tracker
+  "WalnutArea.QiWalnutRoom": "Qi's Walnut Room",
+  "WalnutArea.IslandJungle": "Island Jungle",
+  "WalnutArea.IslandSouth": "Island South",
+  "WalnutArea.IslandNorth": "Island North",
+  "WalnutArea.IslandWest": "Island West",
+  "WalnutArea.Volcano": "Volcano",
+  "WalnutArea.Fishing": "Fishing",
+  "WalnutArea.Farming": "Farming",
+  "WalnutArea.FieldOffice": "Field Office",
+  "WalnutArea.GoldenCoconut": "Golden Coconut",
+  "WalnutArea.GourmandFrog": "Gourmand Frog",
+  "WalnutArea.PiratesWife": "The Pirate's Wife",
   //Tree
   "Stump": "stump",
   // This space is required for languages that use a space between words, delete otherwise (e.g. Korean)

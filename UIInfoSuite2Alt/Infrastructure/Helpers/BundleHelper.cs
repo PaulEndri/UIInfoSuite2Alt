@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewValley;
+using StardewValley.ItemTypeDefinitions;
 using StardewValley.Locations;
 using StardewValley.Menus;
 using SObject = StardewValley.Object;
 
 namespace UIInfoSuite2Alt.Infrastructure.Helpers;
 
+// Maps qualified item ID (or category string) -> list of [bundleIdx, quantity, quality]
 using BundleIngredientsCache = Dictionary<string, List<List<int>>>;
 
 public record BundleRequiredItem(string Name, int BannerWidth, int Id, string QualifiedId, int Quality);
@@ -18,16 +21,17 @@ public record BundleKeyData(string Name, int Color);
 internal static class BundleHelper
 {
   private static readonly Dictionary<int, BundleKeyData> BundleIdToBundleKeyDataMap = new();
+  private static readonly BundleIngredientsCache AllBundleIngredients = new();
 
   public static BundleKeyData? GetBundleKeyDataFromIndex(int bundleIdx, bool forceRefresh = false)
   {
-    PopulateBundleNameMappings(forceRefresh);
+    PopulateBundleCaches(forceRefresh);
     return BundleIdToBundleKeyDataMap.GetValueOrDefault(bundleIdx);
   }
 
   public static Color? GetRealColorFromIndex(int bundleIdx, bool forceRefresh = false)
   {
-    PopulateBundleNameMappings(forceRefresh);
+    PopulateBundleCaches(forceRefresh);
     BundleKeyData? bundleData = BundleIdToBundleKeyDataMap.GetValueOrDefault(bundleIdx);
     if (bundleData == null)
     {
@@ -63,25 +67,12 @@ internal static class BundleHelper
       return null;
     }
 
-    BundleIngredientsCache bundlesIngredientsInfo;
-    try
-    {
-      IReflectedField<BundleIngredientsCache> bundlesIngredientsInfoField =
-        ModEntry.Reflection.GetField<BundleIngredientsCache>(communityCenter, "bundlesIngredientsInfo");
-      bundlesIngredientsInfo = bundlesIngredientsInfoField.GetValue();
-    }
-    catch (Exception e)
-    {
-      ModEntry.MonitorObject.Log("Failed to get bundles info", LogLevel.Error);
-      ModEntry.MonitorObject.Log(e.ToString(), LogLevel.Error);
-      return null;
-    }
-
+    PopulateBundleCaches();
 
     BundleRequiredItem? output;
     List<List<int>>? bundleRequiredItemsList;
 
-    if (bundlesIngredientsInfo.TryGetValue(donatedItem.QualifiedItemId, out bundleRequiredItemsList))
+    if (AllBundleIngredients.TryGetValue(donatedItem.QualifiedItemId, out bundleRequiredItemsList))
     {
       output = GetBundleItemIfNotDonatedFromList(bundleRequiredItemsList, donatedItem);
       if (output != null)
@@ -91,7 +82,7 @@ internal static class BundleHelper
     }
 
     if (donatedItem.Category >= 0 ||
-        !bundlesIngredientsInfo.TryGetValue(donatedItem.Category.ToString(), out bundleRequiredItemsList))
+        !AllBundleIngredients.TryGetValue(donatedItem.Category.ToString(), out bundleRequiredItemsList))
     {
       return null;
     }
@@ -132,7 +123,12 @@ internal static class BundleHelper
     return null;
   }
 
-  public static void PopulateBundleNameMappings(bool force = false)
+  /// <summary>
+  /// Builds both the bundle name/color map and the ingredients cache from BundleData.
+  /// Unlike the game's bundlesIngredientsInfo, this includes ALL areas (not just unlocked ones),
+  /// so the traveling merchant and item tooltips can detect bundle needs for locked rooms too.
+  /// </summary>
+  public static void PopulateBundleCaches(bool force = false)
   {
     if (BundleIdToBundleKeyDataMap.Count != 0 && !force)
     {
@@ -140,16 +136,64 @@ internal static class BundleHelper
     }
 
     BundleIdToBundleKeyDataMap.Clear();
-    foreach (KeyValuePair<string, string> bundleInfo in Game1.netWorldState.Value.BundleData)
+    AllBundleIngredients.Clear();
+
+    Dictionary<string, string> bundleData = Game1.netWorldState.Value.BundleData;
+    Dictionary<int, bool[]> donationStatus = Game1.netWorldState.Value.Bundles.Pairs
+      .ToDictionary(kvp => kvp.Key, kvp => kvp.Value.ToArray());
+
+    foreach (KeyValuePair<string, string> bundleInfo in bundleData)
     {
       try
       {
         string[] bundleLocationInfo = bundleInfo.Key.Split('/');
-        var bundleIdx = Convert.ToInt32(bundleLocationInfo[1]);
+        int bundleIdx = Convert.ToInt32(bundleLocationInfo[1]);
         string[] bundleContentsData = bundleInfo.Value.Split('/');
+
+        // Populate name/color map
         string localizedName = bundleContentsData[6];
-        var color = Convert.ToInt32(bundleContentsData[3]);
+        int color = Convert.ToInt32(bundleContentsData[3]);
         BundleIdToBundleKeyDataMap[bundleIdx] = new BundleKeyData(localizedName, color);
+
+        // Populate ingredients cache for all undonated items (no area-unlock filter)
+        string[] itemEntries = ArgUtility.SplitBySpace(bundleContentsData[2]);
+        if (!donationStatus.TryGetValue(bundleIdx, out bool[]? donated))
+        {
+          continue;
+        }
+
+        for (int i = 0; i < itemEntries.Length; i += 3)
+        {
+          int slotIndex = i / 3;
+          if (slotIndex < donated.Length && donated[slotIndex])
+          {
+            continue;
+          }
+
+          string itemId = itemEntries[i];
+          int quantity = Convert.ToInt32(itemEntries[i + 1]);
+          int quality = Convert.ToInt32(itemEntries[i + 2]);
+
+          // Negative IDs are category matches, otherwise resolve to qualified item ID
+          string key;
+          if (int.TryParse(itemId, out int numericId) && numericId < 0)
+          {
+            key = numericId.ToString();
+          }
+          else
+          {
+            ParsedItemData? data = ItemRegistry.GetData(itemId);
+            key = data != null ? data.QualifiedItemId : "(O)" + itemId;
+          }
+
+          if (!AllBundleIngredients.TryGetValue(key, out List<List<int>>? entryList))
+          {
+            entryList = new List<List<int>>();
+            AllBundleIngredients[key] = entryList;
+          }
+
+          entryList.Add(new List<int> { bundleIdx, quantity, quality });
+        }
       }
       catch (Exception)
       {

@@ -56,6 +56,10 @@
 
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
+- **v2.8.6**
+  - Fix vertical HUD icons overlapping the quest log icon by matching the game's own visibility check
+  - Fix bundle item detection(tooltips + traveling merchant) missing items on save load due to stale game cache
+  - Bundle tooltip now shows the actual bundle icon instead of generic scroll
 - **v2.8.5**
   - Show mail count on the mailbox bubble so you can see how many letters are waiting (toggable option)
   - Add Golden Walnut tracker on Ginger Island with hover panel showing collection progress by area (toggable options)

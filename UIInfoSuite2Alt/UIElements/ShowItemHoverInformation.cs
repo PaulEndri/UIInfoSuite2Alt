@@ -187,12 +187,14 @@ internal class ShowItemHoverInformation : IDisposable
 
       string? requiredBundleName = null;
       Color? bundleColor = null;
+      int bundleId = -1;
       if (hoveredObject != null)
       {
         BundleRequiredItem? bundleDisplayData = BundleHelper.GetBundleItemIfNotDonated(hoveredObject);
         if (bundleDisplayData != null)
         {
           requiredBundleName = bundleDisplayData.Name;
+          bundleId = bundleDisplayData.Id;
 
           if (!_bundleColorCache.TryGetValue(bundleDisplayData.Id, out bundleColor))
           {
@@ -208,7 +210,7 @@ internal class ShowItemHoverInformation : IDisposable
       var bundleHeaderWidth = 0;
       if (!string.IsNullOrEmpty(requiredBundleName))
       {
-        bundleHeaderWidth = 68 + (int)Game1.dialogueFont.MeasureString(requiredBundleName).X;
+        bundleHeaderWidth = 45 + (int)Game1.dialogueFont.MeasureString(requiredBundleName).X;
       }
 
       var itemTextWidth = (int)Game1.smallFont.MeasureString(itemPrice.ToString()).X;
@@ -402,7 +404,7 @@ internal class ShowItemHoverInformation : IDisposable
       if (!string.IsNullOrEmpty(requiredBundleName))
       {
         // Bundle icon + banner
-        DrawBundleBanner(spriteBatch, requiredBundleName, windowPos + new Vector2(-7, -13), windowWidth, bundleColor);
+        DrawBundleBanner(spriteBatch, requiredBundleName, bundleId, windowPos + new Vector2(-7, -17), windowWidth, bundleColor);
       }
 
       if (notShippedYet)
@@ -423,6 +425,7 @@ internal class ShowItemHoverInformation : IDisposable
   private void DrawBundleBanner(
     SpriteBatch spriteBatch,
     string bundleName,
+    int bundleId,
     Vector2 position,
     int windowWidth,
     Color? color = null
@@ -431,7 +434,7 @@ internal class ShowItemHoverInformation : IDisposable
     Color drawColor = color ?? Color.Crimson;
 
     var bundleBannerX = (int)position.X;
-    int bundleBannerY = (int)position.Y + 3;
+    int bundleBannerY = (int)position.Y + 7;
     var cellCount = 36;
     var solidCells = 8;
     int cellWidth = windowWidth / cellCount;
@@ -445,23 +448,85 @@ internal class ShowItemHoverInformation : IDisposable
       );
     }
 
-    spriteBatch.Draw(
-      Game1.mouseCursors,
-      position,
-      _bundleIcon.sourceRect,
-      Color.White,
-      0f,
-      Vector2.Zero,
-      _bundleIcon.scale,
-      SpriteEffects.None,
-      0.86f
-    );
+    // Draw per-bundle icon, fall back to generic scroll if unavailable
+    var spriteInfo = BundleHelper.GetBundleSpriteInfo(bundleId);
+    float iconWidth;
+    const float bundleIconScale = 1.3125f;
+    if (spriteInfo is var (texture, sourceRect))
+    {
+      int iconSize = (int)(32 * bundleIconScale);
+      var iconPos = new Point((int)position.X, (int)position.Y);
+
+      // 1px shadow on right and bottom edges (bottom uses same fade as banner)
+      spriteBatch.Draw(Game1.staminaRect, new Rectangle(iconPos.X - 2, iconPos.Y - 2, iconSize + 4, iconSize + 3), Color.Black * 0.15f);
+
+      int shadowY = iconPos.Y + iconSize + 1;
+      int shadowStartX = iconPos.X;
+      int shadowWidth = windowWidth - 5;
+      for (var cell = 0; cell < cellCount; ++cell)
+      {
+        float fadeAmount = 0.15f * (0.97f - (cell < solidCells ? 0 : 1.0f * (cell - solidCells) / (cellCount - solidCells)));
+        spriteBatch.Draw(
+          Game1.staminaRect,
+          new Rectangle(shadowStartX + cell * (shadowWidth / cellCount) - 2, shadowY, shadowWidth / cellCount, 1),
+          Color.Black * fadeAmount
+        );
+      }
+
+      // 1px border in bundle color
+      spriteBatch.Draw(Game1.staminaRect, new Rectangle(iconPos.X - 1, iconPos.Y - 1, iconSize + 2, 1), drawColor);
+      spriteBatch.Draw(Game1.staminaRect, new Rectangle(iconPos.X - 1, iconPos.Y + iconSize, iconSize + 2, 1), drawColor);
+      spriteBatch.Draw(Game1.staminaRect, new Rectangle(iconPos.X - 1, iconPos.Y, 1, iconSize), drawColor);
+      spriteBatch.Draw(Game1.staminaRect, new Rectangle(iconPos.X + iconSize, iconPos.Y, 1, iconSize), drawColor);
+
+      spriteBatch.Draw(
+        texture,
+        position,
+        sourceRect,
+        Color.White,
+        0f,
+        Vector2.Zero,
+        bundleIconScale,
+        SpriteEffects.None,
+        0.86f
+      );
+
+      // Small CC Icon
+      spriteBatch.Draw(
+        Game1.mouseCursors,
+        position,
+        new Rectangle(332, 375, 13, 11),
+        Color.White,
+        0f,
+        new Vector2(0 - (iconSize - 13), 0 - (iconSize - 11)),
+        1f,
+        SpriteEffects.None,
+        1f
+      );
+
+      iconWidth = iconSize;
+    }
+    else
+    {
+      spriteBatch.Draw(
+        Game1.mouseCursors,
+        position,
+        _bundleIcon.sourceRect,
+        Color.White,
+        0f,
+        Vector2.Zero,
+        _bundleIcon.scale,
+        SpriteEffects.None,
+        0.86f
+      );
+      iconWidth = _bundleIcon.sourceRect.Width * _bundleIcon.scale;
+    }
 
     Utility.drawTextWithColoredShadow(
       spriteBatch,
       bundleName,
       Game1.dialogueFont,
-      position + new Vector2(_bundleIcon.sourceRect.Width * _bundleIcon.scale + 3, 0),
+      position + new Vector2(iconWidth + 3, 0),
       Color.Ivory,
       Color.DarkSlateGray,
       horizontalShadowOffset: 2,

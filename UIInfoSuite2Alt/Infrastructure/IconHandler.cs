@@ -91,7 +91,7 @@ public sealed class IconHandler
     int yPos = Game1.options.zoomButtons ? 290 : 260;
     int xBase = Tools.GetWidthInPlayArea() - 70;
 
-    if (IsQuestLogPermanent || Game1.player.questLog.Any() || Game1.player.team.specialOrders.Any())
+    if (IsQuestLogPermanent || Game1.player.hasVisibleQuests)
     {
       if (UseVerticalLayout)
       {

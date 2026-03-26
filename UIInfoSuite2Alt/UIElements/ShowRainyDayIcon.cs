@@ -74,8 +74,10 @@ internal class ShowRainyDayIcon : IDisposable
   {
     GetWeatherIconSpriteLocation();
 
-    if (!UIElementUtils.IsRenderingNormally()
-        || (_requireTv && !TvChannelWatcher.HasWatchedWeather.Value))
+    if (
+      !UIElementUtils.IsRenderingNormally()
+      || (_requireTv && !TvChannelWatcher.HasWatchedWeather.Value)
+    )
     {
       return;
     }
@@ -105,17 +107,28 @@ internal class ShowRainyDayIcon : IDisposable
           batch.Draw(_weatherBorderTexture, bounds, Color.White);
           var iconRect = new Rectangle(bounds.X + 3, bounds.Y + 3, 34, 34);
           batch.Draw(weather.CustomTexture, iconRect, weather.SpriteLocation.Value, Color.White);
-          weather.IconComponent = new ClickableTextureComponent(bounds, weather.CustomTexture, weather.SpriteLocation.Value, 1f);
+          weather.IconComponent = new ClickableTextureComponent(
+            bounds,
+            weather.CustomTexture,
+            weather.SpriteLocation.Value,
+            1f
+          );
         }
         else
         {
-          weather.IconComponent = new ClickableTextureComponent(bounds, _iconSheet, weather.SpriteLocation.Value, 8 / 3f);
+          weather.IconComponent = new ClickableTextureComponent(
+            bounds,
+            _iconSheet,
+            weather.SpriteLocation.Value,
+            8 / 3f
+          );
           weather.IconComponent.draw(batch);
         }
       },
       batch =>
       {
-        bool hasMouse = weather.IconComponent?.containsPoint(Game1.getMouseX(), Game1.getMouseY()) ?? false;
+        bool hasMouse =
+          weather.IconComponent?.containsPoint(Game1.getMouseX(), Game1.getMouseY()) ?? false;
         bool hasText = !string.IsNullOrEmpty(weather.HoverText);
         if (weather.IsRainyTomorrow && hasMouse && hasText)
         {
@@ -151,7 +164,11 @@ internal class ShowRainyDayIcon : IDisposable
   private void CreateTileSheet()
   {
     // Build composite sheet (separate copy to avoid disturbing existing sprites)
-    _iconSheet = new Texture2D(Game1.graphics.GraphicsDevice, WeatherSheetWidth, WeatherSheetHeight);
+    _iconSheet = new Texture2D(
+      Game1.graphics.GraphicsDevice,
+      WeatherSheetWidth,
+      WeatherSheetHeight
+    );
     _weatherIconColors = new Color[WeatherSheetWidth * WeatherSheetHeight];
     _weatherBorderTexture = Texture2D.FromFile(
       Game1.graphics.GraphicsDevice,
@@ -162,7 +179,12 @@ internal class ShowRainyDayIcon : IDisposable
     var cursorColors = new Color[Game1.mouseCursors.Width * Game1.mouseCursors.Height];
     var cursorColors_1_6 = new Color[Game1.mouseCursors_1_6.Width * Game1.mouseCursors_1_6.Height];
     var bounds = new Rectangle(0, 0, Game1.mouseCursors.Width, Game1.mouseCursors.Height);
-    var bounds_1_6 = new Rectangle(0, 0, Game1.mouseCursors_1_6.Width, Game1.mouseCursors_1_6.Height);
+    var bounds_1_6 = new Rectangle(
+      0,
+      0,
+      Game1.mouseCursors_1_6.Width,
+      Game1.mouseCursors_1_6.Height
+    );
     weatherBorderTexture.GetData(weatherBorderColors);
     Game1.mouseCursors.GetData(cursorColors);
     Game1.mouseCursors_1_6.GetData(cursorColors_1_6);
@@ -178,39 +200,117 @@ internal class ShowRainyDayIcon : IDisposable
     // Copy to each slot
     for (var i = 0; i < 4; i++)
     {
-      Tools.SetSubTexture(subTextureColors, _weatherIconColors, WeatherSheetWidth, new Rectangle(i * 15, 0, 15, 15));
+      Tools.SetSubTexture(
+        subTextureColors,
+        _weatherIconColors,
+        WeatherSheetWidth,
+        new Rectangle(i * 15, 0, 15, 15)
+      );
     }
 
     // Island parrot expanded sprites
-    Tools.SetSubTexture(subTextureColors, _weatherIconColors, WeatherSheetWidth, new Rectangle(60, 0, 15, 15));
-    Tools.SetSubTexture(subTextureColors, _weatherIconColors, WeatherSheetWidth, new Rectangle(78, 0, 15, 15));
-    Tools.SetSubTexture(subTextureColors, _weatherIconColors, WeatherSheetWidth, new Rectangle(96, 0, 15, 15));
+    Tools.SetSubTexture(
+      subTextureColors,
+      _weatherIconColors,
+      WeatherSheetWidth,
+      new Rectangle(60, 0, 15, 15)
+    );
+    Tools.SetSubTexture(
+      subTextureColors,
+      _weatherIconColors,
+      WeatherSheetWidth,
+      new Rectangle(78, 0, 15, 15)
+    );
+    Tools.SetSubTexture(
+      subTextureColors,
+      _weatherIconColors,
+      WeatherSheetWidth,
+      new Rectangle(96, 0, 15, 15)
+    );
 
     subTextureColors = new Color[13 * 13];
     // Rainy Weather
     Tools.GetSubTexture(subTextureColors, cursorColors, bounds, new Rectangle(504, 333, 13, 13));
-    Tools.SetSubTexture(subTextureColors, _weatherIconColors, WeatherSheetWidth, new Rectangle(1, 1, 13, 13));
-    Tools.SetSubTexture(subTextureColors, _weatherIconColors, WeatherSheetWidth, new Rectangle(61, 1, 13, 13));
+    Tools.SetSubTexture(
+      subTextureColors,
+      _weatherIconColors,
+      WeatherSheetWidth,
+      new Rectangle(1, 1, 13, 13)
+    );
+    Tools.SetSubTexture(
+      subTextureColors,
+      _weatherIconColors,
+      WeatherSheetWidth,
+      new Rectangle(61, 1, 13, 13)
+    );
 
     // Stormy Weather
     Tools.GetSubTexture(subTextureColors, cursorColors, bounds, new Rectangle(426, 346, 13, 13));
-    Tools.SetSubTexture(subTextureColors, _weatherIconColors, WeatherSheetWidth, new Rectangle(16, 1, 13, 13));
-    Tools.SetSubTexture(subTextureColors, _weatherIconColors, WeatherSheetWidth, new Rectangle(79, 1, 13, 13));
+    Tools.SetSubTexture(
+      subTextureColors,
+      _weatherIconColors,
+      WeatherSheetWidth,
+      new Rectangle(16, 1, 13, 13)
+    );
+    Tools.SetSubTexture(
+      subTextureColors,
+      _weatherIconColors,
+      WeatherSheetWidth,
+      new Rectangle(79, 1, 13, 13)
+    );
 
     // Snowy Weather
     Tools.GetSubTexture(subTextureColors, cursorColors, bounds, new Rectangle(465, 346, 13, 13));
-    Tools.SetSubTexture(subTextureColors, _weatherIconColors, WeatherSheetWidth, new Rectangle(31, 1, 13, 13));
+    Tools.SetSubTexture(
+      subTextureColors,
+      _weatherIconColors,
+      WeatherSheetWidth,
+      new Rectangle(31, 1, 13, 13)
+    );
 
     // Green Rain
-    Tools.GetSubTexture(subTextureColors, cursorColors_1_6, bounds_1_6, new Rectangle(178, 363, 13, 13));
-    Tools.SetSubTexture(subTextureColors, _weatherIconColors, WeatherSheetWidth, new Rectangle(46, 1, 13, 13));
-    Tools.SetSubTexture(subTextureColors, _weatherIconColors, WeatherSheetWidth, new Rectangle(97, 1, 13, 13));
+    Tools.GetSubTexture(
+      subTextureColors,
+      cursorColors_1_6,
+      bounds_1_6,
+      new Rectangle(178, 363, 13, 13)
+    );
+    Tools.SetSubTexture(
+      subTextureColors,
+      _weatherIconColors,
+      WeatherSheetWidth,
+      new Rectangle(46, 1, 13, 13)
+    );
+    Tools.SetSubTexture(
+      subTextureColors,
+      _weatherIconColors,
+      WeatherSheetWidth,
+      new Rectangle(97, 1, 13, 13)
+    );
 
     subTextureColors = new Color[9 * 14];
     Tools.GetSubTexture(subTextureColors, cursorColors, bounds, new Rectangle(146, 149, 9, 14));
-    Tools.SetSubTexture(subTextureColors, _weatherIconColors, WeatherSheetWidth, new Rectangle(69, 4, 9, 14), true);
-    Tools.SetSubTexture(subTextureColors, _weatherIconColors, WeatherSheetWidth, new Rectangle(87, 4, 9, 14), true);
-    Tools.SetSubTexture(subTextureColors, _weatherIconColors, WeatherSheetWidth, new Rectangle(105, 4, 9, 14), true);
+    Tools.SetSubTexture(
+      subTextureColors,
+      _weatherIconColors,
+      WeatherSheetWidth,
+      new Rectangle(69, 4, 9, 14),
+      true
+    );
+    Tools.SetSubTexture(
+      subTextureColors,
+      _weatherIconColors,
+      WeatherSheetWidth,
+      new Rectangle(87, 4, 9, 14),
+      true
+    );
+    Tools.SetSubTexture(
+      subTextureColors,
+      _weatherIconColors,
+      WeatherSheetWidth,
+      new Rectangle(105, 4, 9, 14),
+      true
+    );
 
     _iconSheet.SetData(_weatherIconColors);
   }

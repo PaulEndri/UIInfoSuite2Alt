@@ -57,7 +57,14 @@ internal class ModOptionsPageHandler : IDisposable
 
   private void OptionsHR()
   {
-    _optionsElements.Add(new ModOptionsElement("------------------------------------------------------------------------", isCentered: true, isVertCentered: true, isSmallText: true));
+    _optionsElements.Add(
+      new ModOptionsElement(
+        "------------------------------------------------------------------------",
+        isCentered: true,
+        isVertCentered: true,
+        isSmallText: true
+      )
+    );
   }
 
   private readonly PerScreen<ModOptionsPageState?> _savedPageState = new();
@@ -73,8 +80,18 @@ internal class ModOptionsPageHandler : IDisposable
     _hasBgm = GameMenuHelper.HasBetterGameMenu;
 
     // Persist config.json on each change
-    Action<bool> Set(Action<bool> setter) => v => { setter(v); saveConfig(); };
-    Action<int> SetInt(Action<int> setter) => v => { setter(v); saveConfig(); };
+    Action<bool> Set(Action<bool> setter) =>
+      v =>
+      {
+        setter(v);
+        saveConfig();
+      };
+    Action<int> SetInt(Action<int> setter) =>
+      v =>
+      {
+        setter(v);
+        saveConfig();
+      };
 
     helper.Events.Input.ButtonsChanged += OnButtonsChanged;
 
@@ -97,7 +114,9 @@ internal class ModOptionsPageHandler : IDisposable
     var showBirthdayIcon = new ShowBirthdayIcon(helper);
     var showAccurateHearts = new ShowAccurateHearts(helper.Events);
     var showWhenAnimalNeedsPet = new ShowWhenAnimalNeedsPet(helper);
-    var showCalendarAndBillboardOnGameMenuButton = new ShowCalendarAndBillboardOnGameMenuButton(helper);
+    var showCalendarAndBillboardOnGameMenuButton = new ShowCalendarAndBillboardOnGameMenuButton(
+      helper
+    );
     var showScarecrowAndSprinklerRange = new ShowItemEffectRanges(helper);
     var experienceBar = new ExperienceBar(helper);
     var showItemHoverInformation = new ShowItemHoverInformation(helper);
@@ -145,12 +164,21 @@ internal class ModOptionsPageHandler : IDisposable
       showFestivalIcon,
       showCustomIcons,
       showFishOnCatch,
-      experienceBar
+      experienceBar,
     };
 
     var whichOption = 1;
-    _optionsElements.Add(new ModOptionsElement($"UI Info Suite 2 Alt. {GetVersionString(helper)}", isCentered: true));
-    _optionsElements.Add(new ModOptionsElement(I18n.Paragraph_KeybindsInGmcm(), isSmallText: true, isCentered: true, isVertCentered: true));
+    _optionsElements.Add(
+      new ModOptionsElement($"UI Info Suite 2 Alt. {GetVersionString(helper)}", isCentered: true)
+    );
+    _optionsElements.Add(
+      new ModOptionsElement(
+        I18n.Paragraph_KeybindsInGmcm(),
+        isSmallText: true,
+        isCentered: true,
+        isVertCentered: true
+      )
+    );
 
     if (ApiManager.GetApi<IGenericModConfigMenuApi>(ModCompat.Gmcm, out var gmcm))
     {
@@ -169,14 +197,25 @@ internal class ModOptionsPageHandler : IDisposable
     }
     else
     {
-      _optionsElements.Add(new ModOptionsElement(I18n.SmallText_GmcmMissing(), isSmallText: true, isCentered: true, isVertCentered: true, textColor: Color.Red));
+      _optionsElements.Add(
+        new ModOptionsElement(
+          I18n.SmallText_GmcmMissing(),
+          isSmallText: true,
+          isCentered: true,
+          isVertCentered: true,
+          textColor: Color.Red
+        )
+      );
     }
     OptionsHR();
 
     // --- HUD Icons ---
     _optionsElements.Add(new ModOptionsElement(I18n.Section_HudIcons(), isVertCentered: true));
     _optionsElements.Add(
-      new ModOptionsImage(() => _helper.ModContent.Load<Texture2D>("assets/banner_hud.png"), scale: 1)
+      new ModOptionsImage(
+        () => _helper.ModContent.Load<Texture2D>("assets/banner_hud.png"),
+        scale: 1
+      )
     );
 
     _optionsElements.Add(
@@ -194,7 +233,11 @@ internal class ModOptionsPageHandler : IDisposable
         whichOption++,
         new List<string> { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" },
         () => config.IconsPerRow - 1,
-        SetInt(v => { config.IconsPerRow = v + 1; IconHandler.Handler.IconsPerRow = v + 1; })
+        SetInt(v =>
+        {
+          config.IconsPerRow = v + 1;
+          IconHandler.Handler.IconsPerRow = v + 1;
+        })
       )
     );
     var luckIcon = new ModOptionsCheckbox(
@@ -213,10 +256,14 @@ internal class ModOptionsPageHandler : IDisposable
         {
           I18n.LuckIconStyle_Clover(),
           I18n.LuckIconStyle_Dice(),
-          I18n.LuckIconStyle_TvFortune()
+          I18n.LuckIconStyle_TvFortune(),
         },
         () => config.LuckIconStyle,
-        SetInt(v => { config.LuckIconStyle = v; luckOfDay.SetIconStyle(v); }),
+        SetInt(v =>
+        {
+          config.LuckIconStyle = v;
+          luckOfDay.SetIconStyle(v);
+        }),
         luckIcon
       )
     );
@@ -410,7 +457,11 @@ internal class ModOptionsPageHandler : IDisposable
         whichOption++,
         showQuestCount.ToggleOption,
         () => config.ShowQuestCount,
-        Set(v => { config.ShowQuestCount = v; IconHandler.Handler.ShowQuestCount = v; })
+        Set(v =>
+        {
+          config.ShowQuestCount = v;
+          IconHandler.Handler.ShowQuestCount = v;
+        })
       )
     );
     var walnutCheckbox = new ModOptionsCheckbox(
@@ -473,7 +524,10 @@ internal class ModOptionsPageHandler : IDisposable
     // --- Farm & Field ---
     _optionsElements.Add(new ModOptionsElement(I18n.Section_FarmAndField(), isVertCentered: true));
     _optionsElements.Add(
-      new ModOptionsImage(() => _helper.ModContent.Load<Texture2D>("assets/banner_ffield.png"), scale: 1)
+      new ModOptionsImage(
+        () => _helper.ModContent.Load<Texture2D>("assets/banner_ffield.png"),
+        scale: 1
+      )
     );
 
     var animalPetIcon = new ModOptionsCheckbox(
@@ -539,10 +593,15 @@ internal class ModOptionsPageHandler : IDisposable
         {
           I18n.MachineProcessingMode_Off(),
           I18n.MachineProcessingMode_Toggle(),
-          I18n.MachineProcessingMode_Hold()
+          I18n.MachineProcessingMode_Hold(),
         },
         () => config.MachineProcessingIconsMode,
-        v => { config.MachineProcessingIconsMode = v; saveConfig(); showMachineProcessingItem.SetMode(v); }
+        v =>
+        {
+          config.MachineProcessingIconsMode = v;
+          saveConfig();
+          showMachineProcessingItem.SetMode(v);
+        }
       )
     );
     _optionsElements.Add(
@@ -590,20 +649,27 @@ internal class ModOptionsPageHandler : IDisposable
         enableItemRangeKeybinds
       )
     );
-    _optionsElements.Add(new ModOptionsElement(
+    _optionsElements.Add(
+      new ModOptionsElement(
         $"{I18n.EnableItemRangeKeybinds()}\n"
-      + $"  {I18n.Keybinds_ShowOneRange_DisplayedName()}:\n"
-      + $"    > {config.ShowOneRange}\n"
-      + $"  {I18n.Keybinds_ShowAllRange_DisplayedName()}:\n"
-      + $"    > {config.ShowAllRange}",
-      isSmallText: true
-    ));
+          + $"  {I18n.Keybinds_ShowOneRange_DisplayedName()}:\n"
+          + $"    > {config.ShowOneRange}\n"
+          + $"  {I18n.Keybinds_ShowAllRange_DisplayedName()}:\n"
+          + $"    > {config.ShowAllRange}",
+        isSmallText: true
+      )
+    );
     OptionsSpacer();
 
     // --- Experience & Skills ---
-    _optionsElements.Add(new ModOptionsElement(I18n.Section_ExperienceAndSkills(), isVertCentered: true));
     _optionsElements.Add(
-      new ModOptionsImage(() => _helper.ModContent.Load<Texture2D>("assets/banner_exp.png"), scale: 1)
+      new ModOptionsElement(I18n.Section_ExperienceAndSkills(), isVertCentered: true)
+    );
+    _optionsElements.Add(
+      new ModOptionsImage(
+        () => _helper.ModContent.Load<Texture2D>("assets/banner_exp.png"),
+        scale: 1
+      )
     );
 
     _optionsElements.Add(
@@ -662,9 +728,14 @@ internal class ModOptionsPageHandler : IDisposable
     );
 
     // --- Items & Shopping ---
-    _optionsElements.Add(new ModOptionsElement(I18n.Section_ItemsAndShopping(), isVertCentered: true));
     _optionsElements.Add(
-      new ModOptionsImage(() => _helper.ModContent.Load<Texture2D>("assets/banner_items.png"), scale: 1)
+      new ModOptionsElement(I18n.Section_ItemsAndShopping(), isVertCentered: true)
+    );
+    _optionsElements.Add(
+      new ModOptionsImage(
+        () => _helper.ModContent.Load<Texture2D>("assets/banner_items.png"),
+        scale: 1
+      )
     );
 
     _optionsElements.Add(
@@ -689,7 +760,10 @@ internal class ModOptionsPageHandler : IDisposable
     // --- NPC & Social ---
     _optionsElements.Add(new ModOptionsElement(I18n.Section_NpcAndSocial(), isVertCentered: true));
     _optionsElements.Add(
-      new ModOptionsImage(() => _helper.ModContent.Load<Texture2D>("assets/banner_npc.png"), scale: 1)
+      new ModOptionsImage(
+        () => _helper.ModContent.Load<Texture2D>("assets/banner_npc.png"),
+        scale: 1
+      )
     );
 
     _optionsElements.Add(
@@ -722,7 +796,9 @@ internal class ModOptionsPageHandler : IDisposable
 
     // --- Icon Order ---
     _optionsElements.Add(new ModOptionsElement(I18n.Section_IconOrder()));
-    _optionsElements.Add(new ModOptionsElement(I18n.Section_IconOrder_Subtitle(), isSmallText: true));
+    _optionsElements.Add(
+      new ModOptionsElement(I18n.Section_IconOrder_Subtitle(), isSmallText: true)
+    );
 
     foreach (string key in IconHandler.IconKeys)
     {
@@ -739,7 +815,7 @@ internal class ModOptionsPageHandler : IDisposable
         "TravelingMerchant" => I18n.IconOrder_TravelingMerchant(),
         "Bookseller" => I18n.IconOrder_Bookseller(),
         "CustomIcons" => I18n.IconOrder_CustomIcons(),
-        _ => key
+        _ => key,
       };
 
       string capturedKey = key;
@@ -758,7 +834,6 @@ internal class ModOptionsPageHandler : IDisposable
       RegisterBgmTab();
     }
   }
-
 
   public void Dispose()
   {
@@ -789,7 +864,12 @@ internal class ModOptionsPageHandler : IDisposable
 
   private void RegisterBgmTab()
   {
-    if (!ApiManager.GetApi<IBetterGameMenuApi>(ModCompat.BetterGameMenu, out IBetterGameMenuApi? bgmApi))
+    if (
+      !ApiManager.GetApi<IBetterGameMenuApi>(
+        ModCompat.BetterGameMenu,
+        out IBetterGameMenuApi? bgmApi
+      )
+    )
     {
       return;
     }
@@ -825,22 +905,31 @@ internal class ModOptionsPageHandler : IDisposable
       return;
     }
 
-    if (ApiManager.GetApi<IGenericModConfigMenuApi>(ModCompat.Gmcm, out IGenericModConfigMenuApi? gmcm))
+    if (
+      ApiManager.GetApi<IGenericModConfigMenuApi>(
+        ModCompat.Gmcm,
+        out IGenericModConfigMenuApi? gmcm
+      )
+    )
     {
       IModInfo? modInfo = _helper.ModRegistry.Get(_helper.ModRegistry.ModID);
       if (modInfo != null)
       {
-        evt.Entries.Add(evt.CreateEntry(
-          I18n.OpenSettings(),
-          () => gmcm.OpenModMenu(modInfo.Manifest)
-        ));
+        evt.Entries.Add(
+          evt.CreateEntry(I18n.OpenSettings(), () => gmcm.OpenModMenu(modInfo.Manifest))
+        );
       }
     }
   }
 
   private void DisposeBgm()
   {
-    if (ApiManager.GetApi<IBetterGameMenuApi>(ModCompat.BetterGameMenu, out IBetterGameMenuApi? bgmApi))
+    if (
+      ApiManager.GetApi<IBetterGameMenuApi>(
+        ModCompat.BetterGameMenu,
+        out IBetterGameMenuApi? bgmApi
+      )
+    )
     {
       bgmApi.UnregisterImplementation(optionsTabName);
       bgmApi.OffTabContextMenu(OnBgmTabContextMenu);
@@ -874,7 +963,10 @@ internal class ModOptionsPageHandler : IDisposable
       if ((e.Button == SButton.MouseLeft || e.Button == SButton.ControllerA) && !e.IsSuppressed())
       {
         // Workaround: map page calls GameMenu.changeTab which fails for our tab
-        if (gameMenu.currentTab == GameMenu.mapTab && gameMenu.lastOpenedNonMapTab == _modOptionsTabPageNumber.Value)
+        if (
+          gameMenu.currentTab == GameMenu.mapTab
+          && gameMenu.lastOpenedNonMapTab == _modOptionsTabPageNumber.Value
+        )
         {
           _changeToOurTabAfterTick.Value = true;
           gameMenu.lastOpenedNonMapTab = GameMenu.optionsTab;
@@ -886,9 +978,12 @@ internal class ModOptionsPageHandler : IDisposable
         if (!gameMenu.invisible && !GameMenu.forcePreventClose)
         {
           const bool uiScale = true;
-          if (_modOptionsTab.Value?.containsPoint(Game1.getMouseX(uiScale), Game1.getMouseY(uiScale)) == true &&
-              gameMenu.currentTab != _modOptionsTabPageNumber.Value &&
-              gameMenu.readyToClose())
+          if (
+            _modOptionsTab.Value?.containsPoint(Game1.getMouseX(uiScale), Game1.getMouseY(uiScale))
+              == true
+            && gameMenu.currentTab != _modOptionsTabPageNumber.Value
+            && gameMenu.readyToClose()
+          )
           {
             ChangeToOurTab(gameMenu);
             _helper.Input.Suppress(e.Button);
@@ -922,7 +1017,12 @@ internal class ModOptionsPageHandler : IDisposable
 
   private void OnButtonsChanged_Bgm()
   {
-    if (!ApiManager.GetApi<IBetterGameMenuApi>(ModCompat.BetterGameMenu, out IBetterGameMenuApi? bgmApi))
+    if (
+      !ApiManager.GetApi<IBetterGameMenuApi>(
+        ModCompat.BetterGameMenu,
+        out IBetterGameMenuApi? bgmApi
+      )
+    )
     {
       return;
     }
@@ -968,16 +1068,14 @@ internal class ModOptionsPageHandler : IDisposable
     if (_addOurTabBeforeTick)
     {
       _addOurTabBeforeTick = false;
-      GameRunner.instance.ExecuteForInstances(
-        instance =>
+      GameRunner.instance.ExecuteForInstances(instance =>
+      {
+        if (_lastMenu.Value != Game1.activeClickableMenu)
         {
-          if (_lastMenu.Value != Game1.activeClickableMenu)
-          {
-            EarlyOnMenuChanged(_lastMenu.Value, Game1.activeClickableMenu);
-            _lastMenu.Value = Game1.activeClickableMenu;
-          }
+          EarlyOnMenuChanged(_lastMenu.Value, Game1.activeClickableMenu);
+          _lastMenu.Value = Game1.activeClickableMenu;
         }
-      );
+      });
       ModEntry.MonitorObject.Log(
         $"{GetType().Name}: Our tab was added back as the final step of the window resize workaround"
       );
@@ -1072,21 +1170,21 @@ internal class ModOptionsPageHandler : IDisposable
 
       // name = tab id, label = hover text
       _modOptionsTab.Value = new ClickableComponent(
-          new Rectangle(
-            GetButtonXPosition(newGameMenu),
-            newGameMenu.yPositionOnScreen + IClickableMenu.tabYPositionRelativeToMenuY + 64,
-            64,
-            64
-          ),
-          optionsTabName,
-          "ui2_mod_options"
-        )
+        new Rectangle(
+          GetButtonXPosition(newGameMenu),
+          newGameMenu.yPositionOnScreen + IClickableMenu.tabYPositionRelativeToMenuY + 64,
+          64,
+          64
+        ),
+        optionsTabName,
+        "ui2_mod_options"
+      )
       {
         myID = 12348, // exit page tab is 12347
 
         leftNeighborID = 12347,
         tryDefaultIfNoDownNeighborExists = true,
-        fullyImmutable = true
+        fullyImmutable = true,
       };
 
       // Don't add to GameMenu.tabs — GameMenu.draw breaks when our page is current tab
@@ -1152,10 +1250,12 @@ internal class ModOptionsPageHandler : IDisposable
       return;
     }
 
-    if (Game1.activeClickableMenu is not GameMenu gameMenu ||
-        gameMenu.currentTab == GameMenu.mapTab ||
-        gameMenu.GetChildMenu() != null ||
-        gameMenu.GetCurrentPage() is CollectionsPage { letterviewerSubMenu: not null })
+    if (
+      Game1.activeClickableMenu is not GameMenu gameMenu
+      || gameMenu.currentTab == GameMenu.mapTab
+      || gameMenu.GetChildMenu() != null
+      || gameMenu.GetCurrentPage() is CollectionsPage { letterviewerSubMenu: not null }
+    )
     {
       return;
     }
@@ -1188,24 +1288,24 @@ internal class ModOptionsPageHandler : IDisposable
   private void OnWindowClientSizeChanged(object? sender, EventArgs e)
   {
     _windowResizing = true;
-    GameRunner.instance.ExecuteForInstances(
-      instance =>
+    GameRunner.instance.ExecuteForInstances(instance =>
+    {
+      if (
+        Game1.activeClickableMenu is GameMenu gameMenu
+        && gameMenu.currentTab == _modOptionsTabPageNumber.GetValueForScreen(instance.instanceId)
+      )
       {
-        if (Game1.activeClickableMenu is GameMenu gameMenu &&
-            gameMenu.currentTab == _modOptionsTabPageNumber.GetValueForScreen(instance.instanceId))
+        // Swap to game's options tab — GameMenu is recreated before we can re-add our page
+        if (gameMenu.GetCurrentPage() is ModOptionsPage modOptionsPage)
         {
-          // Swap to game's options tab — GameMenu is recreated before we can re-add our page
-          if (gameMenu.GetCurrentPage() is ModOptionsPage modOptionsPage)
-          {
-            _savedPageState.Value = new ModOptionsPageState();
-            modOptionsPage.SaveState(_savedPageState.Value);
-          }
-
-          gameMenu.currentTab = GameMenu.optionsTab;
-          _instancesWithOptionsPageOpen.Add(instance.instanceId);
+          _savedPageState.Value = new ModOptionsPageState();
+          modOptionsPage.SaveState(_savedPageState.Value);
         }
+
+        gameMenu.currentTab = GameMenu.optionsTab;
+        _instancesWithOptionsPageOpen.Add(instance.instanceId);
       }
-    );
+    });
     if (_instancesWithOptionsPageOpen.Count > 0)
     {
       ModEntry.MonitorObject.Log(
@@ -1222,20 +1322,21 @@ internal class ModOptionsPageHandler : IDisposable
       _windowResizing = false;
       if (_instancesWithOptionsPageOpen.Count > 0)
       {
-        GameRunner.instance.ExecuteForInstances(
-          instance =>
+        GameRunner.instance.ExecuteForInstances(instance =>
+        {
+          if (_instancesWithOptionsPageOpen.Remove(instance.instanceId))
           {
-            if (_instancesWithOptionsPageOpen.Remove(instance.instanceId))
+            if (Game1.activeClickableMenu is GameMenu gameMenu)
             {
-              if (Game1.activeClickableMenu is GameMenu gameMenu)
-              {
-                gameMenu.currentTab = (int)_modOptionsTabPageNumber.GetValueForScreen(instance.instanceId)!;
-              }
+              gameMenu.currentTab = (int)
+                _modOptionsTabPageNumber.GetValueForScreen(instance.instanceId)!;
             }
           }
-        );
+        });
 
-        ModEntry.MonitorObject.Log($"{GetType().Name}: The window was resized, reverting to our tab");
+        ModEntry.MonitorObject.Log(
+          $"{GetType().Name}: The window was resized, reverting to our tab"
+        );
         _addOurTabBeforeTick = true;
       }
     }
@@ -1291,8 +1392,9 @@ internal class ModOptionsPageHandler : IDisposable
       return;
     }
 
-    button.yPositionOnScreen = gameMenu.yPositionOnScreen +
-                               (gameMenu.currentTab == _modOptionsTabPageNumber.Value ? 24 : 16);
+    button.yPositionOnScreen =
+      gameMenu.yPositionOnScreen
+      + (gameMenu.currentTab == _modOptionsTabPageNumber.Value ? 24 : 16);
 
     button.draw(Game1.spriteBatch);
   }

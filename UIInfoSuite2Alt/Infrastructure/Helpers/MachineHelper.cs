@@ -12,7 +12,11 @@ public static class MachineHelper
   // Adapted from Pathoschild/StardewMods: https://github.com/Pathoschild/StardewMods
 
   /// <summary>Get building chest names referenced by item conversion rules.</summary>
-  public static void GetBuildingChestNames(BuildingData? data, ISet<string> inputChests, ISet<string> outputChests)
+  public static void GetBuildingChestNames(
+    BuildingData? data,
+    ISet<string> inputChests,
+    ISet<string> outputChests
+  )
   {
     if (data?.ItemConversions?.Count is not > 0)
     {
@@ -33,7 +37,11 @@ public static class MachineHelper
     }
   }
 
-  public static void GetBuildingChestItems(Building? building, List<Item?> inputItems, List<Item?> outputItems)
+  public static void GetBuildingChestItems(
+    Building? building,
+    List<Item?> inputItems,
+    List<Item?> outputItems
+  )
   {
     if (building is null)
     {
@@ -44,10 +52,12 @@ public static class MachineHelper
     HashSet<string> outputChestNames = new();
     GetBuildingChestNames(building.GetData(), inputChestNames, outputChestNames);
 
-    IEnumerable<Chest> inputChests = inputChestNames.Select(building.GetBuildingChest)
-                                                    .Where(chest => chest is not null);
-    IEnumerable<Chest> outputChests =
-      outputChestNames.Select(building.GetBuildingChest).Where(chest => chest is not null);
+    IEnumerable<Chest> inputChests = inputChestNames
+      .Select(building.GetBuildingChest)
+      .Where(chest => chest is not null);
+    IEnumerable<Chest> outputChests = outputChestNames
+      .Select(building.GetBuildingChest)
+      .Where(chest => chest is not null);
 
     foreach (Chest chest in inputChests)
     {

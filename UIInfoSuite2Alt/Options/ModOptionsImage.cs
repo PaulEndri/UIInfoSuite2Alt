@@ -15,7 +15,8 @@ internal class ModOptionsImage : ModOptionsElement
     Func<Texture2D> texture,
     Rectangle? sourceRect = null,
     int scale = Game1.pixelZoom
-  ) : base("", -1)
+  )
+    : base("", -1)
   {
     _texture = texture;
     _sourceRect = sourceRect;
@@ -34,9 +35,10 @@ internal class ModOptionsImage : ModOptionsElement
     int drawX = slotX + (slotWidth - Game1.tileSize / 2 - drawWidth) / 2;
 
     // Center vertically in the slot
-    int slotHeight = Game1.activeClickableMenu != null
-      ? (Game1.activeClickableMenu.height - Game1.tileSize * 2) / 7 + Game1.pixelZoom
-      : drawHeight;
+    int slotHeight =
+      Game1.activeClickableMenu != null
+        ? (Game1.activeClickableMenu.height - Game1.tileSize * 2) / 7 + Game1.pixelZoom
+        : drawHeight;
     int drawY = slotY + (slotHeight - drawHeight) / 2;
 
     batch.Draw(

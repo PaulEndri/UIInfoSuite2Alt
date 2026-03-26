@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
-using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
 using StardewValley.Menus;
 using StardewValley.Objects;
@@ -85,7 +85,12 @@ internal class ShowQueenOfSauceIcon : IDisposable
 
   private void OnUpdateTicked(object? sender, UpdateTickedEventArgs e)
   {
-    if (e.IsOneSecond && _drawQueenOfSauceIcon.Value && _todaysRecipe != null && Game1.player.knowsRecipe(_todaysRecipe.name))
+    if (
+      e.IsOneSecond
+      && _drawQueenOfSauceIcon.Value
+      && _todaysRecipe != null
+      && Game1.player.knowsRecipe(_todaysRecipe.name)
+    )
     {
       _drawQueenOfSauceIcon.Value = false;
     }
@@ -93,7 +98,11 @@ internal class ShowQueenOfSauceIcon : IDisposable
 
   private void OnRenderingHud(object? sender, RenderingHudEventArgs e)
   {
-    if (UIElementUtils.IsRenderingNormally() && _drawQueenOfSauceIcon.Value && _todaysRecipe != null)
+    if (
+      UIElementUtils.IsRenderingNormally()
+      && _drawQueenOfSauceIcon.Value
+      && _todaysRecipe != null
+    )
     {
       IconHandler.Handler.EnqueueIcon(
         "QueenOfSauce",
@@ -138,8 +147,10 @@ internal class ShowQueenOfSauceIcon : IDisposable
         },
         batch =>
         {
-          if (!Game1.IsFakedBlackScreen() &&
-              (_icon.Value?.containsPoint(Game1.getMouseX(), Game1.getMouseY()) ?? false))
+          if (
+            !Game1.IsFakedBlackScreen()
+            && (_icon.Value?.containsPoint(Game1.getMouseX(), Game1.getMouseY()) ?? false)
+          )
           {
             IClickableMenu.drawHoverText(
               batch,
@@ -188,9 +199,10 @@ internal class ShowQueenOfSauceIcon : IDisposable
       Game1.player.cookingRecipes.Remove(_todaysRecipe.name);
     }
 
-    _drawQueenOfSauceIcon.Value = (Game1.dayOfMonth % 7 == 0 || (Game1.dayOfMonth - 3) % 7 == 0) &&
-                                  Game1.stats.DaysPlayed > 5 &&
-                                  !Game1.player.knowsRecipe(_todaysRecipe.name);
+    _drawQueenOfSauceIcon.Value =
+      (Game1.dayOfMonth % 7 == 0 || (Game1.dayOfMonth - 3) % 7 == 0)
+      && Game1.stats.DaysPlayed > 5
+      && !Game1.player.knowsRecipe(_todaysRecipe.name);
   }
   #endregion
 }

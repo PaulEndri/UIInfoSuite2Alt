@@ -9,6 +9,7 @@ public class DisplayedExperienceBar
 {
   // private const int DefaultBoxWidth = 240;
   private const int WideBoxWidth = 310;
+
   // private const int DefaultMaxBarWidth = 175;
   private const int WideMaxBarWidth = 245;
 
@@ -31,18 +32,15 @@ public class DisplayedExperienceBar
     int maxBarWidth = WideMaxBarWidth;
     //int boxWidth = isWide ? WideBoxWidth : DefaultBoxWidth;
     int boxWidth = WideBoxWidth;
-    int barWidth = GetBarWidth(experienceEarnedThisLevel, experienceDifferenceBetweenLevels, maxBarWidth);
+    int barWidth = GetBarWidth(
+      experienceEarnedThisLevel,
+      experienceDifferenceBetweenLevels,
+      maxBarWidth
+    );
     float leftSide = GetExperienceBarLeftSide();
     int bottom = Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Bottom - yOffset;
 
-    Game1.drawDialogueBox(
-      (int)leftSide,
-      bottom - 160,
-      boxWidth,
-      160,
-      false,
-      true
-    );
+    Game1.drawDialogueBox((int)leftSide, bottom - 160, boxWidth, 160, false, true);
 
     Game1.spriteBatch.Draw(
       Game1.staminaRect,
@@ -52,12 +50,7 @@ public class DisplayedExperienceBar
 
     Game1.spriteBatch.Draw(
       Game1.staminaRect,
-      new Rectangle(
-        (int)leftSide + 32,
-        bottom - 64,
-        Math.Min(4, barWidth),
-        31
-      ),
+      new Rectangle((int)leftSide + 32, bottom - 64, Math.Min(4, barWidth), 31),
       experienceFillColor
     );
 
@@ -81,19 +74,14 @@ public class DisplayedExperienceBar
 
       // Shadow
       Game1.spriteBatch.DrawString(
-          Game1.smallFont,
-          text,
-          pos + new Vector2(1f, 1f),
-          Color.Black * 0.4f
+        Game1.smallFont,
+        text,
+        pos + new Vector2(1f, 1f),
+        Color.Black * 0.4f
       );
 
       // Text
-      Game1.spriteBatch.DrawString(
-          Game1.smallFont,
-          text,
-          pos,
-          new Color(28, 28, 28, 255)
-      );
+      Game1.spriteBatch.DrawString(Game1.smallFont, text, pos, new Color(28, 28, 28, 255));
     }
     else
     {
@@ -117,18 +105,18 @@ public class DisplayedExperienceBar
 
       // Shadow
       Game1.spriteBatch.DrawString(
-          Game1.smallFont,
-          levelText,
-          levelPos + new Vector2(1f, 1f),
-          Color.Black * 0.4f
+        Game1.smallFont,
+        levelText,
+        levelPos + new Vector2(1f, 1f),
+        Color.Black * 0.4f
       );
 
       // Text
       Game1.spriteBatch.DrawString(
-          Game1.smallFont,
-          levelText,
-          levelPos,
-          new Color(28, 28, 28, 255)
+        Game1.smallFont,
+        levelText,
+        levelPos,
+        new Color(28, 28, 28, 255)
       );
     }
 
@@ -139,39 +127,44 @@ public class DisplayedExperienceBar
       float textWidth = Game1.smallFont.MeasureString(comboText).X;
       float rightEdge = leftSide + 32 + maxBarWidth;
 
-      float shakeX = comboShakeTicks > 0
-        ? MathF.Sin(comboShakeTicks * 1.5f) * (comboShakeTicks / 15f) * 2f
-        : 0f;
+      float shakeX =
+        comboShakeTicks > 0 ? MathF.Sin(comboShakeTicks * 1.5f) * (comboShakeTicks / 15f) * 2f : 0f;
 
       Vector2 comboPos = new Vector2(rightEdge - textWidth - 12 + shakeX, bottom - 62);
 
       // Shadow
       Game1.spriteBatch.DrawString(
-          Game1.smallFont,
-          comboText,
-          comboPos + new Vector2(1f, 1f),
-          Color.Black * (0.4f * comboAlpha)
+        Game1.smallFont,
+        comboText,
+        comboPos + new Vector2(1f, 1f),
+        Color.Black * (0.4f * comboAlpha)
       );
 
       // Text
       Game1.spriteBatch.DrawString(
-          Game1.smallFont,
-          comboText,
-          comboPos,
-          new Color(28, 28, 28, 255) * comboAlpha
+        Game1.smallFont,
+        comboText,
+        comboPos,
+        new Color(28, 28, 28, 255) * comboAlpha
       );
     }
   }
 
   #region Static helpers
-  private static int GetBarWidth(int experienceEarnedThisLevel, int experienceDifferenceBetweenLevels, int maxBarWidth)
+  private static int GetBarWidth(
+    int experienceEarnedThisLevel,
+    int experienceDifferenceBetweenLevels,
+    int maxBarWidth
+  )
   {
     if (experienceDifferenceBetweenLevels <= 0)
     {
       return maxBarWidth;
     }
 
-    return (int)((double)experienceEarnedThisLevel / experienceDifferenceBetweenLevels * maxBarWidth);
+    return (int)(
+      (double)experienceEarnedThisLevel / experienceDifferenceBetweenLevels * maxBarWidth
+    );
   }
 
   private static float GetExperienceBarLeftSide()

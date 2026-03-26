@@ -43,7 +43,7 @@ public static class ObjectExtensions
     { "Vincent", 6 },
     { "Sandy", 7 },
     { "Clint", 10 },
-    { "Willy", 10 }
+    { "Willy", 10 },
   };
   #endregion
 

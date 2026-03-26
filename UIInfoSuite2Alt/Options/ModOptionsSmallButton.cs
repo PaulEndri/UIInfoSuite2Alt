@@ -17,7 +17,8 @@ internal class ModOptionsSmallButton : ModOptionsElement
     int whichOption,
     Action onClick,
     bool isCentered = false
-  ) : base(label, whichOption)
+  )
+    : base(label, whichOption)
   {
     _onClick = onClick;
     _isCentered = isCentered;
@@ -41,12 +42,7 @@ internal class ModOptionsSmallButton : ModOptionsElement
       buttonX = (slotWidth - Game1.tileSize / 2 - buttonWidth) / 2;
     }
 
-    Bounds = new Rectangle(
-      buttonX,
-      Bounds.Y,
-      buttonWidth,
-      (int)textSize.Y + 20
-    );
+    Bounds = new Rectangle(buttonX, Bounds.Y, buttonWidth, (int)textSize.Y + 20);
   }
 
   public override void ReceiveLeftClick(int x, int y)

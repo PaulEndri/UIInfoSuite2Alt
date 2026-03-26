@@ -22,5 +22,8 @@
     <PackageReference Include="Pathoschild.Stardew.ModTranslationClassBuilder" Version="2.2.1" />
   </ItemGroup>
 
-  <Import Project="UIInfoSuite2Alt.csproj.local" Condition="Exists('UIInfoSuite2Alt.csproj.local')" />
+  <Import
+    Project="UIInfoSuite2Alt.csproj.local"
+    Condition="Exists('UIInfoSuite2Alt.csproj.local')"
+  />
 </Project>

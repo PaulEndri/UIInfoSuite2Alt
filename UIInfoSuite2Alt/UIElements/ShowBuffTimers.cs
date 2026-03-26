@@ -129,9 +129,10 @@ internal class ShowBuffTimers : IDisposable
       float x = icon.bounds.X + icon.bounds.Width / 2f - totalWidth / 2f;
       float y = icon.bounds.Y + icon.bounds.Height + 2;
 
-      float alpha = buff.displayAlphaTimer > 0f
-        ? (float)(Math.Cos(buff.displayAlphaTimer / 100f) + 3.0) / 4f
-        : 1f;
+      float alpha =
+        buff.displayAlphaTimer > 0f
+          ? (float)(Math.Cos(buff.displayAlphaTimer / 100f) + 3.0) / 4f
+          : 1f;
 
       bool isFading = buff.displayAlphaTimer > 0f;
 
@@ -140,7 +141,14 @@ internal class ShowBuffTimers : IDisposable
   }
 
   /// <summary>Draws a timer as "M:SS" using the game's tiny digit sprites with a colon separator.</summary>
-  private static void DrawTimer(SpriteBatch b, int minutes, int seconds, Vector2 position, float alpha, bool isFading)
+  private static void DrawTimer(
+    SpriteBatch b,
+    int minutes,
+    int seconds,
+    Vector2 position,
+    float alpha,
+    bool isFading
+  )
   {
     float xOffset = 0;
     int scaledDigitStep = (int)(DigitWidth * DigitScale) - 1;
@@ -161,7 +169,15 @@ internal class ShowBuffTimers : IDisposable
     DrawTinyDigit(b, seconds % 10, position, ref xOffset, scaledDigitStep, digitColor, shadowColor);
   }
 
-  private static void DrawTinyDigits(SpriteBatch b, int number, Vector2 position, ref float xOffset, int step, Color digitColor, Color shadowColor)
+  private static void DrawTinyDigits(
+    SpriteBatch b,
+    int number,
+    Vector2 position,
+    ref float xOffset,
+    int step,
+    Color digitColor,
+    Color shadowColor
+  )
   {
     if (number == 0)
     {
@@ -172,7 +188,11 @@ internal class ShowBuffTimers : IDisposable
     // Count digits to draw left-to-right
     int digitCount = 0;
     int temp = number;
-    while (temp > 0) { digitCount++; temp /= 10; }
+    while (temp > 0)
+    {
+      digitCount++;
+      temp /= 10;
+    }
 
     int divisor = (int)Math.Pow(10, digitCount - 1);
     for (int i = 0; i < digitCount; i++)
@@ -183,7 +203,15 @@ internal class ShowBuffTimers : IDisposable
     }
   }
 
-  private static void DrawTinyDigit(SpriteBatch b, int digit, Vector2 position, ref float xOffset, int step, Color digitColor, Color shadowColor)
+  private static void DrawTinyDigit(
+    SpriteBatch b,
+    int digit,
+    Vector2 position,
+    ref float xOffset,
+    int step,
+    Color digitColor,
+    Color shadowColor
+  )
   {
     var sourceRect = new Rectangle(368 + digit * DigitWidth, 56, DigitWidth, DigitHeight);
 
@@ -193,7 +221,11 @@ internal class ShowBuffTimers : IDisposable
       position + new Vector2(xOffset + 1, 1),
       sourceRect,
       shadowColor,
-      0f, Vector2.Zero, DigitScale, SpriteEffects.None, 0.99f
+      0f,
+      Vector2.Zero,
+      DigitScale,
+      SpriteEffects.None,
+      0.99f
     );
 
     // Digit
@@ -202,13 +234,23 @@ internal class ShowBuffTimers : IDisposable
       position + new Vector2(xOffset, 0f),
       sourceRect,
       digitColor,
-      0f, Vector2.Zero, DigitScale, SpriteEffects.None, 1f
+      0f,
+      Vector2.Zero,
+      DigitScale,
+      SpriteEffects.None,
+      1f
     );
 
     xOffset += step;
   }
 
-  private static void DrawColon(SpriteBatch b, Vector2 position, float xOffset, Color dotColor, Color shadowColor)
+  private static void DrawColon(
+    SpriteBatch b,
+    Vector2 position,
+    float xOffset,
+    Color dotColor,
+    Color shadowColor
+  )
   {
     float dotSize = DigitScale;
     float scaledHeight = DigitHeight * DigitScale;
@@ -228,7 +270,13 @@ internal class ShowBuffTimers : IDisposable
     DrawDot(b, lowerPos, dotSize, dotColor, 1f);
   }
 
-  private static void DrawDot(SpriteBatch b, Vector2 position, float size, Color color, float layerDepth)
+  private static void DrawDot(
+    SpriteBatch b,
+    Vector2 position,
+    float size,
+    Color color,
+    float layerDepth
+  )
   {
     // Use a single white pixel from the mouseCursors sheet (solid area)
     b.Draw(
@@ -236,7 +284,10 @@ internal class ShowBuffTimers : IDisposable
       new Rectangle((int)position.X, (int)position.Y, (int)size, (int)size),
       null,
       color,
-      0f, Vector2.Zero, SpriteEffects.None, layerDepth
+      0f,
+      Vector2.Zero,
+      SpriteEffects.None,
+      layerDepth
     );
   }
 
@@ -255,8 +306,11 @@ internal class ShowBuffTimers : IDisposable
   {
     try
     {
-      return _helper.Reflection
-        .GetField<Dictionary<ClickableTextureComponent, Buff>>(Game1.buffsDisplay, "buffs")
+      return _helper
+        .Reflection.GetField<Dictionary<ClickableTextureComponent, Buff>>(
+          Game1.buffsDisplay,
+          "buffs"
+        )
         .GetValue();
     }
     catch

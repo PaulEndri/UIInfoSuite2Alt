@@ -17,7 +17,7 @@ internal class ShowMachineProcessingItem : IDisposable
   // Custom icon offsets from the machine's sprite center
   private static readonly Dictionary<string, Vector2> CustomOffsets = new()
   {
-    { "Cask", new Vector2(0f, -20f) }
+    { "Cask", new Vector2(0f, -20f) },
   };
 
   private readonly PerScreen<List<MachineIconData>> _visibleMachines = new(() => []);
@@ -50,7 +50,7 @@ internal class ShowMachineProcessingItem : IDisposable
     {
       1 => _toggleState,
       2 => true,
-      _ => false
+      _ => false,
     };
     UpdateEventSubscriptions();
   }
@@ -118,13 +118,16 @@ internal class ShowMachineProcessingItem : IDisposable
     fishPonds.Clear();
 
     // Hold mode: show only while keybind is held; Toggle mode: use current toggle state
-    bool showMachines = ModEntry.ModConfig.MachineProcessingIconsMode == 2
-      ? ModEntry.ModConfig.ToggleMachineProcessingIcons.IsDown()
-      : _showMachineIcons;
+    bool showMachines =
+      ModEntry.ModConfig.MachineProcessingIconsMode == 2
+        ? ModEntry.ModConfig.ToggleMachineProcessingIcons.IsDown()
+        : _showMachineIcons;
 
-    if (Game1.currentLocation == null ||
-        !UIElementUtils.IsRenderingNormally() ||
-        Game1.activeClickableMenu != null)
+    if (
+      Game1.currentLocation == null
+      || !UIElementUtils.IsRenderingNormally()
+      || Game1.activeClickableMenu != null
+    )
     {
       return;
     }
@@ -147,11 +150,13 @@ internal class ShowMachineProcessingItem : IDisposable
           continue;
         }
 
-        if (!obj.bigCraftable.Value ||
-            obj.heldObject.Value == null ||
-            obj.readyForHarvest.Value ||
-            obj.MinutesUntilReady <= 0 ||
-            obj.Name == "Heater")
+        if (
+          !obj.bigCraftable.Value
+          || obj.heldObject.Value == null
+          || obj.readyForHarvest.Value
+          || obj.MinutesUntilReady <= 0
+          || obj.Name == "Heater"
+        )
         {
           continue;
         }
@@ -182,27 +187,34 @@ internal class ShowMachineProcessingItem : IDisposable
     if (_showFishPondIcons)
     {
       foreach (Building building in Game1.currentLocation.buildings)
-    {
-      if (building is not FishPond fishPond ||
-          fishPond.fishType.Value == null ||
-          fishPond.currentOccupants.Value <= 0)
       {
-        continue;
-      }
+        if (
+          building is not FishPond fishPond
+          || fishPond.fishType.Value == null
+          || fishPond.currentOccupants.Value <= 0
+        )
+        {
+          continue;
+        }
 
-      Vector2 centerTile = fishPond.GetCenterTile();
-      if (centerTile.X < startX || centerTile.X > endX || centerTile.Y < startY || centerTile.Y > endY)
-      {
-        continue;
-      }
+        Vector2 centerTile = fishPond.GetCenterTile();
+        if (
+          centerTile.X < startX
+          || centerTile.X > endX
+          || centerTile.Y < startY
+          || centerTile.Y > endY
+        )
+        {
+          continue;
+        }
 
-      ParsedItemData? fishData = ItemRegistry.GetData("(O)" + fishPond.fishType.Value);
-      if (fishData == null)
-      {
-        continue;
-      }
+        ParsedItemData? fishData = ItemRegistry.GetData("(O)" + fishPond.fishType.Value);
+        if (fishData == null)
+        {
+          continue;
+        }
 
-      fishPonds.Add(new FishPondIconData(centerTile, fishData));
+        fishPonds.Add(new FishPondIconData(centerTile, fishData));
       }
     }
   }
@@ -241,8 +253,28 @@ internal class ShowMachineProcessingItem : IDisposable
       );
 
       float outlineScale = Game1.pixelZoom + 2f / sourceRect.Width;
-      spriteBatch.Draw(texture, iconPos - new Vector2(1f, 1f), sourceRect, Color.Black * 0.5f, 0f, Vector2.Zero, outlineScale, SpriteEffects.None, 1f);
-      spriteBatch.Draw(texture, iconPos, sourceRect, Color.White * 0.9f, 0f, Vector2.Zero, Game1.pixelZoom, SpriteEffects.None, 1f);
+      spriteBatch.Draw(
+        texture,
+        iconPos - new Vector2(1f, 1f),
+        sourceRect,
+        Color.Black * 0.5f,
+        0f,
+        Vector2.Zero,
+        outlineScale,
+        SpriteEffects.None,
+        1f
+      );
+      spriteBatch.Draw(
+        texture,
+        iconPos,
+        sourceRect,
+        Color.White * 0.9f,
+        0f,
+        Vector2.Zero,
+        Game1.pixelZoom,
+        SpriteEffects.None,
+        1f
+      );
     }
 
     // Machine icons: draw processing item on each machine
@@ -267,11 +299,37 @@ internal class ShowMachineProcessingItem : IDisposable
 
       // Outline: 2px larger black silhouette centered behind the icon
       float outlineScale = 2f + 2f / sourceRect.Width;
-      spriteBatch.Draw(texture, iconPos - new Vector2(1f, 1f), sourceRect, Color.Black * 0.5f, 0f, Vector2.Zero, outlineScale, SpriteEffects.None, 1f);
-      spriteBatch.Draw(texture, iconPos, sourceRect, Color.White * 0.9f, 0f, Vector2.Zero, 2f, SpriteEffects.None, 1f);
+      spriteBatch.Draw(
+        texture,
+        iconPos - new Vector2(1f, 1f),
+        sourceRect,
+        Color.Black * 0.5f,
+        0f,
+        Vector2.Zero,
+        outlineScale,
+        SpriteEffects.None,
+        1f
+      );
+      spriteBatch.Draw(
+        texture,
+        iconPos,
+        sourceRect,
+        Color.White * 0.9f,
+        0f,
+        Vector2.Zero,
+        2f,
+        SpriteEffects.None,
+        1f
+      );
     }
   }
 
-  private readonly record struct MachineIconData(Vector2 Tile, ParsedItemData ItemData, int MachineSpriteHeight, Vector2 Offset);
+  private readonly record struct MachineIconData(
+    Vector2 Tile,
+    ParsedItemData ItemData,
+    int MachineSpriteHeight,
+    Vector2 Offset
+  );
+
   private readonly record struct FishPondIconData(Vector2 CenterTile, ParsedItemData FishData);
 }

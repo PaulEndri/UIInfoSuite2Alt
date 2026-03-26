@@ -100,7 +100,13 @@ internal static class CustomBushExtensions
     api.TryGetDrops(id, out IList<ICustomBushDrop>? drops);
     return drops == null
       ? new List<PossibleDroppedItem>()
-      : DropsHelper.GetGenericDropItems(drops, id, includeToday, bush.DisplayName, BushDropConverter);
+      : DropsHelper.GetGenericDropItems(
+        drops,
+        id,
+        includeToday,
+        bush.DisplayName,
+        BushDropConverter
+      );
 
     DropInfo BushDropConverter(ICustomBushDrop input)
     {

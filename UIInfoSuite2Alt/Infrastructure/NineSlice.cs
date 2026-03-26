@@ -21,8 +21,15 @@ public static class NineSlice
   /// <param name="layerDepth">Draw layer depth.</param>
   /// <param name="color">Tint color (default White).</param>
   public static void Draw(
-    SpriteBatch batch, Texture2D texture, Rectangle source, Rectangle destination,
-    int cornerSize, float scale, float layerDepth, Color? color = null)
+    SpriteBatch batch,
+    Texture2D texture,
+    Rectangle source,
+    Rectangle destination,
+    int cornerSize,
+    float scale,
+    float layerDepth,
+    Color? color = null
+  )
   {
     Color tint = color ?? Color.White;
     int cs = (int)(cornerSize * scale); // scaled corner size
@@ -36,7 +43,12 @@ public static class NineSlice
     Rectangle srcTL = new(source.X, source.Y, cornerSize, cornerSize);
     Rectangle srcTR = new(source.Right - cornerSize, source.Y, cornerSize, cornerSize);
     Rectangle srcBL = new(source.X, source.Bottom - cornerSize, cornerSize, cornerSize);
-    Rectangle srcBR = new(source.Right - cornerSize, source.Bottom - cornerSize, cornerSize, cornerSize);
+    Rectangle srcBR = new(
+      source.Right - cornerSize,
+      source.Bottom - cornerSize,
+      cornerSize,
+      cornerSize
+    );
 
     // Edges
     Rectangle srcTop = new(source.X + cornerSize, source.Y, edgeW, cornerSize);
@@ -57,25 +69,125 @@ public static class NineSlice
     int innerH = destination.Height - cs * 2;
 
     // --- Corners (fixed size) ---
-    batch.Draw(texture, new Rectangle(destination.X, destination.Y, cs, cs), srcTL, tint, 0f, Vector2.Zero, SpriteEffects.None, layerDepth);
-    batch.Draw(texture, new Rectangle(destination.Right - cs, destination.Y, cs, cs), srcTR, tint, 0f, Vector2.Zero, SpriteEffects.None, layerDepth);
-    batch.Draw(texture, new Rectangle(destination.X, destination.Bottom - cs, cs, cs), srcBL, tint, 0f, Vector2.Zero, SpriteEffects.None, layerDepth);
-    batch.Draw(texture, new Rectangle(destination.Right - cs, destination.Bottom - cs, cs, cs), srcBR, tint, 0f, Vector2.Zero, SpriteEffects.None, layerDepth);
+    batch.Draw(
+      texture,
+      new Rectangle(destination.X, destination.Y, cs, cs),
+      srcTL,
+      tint,
+      0f,
+      Vector2.Zero,
+      SpriteEffects.None,
+      layerDepth
+    );
+    batch.Draw(
+      texture,
+      new Rectangle(destination.Right - cs, destination.Y, cs, cs),
+      srcTR,
+      tint,
+      0f,
+      Vector2.Zero,
+      SpriteEffects.None,
+      layerDepth
+    );
+    batch.Draw(
+      texture,
+      new Rectangle(destination.X, destination.Bottom - cs, cs, cs),
+      srcBL,
+      tint,
+      0f,
+      Vector2.Zero,
+      SpriteEffects.None,
+      layerDepth
+    );
+    batch.Draw(
+      texture,
+      new Rectangle(destination.Right - cs, destination.Bottom - cs, cs, cs),
+      srcBR,
+      tint,
+      0f,
+      Vector2.Zero,
+      SpriteEffects.None,
+      layerDepth
+    );
 
     // --- Edges (tile to fill) ---
-    TileHorizontal(batch, texture, srcTop, innerX, destination.Y, innerW, cs, scaledEdgeW, tint, layerDepth);
-    TileHorizontal(batch, texture, srcBot, innerX, destination.Bottom - cs, innerW, cs, scaledEdgeW, tint, layerDepth);
-    TileVertical(batch, texture, srcLeft, destination.X, innerY, cs, innerH, scaledEdgeH, tint, layerDepth);
-    TileVertical(batch, texture, srcRight, destination.Right - cs, innerY, cs, innerH, scaledEdgeH, tint, layerDepth);
+    TileHorizontal(
+      batch,
+      texture,
+      srcTop,
+      innerX,
+      destination.Y,
+      innerW,
+      cs,
+      scaledEdgeW,
+      tint,
+      layerDepth
+    );
+    TileHorizontal(
+      batch,
+      texture,
+      srcBot,
+      innerX,
+      destination.Bottom - cs,
+      innerW,
+      cs,
+      scaledEdgeW,
+      tint,
+      layerDepth
+    );
+    TileVertical(
+      batch,
+      texture,
+      srcLeft,
+      destination.X,
+      innerY,
+      cs,
+      innerH,
+      scaledEdgeH,
+      tint,
+      layerDepth
+    );
+    TileVertical(
+      batch,
+      texture,
+      srcRight,
+      destination.Right - cs,
+      innerY,
+      cs,
+      innerH,
+      scaledEdgeH,
+      tint,
+      layerDepth
+    );
 
     // --- Center (tile to fill) ---
-    TileArea(batch, texture, srcCenter, innerX, innerY, innerW, innerH, scaledEdgeW, scaledEdgeH, tint, layerDepth);
+    TileArea(
+      batch,
+      texture,
+      srcCenter,
+      innerX,
+      innerY,
+      innerW,
+      innerH,
+      scaledEdgeW,
+      scaledEdgeH,
+      tint,
+      layerDepth
+    );
   }
 
   private static void TileHorizontal(
-    SpriteBatch batch, Texture2D texture, Rectangle src,
-    int x, int y, int totalWidth, int height, int tileWidth,
-    Color tint, float layerDepth)
+    SpriteBatch batch,
+    Texture2D texture,
+    Rectangle src,
+    int x,
+    int y,
+    int totalWidth,
+    int height,
+    int tileWidth,
+    Color tint,
+    float layerDepth
+  )
   {
     int drawn = 0;
     while (drawn < totalWidth)
@@ -84,19 +196,42 @@ public static class NineSlice
       int drawWidth = Math.Min(tileWidth, remaining);
 
       // Clip source if partial tile
-      Rectangle clippedSrc = drawWidth < tileWidth
-        ? new Rectangle(src.X, src.Y, (int)Math.Ceiling((double)drawWidth / tileWidth * src.Width), src.Height)
-        : src;
+      Rectangle clippedSrc =
+        drawWidth < tileWidth
+          ? new Rectangle(
+            src.X,
+            src.Y,
+            (int)Math.Ceiling((double)drawWidth / tileWidth * src.Width),
+            src.Height
+          )
+          : src;
 
-      batch.Draw(texture, new Rectangle(x + drawn, y, drawWidth, height), clippedSrc, tint, 0f, Vector2.Zero, SpriteEffects.None, layerDepth);
+      batch.Draw(
+        texture,
+        new Rectangle(x + drawn, y, drawWidth, height),
+        clippedSrc,
+        tint,
+        0f,
+        Vector2.Zero,
+        SpriteEffects.None,
+        layerDepth
+      );
       drawn += tileWidth;
     }
   }
 
   private static void TileVertical(
-    SpriteBatch batch, Texture2D texture, Rectangle src,
-    int x, int y, int width, int totalHeight, int tileHeight,
-    Color tint, float layerDepth)
+    SpriteBatch batch,
+    Texture2D texture,
+    Rectangle src,
+    int x,
+    int y,
+    int width,
+    int totalHeight,
+    int tileHeight,
+    Color tint,
+    float layerDepth
+  )
   {
     int drawn = 0;
     while (drawn < totalHeight)
@@ -104,19 +239,43 @@ public static class NineSlice
       int remaining = totalHeight - drawn;
       int drawHeight = Math.Min(tileHeight, remaining);
 
-      Rectangle clippedSrc = drawHeight < tileHeight
-        ? new Rectangle(src.X, src.Y, src.Width, (int)Math.Ceiling((double)drawHeight / tileHeight * src.Height))
-        : src;
+      Rectangle clippedSrc =
+        drawHeight < tileHeight
+          ? new Rectangle(
+            src.X,
+            src.Y,
+            src.Width,
+            (int)Math.Ceiling((double)drawHeight / tileHeight * src.Height)
+          )
+          : src;
 
-      batch.Draw(texture, new Rectangle(x, y + drawn, width, drawHeight), clippedSrc, tint, 0f, Vector2.Zero, SpriteEffects.None, layerDepth);
+      batch.Draw(
+        texture,
+        new Rectangle(x, y + drawn, width, drawHeight),
+        clippedSrc,
+        tint,
+        0f,
+        Vector2.Zero,
+        SpriteEffects.None,
+        layerDepth
+      );
       drawn += tileHeight;
     }
   }
 
   private static void TileArea(
-    SpriteBatch batch, Texture2D texture, Rectangle src,
-    int x, int y, int totalWidth, int totalHeight, int tileWidth, int tileHeight,
-    Color tint, float layerDepth)
+    SpriteBatch batch,
+    Texture2D texture,
+    Rectangle src,
+    int x,
+    int y,
+    int totalWidth,
+    int totalHeight,
+    int tileWidth,
+    int tileHeight,
+    Color tint,
+    float layerDepth
+  )
   {
     int drawnY = 0;
     while (drawnY < totalHeight)
@@ -134,11 +293,24 @@ public static class NineSlice
         Rectangle clippedSrc = new(
           src.X,
           src.Y,
-          drawWidth < tileWidth ? (int)Math.Ceiling((double)drawWidth / tileWidth * src.Width) : src.Width,
-          drawHeight < tileHeight ? (int)Math.Ceiling((double)drawHeight / tileHeight * src.Height) : src.Height
+          drawWidth < tileWidth
+            ? (int)Math.Ceiling((double)drawWidth / tileWidth * src.Width)
+            : src.Width,
+          drawHeight < tileHeight
+            ? (int)Math.Ceiling((double)drawHeight / tileHeight * src.Height)
+            : src.Height
         );
 
-        batch.Draw(texture, new Rectangle(x + drawnX, y + drawnY, drawWidth, drawHeight), clippedSrc, tint, 0f, Vector2.Zero, SpriteEffects.None, layerDepth);
+        batch.Draw(
+          texture,
+          new Rectangle(x + drawnX, y + drawnY, drawWidth, drawHeight),
+          clippedSrc,
+          tint,
+          0f,
+          Vector2.Zero,
+          SpriteEffects.None,
+          layerDepth
+        );
         drawnX += tileWidth;
       }
 

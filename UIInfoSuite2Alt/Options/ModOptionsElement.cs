@@ -22,7 +22,16 @@ public class ModOptionsElement
   private readonly Color? _textColor;
   private readonly bool _isVertCentered;
 
-  public ModOptionsElement(string label, int whichOption = -1, ModOptionsElement? parent = null, bool isSubtitle = false, bool isSmallText = false, bool isCentered = false, Color? textColor = null, bool isVertCentered = false)
+  public ModOptionsElement(
+    string label,
+    int whichOption = -1,
+    ModOptionsElement? parent = null,
+    bool isSubtitle = false,
+    bool isSmallText = false,
+    bool isCentered = false,
+    Color? textColor = null,
+    bool isVertCentered = false
+  )
   {
     int x = DefaultX * Game1.pixelZoom;
     int y = DefaultY * Game1.pixelZoom;
@@ -76,7 +85,8 @@ public class ModOptionsElement
       float drawY = slotY + Bounds.Y;
       if (_isVertCentered && Game1.activeClickableMenu != null)
       {
-        int slotHeight = (Game1.activeClickableMenu.height - Game1.tileSize * 2) / 7 + Game1.pixelZoom;
+        int slotHeight =
+          (Game1.activeClickableMenu.height - Game1.tileSize * 2) / 7 + Game1.pixelZoom;
         float textHeight = Game1.smallFont.MeasureString(_label).Y;
         drawY = slotY + (slotHeight - textHeight) / 2f;
       }
@@ -116,22 +126,13 @@ public class ModOptionsElement
       int drawY = slotY + Bounds.Y;
       if (_isVertCentered && Game1.activeClickableMenu != null)
       {
-        int slotHeight = (Game1.activeClickableMenu.height - Game1.tileSize * 2) / 7 + Game1.pixelZoom;
+        int slotHeight =
+          (Game1.activeClickableMenu.height - Game1.tileSize * 2) / 7 + Game1.pixelZoom;
         int textHeight = SpriteText.getHeightOfString(_label);
         drawY = slotY + (slotHeight - textHeight) / 2 + Game1.pixelZoom * 3;
       }
 
-      SpriteText.drawString(
-        batch,
-        _label,
-        drawX,
-        drawY,
-        999,
-        -1,
-        999,
-        1,
-        0.1f
-      );
+      SpriteText.drawString(batch, _label, drawX, drawY, 999, -1, 999, 1, 0.1f);
     }
     else
     {

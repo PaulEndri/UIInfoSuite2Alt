@@ -7,7 +7,9 @@ public static class ColorExtensions
 {
   public static Color Desaturate(this Color color, float desaturationFactor)
   {
-    float hue, saturation, lum;
+    float hue,
+      saturation,
+      lum;
     ColorToHsl(color, out hue, out saturation, out lum);
     float newSaturation = Math.Max(0, Math.Min(saturation * (1 - desaturationFactor), 1));
     Color newColor = HslToColor(hue, newSaturation, lum);
@@ -17,11 +19,15 @@ public static class ColorExtensions
 
   public static Color ShiftHue(this Color color, float degrees)
   {
-    float hue, saturation, lum;
+    float hue,
+      saturation,
+      lum;
     ColorToHsl(color, out hue, out saturation, out lum);
     hue += degrees / 360f;
-    if (hue < 0) hue += 1f;
-    if (hue > 1) hue -= 1f;
+    if (hue < 0)
+      hue += 1f;
+    if (hue > 1)
+      hue -= 1f;
     Color newColor = HslToColor(hue, saturation, lum);
     newColor.A = color.A;
     return newColor;
@@ -43,7 +49,6 @@ public static class ColorExtensions
 
     // luminance is the ave of max and min
     l = (max + min) / 2f;
-
 
     if (delta > 0)
     {
@@ -123,12 +128,10 @@ public static class ColorExtensions
     {
       ret = p + (q - p) * 6 * t;
     }
-
     else if (2 * t < 1)
     {
       ret = q;
     }
-
     else if (3 * t < 2)
     {
       ret = p + (q - p) * (2f / 3f - t) * 6f;

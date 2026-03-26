@@ -1,18 +1,14 @@
-#nullable enable
+﻿#nullable enable
 
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-
 using StardewModdingAPI.Events;
-
 using StardewValley.Menus;
 
 namespace UIInfoSuite2Alt.Compatibility;
-
 
 public interface ITabChangedEvent
 {
@@ -21,7 +17,6 @@ public interface ITabChangedEvent
   string OldTab { get; }
 }
 
-
 public interface ITabContextMenuEvent
 {
   IClickableMenu Menu { get; }
@@ -29,9 +24,12 @@ public interface ITabContextMenuEvent
   string Tab { get; }
   IClickableMenu? Page { get; }
   IList<ITabContextMenuEntry> Entries { get; }
-  ITabContextMenuEntry CreateEntry(string label, Action? onSelect, IBetterGameMenuApi.DrawDelegate? icon = null);
+  ITabContextMenuEntry CreateEntry(
+    string label,
+    Action? onSelect,
+    IBetterGameMenuApi.DrawDelegate? icon = null
+  );
 }
-
 
 public interface ITabContextMenuEntry
 {
@@ -39,7 +37,6 @@ public interface ITabContextMenuEntry
   Action? OnSelect { get; }
   IBetterGameMenuApi.DrawDelegate? Icon { get; }
 }
-
 
 public interface IPageCreatedEvent
 {
@@ -50,7 +47,6 @@ public interface IPageCreatedEvent
   IClickableMenu? OldPage { get; }
 }
 
-
 public interface IBetterGameMenu
 {
   IClickableMenu Menu { get; }
@@ -58,11 +54,14 @@ public interface IBetterGameMenu
   IReadOnlyList<string> VisibleTabs { get; }
   string CurrentTab { get; }
   IClickableMenu? CurrentPage { get; }
-  bool TryGetPage(string target, [NotNullWhen(true)] out IClickableMenu? page, bool forceCreation = false);
+  bool TryGetPage(
+    string target,
+    [NotNullWhen(true)] out IClickableMenu? page,
+    bool forceCreation = false
+  );
   bool TryChangeTab(string target, bool playSound = true);
   void UpdateTabs(string? target = null);
 }
-
 
 public enum VanillaTabOrders
 {
@@ -75,15 +74,21 @@ public enum VanillaTabOrders
   Powers = 120,
   Collections = 140,
   Options = 160,
-  Exit = 200
+  Exit = 200,
 }
-
 
 public interface IBetterGameMenuApi
 {
   delegate void DrawDelegate(SpriteBatch batch, Rectangle bounds);
 
-  DrawDelegate CreateDraw(Texture2D texture, Rectangle source, float scale = 1f, int frames = 1, int frameTime = 16, Vector2? offset = null);
+  DrawDelegate CreateDraw(
+    Texture2D texture,
+    Rectangle source,
+    float scale = 1f,
+    int frames = 1,
+    int frameTime = 16,
+    Vector2? offset = null
+  );
 
   void RegisterTab(
     string id,
@@ -115,15 +120,9 @@ public interface IBetterGameMenuApi
     bool closeExistingMenu = false
   );
 
-  IClickableMenu CreateMenu(
-    string? defaultTab = null,
-    bool playSound = false
-  );
+  IClickableMenu CreateMenu(string? defaultTab = null, bool playSound = false);
 
-  IClickableMenu CreateMenu(
-    int startingTab,
-    bool playSound = false
-  );
+  IClickableMenu CreateMenu(int startingTab, bool playSound = false);
 
   delegate void MenuCreatedDelegate(IClickableMenu menu);
   delegate void TabChangedDelegate(ITabChangedEvent evt);
@@ -134,7 +133,10 @@ public interface IBetterGameMenuApi
   void OffMenuCreated(MenuCreatedDelegate handler);
   void OnTabChanged(TabChangedDelegate handler, EventPriority priority = EventPriority.Normal);
   void OffTabChanged(TabChangedDelegate handler);
-  void OnTabContextMenu(TabContextMenuDelegate handler, EventPriority priority = EventPriority.Normal);
+  void OnTabContextMenu(
+    TabContextMenuDelegate handler,
+    EventPriority priority = EventPriority.Normal
+  );
   void OffTabContextMenu(TabContextMenuDelegate handler);
   void OnPageCreated(PageCreatedDelegate handler, EventPriority priority = EventPriority.Normal);
   void OffPageCreated(PageCreatedDelegate handler);

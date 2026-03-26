@@ -30,12 +30,17 @@ public class ModOptionsPage : IClickableMenu
   public ModOptionsPage(List<ModOptionsElement> options, IModEvents events)
     : this(options, events, Game1.activeClickableMenu) { }
 
-  public ModOptionsPage(List<ModOptionsElement> options, IModEvents events, IClickableMenu parentMenu) : base(
-    parentMenu.xPositionOnScreen,
-    parentMenu.yPositionOnScreen + 10,
-    parentMenu.width,
-    parentMenu.height
+  public ModOptionsPage(
+    List<ModOptionsElement> options,
+    IModEvents events,
+    IClickableMenu parentMenu
   )
+    : base(
+      parentMenu.xPositionOnScreen,
+      parentMenu.yPositionOnScreen + 10,
+      parentMenu.width,
+      parentMenu.height
+    )
   {
     _options = options;
     _upArrow = new ClickableTextureComponent(
@@ -87,10 +92,10 @@ public class ModOptionsPage : IClickableMenu
       var component = new ClickableComponent(
         new Rectangle(
           xPositionOnScreen + Game1.tileSize / 4,
-          yPositionOnScreen +
-          Game1.tileSize * 5 / 4 +
-          Game1.pixelZoom +
-          i * (height - Game1.tileSize * 2) / visibleSlots,
+          yPositionOnScreen
+            + Game1.tileSize * 5 / 4
+            + Game1.pixelZoom
+            + i * (height - Game1.tileSize * 2) / visibleSlots,
           width - Game1.tileSize / 2,
           (height - Game1.tileSize * 2) / visibleSlots + Game1.pixelZoom
         ),
@@ -100,7 +105,7 @@ public class ModOptionsPage : IClickableMenu
         myID = i,
         downNeighborID = i + 1 < visibleSlots ? i + 1 : ClickableComponent.CUSTOM_SNAP_BEHAVIOR,
         upNeighborID = i - 1 >= 0 ? i - 1 : ClickableComponent.CUSTOM_SNAP_BEHAVIOR,
-        fullyImmutable = true
+        fullyImmutable = true,
       };
       _optionSlots.Add(component);
     }
@@ -123,10 +128,11 @@ public class ModOptionsPage : IClickableMenu
       {
         ClickableComponent next = _optionSlots[i];
         next.bounds.X = xPositionOnScreen + Game1.tileSize / 4;
-        next.bounds.Y = yPositionOnScreen +
-                        Game1.tileSize * 5 / 4 +
-                        Game1.pixelZoom +
-                        i * (height - Game1.tileSize * 2) / 7;
+        next.bounds.Y =
+          yPositionOnScreen
+          + Game1.tileSize * 5 / 4
+          + Game1.pixelZoom
+          + i * (height - Game1.tileSize * 2) / 7;
         next.bounds.Width = width - Game1.tileSize / 2;
         next.bounds.Height = (height - Game1.tileSize * 2) / 7 + Game1.pixelZoom;
       }
@@ -149,7 +155,8 @@ public class ModOptionsPage : IClickableMenu
       _scrollBarRunner.X = _scrollBar.bounds.X;
       _scrollBarRunner.Y = _scrollBar.bounds.Y;
       _scrollBarRunner.Width = _scrollBar.bounds.Width;
-      _scrollBarRunner.Height = height - Game1.tileSize * 2 - _upArrow.bounds.Height - Game1.pixelZoom * 2;
+      _scrollBarRunner.Height =
+        height - Game1.tileSize * 2 - _upArrow.bounds.Height - Game1.pixelZoom * 2;
     }
   }
 
@@ -230,9 +237,10 @@ public class ModOptionsPage : IClickableMenu
   {
     if (_options.Count > 0)
     {
-      _scrollBar.bounds.Y = _scrollBarRunner.Height / Math.Max(1, _options.Count - 7 + 1) * _currentItemIndex +
-                            _upArrow.bounds.Bottom +
-                            Game1.pixelZoom;
+      _scrollBar.bounds.Y =
+        _scrollBarRunner.Height / Math.Max(1, _options.Count - 7 + 1) * _currentItemIndex
+        + _upArrow.bounds.Bottom
+        + Game1.pixelZoom;
 
       if (_currentItemIndex == _options.Count - 7)
       {
@@ -252,13 +260,20 @@ public class ModOptionsPage : IClickableMenu
         int yBefore = _scrollBar.bounds.Y;
 
         _scrollBar.bounds.Y = Math.Min(
-          yPositionOnScreen + height - Game1.tileSize - Game1.pixelZoom * 3 - _scrollBar.bounds.Height,
+          yPositionOnScreen
+            + height
+            - Game1.tileSize
+            - Game1.pixelZoom * 3
+            - _scrollBar.bounds.Height,
           Math.Max(y, yPositionOnScreen + _upArrow.bounds.Height + Game1.pixelZoom * 5)
         );
 
         _currentItemIndex = Math.Max(
           0,
-          Math.Min(_options.Count - visibleSlots, _options.Count * (y - _scrollBarRunner.Y) / _scrollBarRunner.Height)
+          Math.Min(
+            _options.Count - visibleSlots,
+            _options.Count * (y - _scrollBarRunner.Y) / _scrollBarRunner.Height
+          )
         );
 
         SetScrollBarToCurrentItem();
@@ -271,7 +286,10 @@ public class ModOptionsPage : IClickableMenu
       else if (_optionsSlotHeld > -1 && _optionsSlotHeld + _currentItemIndex < _options.Count)
       {
         _options[_currentItemIndex + _optionsSlotHeld]
-          .LeftClickHeld(x - _optionSlots[_optionsSlotHeld].bounds.X, y - _optionSlots[_optionsSlotHeld].bounds.Y);
+          .LeftClickHeld(
+            x - _optionSlots[_optionsSlotHeld].bounds.X,
+            y - _optionSlots[_optionsSlotHeld].bounds.Y
+          );
       }
     }
   }
@@ -358,11 +376,13 @@ public class ModOptionsPage : IClickableMenu
       {
         _isScrolling = true;
       }
-      else if (!_downArrow.containsPoint(x, y) &&
-               x > xPositionOnScreen + width &&
-               x < xPositionOnScreen + width + Game1.tileSize * 2 &&
-               y > yPositionOnScreen &&
-               y < yPositionOnScreen + height)
+      else if (
+        !_downArrow.containsPoint(x, y)
+        && x > xPositionOnScreen + width
+        && x < xPositionOnScreen + width + Game1.tileSize * 2
+        && y > yPositionOnScreen
+        && y < yPositionOnScreen + height
+      )
       {
         // Handle scrollbar click even if the player clicked right next to it, but do not enable scrollbar dragging
         // NB the leniency area is based on the option page's, so it's too large
@@ -374,18 +394,21 @@ public class ModOptionsPage : IClickableMenu
       _currentItemIndex = Math.Max(0, Math.Min(_options.Count - visibleSlots, _currentItemIndex));
       for (var i = 0; i < _optionSlots.Count; ++i)
       {
-        if (_optionSlots[i].bounds.Contains(x, y) &&
-            _currentItemIndex + i < _options.Count &&
-            _options[_currentItemIndex + i].Bounds.Contains(x - _optionSlots[i].bounds.X, y - _optionSlots[i].bounds.Y))
+        if (
+          _optionSlots[i].bounds.Contains(x, y)
+          && _currentItemIndex + i < _options.Count
+          && _options[_currentItemIndex + i]
+            .Bounds.Contains(x - _optionSlots[i].bounds.X, y - _optionSlots[i].bounds.Y)
+        )
         {
-          _options[_currentItemIndex + i].ReceiveLeftClick(x - _optionSlots[i].bounds.X, y - _optionSlots[i].bounds.Y);
+          _options[_currentItemIndex + i]
+            .ReceiveLeftClick(x - _optionSlots[i].bounds.X, y - _optionSlots[i].bounds.Y);
           _optionsSlotHeld = i;
           break;
         }
       }
     }
   }
-
 
   public override void receiveRightClick(int x, int y, bool playSound = true) { }
 
@@ -409,7 +432,8 @@ public class ModOptionsPage : IClickableMenu
     {
       if (_currentItemIndex >= 0 && _currentItemIndex + i < _options.Count)
       {
-        _options[_currentItemIndex + i].Draw(batch, _optionSlots[i].bounds.X, _optionSlots[i].bounds.Y);
+        _options[_currentItemIndex + i]
+          .Draw(batch, _optionSlots[i].bounds.X, _optionSlots[i].bounds.Y);
       }
     }
 

@@ -35,6 +35,7 @@ internal class ShowGoldenWalnutCount : IDisposable
 
   /// <summary>Ticks before fade starts after mouse leaves counter panel.</summary>
   private const int FadeDelayTicks = 60; // 1 second at 60fps
+
   /// <summary>Ticks for the fade-out animation.</summary>
   private const int FadeDurationTicks = 60; // 1 second
   private const float MinFadeAlpha = 0f;
@@ -51,72 +52,123 @@ internal class ShowGoldenWalnutCount : IDisposable
   /// <summary>Walnut tracking keys grouped by island area, matching stardew.app categories.</summary>
   private static readonly AreaDefinition[] Areas =
   {
-    new("IslandJungle", I18n.WalnutArea_IslandJungle, new[]
-    {
-      "Bush_IslandEast_17_37", "Bush_IslandShrine_23_34",
-      "BananaShrine", "IslandShrinePuzzle", "TreeNut"
-    }),
-    new("IslandSouth", I18n.WalnutArea_IslandSouth, new[]
-    {
-      "Bush_IslandSouth_31_5",
-      "Buried_IslandSouthEast_25_17", "Buried_IslandSouthEastCave_36_26",
-      "StardropPool", "Mermaid", "Darts"
-    }),
-    new("IslandNorth", I18n.WalnutArea_IslandNorth, new[]
-    {
-      "Bush_IslandNorth_13_33", "Bush_IslandNorth_5_30", "Bush_IslandNorth_4_42",
-      "Bush_IslandNorth_45_38", "Bush_IslandNorth_47_40", "Bush_IslandNorth_20_26",
-      "Bush_IslandNorth_9_84", "Bush_IslandNorth_56_27",
-      "Buried_IslandNorth_57_79", "Buried_IslandNorth_19_39", "Buried_IslandNorth_19_13",
-      "Buried_IslandNorth_54_21", "Buried_IslandNorth_42_77", "Buried_IslandNorth_62_54",
-      "Buried_IslandNorth_26_81",
-      "TreeNutShot", "Island_N_BuriedTreasureNut"
-    }),
-    new("IslandWest", I18n.WalnutArea_IslandWest, new[]
-    {
-      "Bush_IslandWest_104_3", "Bush_IslandWest_31_24", "Bush_IslandWest_38_56",
-      "Bush_IslandWest_75_29", "Bush_IslandWest_64_30", "Bush_IslandWest_54_18",
-      "Bush_IslandWest_25_30", "Bush_IslandWest_15_3", "Bush_CaptainRoom_2_4",
-      "Buried_IslandWest_21_81", "Buried_IslandWest_62_76", "Buried_IslandWest_39_24",
-      "Buried_IslandWest_88_14", "Buried_IslandWest_43_74", "Buried_IslandWest_30_75",
-      "IslandWestCavePuzzle", "SandDuggy", "TigerSlimeNut",
-      "Island_W_BuriedTreasureNut", "Island_W_BuriedTreasureNut2", "MusselStone"
-    }),
-    new("Volcano", I18n.WalnutArea_Volcano, new[]
-    {
-      "Bush_Caldera_28_36", "Bush_Caldera_9_34",
-      "VolcanoNormalChest", "VolcanoRareChest",
-      "VolcanoBarrel", "VolcanoMining", "VolcanoMonsterDrop"
-    }),
-    new("Fishing", I18n.WalnutArea_Fishing, new[]
-    {
-      "IslandFishing"
-    }),
-    new("Farming", I18n.WalnutArea_Farming, new[]
-    {
-      "IslandFarming"
-    }),
-    new("FieldOffice", I18n.WalnutArea_FieldOffice, new[]
-    {
-      "IslandLeftPlantRestored", "IslandRightPlantRestored",
-      "IslandCenterSkeletonRestored", "IslandSnakeRestored",
-      "IslandBatRestored", "IslandFrogRestored"
-    }),
-    new("GoldenCoconut", I18n.WalnutArea_GoldenCoconut, new[]
-    {
-      "GoldenCoconut"
-    }),
-    new("GourmandFrog", I18n.WalnutArea_GourmandFrog, new[]
-    {
-      "IslandGourmand1", "IslandGourmand2", "IslandGourmand3",
-    }),
-    new("PiratesWife", I18n.WalnutArea_PiratesWife, new[]
-    {
-      "Birdie"
-    })
+    new(
+      "IslandJungle",
+      I18n.WalnutArea_IslandJungle,
+      new[]
+      {
+        "Bush_IslandEast_17_37",
+        "Bush_IslandShrine_23_34",
+        "BananaShrine",
+        "IslandShrinePuzzle",
+        "TreeNut",
+      }
+    ),
+    new(
+      "IslandSouth",
+      I18n.WalnutArea_IslandSouth,
+      new[]
+      {
+        "Bush_IslandSouth_31_5",
+        "Buried_IslandSouthEast_25_17",
+        "Buried_IslandSouthEastCave_36_26",
+        "StardropPool",
+        "Mermaid",
+        "Darts",
+      }
+    ),
+    new(
+      "IslandNorth",
+      I18n.WalnutArea_IslandNorth,
+      new[]
+      {
+        "Bush_IslandNorth_13_33",
+        "Bush_IslandNorth_5_30",
+        "Bush_IslandNorth_4_42",
+        "Bush_IslandNorth_45_38",
+        "Bush_IslandNorth_47_40",
+        "Bush_IslandNorth_20_26",
+        "Bush_IslandNorth_9_84",
+        "Bush_IslandNorth_56_27",
+        "Buried_IslandNorth_57_79",
+        "Buried_IslandNorth_19_39",
+        "Buried_IslandNorth_19_13",
+        "Buried_IslandNorth_54_21",
+        "Buried_IslandNorth_42_77",
+        "Buried_IslandNorth_62_54",
+        "Buried_IslandNorth_26_81",
+        "TreeNutShot",
+        "Island_N_BuriedTreasureNut",
+      }
+    ),
+    new(
+      "IslandWest",
+      I18n.WalnutArea_IslandWest,
+      new[]
+      {
+        "Bush_IslandWest_104_3",
+        "Bush_IslandWest_31_24",
+        "Bush_IslandWest_38_56",
+        "Bush_IslandWest_75_29",
+        "Bush_IslandWest_64_30",
+        "Bush_IslandWest_54_18",
+        "Bush_IslandWest_25_30",
+        "Bush_IslandWest_15_3",
+        "Bush_CaptainRoom_2_4",
+        "Buried_IslandWest_21_81",
+        "Buried_IslandWest_62_76",
+        "Buried_IslandWest_39_24",
+        "Buried_IslandWest_88_14",
+        "Buried_IslandWest_43_74",
+        "Buried_IslandWest_30_75",
+        "IslandWestCavePuzzle",
+        "SandDuggy",
+        "TigerSlimeNut",
+        "Island_W_BuriedTreasureNut",
+        "Island_W_BuriedTreasureNut2",
+        "MusselStone",
+      }
+    ),
+    new(
+      "Volcano",
+      I18n.WalnutArea_Volcano,
+      new[]
+      {
+        "Bush_Caldera_28_36",
+        "Bush_Caldera_9_34",
+        "VolcanoNormalChest",
+        "VolcanoRareChest",
+        "VolcanoBarrel",
+        "VolcanoMining",
+        "VolcanoMonsterDrop",
+      }
+    ),
+    new("Fishing", I18n.WalnutArea_Fishing, new[] { "IslandFishing" }),
+    new("Farming", I18n.WalnutArea_Farming, new[] { "IslandFarming" }),
+    new(
+      "FieldOffice",
+      I18n.WalnutArea_FieldOffice,
+      new[]
+      {
+        "IslandLeftPlantRestored",
+        "IslandRightPlantRestored",
+        "IslandCenterSkeletonRestored",
+        "IslandSnakeRestored",
+        "IslandBatRestored",
+        "IslandFrogRestored",
+      }
+    ),
+    new("GoldenCoconut", I18n.WalnutArea_GoldenCoconut, new[] { "GoldenCoconut" }),
+    new(
+      "GourmandFrog",
+      I18n.WalnutArea_GourmandFrog,
+      new[] { "IslandGourmand1", "IslandGourmand2", "IslandGourmand3" }
+    ),
+    new("PiratesWife", I18n.WalnutArea_PiratesWife, new[] { "Birdie" }),
   };
 
   private record WalnutInfo(int Count, string Name, string Description);
+
   private record AreaDefinition(string Id, Func<string> DisplayName, string[] Keys);
   #endregion
 
@@ -124,8 +176,9 @@ internal class ShowGoldenWalnutCount : IDisposable
   public ShowGoldenWalnutCount(IModHelper helper)
   {
     _helper = helper;
-    _walnutData = helper.Data.ReadJsonFile<Dictionary<string, WalnutInfo>>("assets/walnuts.json")
-                  ?? new Dictionary<string, WalnutInfo>();
+    _walnutData =
+      helper.Data.ReadJsonFile<Dictionary<string, WalnutInfo>>("assets/walnuts.json")
+      ?? new Dictionary<string, WalnutInfo>();
   }
 
   public void Dispose()
@@ -308,7 +361,16 @@ internal class ShowGoldenWalnutCount : IDisposable
 
     // Draw 9-slice background
     var dest = new Rectangle((int)panelX, (int)panelY, panelWidth, panelHeight);
-    NineSlice.Draw(batch, Game1.mouseCursors, PanelSource, dest, PanelCornerSize, PanelScale, 0.89f, Color.White * 0.9f * alpha);
+    NineSlice.Draw(
+      batch,
+      Game1.mouseCursors,
+      PanelSource,
+      dest,
+      PanelCornerSize,
+      PanelScale,
+      0.89f,
+      Color.White * 0.9f * alpha
+    );
 
     // Draw walnut icon (vertically centered in panel)
     float iconX = panelX + PaddingX;
@@ -348,10 +410,21 @@ internal class ShowGoldenWalnutCount : IDisposable
     float qiNameWidth = qiGemWidth + Game1.smallFont.MeasureString(qiLabel).X * TextScale;
     float qiCountWidth = qiComplete
       ? Game1.smallFont.MeasureString(qiCollectedText).X * TextScale
-      : (Game1.smallFont.MeasureString(qiCollectedText).X + Game1.smallFont.MeasureString(qiTotalText).X) * TextScale;
+      : (
+        Game1.smallFont.MeasureString(qiCollectedText).X
+        + Game1.smallFont.MeasureString(qiTotalText).X
+      ) * TextScale;
 
     // Area breakdowns
-    var areaLines = new List<(string id, string name, string collectedText, string totalText, Color countColor, bool complete)>();
+    var areaLines =
+      new List<(
+        string id,
+        string name,
+        string collectedText,
+        string totalText,
+        Color countColor,
+        bool complete
+      )>();
     float maxNameWidth = qiNameWidth;
     float maxCountWidth = qiCountWidth;
 
@@ -366,7 +439,10 @@ internal class ShowGoldenWalnutCount : IDisposable
       float nameWidth = Game1.smallFont.MeasureString(area.DisplayName()).X * TextScale;
       float countWidth = complete
         ? Game1.smallFont.MeasureString(collectedText).X * TextScale
-        : (Game1.smallFont.MeasureString(collectedText).X + Game1.smallFont.MeasureString(totalText).X) * TextScale;
+        : (
+          Game1.smallFont.MeasureString(collectedText).X
+          + Game1.smallFont.MeasureString(totalText).X
+        ) * TextScale;
       areaLines.Add((area.Id, area.DisplayName(), collectedText, totalText, countColor, complete));
       maxNameWidth = Math.Max(maxNameWidth, nameWidth);
       maxCountWidth = Math.Max(maxCountWidth, countWidth);
@@ -377,7 +453,13 @@ internal class ShowGoldenWalnutCount : IDisposable
     int columnGap = 12;
     float maxLineWidth = maxNameWidth + columnGap + maxCountWidth;
     float separatorHeight = (lineHeight / 2) + lineSpacing;
-    float totalLineHeight = lineHeight + lineSpacing + separatorHeight + separatorHeight + (areaLines.Count * lineHeight) + ((areaLines.Count) * lineSpacing);
+    float totalLineHeight =
+      lineHeight
+      + lineSpacing
+      + separatorHeight
+      + separatorHeight
+      + (areaLines.Count * lineHeight)
+      + ((areaLines.Count) * lineSpacing);
 
     int panelWidth = (int)maxLineWidth + PaddingX * 2 + 20;
     int panelHeight = (int)totalLineHeight + PaddingY * 2 + 2;
@@ -387,7 +469,16 @@ internal class ShowGoldenWalnutCount : IDisposable
 
     // Draw 9-slice background
     var dest = new Rectangle((int)panelX, (int)panelY, panelWidth, panelHeight);
-    NineSlice.Draw(batch, Game1.mouseCursors, PanelSource, dest, PanelCornerSize, PanelScale, 0.89f, Color.White * 0.9f);
+    NineSlice.Draw(
+      batch,
+      Game1.mouseCursors,
+      PanelSource,
+      dest,
+      PanelCornerSize,
+      PanelScale,
+      0.89f,
+      Color.White * 0.9f
+    );
 
     float rightEdge = panelX + panelWidth - PaddingX;
 
@@ -412,11 +503,21 @@ internal class ShowGoldenWalnutCount : IDisposable
     if (qiComplete)
     {
       float cw = Game1.smallFont.MeasureString(qiCollectedText).X * TextScale;
-      DrawTextWithShadow(batch, qiCollectedText, new Vector2(rightEdge - cw, lineY), qiCountColor, 40);
+      DrawTextWithShadow(
+        batch,
+        qiCollectedText,
+        new Vector2(rightEdge - cw, lineY),
+        qiCountColor,
+        40
+      );
     }
     else
     {
-      float fw = (Game1.smallFont.MeasureString(qiCollectedText).X + Game1.smallFont.MeasureString(qiTotalText).X) * TextScale;
+      float fw =
+        (
+          Game1.smallFont.MeasureString(qiCollectedText).X
+          + Game1.smallFont.MeasureString(qiTotalText).X
+        ) * TextScale;
       float cx = rightEdge - fw;
       DrawTextWithShadow(batch, qiCollectedText, new Vector2(cx, lineY), qiCountColor, 40);
       cx += Game1.smallFont.MeasureString(qiCollectedText).X * TextScale;
@@ -428,7 +529,16 @@ internal class ShowGoldenWalnutCount : IDisposable
     lineY += (lineHeight / 2) + lineSpacing;
 
     // Draw area lines: name left-aligned, count right-aligned
-    foreach ((string id, string name, string collectedText, string totalText, Color countColor, bool complete) in areaLines)
+    foreach (
+      (
+        string id,
+        string name,
+        string collectedText,
+        string totalText,
+        Color countColor,
+        bool complete
+      ) in areaLines
+    )
     {
       Color nameColor = complete ? Tools.TooltipWalnutGreen : Game1.textColor;
       DrawTextWithShadow(batch, name, new Vector2(panelX + PaddingX, lineY), nameColor, 40);
@@ -436,11 +546,21 @@ internal class ShowGoldenWalnutCount : IDisposable
       if (complete)
       {
         float countWidth = Game1.smallFont.MeasureString(collectedText).X * TextScale;
-        DrawTextWithShadow(batch, collectedText, new Vector2(rightEdge - countWidth, lineY), countColor, 40);
+        DrawTextWithShadow(
+          batch,
+          collectedText,
+          new Vector2(rightEdge - countWidth, lineY),
+          countColor,
+          40
+        );
       }
       else
       {
-        float fullWidth = (Game1.smallFont.MeasureString(collectedText).X + Game1.smallFont.MeasureString(totalText).X) * TextScale;
+        float fullWidth =
+          (
+            Game1.smallFont.MeasureString(collectedText).X
+            + Game1.smallFont.MeasureString(totalText).X
+          ) * TextScale;
         float countX = rightEdge - fullWidth;
         DrawTextWithShadow(batch, collectedText, new Vector2(countX, lineY), countColor, 40);
         countX += Game1.smallFont.MeasureString(collectedText).X * TextScale;
@@ -457,7 +577,13 @@ internal class ShowGoldenWalnutCount : IDisposable
     }
   }
 
-  private static void DrawTextWithShadow(SpriteBatch batch, string text, Vector2 position, Color color, int shadowAlpha = 120)
+  private static void DrawTextWithShadow(
+    SpriteBatch batch,
+    string text,
+    Vector2 position,
+    Color color,
+    int shadowAlpha = 120
+  )
   {
     float alphaRatio = color.A / 255f;
     batch.DrawString(

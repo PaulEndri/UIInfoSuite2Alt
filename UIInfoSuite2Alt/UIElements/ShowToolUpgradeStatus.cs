@@ -24,12 +24,7 @@ internal class ShowToolUpgradeStatus : IDisposable
       return;
     }
 
-    if (toolBeingUpgraded is Axe
-        or Pickaxe
-        or Hoe
-        or WateringCan
-        or Pan
-        or GenericTool)
+    if (toolBeingUpgraded is Axe or Pickaxe or Hoe or WateringCan or Pan or GenericTool)
     {
       ParsedItemData? itemData = ItemRegistry.GetDataOrErrorItem(toolBeingUpgraded.QualifiedItemId);
       Texture2D? itemTexture = itemData.GetTexture();
@@ -53,7 +48,10 @@ internal class ShowToolUpgradeStatus : IDisposable
     }
     else
     {
-      _hoverText.Value = string.Format(I18n.ToolIsFinishedBeingUpgraded(), toolBeingUpgraded.DisplayName);
+      _hoverText.Value = string.Format(
+        I18n.ToolIsFinishedBeingUpgraded(),
+        toolBeingUpgraded.DisplayName
+      );
     }
   }
   #endregion
@@ -62,17 +60,15 @@ internal class ShowToolUpgradeStatus : IDisposable
   private readonly PerScreen<string> _hoverText = new();
   private readonly PerScreen<Tool?> _toolBeingUpgraded = new();
 
-  private readonly PerScreen<ClickableTextureComponent> _toolUpgradeIcon = new(
-    () =>
-    {
-      return new ClickableTextureComponent(
-        new Rectangle(0, 0, 40, 40),
-        Game1.mouseCursors,
-        new Rectangle(322, 498, 12, 12),
-        40 / 12f
-      );
-    }
-  );
+  private readonly PerScreen<ClickableTextureComponent> _toolUpgradeIcon = new(() =>
+  {
+    return new ClickableTextureComponent(
+      new Rectangle(0, 0, 40, 40),
+      Game1.mouseCursors,
+      new Rectangle(322, 498, 12, 12),
+      40 / 12f
+    );
+  });
 
   private readonly IModHelper _helper;
   #endregion

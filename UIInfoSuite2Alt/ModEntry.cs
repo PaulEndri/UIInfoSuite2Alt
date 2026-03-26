@@ -1,15 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
+using HarmonyLib;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Menus;
 using UIInfoSuite2Alt.Compatibility;
-using HarmonyLib;
-using System.Collections.Generic;
 using UIInfoSuite2Alt.Infrastructure;
-using UIInfoSuite2Alt.Patches;
 using UIInfoSuite2Alt.Infrastructure.Structures;
 using UIInfoSuite2Alt.Options;
+using UIInfoSuite2Alt.Patches;
 using UIInfoSuite2Alt.UIElements;
 
 namespace UIInfoSuite2Alt;
@@ -61,7 +61,9 @@ public partial class ModEntry : Mod
     RegisterCalendarAndQuestKeyBindings(helper, true);
     RegisterMonsterEradicationKeyBindings(helper, true);
 
-    IconHandler.Handler.IsQuestLogPermanent = helper.ModRegistry.IsLoaded("MolsonCAD.DeluxeJournal");
+    IconHandler.Handler.IsQuestLogPermanent = helper.ModRegistry.IsLoaded(
+      "MolsonCAD.DeluxeJournal"
+    );
 
     CheckForConflictingMods(helper);
   }
@@ -81,9 +83,9 @@ public partial class ModEntry : Mod
       if (helper.ModRegistry.IsLoaded(modId))
       {
         Monitor.Log(
-          $"Detected '{name}' ({modId}) installed alongside UI Info Suite 2 Alternative. " +
-          "Both mods provide the same features and will conflict. " +
-          "Please remove one to avoid issues.",
+          $"Detected '{name}' ({modId}) installed alongside UI Info Suite 2 Alternative. "
+            + "Both mods provide the same features and will conflict. "
+            + "Please remove one to avoid issues.",
           LogLevel.Alert
         );
       }
@@ -98,17 +100,23 @@ public partial class ModEntry : Mod
   {
     var recommendations = new (string ModId, string Name, int NexusId, string Reason)[]
     {
-      (ModCompat.Gmcm, "Generic Mod Config Menu", 5098,
-        "Required to Change Keybinds in-game"),
-      (ModCompat.NpcMapLocations, "NPC Map Locations", 239,
-        "NPC map tracking was Removed in v2.7.0 - Use this mod instead"),
+      (ModCompat.Gmcm, "Generic Mod Config Menu", 5098, "Required to Change Keybinds in-game"),
+      (
+        ModCompat.NpcMapLocations,
+        "NPC Map Locations",
+        239,
+        "NPC map tracking was Removed in v2.7.0 - Use this mod instead"
+      ),
     };
 
     foreach (var (modId, name, nexusId, reason) in recommendations)
     {
       if (!helper.ModRegistry.IsLoaded(modId))
       {
-        MonitorObject.Log($"Recommended mod not installed: {name} [Nexus:{nexusId}] - {reason}.", LogLevel.Info);
+        MonitorObject.Log(
+          $"Recommended mod not installed: {name} [Nexus:{nexusId}] - {reason}.",
+          LogLevel.Info
+        );
       }
     }
   }
@@ -154,15 +162,11 @@ public partial class ModEntry : Mod
     _modOptionsPageHandler = new ModOptionsPageHandler(Helper, ModConfig, SaveConfig);
   }
 
-
   private void OnAssetRequested(object? sender, AssetRequestedEventArgs e)
   {
     if (e.NameWithoutLocale.IsEquivalentTo(CustomIconsAssetName))
     {
-      e.LoadFrom(
-        () => new Dictionary<string, CustomIconData>(),
-        AssetLoadPriority.Low
-      );
+      e.LoadFrom(() => new Dictionary<string, CustomIconData>(), AssetLoadPriority.Low);
     }
   }
 
@@ -175,7 +179,8 @@ public partial class ModEntry : Mod
   {
     if (_calendarAndQuestKeyBindingsHandler == null)
     {
-      _calendarAndQuestKeyBindingsHandler = (sender, e) => HandleCalendarAndQuestKeyBindings(helper);
+      _calendarAndQuestKeyBindingsHandler = (sender, e) =>
+        HandleCalendarAndQuestKeyBindings(helper);
     }
 
     helper.Events.Input.ButtonsChanged -= _calendarAndQuestKeyBindingsHandler;
@@ -209,7 +214,8 @@ public partial class ModEntry : Mod
   {
     if (_monsterEradicationKeyBindingsHandler == null)
     {
-      _monsterEradicationKeyBindingsHandler = (sender, e) => HandleMonsterEradicationKeyBindings(helper);
+      _monsterEradicationKeyBindingsHandler = (sender, e) =>
+        HandleMonsterEradicationKeyBindings(helper);
     }
 
     helper.Events.Input.ButtonsChanged -= _monsterEradicationKeyBindingsHandler;

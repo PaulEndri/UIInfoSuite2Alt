@@ -18,7 +18,12 @@ public record DropInfo(string? Condition, float Chance, string ItemId)
   }
 }
 
-public record PossibleDroppedItem(int NextDayToProduce, ParsedItemData Item, float Chance, string? CustomId = null)
+public record PossibleDroppedItem(
+  int NextDayToProduce,
+  ParsedItemData Item,
+  float Chance,
+  string? CustomId = null
+)
 {
   public bool ReadyToPick => Game1.dayOfMonth == NextDayToProduce;
 }
@@ -50,7 +55,7 @@ public static class DropsHelper
       {
         "1" => "399", // Spring Onion
         "2" => "829", // Ginger
-        _ => crop.whichForageCrop.Value
+        _ => crop.whichForageCrop.Value,
       };
       return GetOrCacheCropName(forageCropItemId);
     }
@@ -82,9 +87,18 @@ public static class DropsHelper
     return harvestName;
   }
 
-  public static List<PossibleDroppedItem> GetFruitTreeDropItems(FruitTree tree, bool includeToday = false)
+  public static List<PossibleDroppedItem> GetFruitTreeDropItems(
+    FruitTree tree,
+    bool includeToday = false
+  )
   {
-    return GetGenericDropItems(tree.GetData().Fruit, null, includeToday, "Fruit Tree", FruitTreeDropConverter);
+    return GetGenericDropItems(
+      tree.GetData().Fruit,
+      null,
+      includeToday,
+      "Fruit Tree",
+      FruitTreeDropConverter
+    );
 
     DropInfo FruitTreeDropConverter(FruitTreeFruitData input)
     {
@@ -111,7 +125,8 @@ public static class DropsHelper
     if (string.IsNullOrEmpty(displayName))
     {
       var itemData = ItemRegistry.GetData(tree.treeId.Value);
-      if (itemData != null) displayName = itemData.DisplayName;
+      if (itemData != null)
+        displayName = itemData.DisplayName;
     }
 
     List<PossibleDroppedItem> drops = GetFruitTreeDropItems(tree, harvestIncludeToday);
@@ -135,8 +150,10 @@ public static class DropsHelper
     string treeSuffix = I18n.Tree();
     string finalName;
 
-    if (cleanName.EndsWith(treeSuffix.Trim(), StringComparison.OrdinalIgnoreCase) ||
-        cleanName.EndsWith("Tree", StringComparison.OrdinalIgnoreCase))
+    if (
+      cleanName.EndsWith(treeSuffix.Trim(), StringComparison.OrdinalIgnoreCase)
+      || cleanName.EndsWith("Tree", StringComparison.OrdinalIgnoreCase)
+    )
     {
       finalName = cleanName;
     }
@@ -182,7 +199,8 @@ public static class DropsHelper
       {
         ModEntry.MonitorObject.LogOnce(
           $"DropsHelper: Could not parse the correct item '{displayName}' will drop. (ItemId: {dropInfo.ItemId})",
-        LogLevel.Debug);
+          LogLevel.Debug
+        );
         continue;
       }
 

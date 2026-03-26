@@ -93,14 +93,20 @@ internal class ShowTodaysGifts : IDisposable
 
     var yOffset = 25;
 
-    for (int i = _socialPage.slotPosition; i < _socialPage.slotPosition + 5 && i < _socialPage.SocialEntries.Count; ++i)
+    for (
+      int i = _socialPage.slotPosition;
+      i < _socialPage.slotPosition + 5 && i < _socialPage.SocialEntries.Count;
+      ++i
+    )
     {
       int yPosition = _socialPage.yPositionOnScreen + 130 + yOffset;
       yOffset += 112;
       string internalName = _socialPage.SocialEntries[i].InternalName;
-      if (Game1.player.friendshipData.TryGetValue(internalName, out Friendship? data) &&
-          data.GiftsToday != 0 &&
-          data.GiftsThisWeek < 2)
+      if (
+        Game1.player.friendshipData.TryGetValue(internalName, out Friendship? data)
+        && data.GiftsToday != 0
+        && data.GiftsThisWeek < 2
+      )
       {
         Game1.spriteBatch.Draw(
           Game1.mouseCursors,

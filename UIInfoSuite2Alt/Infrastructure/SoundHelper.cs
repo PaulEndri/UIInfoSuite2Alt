@@ -9,7 +9,7 @@ namespace UIInfoSuite2Alt.Infrastructure;
 public enum Sounds
 {
   LevelUp,
-  BuffExpired
+  BuffExpired,
 }
 
 public class SoundHelper

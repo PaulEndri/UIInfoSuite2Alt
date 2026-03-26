@@ -24,10 +24,11 @@ public sealed class IconHandler
     "SeasonalBerry",
     "TravelingMerchant",
     "Bookseller",
-    "CustomIcons"
+    "CustomIcons",
   ];
 
   private const int IconGap = 48;
+
   /// <summary>How many icons per row (horizontal) or column (vertical) before wrapping.</summary>
   public int IconsPerRow { get; set; } = 10;
 
@@ -51,16 +52,22 @@ public sealed class IconHandler
   public bool UseVerticalLayout { get; set; }
 
   /// <summary>Enqueue an icon to draw this frame, sorted by configured order.</summary>
-  public void EnqueueIcon(string iconKey, Action<SpriteBatch, Point> draw, Action<SpriteBatch>? drawHover = null)
+  public void EnqueueIcon(
+    string iconKey,
+    Action<SpriteBatch, Point> draw,
+    Action<SpriteBatch>? drawHover = null
+  )
   {
     int order = IconOrder.TryGetValue(iconKey, out int o) ? o : 99;
-    _queuedIcons.Value.Add(new QueuedIcon
-    {
-      Draw = draw,
-      DrawHover = drawHover,
-      SortOrder = order,
-      RegistrationOrder = _queuedIcons.Value.Count
-    });
+    _queuedIcons.Value.Add(
+      new QueuedIcon
+      {
+        Draw = draw,
+        DrawHover = drawHover,
+        SortOrder = order,
+        RegistrationOrder = _queuedIcons.Value.Count,
+      }
+    );
   }
 
   /// <summary>Sort, position, draw all queued icons + hover text. Call once per frame.</summary>

@@ -31,7 +31,8 @@ internal class ModOptionsDropdown : ModOptionsElement
     Func<int> getOption,
     Action<int> setOption,
     ModOptionsCheckbox? parent = null
-  ) : base(label, whichOption, parent)
+  )
+    : base(label, whichOption, parent)
   {
     _displayOptions = displayOptions;
     _setOption = setOption;
@@ -40,7 +41,8 @@ internal class ModOptionsDropdown : ModOptionsElement
     RecalculateBounds();
   }
 
-  private bool _canClick => _parent is not ModOptionsCheckbox parentCheckbox || parentCheckbox.IsChecked;
+  private bool _canClick =>
+    _parent is not ModOptionsCheckbox parentCheckbox || parentCheckbox.IsChecked;
 
   private void RecalculateBounds()
   {
@@ -64,7 +66,8 @@ internal class ModOptionsDropdown : ModOptionsElement
 
   public override void ReceiveLeftClick(int x, int y)
   {
-    if (!_canClick) return;
+    if (!_canClick)
+      return;
 
     _startingSelected = _selectedOption;
     _dropDownBounds.Y = Bounds.Y;
@@ -78,7 +81,8 @@ internal class ModOptionsDropdown : ModOptionsElement
 
   public override void LeftClickHeld(int x, int y)
   {
-    if (!_canClick || !_clicked) return;
+    if (!_canClick || !_clicked)
+      return;
 
     _dropDownBounds.Y = Math.Min(
       _dropDownBounds.Y,
@@ -94,7 +98,8 @@ internal class ModOptionsDropdown : ModOptionsElement
 
   public override void LeftClickReleased(int x, int y)
   {
-    if (!_canClick || !_clicked) return;
+    if (!_canClick || !_clicked)
+      return;
 
     _clicked = false;
 
@@ -111,7 +116,8 @@ internal class ModOptionsDropdown : ModOptionsElement
 
   public override void ReceiveKeyPress(Keys key)
   {
-    if (!_canClick || !_clicked || _displayOptions.Count == 0) return;
+    if (!_canClick || !_clicked || _displayOptions.Count == 0)
+      return;
 
     if (Game1.options.doesInputListContain(Game1.options.moveDownButton, key))
     {

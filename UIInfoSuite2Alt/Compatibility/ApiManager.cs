@@ -31,20 +31,22 @@ public static class ApiManager
   private static readonly List<string> SuccessfullyLoadedModIds = [];
 
   public static T? TryRegisterApi<T>(
-        IModHelper helper,
-        string modId,
-        string? minimumVersion = null,
-        bool warnIfNotPresent = false
-    ) where T : class
+    IModHelper helper,
+    string modId,
+    string? minimumVersion = null,
+    bool warnIfNotPresent = false
+  )
+    where T : class
   {
     IModInfo? modInfo = helper.ModRegistry.Get(modId);
-    if (modInfo == null) return null;
+    if (modInfo == null)
+      return null;
 
     if (minimumVersion != null && modInfo.Manifest.Version.IsOlderThan(minimumVersion))
     {
       ModEntry.MonitorObject.Log(
-          $"Requested version {minimumVersion} for mod {modId}, but got {modInfo.Manifest.Version} instead.",
-          LogLevel.Warn
+        $"Requested version {minimumVersion} for mod {modId}, but got {modInfo.Manifest.Version} instead.",
+        LogLevel.Warn
       );
       return null;
     }
@@ -73,7 +75,8 @@ public static class ApiManager
     }
   }
 
-  public static bool GetApi<T>(string modId, [NotNullWhen(true)] out T? apiInstance) where T : class
+  public static bool GetApi<T>(string modId, [NotNullWhen(true)] out T? apiInstance)
+    where T : class
   {
     apiInstance = null;
     if (!RegisteredApis.TryGetValue(modId, out object? api))

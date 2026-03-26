@@ -17,7 +17,11 @@ internal class ShowFishOnCatch : IDisposable
   public static void Initialize(Harmony harmony)
   {
     harmony.Patch(
-      original: AccessTools.Method(typeof(BobberBar), nameof(BobberBar.draw), [typeof(SpriteBatch)]),
+      original: AccessTools.Method(
+        typeof(BobberBar),
+        nameof(BobberBar.draw),
+        [typeof(SpriteBatch)]
+      ),
       prefix: new HarmonyMethod(typeof(ShowFishOnCatch), nameof(BeforeDraw)),
       postfix: new HarmonyMethod(typeof(ShowFishOnCatch), nameof(AfterDraw))
     );
@@ -54,7 +58,8 @@ internal class ShowFishOnCatch : IDisposable
     SpriteBatch b,
     List<string> ___bobbers,
     int ___fishQuality,
-    Vector2 ___everythingShake)
+    Vector2 ___everythingShake
+  )
   {
     if (!_enabled.Value)
     {
@@ -92,25 +97,25 @@ internal class ShowFishOnCatch : IDisposable
     int xPos = __instance.xPositionOnScreen;
     int yPos = __instance.yPositionOnScreen;
 
-    int iconX = (xPos > Game1.viewport.Width * 0.75f)
-      ? (xPos - 80)
-      : (xPos + 216);
+    int iconX = (xPos > Game1.viewport.Width * 0.75f) ? (xPos - 80) : (xPos + 216);
     bool flipped = iconX < xPos;
 
     // Fish icon is drawn at this position by the game
-    Vector2 fishIconPos = new Vector2(iconX, yPos)
-      + new Vector2(flipped ? -8 : -4, 4f) * 4f
-      + ___everythingShake;
+    Vector2 fishIconPos =
+      new Vector2(iconX, yPos) + new Vector2(flipped ? -8 : -4, 4f) * 4f + ___everythingShake;
 
     // Quality star sprite from Game1.mouseCursors
-    Rectangle starRect = quality < 4
-      ? new Rectangle(338 + (quality - 1) * 8, 400, 8, 8)
-      : new Rectangle(346, 392, 8, 8);
+    Rectangle starRect =
+      quality < 4
+        ? new Rectangle(338 + (quality - 1) * 8, 400, 8, 8)
+        : new Rectangle(346, 392, 8, 8);
 
     // Iridium star pulsing effect
-    float pulseScale = quality < 4
-      ? 0f
-      : ((float)Math.Cos(Game1.currentGameTime.TotalGameTime.Milliseconds * Math.PI / 512.0) + 1f) * 0.05f;
+    float pulseScale =
+      quality < 4
+        ? 0f
+        : ((float)Math.Cos(Game1.currentGameTime.TotalGameTime.Milliseconds * Math.PI / 512.0) + 1f)
+          * 0.05f;
 
     // Draw quality star at bottom-left of the fish icon (matching inventory style)
     b.Draw(

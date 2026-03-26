@@ -18,7 +18,10 @@ internal class ShowCustomIcons : IDisposable
 
   private readonly IModHelper _helper;
   private readonly PerScreen<Dictionary<string, CustomIconData>> _activeIcons = new(() => []);
-  private readonly PerScreen<Dictionary<string, ClickableTextureComponent>> _iconComponents = new(() => []);
+  private readonly PerScreen<Dictionary<string, ClickableTextureComponent>> _iconComponents = new(
+    () =>
+      []
+  );
   private readonly PerScreen<bool> _needsReload = new(() => true);
 
   public ShowCustomIcons(IModHelper helper)
@@ -71,11 +74,16 @@ internal class ShowCustomIcons : IDisposable
     Dictionary<string, CustomIconData> data;
     try
     {
-      data = _helper.GameContent.Load<Dictionary<string, CustomIconData>>(ModEntry.CustomIconsAssetName);
+      data = _helper.GameContent.Load<Dictionary<string, CustomIconData>>(
+        ModEntry.CustomIconsAssetName
+      );
     }
     catch (Exception ex)
     {
-      ModEntry.MonitorObject.Log($"Failed to load custom icons asset: {ex.Message}", LogLevel.Error);
+      ModEntry.MonitorObject.Log(
+        $"Failed to load custom icons asset: {ex.Message}",
+        LogLevel.Error
+      );
       _needsReload.Value = false;
       return;
     }
@@ -84,7 +92,10 @@ internal class ShowCustomIcons : IDisposable
     {
       if (string.IsNullOrWhiteSpace(iconData.Texture))
       {
-        ModEntry.MonitorObject.LogOnce($"Custom icon '{key}' has no texture, skipping", LogLevel.Warn);
+        ModEntry.MonitorObject.LogOnce(
+          $"Custom icon '{key}' has no texture, skipping",
+          LogLevel.Warn
+        );
         continue;
       }
 
@@ -177,8 +188,10 @@ internal class ShowCustomIcons : IDisposable
 
   private void DrawHover(SpriteBatch batch, string key, string hoverText)
   {
-    if (_iconComponents.Value.TryGetValue(key, out ClickableTextureComponent? comp) &&
-        comp.containsPoint(Game1.getMouseX(), Game1.getMouseY()))
+    if (
+      _iconComponents.Value.TryGetValue(key, out ClickableTextureComponent? comp)
+      && comp.containsPoint(Game1.getMouseX(), Game1.getMouseY())
+    )
     {
       IClickableMenu.drawHoverText(batch, hoverText, Game1.dialogueFont);
     }

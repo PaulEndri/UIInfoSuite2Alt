@@ -116,7 +116,10 @@ internal class LuckOfDay : IDisposable
 
   private void OnRenderingHud(object? sender, RenderingHudEventArgs e)
   {
-    if (UIElementUtils.IsRenderingNormally() && (!RequireTv || TvChannelWatcher.HasWatchedFortune.Value))
+    if (
+      UIElementUtils.IsRenderingNormally()
+      && (!RequireTv || TvChannelWatcher.HasWatchedFortune.Value)
+    )
     {
       switch (IconStyle)
       {
@@ -142,7 +145,12 @@ internal class LuckOfDay : IDisposable
         ClickableTextureComponent icon = _icon.Value;
         icon.bounds.X = pos.X;
         icon.bounds.Y = pos.Y;
-        icon.sourceRect = new Rectangle(_cloverFrame.Value * CloverFrameSize, 0, CloverFrameSize, CloverFrameSize);
+        icon.sourceRect = new Rectangle(
+          _cloverFrame.Value * CloverFrameSize,
+          0,
+          CloverFrameSize,
+          CloverFrameSize
+        );
         _icon.Value = icon;
         _icon.Value.draw(batch, Color.White * 0.9f, 1f);
       },
@@ -286,7 +294,10 @@ internal class LuckOfDay : IDisposable
       // Rewrite the text, but keep the frame/color
       if (ShowExactValue)
       {
-        _hoverText.Value = string.Format(I18n.DailyLuckValue(), Game1.player.DailyLuck.ToString("N3"));
+        _hoverText.Value = string.Format(
+          I18n.DailyLuckValue(),
+          Game1.player.DailyLuck.ToString("N3")
+        );
       }
     }
   }
@@ -311,7 +322,12 @@ internal class LuckOfDay : IDisposable
     {
       return new ClickableTextureComponent(
         "",
-        new Rectangle(Tools.GetWidthInPlayArea() - 134, 290, 10 * Game1.pixelZoom, 10 * Game1.pixelZoom),
+        new Rectangle(
+          Tools.GetWidthInPlayArea() - 134,
+          290,
+          10 * Game1.pixelZoom,
+          10 * Game1.pixelZoom
+        ),
         "",
         "",
         Game1.mouseCursors,

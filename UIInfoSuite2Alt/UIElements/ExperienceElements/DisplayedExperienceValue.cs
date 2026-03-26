@@ -1,6 +1,6 @@
 using System;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
 
 namespace UIInfoSuite2Alt.UIElements.ExperienceElements;
@@ -14,7 +14,12 @@ internal class DisplayedExperienceValue
   private Vector2 _position;
   private int _delayTicks;
 
-  public DisplayedExperienceValue(float experiencePoints, Vector2 position, Color? color = null, int delayTicks = 0)
+  public DisplayedExperienceValue(
+    float experiencePoints,
+    Vector2 position,
+    Color? color = null,
+    int delayTicks = 0
+  )
   {
     _experiencePoints = experiencePoints;
     _position = position;
@@ -43,28 +48,28 @@ internal class DisplayedExperienceValue
 
     // Shadow
     Game1.spriteBatch.DrawString(
-        Game1.smallFont,
-        text,
-        pos + new Vector2(2f, 2f),
-        Color.Black * _alpha,
-        0f,
-        Vector2.Zero,
-        _scale,
-        SpriteEffects.None,
-        1f
+      Game1.smallFont,
+      text,
+      pos + new Vector2(2f, 2f),
+      Color.Black * _alpha,
+      0f,
+      Vector2.Zero,
+      _scale,
+      SpriteEffects.None,
+      1f
     );
 
     // Text
     Game1.spriteBatch.DrawString(
-        Game1.smallFont,
-        text,
-        pos,
-        _color * _alpha,
-        0f,
-        Vector2.Zero,
-        _scale,
-        SpriteEffects.None,
-        1f
+      Game1.smallFont,
+      text,
+      pos,
+      _color * _alpha,
+      0f,
+      Vector2.Zero,
+      _scale,
+      SpriteEffects.None,
+      1f
     );
   }
 }

@@ -8,7 +8,12 @@ using StardewModdingAPI;
 
 namespace UIInfoSuite2Alt.Compatibility;
 
-public class CachedCustomSkillInfo(Texture2D icon, Color barColor, int[] experienceCurve, string displayName)
+public class CachedCustomSkillInfo(
+  Texture2D icon,
+  Color barColor,
+  int[] experienceCurve,
+  string displayName
+)
 {
   public Texture2D Icon { get; } = icon;
   public Color BarColor { get; } = barColor;

@@ -9,16 +9,16 @@ public static class GameMenuHelper
   // Vanilla tab index → BGM tab name mapping
   private static readonly string[] VanillaTabNames =
   {
-    nameof(VanillaTabOrders.Inventory),  // 0
-    nameof(VanillaTabOrders.Skills),     // 1
-    nameof(VanillaTabOrders.Social),     // 2
-    nameof(VanillaTabOrders.Map),        // 3
-    nameof(VanillaTabOrders.Crafting),   // 4
-    nameof(VanillaTabOrders.Animals),    // 5
-    nameof(VanillaTabOrders.Powers),     // 6
-    nameof(VanillaTabOrders.Collections),// 7
-    nameof(VanillaTabOrders.Options),    // 8
-    nameof(VanillaTabOrders.Exit)        // 9
+    nameof(VanillaTabOrders.Inventory), // 0
+    nameof(VanillaTabOrders.Skills), // 1
+    nameof(VanillaTabOrders.Social), // 2
+    nameof(VanillaTabOrders.Map), // 3
+    nameof(VanillaTabOrders.Crafting), // 4
+    nameof(VanillaTabOrders.Animals), // 5
+    nameof(VanillaTabOrders.Powers), // 6
+    nameof(VanillaTabOrders.Collections), // 7
+    nameof(VanillaTabOrders.Options), // 8
+    nameof(VanillaTabOrders.Exit), // 9
   };
 
   public static bool HasBetterGameMenu => GetBgmApi() != null;
@@ -71,7 +71,8 @@ public static class GameMenuHelper
   }
 
   /// <summary>Finds a page of the given type, searching all pages for vanilla or using TryGetPage for BGM.</summary>
-  public static T? FindPage<T>(IClickableMenu? menu) where T : class
+  public static T? FindPage<T>(IClickableMenu? menu)
+    where T : class
   {
     if (menu is GameMenu gameMenu)
     {

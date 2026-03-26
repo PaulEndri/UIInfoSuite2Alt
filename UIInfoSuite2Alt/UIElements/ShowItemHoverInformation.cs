@@ -62,7 +62,12 @@ internal class ShowItemHoverInformation : IDisposable
         $"{GetType().Name}: Could not find Gunther in the game, creating a fake one for ourselves.",
         LogLevel.Warn
       );
-      gunther = new NPC { Name = "Gunther", Age = 0, Sprite = new AnimatedSprite("Characters\\Gunther") };
+      gunther = new NPC
+      {
+        Name = "Gunther",
+        Age = 0,
+        Sprite = new AnimatedSprite("Characters\\Gunther"),
+      };
     }
 
     _museumIcon = new ClickableTextureComponent(
@@ -159,9 +164,11 @@ internal class ShowItemHoverInformation : IDisposable
 
   private void DrawAdvancedTooltip(SpriteBatch spriteBatch)
   {
-    if (_hoverItem.Value != null &&
-        !(_hoverItem.Value is MeleeWeapon weapon && weapon.isScythe()) &&
-        _hoverItem.Value is not FishingRod)
+    if (
+      _hoverItem.Value != null
+      && !(_hoverItem.Value is MeleeWeapon weapon && weapon.isScythe())
+      && _hoverItem.Value is not FishingRod
+    )
     {
       var hoveredObject = _hoverItem.Value as Object;
 
@@ -179,18 +186,21 @@ internal class ShowItemHoverInformation : IDisposable
 
       bool notDonatedToAquarium = AquariumHelper.IsUndonatedAquariumFish(_hoverItem.Value);
 
-      bool notShippedYet = hoveredObject != null &&
-                           hoveredObject.countsForShippedCollection() &&
-                           !Game1.player.basicShipped.ContainsKey(hoveredObject.ItemId) &&
-                           hoveredObject.Type != "Fish" &&
-                           hoveredObject.Category != Object.skillBooksCategory;
+      bool notShippedYet =
+        hoveredObject != null
+        && hoveredObject.countsForShippedCollection()
+        && !Game1.player.basicShipped.ContainsKey(hoveredObject.ItemId)
+        && hoveredObject.Type != "Fish"
+        && hoveredObject.Category != Object.skillBooksCategory;
 
       string? requiredBundleName = null;
       Color? bundleColor = null;
       int bundleId = -1;
       if (hoveredObject != null)
       {
-        BundleRequiredItem? bundleDisplayData = BundleHelper.GetBundleItemIfNotDonated(hoveredObject);
+        BundleRequiredItem? bundleDisplayData = BundleHelper.GetBundleItemIfNotDonated(
+          hoveredObject
+        );
         if (bundleDisplayData != null)
         {
           requiredBundleName = bundleDisplayData.Name;
@@ -198,14 +208,17 @@ internal class ShowItemHoverInformation : IDisposable
 
           if (!_bundleColorCache.TryGetValue(bundleDisplayData.Id, out bundleColor))
           {
-            bundleColor = BundleHelper.GetRealColorFromIndex(bundleDisplayData.Id)?.Desaturate(0.35f);
+            bundleColor = BundleHelper
+              .GetRealColorFromIndex(bundleDisplayData.Id)
+              ?.Desaturate(0.35f);
             _bundleColorCache[bundleDisplayData.Id] = bundleColor;
           }
         }
       }
 
       var drawPositionOffset = new Vector2();
-      int windowWidth, windowHeight;
+      int windowWidth,
+        windowHeight;
 
       var bundleHeaderWidth = 0;
       if (!string.IsNullOrEmpty(requiredBundleName))
@@ -218,7 +231,8 @@ internal class ShowItemHoverInformation : IDisposable
       var cropTextWidth = (int)Game1.smallFont.MeasureString(cropPrice.ToString()).X;
       var minTextWidth = (int)Game1.smallFont.MeasureString("000").X;
       int largestTextWidth =
-        76 + Math.Max(minTextWidth, Math.Max(stackTextWidth, Math.Max(itemTextWidth, cropTextWidth)));
+        76
+        + Math.Max(minTextWidth, Math.Max(stackTextWidth, Math.Max(itemTextWidth, cropTextWidth)));
       windowWidth = Math.Max(bundleHeaderWidth, largestTextWidth);
 
       windowHeight = 20 + 16;
@@ -251,10 +265,12 @@ internal class ShowItemHoverInformation : IDisposable
       int windowX = Game1.getMouseX() - 25 - windowWidth;
 
       // Avoid overlapping Ferngill Simple Economy tooltip
-      if (hoveredObject != null &&
-          ApiManager.GetApi(ModCompat.FerngillEconomy, out IFerngillSimpleEconomyApi? fseApi) &&
-          fseApi.IsLoaded() &&
-          fseApi.ItemIsInEconomy(hoveredObject))
+      if (
+        hoveredObject != null
+        && ApiManager.GetApi(ModCompat.FerngillEconomy, out IFerngillSimpleEconomyApi? fseApi)
+        && fseApi.IsLoaded()
+        && fseApi.ItemIsInEconomy(hoveredObject)
+      )
       {
         windowX -= 270;
       }
@@ -284,13 +300,15 @@ internal class ShowItemHoverInformation : IDisposable
       var iconCenterOffset = new Vector2(16, 20);
       var textOffset = new Vector2(32 + 4, (rowHeight - 18) / 2 - 6);
 
-      if (itemPrice > 0 ||
-          stackPrice > 0 ||
-          cropPrice > 0 ||
-          !string.IsNullOrEmpty(requiredBundleName) ||
-          notDonatedYet ||
-          notDonatedToAquarium ||
-          notShippedYet)
+      if (
+        itemPrice > 0
+        || stackPrice > 0
+        || cropPrice > 0
+        || !string.IsNullOrEmpty(requiredBundleName)
+        || notDonatedYet
+        || notDonatedToAquarium
+        || notShippedYet
+      )
       {
         IClickableMenu.drawTextureBox(
           spriteBatch,
@@ -404,14 +422,25 @@ internal class ShowItemHoverInformation : IDisposable
       if (!string.IsNullOrEmpty(requiredBundleName))
       {
         // Bundle icon + banner
-        DrawBundleBanner(spriteBatch, requiredBundleName, bundleId, windowPos + new Vector2(-7, -17), windowWidth, bundleColor);
+        DrawBundleBanner(
+          spriteBatch,
+          requiredBundleName,
+          bundleId,
+          windowPos + new Vector2(-7, -17),
+          windowWidth,
+          bundleColor
+        );
       }
 
       if (notShippedYet)
       {
         // Shipping bin icon
         var shippingBinDims = new Vector2(30, 24);
-        DrawShippingBin(spriteBatch, windowPos + new Vector2(windowWidth - 6, 8), shippingBinDims / 2);
+        DrawShippingBin(
+          spriteBatch,
+          windowPos + new Vector2(windowWidth - 6, 8),
+          shippingBinDims / 2
+        );
       }
     }
   }
@@ -440,7 +469,8 @@ internal class ShowItemHoverInformation : IDisposable
     int cellWidth = windowWidth / cellCount;
     for (var cell = 0; cell < cellCount; ++cell)
     {
-      float fadeAmount = 0.97f - (cell < solidCells ? 0 : 1.0f * (cell - solidCells) / (cellCount - solidCells));
+      float fadeAmount =
+        0.97f - (cell < solidCells ? 0 : 1.0f * (cell - solidCells) / (cellCount - solidCells));
       spriteBatch.Draw(
         Game1.staminaRect,
         new Rectangle(bundleBannerX + cell * cellWidth, bundleBannerY, cellWidth, 36),
@@ -458,8 +488,16 @@ internal class ShowItemHoverInformation : IDisposable
       var iconPos = new Point((int)position.X, (int)position.Y - 3);
 
       // filled rectangle behind the icon acts as a 2px border in bundle color and 1px shadow border
-      spriteBatch.Draw(Game1.staminaRect, new Rectangle(iconPos.X - 2, iconPos.Y - 2, iconSize + 4, iconSize + 4), drawColor);
-      spriteBatch.Draw(Game1.staminaRect, new Rectangle(iconPos.X - 1, iconPos.Y - 1, iconSize + 2, iconSize + 2), Color.Black * 0.3f);
+      spriteBatch.Draw(
+        Game1.staminaRect,
+        new Rectangle(iconPos.X - 2, iconPos.Y - 2, iconSize + 4, iconSize + 4),
+        drawColor
+      );
+      spriteBatch.Draw(
+        Game1.staminaRect,
+        new Rectangle(iconPos.X - 1, iconPos.Y - 1, iconSize + 2, iconSize + 2),
+        Color.Black * 0.3f
+      );
 
       spriteBatch.Draw(
         texture,
@@ -478,8 +516,26 @@ internal class ShowItemHoverInformation : IDisposable
       int ccIconH = 11;
       Rectangle ccIconRect = new(332, 375, ccIconW, ccIconH);
 
-      spriteBatch.Draw(Game1.staminaRect, new Rectangle(iconPos.X + iconSize - ccIconW, iconPos.Y + iconSize - ccIconH, ccIconW, ccIconH), drawColor);
-      spriteBatch.Draw(Game1.staminaRect, new Rectangle(iconPos.X + iconSize - ccIconW, iconPos.Y + iconSize - ccIconH, ccIconW, ccIconH), Color.Black * 0.3f);
+      spriteBatch.Draw(
+        Game1.staminaRect,
+        new Rectangle(
+          iconPos.X + iconSize - ccIconW,
+          iconPos.Y + iconSize - ccIconH,
+          ccIconW,
+          ccIconH
+        ),
+        drawColor
+      );
+      spriteBatch.Draw(
+        Game1.staminaRect,
+        new Rectangle(
+          iconPos.X + iconSize - ccIconW,
+          iconPos.Y + iconSize - ccIconH,
+          ccIconW,
+          ccIconH
+        ),
+        Color.Black * 0.3f
+      );
 
       spriteBatch.Draw(
         Game1.mouseCursors,

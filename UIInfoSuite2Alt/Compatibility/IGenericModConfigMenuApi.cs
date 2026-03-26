@@ -27,7 +27,6 @@ public interface IGenericModConfigMenuApi
   /// </remarks>
   void Register(IManifest mod, Action reset, Action save, bool titleScreenOnly = false);
 
-
   /****
    ** Basic options
    ****/
@@ -212,7 +211,6 @@ public interface IGenericModConfigMenuApi
     string? fieldId = null
   );
 
-
   /****
    ** Multi-page management
    ****/
@@ -235,7 +233,6 @@ public interface IGenericModConfigMenuApi
   /// <param name="text">The link text shown in the form.</param>
   /// <param name="tooltip">The tooltip text shown when the cursor hovers on the link, or <c>null</c> to disable the tooltip.</param>
   void AddPageLink(IManifest mod, string pageId, Func<string> text, Func<string>? tooltip = null);
-
 
   /****
    ** Advanced

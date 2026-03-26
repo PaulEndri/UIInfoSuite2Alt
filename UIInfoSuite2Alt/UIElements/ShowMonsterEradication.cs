@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using StardewValley;
-using StardewValley.Menus;
 using StardewValley.GameData;
+using StardewValley.Menus;
 using StardewValley.TokenizableStrings;
 
 namespace UIInfoSuite2Alt.UIElements;

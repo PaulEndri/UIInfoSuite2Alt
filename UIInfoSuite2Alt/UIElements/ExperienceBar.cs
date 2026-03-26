@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Enums;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Locations;
-using StardewValley.Tools;
-using Microsoft.Xna.Framework.Graphics;
 using StardewValley.Menus;
+using StardewValley.Tools;
 using UIInfoSuite2Alt.Compatibility;
 using UIInfoSuite2Alt.Infrastructure;
 using UIInfoSuite2Alt.UIElements.ExperienceElements;
@@ -26,13 +26,17 @@ public partial class ExperienceBar : IDisposable
   private readonly PerScreen<int> _experienceFromPreviousLevels = new(() => -1);
   private readonly PerScreen<int> _experienceEarnedThisLevel = new(() => -1);
 
-  private readonly PerScreen<DisplayedExperienceBar> _displayedExperienceBar = new(() => new DisplayedExperienceBar());
+  private readonly PerScreen<DisplayedExperienceBar> _displayedExperienceBar = new(() =>
+    new DisplayedExperienceBar()
+  );
 
-  private readonly PerScreen<DisplayedLevelUpMessage> _displayedLevelUpMessage =
-    new(() => new DisplayedLevelUpMessage());
+  private readonly PerScreen<DisplayedLevelUpMessage> _displayedLevelUpMessage = new(() =>
+    new DisplayedLevelUpMessage()
+  );
 
-  private readonly PerScreen<List<DisplayedExperienceValue>> _displayedExperienceValues =
-    new(() => []);
+  private readonly PerScreen<List<DisplayedExperienceValue>> _displayedExperienceValues = new(() =>
+    []
+  );
 
   private const int LevelUpVisibleTicks = 120;
   private readonly PerScreen<int> _levelUpVisibleTimer = new();
@@ -46,7 +50,7 @@ public partial class ExperienceBar : IDisposable
     { SkillType.Foraging, new Rectangle(60, 428, 10, 10) },
     { SkillType.Mining, new Rectangle(30, 428, 10, 10) },
     { SkillType.Combat, new Rectangle(120, 428, 10, 10) },
-    { SkillType.Luck, new Rectangle(50, 428, 10, 10) }
+    { SkillType.Luck, new Rectangle(50, 428, 10, 10) },
   };
 
   private static readonly Dictionary<SkillType, Color> ExperienceFillColor = new()
@@ -56,7 +60,7 @@ public partial class ExperienceBar : IDisposable
     { SkillType.Foraging, new Color(0, 234, 0, 0.63f) },
     { SkillType.Mining, new Color(145, 104, 63, 0.63f) },
     { SkillType.Combat, new Color(204, 0, 3, 0.63f) },
-    { SkillType.Luck, new Color(232, 223, 42, 0.63f) }
+    { SkillType.Luck, new Color(232, 223, 42, 0.63f) },
   };
 
   private readonly PerScreen<int> _previousMasteryExperience = new();
@@ -65,10 +69,16 @@ public partial class ExperienceBar : IDisposable
   private static readonly Color MasteryFillColor = new(60 / 255f, 180 / 255f, 80 / 255f, 0.63f);
   private static readonly Rectangle MasteryIconRectangle = new(457, 298, 11, 11);
 
-  private readonly PerScreen<Rectangle> _experienceIconRectangle = new(() => SkillIconRectangles[SkillType.Farming]);
+  private readonly PerScreen<Rectangle> _experienceIconRectangle = new(() =>
+    SkillIconRectangles[SkillType.Farming]
+  );
 
-  private readonly PerScreen<Rectangle> _levelUpIconRectangle = new(() => SkillIconRectangles[SkillType.Farming]);
-  private readonly PerScreen<Color> _experienceFillColor = new(() => ExperienceFillColor[SkillType.Farming]);
+  private readonly PerScreen<Rectangle> _levelUpIconRectangle = new(() =>
+    SkillIconRectangles[SkillType.Farming]
+  );
+  private readonly PerScreen<Color> _experienceFillColor = new(() =>
+    ExperienceFillColor[SkillType.Farming]
+  );
 
   private bool ExperienceBarFadeoutEnabled { get; set; } = true;
   private bool ExperienceGainTextEnabled { get; set; } = true;
@@ -113,7 +123,9 @@ public partial class ExperienceBar : IDisposable
 
     if (_helper.ModRegistry.IsLoaded(ModCompat.VanillaPlusProfessions))
     {
-      _vppApi = _helper.ModRegistry.GetApi<IVanillaPlusProfessions>(ModCompat.VanillaPlusProfessions);
+      _vppApi = _helper.ModRegistry.GetApi<IVanillaPlusProfessions>(
+        ModCompat.VanillaPlusProfessions
+      );
     }
   }
 
@@ -137,7 +149,12 @@ public partial class ExperienceBar : IDisposable
     ExperienceGainTextEnabled = experienceGainTextEnabled;
     LevelUpAnimationEnabled = levelUpAnimationEnabled;
 
-    if (ExperienceBarEnabled || ExperienceBarFadeoutEnabled || ExperienceGainTextEnabled || LevelUpAnimationEnabled)
+    if (
+      ExperienceBarEnabled
+      || ExperienceBarFadeoutEnabled
+      || ExperienceGainTextEnabled
+      || LevelUpAnimationEnabled
+    )
     {
       _helper.Events.Display.RenderingHud += OnRenderingHud;
       _helper.Events.Player.Warped += OnWarped;
@@ -158,24 +175,45 @@ public partial class ExperienceBar : IDisposable
 
   public void ToggleShowExperienceBar(bool experienceBarEnabled)
   {
-    ToggleOption(experienceBarEnabled, ExperienceBarFadeoutEnabled, ExperienceGainTextEnabled, LevelUpAnimationEnabled);
+    ToggleOption(
+      experienceBarEnabled,
+      ExperienceBarFadeoutEnabled,
+      ExperienceGainTextEnabled,
+      LevelUpAnimationEnabled
+    );
   }
 
   public void ToggleExperienceBarFade(bool experienceBarFadeoutEnabled)
   {
-    ToggleOption(ExperienceBarEnabled, experienceBarFadeoutEnabled, ExperienceGainTextEnabled, LevelUpAnimationEnabled);
+    ToggleOption(
+      ExperienceBarEnabled,
+      experienceBarFadeoutEnabled,
+      ExperienceGainTextEnabled,
+      LevelUpAnimationEnabled
+    );
   }
 
   public void ToggleShowExperienceGain(bool experienceGainTextEnabled)
   {
     InitializeExperiencePoints();
-    ToggleOption(ExperienceBarEnabled, ExperienceBarFadeoutEnabled, experienceGainTextEnabled, LevelUpAnimationEnabled);
+    ToggleOption(
+      ExperienceBarEnabled,
+      ExperienceBarFadeoutEnabled,
+      experienceGainTextEnabled,
+      LevelUpAnimationEnabled
+    );
   }
 
   public void ToggleLevelUpAnimation(bool levelUpAnimationEnabled)
   {
-    ToggleOption(ExperienceBarEnabled, ExperienceBarFadeoutEnabled, ExperienceGainTextEnabled, levelUpAnimationEnabled);
+    ToggleOption(
+      ExperienceBarEnabled,
+      ExperienceBarFadeoutEnabled,
+      ExperienceGainTextEnabled,
+      levelUpAnimationEnabled
+    );
   }
+
   public void Dispose()
   {
     ToggleOption(false, false, false, false);
@@ -352,17 +390,18 @@ public partial class ExperienceBar : IDisposable
     }
 
     // Primary experience bar
-    if (ExperienceBarEnabled &&
-        (_experienceBarVisibleTimer.Value != 0 || !ExperienceBarFadeoutEnabled) &&
-        _experienceRequiredToLevel.Value > 0)
+    if (
+      ExperienceBarEnabled
+      && (_experienceBarVisibleTimer.Value != 0 || !ExperienceBarFadeoutEnabled)
+      && _experienceRequiredToLevel.Value > 0
+    )
     {
       Texture2D? barIconTexture = _isMasteryActive.Value
         ? Game1.mouseCursors_1_6
         : _customSkillIconTexture.Value;
 
-      float comboAlpha = _comboTimer.Value > ComboFadeTicks
-        ? 1f
-        : _comboTimer.Value / (float)ComboFadeTicks;
+      float comboAlpha =
+        _comboTimer.Value > ComboFadeTicks ? 1f : _comboTimer.Value / (float)ComboFadeTicks;
 
       _displayedExperienceBar.Value.Draw(
         _experienceFillColor.Value,
@@ -386,9 +425,8 @@ public partial class ExperienceBar : IDisposable
       ExperienceBarState bar = _secondaryBars.Value[i];
       if (bar.VisibleTimer > 0 || !ExperienceBarFadeoutEnabled)
       {
-        float barComboAlpha = bar.ComboTimer > ComboFadeTicks
-          ? 1f
-          : bar.ComboTimer / (float)ComboFadeTicks;
+        float barComboAlpha =
+          bar.ComboTimer > ComboFadeTicks ? 1f : bar.ComboTimer / (float)ComboFadeTicks;
 
         _displayedExperienceBar.Value.Draw(
           bar.FillColor,
@@ -436,10 +474,14 @@ public partial class ExperienceBar : IDisposable
 
     foreach (string skillId in _spaceCoreApi.GetCustomSkills())
     {
-      _currentCustomExperience.Value[skillId] =
-        _spaceCoreApi.GetExperienceForCustomSkill(Game1.player, skillId);
-      _currentCustomLevels.Value[skillId] =
-        _spaceCoreApi.GetLevelForCustomSkill(Game1.player, skillId);
+      _currentCustomExperience.Value[skillId] = _spaceCoreApi.GetExperienceForCustomSkill(
+        Game1.player,
+        skillId
+      );
+      _currentCustomLevels.Value[skillId] = _spaceCoreApi.GetLevelForCustomSkill(
+        Game1.player,
+        skillId
+      );
     }
   }
 
@@ -466,8 +508,9 @@ public partial class ExperienceBar : IDisposable
       FishingRod => (int)SkillType.Fishing,
       Pickaxe => (int)SkillType.Mining,
       MeleeWeapon weapon when weapon.Name != "Scythe" => (int)SkillType.Combat,
-      _ when Game1.currentLocation is Farm or FarmHouse && currentItem is not Axe => (int)SkillType.Farming,
-      _ => (int)SkillType.Foraging
+      _ when Game1.currentLocation is Farm or FarmHouse && currentItem is not Axe => (int)
+        SkillType.Farming,
+      _ => (int)SkillType.Foraging,
     };
   }
 
@@ -492,14 +535,20 @@ public partial class ExperienceBar : IDisposable
     _currentSkillLevel.Value = Game1.player.GetUnmodifiedSkillLevel(currentLevelIndex);
 
     _experienceRequiredToLevel.Value = GetExperienceRequiredToLevel(_currentSkillLevel.Value);
-    _experienceFromPreviousLevels.Value = GetExperienceRequiredToLevel(_currentSkillLevel.Value - 1);
+    _experienceFromPreviousLevels.Value = GetExperienceRequiredToLevel(
+      _currentSkillLevel.Value - 1
+    );
     _experienceEarnedThisLevel.Value =
       Game1.player.experiencePoints[currentLevelIndex] - _experienceFromPreviousLevels.Value;
 
     // Mastery experience bar when skill is maxed and all skills meet the required level
     _isMasteryActive.Value = false;
     int masteryMinLevel = _vppApi?.MasteryCaveChanges ?? 10;
-    if (_experienceRequiredToLevel.Value <= 0 && _currentSkillLevel.Value >= masteryMinLevel && IsMasteryUnlocked())
+    if (
+      _experienceRequiredToLevel.Value <= 0
+      && _currentSkillLevel.Value >= masteryMinLevel
+      && IsMasteryUnlocked()
+    )
     {
       int currentMasteryLevel = MasteryTrackerMenu.getCurrentMasteryLevel();
       if (currentMasteryLevel < 5)
@@ -507,8 +556,12 @@ public partial class ExperienceBar : IDisposable
         _isMasteryActive.Value = true;
         _experienceIconRectangle.Value = MasteryIconRectangle;
         _experienceFillColor.Value = MasteryFillColor;
-        _experienceFromPreviousLevels.Value = MasteryTrackerMenu.getMasteryExpNeededForLevel(currentMasteryLevel);
-        _experienceRequiredToLevel.Value = MasteryTrackerMenu.getMasteryExpNeededForLevel(currentMasteryLevel + 1);
+        _experienceFromPreviousLevels.Value = MasteryTrackerMenu.getMasteryExpNeededForLevel(
+          currentMasteryLevel
+        );
+        _experienceRequiredToLevel.Value = MasteryTrackerMenu.getMasteryExpNeededForLevel(
+          currentMasteryLevel + 1
+        );
         _experienceEarnedThisLevel.Value =
           (int)Game1.stats.Get("MasteryExp") - _experienceFromPreviousLevels.Value;
         _currentSkillLevel.Value = currentMasteryLevel;
@@ -555,12 +608,17 @@ public partial class ExperienceBar : IDisposable
           _accumulatedExperience.Value += experienceGain;
           _comboTimer.Value = ComboVisibleTicks;
           _displayedExperienceValues.Value.Add(
-            new DisplayedExperienceValue(experienceGain, Game1.player.getLocalPosition(Game1.viewport))
+            new DisplayedExperienceValue(
+              experienceGain,
+              Game1.player.getLocalPosition(Game1.viewport)
+            )
           );
         }
       }
 
-      _currentExperience.Value[currentLevelIndex] = Game1.player.experiencePoints[currentLevelIndex];
+      _currentExperience.Value[currentLevelIndex] = Game1.player.experiencePoints[
+        currentLevelIndex
+      ];
 
       if (_isMasteryActive.Value)
       {
@@ -617,9 +675,11 @@ public partial class ExperienceBar : IDisposable
     int currentXp = _spaceCoreApi.GetExperienceForCustomSkill(Game1.player, skillId);
 
     // Level-up detection
-    if (LevelUpAnimationEnabled &&
-        _currentCustomLevels.Value.TryGetValue(skillId, out int prevLevel) &&
-        currentLevel > prevLevel)
+    if (
+      LevelUpAnimationEnabled
+      && _currentCustomLevels.Value.TryGetValue(skillId, out int prevLevel)
+      && currentLevel > prevLevel
+    )
     {
       _levelUpVisibleTimer.Value = LevelUpVisibleTicks;
       _customSkillIconTexture.Value = info.Icon;
@@ -665,7 +725,11 @@ public partial class ExperienceBar : IDisposable
         _accumulatedExperience.Value += gain;
         _comboTimer.Value = ComboVisibleTicks;
         _displayedExperienceValues.Value.Add(
-          new DisplayedExperienceValue(gain, Game1.player.getLocalPosition(Game1.viewport), info.BarColor)
+          new DisplayedExperienceValue(
+            gain,
+            Game1.player.getLocalPosition(Game1.viewport),
+            info.BarColor
+          )
         );
       }
     }
@@ -694,9 +758,11 @@ public partial class ExperienceBar : IDisposable
     }
 
     // Level-up detection
-    if (LevelUpAnimationEnabled &&
-        _currentCustomLevels.Value.TryGetValue(skillId, out int prevLevel) &&
-        currentLevel > prevLevel)
+    if (
+      LevelUpAnimationEnabled
+      && _currentCustomLevels.Value.TryGetValue(skillId, out int prevLevel)
+      && currentLevel > prevLevel
+    )
     {
       _levelUpVisibleTimer.Value = LevelUpVisibleTicks;
       _customSkillIconTexture.Value = info.Icon;
@@ -713,7 +779,12 @@ public partial class ExperienceBar : IDisposable
       if (gain > 0)
       {
         _displayedExperienceValues.Value.Add(
-          new DisplayedExperienceValue(gain, Game1.player.getLocalPosition(Game1.viewport), info.BarColor, delayTicks)
+          new DisplayedExperienceValue(
+            gain,
+            Game1.player.getLocalPosition(Game1.viewport),
+            info.BarColor,
+            delayTicks
+          )
         );
       }
     }
@@ -769,10 +840,10 @@ public partial class ExperienceBar : IDisposable
   {
     int maxLevel = _vppApi?.MasteryCaveChanges ?? 10;
     return Game1.player.farmingLevel.Value >= maxLevel
-        && Game1.player.fishingLevel.Value >= maxLevel
-        && Game1.player.foragingLevel.Value >= maxLevel
-        && Game1.player.miningLevel.Value >= maxLevel
-        && Game1.player.combatLevel.Value >= maxLevel;
+      && Game1.player.fishingLevel.Value >= maxLevel
+      && Game1.player.foragingLevel.Value >= maxLevel
+      && Game1.player.miningLevel.Value >= maxLevel
+      && Game1.player.combatLevel.Value >= maxLevel;
   }
 
   /// <summary>Returns pixel offset for vanilla HUD notifications when experience bars are visible.</summary>
@@ -795,7 +866,7 @@ public partial class ExperienceBar : IDisposable
       7 => 6900,
       8 => 10000,
       9 => 15000,
-      _ => GetVppExperienceRequiredToLevel(currentLevel)
+      _ => GetVppExperienceRequiredToLevel(currentLevel),
     };
   }
 

@@ -54,7 +54,14 @@ internal class ShowQuestCount : IDisposable
     }
 
     Rectangle bounds = Game1.dayTimeMoneyBox.questButton.bounds;
-    GetPositionAndSize(bounds, questCount, out float centerX, out float y, out int bgWidth, out int bgHeight);
+    GetPositionAndSize(
+      bounds,
+      questCount,
+      out float centerX,
+      out float y,
+      out int bgWidth,
+      out int bgHeight
+    );
 
     // Draw background
     var bgDest = new Rectangle(
@@ -87,13 +94,17 @@ internal class ShowQuestCount : IDisposable
   private static int GetVisibleQuestCount()
   {
     return Game1.player.questLog.Count(q => q != null && !q.IsHidden())
-           + Game1.player.team.specialOrders.Count(so => !so.IsHidden());
+      + Game1.player.team.specialOrders.Count(so => !so.IsHidden());
   }
 
   private static void GetPositionAndSize(
-    Rectangle bounds, int questCount,
-    out float centerX, out float y,
-    out int bgWidth, out int bgHeight)
+    Rectangle bounds,
+    int questCount,
+    out float centerX,
+    out float y,
+    out int bgWidth,
+    out int bgHeight
+  )
   {
     int scaledWidth = Utility.getWidthOfTinyDigitString(questCount, DigitScale);
     int scaledHeight = (int)(7f * DigitScale); // tinyDigits are 5x7px

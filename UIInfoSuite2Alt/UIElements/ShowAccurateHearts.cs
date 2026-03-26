@@ -16,11 +16,11 @@ internal class ShowAccurateHearts : IDisposable
   // @formatter:off
   private readonly int[][] _numArray =
   [
-      [1, 1, 0, 1, 1],
-      [1, 1, 1, 1, 1],
-      [0, 1, 1, 1, 0],
-      [0, 0, 1, 0, 0]
-    ];
+    [1, 1, 0, 1, 1],
+    [1, 1, 1, 1, 1],
+    [0, 1, 1, 1, 0],
+    [0, 0, 1, 0, 0],
+  ];
   // @formatter:on
   #endregion
 
@@ -99,13 +99,19 @@ internal class ShowAccurateHearts : IDisposable
 
     var yOffset = 0;
 
-    for (int i = _socialPage.slotPosition; i < _socialPage.slotPosition + 5 && i < _socialPage.SocialEntries.Count; ++i)
+    for (
+      int i = _socialPage.slotPosition;
+      i < _socialPage.slotPosition + 5 && i < _socialPage.SocialEntries.Count;
+      ++i
+    )
     {
       string internalName = _socialPage.SocialEntries[i].InternalName;
-      if (Game1.player.friendshipData.TryGetValue(internalName, out Friendship friendshipValues) &&
-          friendshipValues.Points > 0 &&
-          friendshipValues.Points <
-          Utility.GetMaximumHeartsForCharacter(Game1.getCharacterFromName(internalName)) * 250)
+      if (
+        Game1.player.friendshipData.TryGetValue(internalName, out Friendship friendshipValues)
+        && friendshipValues.Points > 0
+        && friendshipValues.Points
+          < Utility.GetMaximumHeartsForCharacter(Game1.getCharacterFromName(internalName)) * 250
+      )
       {
         int pointsToNextHeart = friendshipValues.Points % 250;
         int numHearts = friendshipValues.Points / 250;

@@ -21,5 +21,4 @@ public static class CollectionExtensions
   {
     return dictionary.TryGetValue(key, out TValue? foundDictValue) ? foundDictValue : defaultValue;
   }
-
 }

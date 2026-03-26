@@ -14,7 +14,8 @@ public class ModConfig
   public KeybindList ShowOneRange { get; set; } = KeybindList.ForSingle(SButton.LeftControl);
   public KeybindList ShowAllRange { get; set; } = KeybindList.Parse("LeftControl + LeftAlt");
   public KeybindList OpenModOptionsKeybind { get; set; } = KeybindList.ForSingle(SButton.F8);
-  public KeybindList OpenMonsterEradicationKeybind { get; set; } = KeybindList.ForSingle(SButton.F9);
+  public KeybindList OpenMonsterEradicationKeybind { get; set; } =
+    KeybindList.ForSingle(SButton.F9);
 
   // --- Feature toggles (migrated from per-save ModOptions) ---
   public bool AllowExperienceBarToFadeOut { get; set; } = true;
@@ -33,7 +34,8 @@ public class ModConfig
   public bool ShowFishPondTooltip { get; set; } = true;
   public int MachineProcessingIconsMode { get; set; } = 1;
   public bool MachineProcessingIconsVisible { get; set; } = true;
-  public KeybindList ToggleMachineProcessingIcons { get; set; } = KeybindList.ForSingle(SButton.F10);
+  public KeybindList ToggleMachineProcessingIcons { get; set; } =
+    KeybindList.ForSingle(SButton.F10);
   public bool ShowFishPondIcons { get; set; } = false;
   public bool ShowBirthdayIcon { get; set; } = true;
   public bool ShowAnimalsNeedPets { get; set; } = true;
@@ -74,18 +76,19 @@ public class ModConfig
   public bool PlayBuffExpireSound { get; set; } = true;
   public bool ShowCustomIcons { get; set; } = true;
   public Dictionary<string, bool> ShowLocationOfFriends { get; set; } = new();
-  public Dictionary<string, int> IconOrder { get; set; } = new()
-  {
-    { "Luck", 1 },
-    { "Weather", 2 },
-    { "Birthday", 3 },
-    { "Festival", 4 },
-    { "QueenOfSauce", 5 },
-    { "ToolUpgrade", 6 },
-    { "RobinBuilding", 7 },
-    { "SeasonalBerry", 8 },
-    { "TravelingMerchant", 9 },
-    { "Bookseller", 10 },
-    { "CustomIcons", 11 }
-  };
+  public Dictionary<string, int> IconOrder { get; set; } =
+    new()
+    {
+      { "Luck", 1 },
+      { "Weather", 2 },
+      { "Birthday", 3 },
+      { "Festival", 4 },
+      { "QueenOfSauce", 5 },
+      { "ToolUpgrade", 6 },
+      { "RobinBuilding", 7 },
+      { "SeasonalBerry", 8 },
+      { "TravelingMerchant", 9 },
+      { "Bookseller", 10 },
+      { "CustomIcons", 11 },
+    };
 }

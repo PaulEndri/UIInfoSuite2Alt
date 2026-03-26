@@ -21,7 +21,8 @@ internal class ModOptionsCheckbox : ModOptionsElement
     Func<bool> getOption,
     Action<bool> setOption,
     ModOptionsCheckbox? parent = null
-  ) : base(label, whichOption, parent)
+  )
+    : base(label, whichOption, parent)
   {
     _toggleOptionsDelegate = toggleOptionDelegate;
     _setOption = setOption;
@@ -30,7 +31,8 @@ internal class ModOptionsCheckbox : ModOptionsElement
     _toggleOptionsDelegate(_isChecked);
   }
 
-  private bool _canClick => _parent is not ModOptionsCheckbox parentCheckbox || parentCheckbox._isChecked;
+  private bool _canClick =>
+    _parent is not ModOptionsCheckbox parentCheckbox || parentCheckbox._isChecked;
 
   public override void ReceiveLeftClick(int x, int y)
   {

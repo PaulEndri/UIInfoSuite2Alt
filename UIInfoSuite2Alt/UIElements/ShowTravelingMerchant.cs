@@ -161,7 +161,9 @@ public class ShowTravelingMerchant : IDisposable
         "TravelingMerchant",
         (batch, pos) =>
         {
-          bool useRsvIcon = _rsvMerchantIsHere && (!_rsvMerchantIsVisited || !HideWhenVisited)
+          bool useRsvIcon =
+            _rsvMerchantIsHere
+            && (!_rsvMerchantIsVisited || !HideWhenVisited)
             && (!_travelingMerchantIsHere || _travelingMerchantIsVisited);
           Texture2D iconTexture = useRsvIcon ? GetRsvIconTexture() : _merchantTexture;
           var iconSource = new Rectangle(0, 0, _merchantTexture.Width, _merchantTexture.Height);
@@ -182,7 +184,8 @@ public class ShowTravelingMerchant : IDisposable
 
             if (_bundlePulseTimer > 0)
             {
-              float pulseScale = 1f / (Math.Max(300f, Math.Abs(_bundlePulseTimer % 1000 - 500)) / 500f);
+              float pulseScale =
+                1f / (Math.Max(300f, Math.Abs(_bundlePulseTimer % 1000 - 500)) / 500f);
               scale = baseScale * pulseScale;
               if (pulseScale > 1f)
               {
@@ -251,7 +254,9 @@ public class ShowTravelingMerchant : IDisposable
   #region Logic
   private void UpdateTravelingMerchant()
   {
-    _travelingMerchantIsHere = ((Forest)Game1.getLocationFromName(nameof(Forest))).ShouldTravelingMerchantVisitToday();
+    _travelingMerchantIsHere = (
+      (Forest)Game1.getLocationFromName(nameof(Forest))
+    ).ShouldTravelingMerchantVisitToday();
     _travelingMerchantIsVisited = false;
     _merchantHasBundleItems = false;
     _bundleItemNames.Clear();
@@ -284,14 +289,18 @@ public class ShowTravelingMerchant : IDisposable
     }
     catch (Exception e)
     {
-      ModEntry.MonitorObject.Log("Failed to check merchant stock for bundle items: " + e.Message, LogLevel.Warn);
+      ModEntry.MonitorObject.Log(
+        "Failed to check merchant stock for bundle items: " + e.Message,
+        LogLevel.Warn
+      );
       _merchantHasBundleItems = false;
     }
   }
 
   private bool ShouldDrawIcon()
   {
-    bool vanillaVisible = _travelingMerchantIsHere && (!_travelingMerchantIsVisited || !HideWhenVisited);
+    bool vanillaVisible =
+      _travelingMerchantIsHere && (!_travelingMerchantIsVisited || !HideWhenVisited);
     bool rsvVisible = _rsvMerchantIsHere && (!_rsvMerchantIsVisited || !HideWhenVisited);
     return vanillaVisible || rsvVisible;
   }
@@ -311,7 +320,11 @@ public class ShowTravelingMerchant : IDisposable
         }
       }
 
-      _rsvIconTexture = new Texture2D(Game1.graphics.GraphicsDevice, _merchantTexture.Width, _merchantTexture.Height);
+      _rsvIconTexture = new Texture2D(
+        Game1.graphics.GraphicsDevice,
+        _merchantTexture.Width,
+        _merchantTexture.Height
+      );
       _rsvIconTexture.SetData(pixels);
     }
 

@@ -15,7 +15,13 @@ namespace UIInfoSuite2Alt.Infrastructure.Helpers;
 // Maps qualified item ID (or category string) -> list of [bundleIdx, quantity, quality]
 using BundleIngredientsCache = Dictionary<string, List<List<int>>>;
 
-public record BundleRequiredItem(string Name, int BannerWidth, int Id, string QualifiedId, int Quality);
+public record BundleRequiredItem(
+  string Name,
+  int BannerWidth,
+  int Id,
+  string QualifiedId,
+  int Quality
+);
 
 public record BundleKeyData(string Name, int Color, string TexturePath, int SpriteIndex);
 
@@ -113,8 +119,13 @@ internal static class BundleHelper
       }
     }
 
-    if (donatedItem.Category >= 0 ||
-        !AllBundleIngredients.TryGetValue(donatedItem.Category.ToString(), out bundleRequiredItemsList))
+    if (
+      donatedItem.Category >= 0
+      || !AllBundleIngredients.TryGetValue(
+        donatedItem.Category.ToString(),
+        out bundleRequiredItemsList
+      )
+    )
     {
       return null;
     }
@@ -123,7 +134,10 @@ internal static class BundleHelper
     return output;
   }
 
-  private static BundleRequiredItem? GetBundleItemIfNotDonatedFromList(List<List<int>>? lists, ISalable obj)
+  private static BundleRequiredItem? GetBundleItemIfNotDonatedFromList(
+    List<List<int>>? lists,
+    ISalable obj
+  )
   {
     if (lists == null)
     {
@@ -171,8 +185,10 @@ internal static class BundleHelper
     AllBundleIngredients.Clear();
 
     Dictionary<string, string> bundleData = Game1.netWorldState.Value.BundleData;
-    Dictionary<int, bool[]> donationStatus = Game1.netWorldState.Value.Bundles.Pairs
-      .ToDictionary(kvp => kvp.Key, kvp => kvp.Value.ToArray());
+    Dictionary<int, bool[]> donationStatus = Game1.netWorldState.Value.Bundles.Pairs.ToDictionary(
+      kvp => kvp.Key,
+      kvp => kvp.Value.ToArray()
+    );
 
     foreach (KeyValuePair<string, string> bundleInfo in bundleData)
     {
@@ -203,7 +219,12 @@ internal static class BundleHelper
           }
         }
 
-        BundleIdToBundleKeyDataMap[bundleIdx] = new BundleKeyData(localizedName, color, texturePath, spriteIndex);
+        BundleIdToBundleKeyDataMap[bundleIdx] = new BundleKeyData(
+          localizedName,
+          color,
+          texturePath,
+          spriteIndex
+        );
 
         // Populate ingredients cache for all undonated items (no area-unlock filter)
         string[] itemEntries = ArgUtility.SplitBySpace(bundleContentsData[2]);

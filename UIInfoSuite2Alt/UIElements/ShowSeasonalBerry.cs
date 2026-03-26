@@ -63,13 +63,10 @@ internal class ShowSeasonalBerry : IDisposable
 
     if (season == "spring" && day is >= 15 and <= 18)
       AddIcon("SeasonalBerry", new Rectangle(128, 193, 15, 15), I18n.CanFindSalmonberry(), 8 / 3f);
-
     else if (season == "summer" && day is >= 12 and <= 14)
       AddIcon("SeasonalBerry", new Rectangle(144, 256, 16, 16), I18n.CanFindBeachForage(), 20 / 8f);
-
     else if (season == "fall" && day is >= 8 and <= 11)
       AddIcon("SeasonalBerry", new Rectangle(32, 272, 16, 16), I18n.CanFindBlackberry(), 20 / 8f);
-
     else if (season == "fall" && day >= 15 && ShowHazelnut)
       AddIcon("SeasonalBerry", new Rectangle(1, 274, 14, 14), I18n.CanFindHazelnut(), 20 / 7f);
 
@@ -78,11 +75,11 @@ internal class ShowSeasonalBerry : IDisposable
       if (IsPotOfGoldStillThere())
       {
         AddIcon(
-            "SeasonalBerry",
-            new Rectangle(131, 0, 16, 16),
-            I18n.CanFindPotOfGold(),
-            20 / 8f,
-            _cursors16
+          "SeasonalBerry",
+          new Rectangle(131, 0, 16, 16),
+          I18n.CanFindPotOfGold(),
+          20 / 8f,
+          _cursors16
         );
       }
     }
@@ -91,7 +88,8 @@ internal class ShowSeasonalBerry : IDisposable
   private bool IsPotOfGoldStillThere()
   {
     GameLocation forest = Game1.getLocationFromName("Forest");
-    if (forest == null) return false;
+    if (forest == null)
+      return false;
 
     // Pot of Gold Position in Forest
     Vector2 potPosition = new Vector2(52f, 98f);
@@ -106,7 +104,13 @@ internal class ShowSeasonalBerry : IDisposable
   #endregion
 
   #region Logic
-  private void AddIcon(string id, Rectangle sourceRect, string hoverText, float scale, Texture2D? customTexture = null)
+  private void AddIcon(
+    string id,
+    Rectangle sourceRect,
+    string hoverText,
+    float scale,
+    Texture2D? customTexture = null
+  )
   {
     ClickableTextureComponent? currentIcon = null;
 

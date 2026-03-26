@@ -17,8 +17,9 @@ internal class ShowBirthdayIcon : IDisposable
   #region Properties
   private readonly PerScreen<List<NPC>> _birthdayNPCs = new(() => new List<NPC>());
 
-  private readonly PerScreen<List<ClickableTextureComponent>> _birthdayIcons =
-    new(() => new List<ClickableTextureComponent>());
+  private readonly PerScreen<List<ClickableTextureComponent>> _birthdayIcons = new(() =>
+    new List<ClickableTextureComponent>()
+  );
 
   private bool Enabled { get; set; }
   private bool HideBirthdayIfFullFriendShip { get; set; }
@@ -116,9 +117,12 @@ internal class ShowBirthdayIcon : IDisposable
           Friendship? friendship = GetFriendshipWithNPC(character.Name);
           if (friendship != null)
           {
-            if (HideBirthdayIfFullFriendShip &&
-                friendship.Points >=
-                Utility.GetMaximumHeartsForCharacter(character) * NPC.friendshipPointsPerHeartLevel)
+            if (
+              HideBirthdayIfFullFriendShip
+              && friendship.Points
+                >= Utility.GetMaximumHeartsForCharacter(character)
+                  * NPC.friendshipPointsPerHeartLevel
+            )
             {
               continue;
             }
@@ -143,7 +147,10 @@ internal class ShowBirthdayIcon : IDisposable
     }
     catch (Exception ex)
     {
-      ModEntry.MonitorObject.LogOnce("Error while getting information about the birthday of " + name, LogLevel.Error);
+      ModEntry.MonitorObject.LogOnce(
+        "Error while getting information about the birthday of " + name,
+        LogLevel.Error
+      );
       ModEntry.MonitorObject.Log(ex.ToString());
     }
 
@@ -164,15 +171,17 @@ internal class ShowBirthdayIcon : IDisposable
       icons.Clear();
       foreach (NPC npc in npcs)
       {
-        icons.Add(new ClickableTextureComponent(
-          npc.Name,
-          Rectangle.Empty,
-          null,
-          npc.Name,
-          npc.Sprite.Texture,
-          npc.GetHeadShot(),
-          2f
-        ));
+        icons.Add(
+          new ClickableTextureComponent(
+            npc.Name,
+            Rectangle.Empty,
+            null,
+            npc.Name,
+            npc.Sprite.Texture,
+            npc.GetHeadShot(),
+            2f
+          )
+        );
       }
     }
 
@@ -195,7 +204,12 @@ internal class ShowBirthdayIcon : IDisposable
             1f
           );
 
-          icons[capturedI].bounds = new Rectangle(pos.X - 7, pos.Y - 5, (int)(16.0 * scale), (int)(16.0 * scale));
+          icons[capturedI].bounds = new Rectangle(
+            pos.X - 7,
+            pos.Y - 5,
+            (int)(16.0 * scale),
+            (int)(16.0 * scale)
+          );
           icons[capturedI].sourceRect = npcs[capturedI].GetHeadShot();
           icons[capturedI].draw(batch);
         },

@@ -27,7 +27,8 @@ internal class QuestBoardSelector : IClickableMenu
   public QuestBoardSelector(
     List<(string BoardType, string DisplayName)> modBoards,
     Action<string>? onBoardSelected = null,
-    HashSet<string>? viewedBoardTypes = null)
+    HashSet<string>? viewedBoardTypes = null
+  )
     : base(0, 0, 0, 0, showUpperRightCloseButton: true)
   {
     _onBoardSelected = onBoardSelected;
@@ -60,7 +61,12 @@ internal class QuestBoardSelector : IClickableMenu
     }
 
     width = maxTextWidth + MenuPadding * 2 + borderWidth * 2;
-    height = titleHeight + TitleBottomMargin + RowHeight * _options.Count + MenuPadding * 2 + borderWidth * 2;
+    height =
+      titleHeight
+      + TitleBottomMargin
+      + RowHeight * _options.Count
+      + MenuPadding * 2
+      + borderWidth * 2;
 
     Vector2 center = Utility.getTopLeftPositionForCenteringOnScreen(width, height);
     xPositionOnScreen = (int)center.X;
@@ -81,7 +87,7 @@ internal class QuestBoardSelector : IClickableMenu
         upNeighborID = i > 0 ? BaseSnapId + i - 1 : -99998,
         downNeighborID = i < _options.Count - 1 ? BaseSnapId + i + 1 : -99998,
         leftNeighborID = -99998,
-        rightNeighborID = -99998
+        rightNeighborID = -99998,
       };
       _optionComponents.Add(comp);
     }
@@ -157,7 +163,11 @@ internal class QuestBoardSelector : IClickableMenu
   public override void draw(SpriteBatch b)
   {
     // Dim background
-    b.Draw(Game1.fadeToBlackRect, Game1.graphics.GraphicsDevice.Viewport.Bounds, Color.Black * 0.75f);
+    b.Draw(
+      Game1.fadeToBlackRect,
+      Game1.graphics.GraphicsDevice.Viewport.Bounds,
+      Color.Black * 0.75f
+    );
 
     // Draw menu box
     drawTextureBox(
@@ -191,7 +201,9 @@ internal class QuestBoardSelector : IClickableMenu
       float textY = rowY + (RowHeight - font.MeasureString(_options[i].DisplayName).Y) / 2;
 
       Utility.drawTextWithShadow(
-        b, _options[i].DisplayName, font,
+        b,
+        _options[i].DisplayName,
+        font,
         new Vector2(contentX, textY),
         textColor
       );

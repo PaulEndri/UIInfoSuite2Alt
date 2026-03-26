@@ -27,7 +27,8 @@ internal class ModOptionsNumberPicker : ModOptionsElement
     Action<int> setOption,
     int minValue = 1,
     int maxValue = 20
-  ) : base(label, whichOption)
+  )
+    : base(label, whichOption)
   {
     _setOption = setOption;
     _minValue = minValue;

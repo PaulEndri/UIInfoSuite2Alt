@@ -69,7 +69,11 @@ internal class ShowRobinBuildingStatusIcon : IDisposable
 
   private void OnRenderingHud(object? sender, RenderingHudEventArgs e)
   {
-    if (UIElementUtils.IsRenderingNormally() && _IsBuildingInProgress && _buildingIconSpriteLocation.HasValue)
+    if (
+      UIElementUtils.IsRenderingNormally()
+      && _IsBuildingInProgress
+      && _buildingIconSpriteLocation.HasValue
+    )
     {
       IconHandler.Handler.EnqueueIcon(
         "RobinBuilding",
@@ -85,8 +89,10 @@ internal class ShowRobinBuildingStatusIcon : IDisposable
         },
         batch =>
         {
-          if ((_buildingIcon.Value?.containsPoint(Game1.getMouseX(), Game1.getMouseY()) ?? false) &&
-              !string.IsNullOrEmpty(_hoverText))
+          if (
+            (_buildingIcon.Value?.containsPoint(Game1.getMouseX(), Game1.getMouseY()) ?? false)
+            && !string.IsNullOrEmpty(_hoverText)
+          )
           {
             IClickableMenu.drawHoverText(batch, _hoverText, Game1.dialogueFont);
           }
@@ -109,7 +115,10 @@ internal class ShowRobinBuildingStatusIcon : IDisposable
       {
         if (building.daysOfConstructionLeft.Value > building.daysUntilUpgrade.Value)
         {
-          hoverText = string.Format(I18n.RobinBuildingStatus(), building.daysOfConstructionLeft.Value);
+          hoverText = string.Format(
+            I18n.RobinBuildingStatus(),
+            building.daysOfConstructionLeft.Value
+          );
           return true;
         }
 
@@ -148,11 +157,13 @@ internal class ShowRobinBuildingStatusIcon : IDisposable
     }
     else
     {
-      ModEntry.MonitorObject.Log($"{GetType().Name}: Could not find Robin spritesheet.", LogLevel.Warn);
+      ModEntry.MonitorObject.Log(
+        $"{GetType().Name}: Could not find Robin spritesheet.",
+        LogLevel.Warn
+      );
     }
 
-    _buildingIconSpriteLocation =
-      new Rectangle(0, 195 + 1, 15, 15 - 1); // 1px edits for better alignment with other icons
+    _buildingIconSpriteLocation = new Rectangle(0, 195 + 1, 15, 15 - 1); // 1px edits for better alignment with other icons
   }
   #endregion
 }

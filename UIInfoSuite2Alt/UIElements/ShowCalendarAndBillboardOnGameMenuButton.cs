@@ -9,8 +9,8 @@ using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.ItemTypeDefinitions;
-using StardewValley.Menus;
 using StardewValley.Locations;
+using StardewValley.Menus;
 using StardewValley.SpecialOrders;
 using UIInfoSuite2Alt.Compatibility;
 using UIInfoSuite2Alt.Infrastructure;
@@ -35,13 +35,17 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
   private readonly PerScreen<Rectangle> _qiOrdersBounds = new(() => Rectangle.Empty);
 
   private readonly PerScreen<ClickableComponent> _calendarSnap = new(() =>
-    new ClickableComponent(Rectangle.Empty, "calendar") { myID = CalendarSnapId });
+    new ClickableComponent(Rectangle.Empty, "calendar") { myID = CalendarSnapId }
+  );
   private readonly PerScreen<ClickableComponent> _questSnap = new(() =>
-    new ClickableComponent(Rectangle.Empty, "quest") { myID = QuestSnapId });
+    new ClickableComponent(Rectangle.Empty, "quest") { myID = QuestSnapId }
+  );
   private readonly PerScreen<ClickableComponent> _specialOrdersSnap = new(() =>
-    new ClickableComponent(Rectangle.Empty, "specialOrders") { myID = SpecialOrdersSnapId });
+    new ClickableComponent(Rectangle.Empty, "specialOrders") { myID = SpecialOrdersSnapId }
+  );
   private readonly PerScreen<ClickableComponent> _qiOrdersSnap = new(() =>
-    new ClickableComponent(Rectangle.Empty, "qiOrders") { myID = QiOrdersSnapId });
+    new ClickableComponent(Rectangle.Empty, "qiOrders") { myID = QiOrdersSnapId }
+  );
 
   private readonly IModHelper _helper;
   private Texture2D? _townTexture;
@@ -136,8 +140,10 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
       return;
     }
 
-    if (GameMenuHelper.IsTab(menu, GameMenu.inventoryTab) &&
-        GameMenuHelper.GetCurrentPage(menu) is InventoryPage)
+    if (
+      GameMenuHelper.IsTab(menu, GameMenu.inventoryTab)
+      && GameMenuHelper.GetCurrentPage(menu) is InventoryPage
+    )
     {
       _heldItem.Value = Game1.player.CursorSlotItem;
     }
@@ -158,8 +164,10 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
   {
     IClickableMenu? activeMenu = Game1.activeClickableMenu;
 
-    if (GameMenuHelper.IsTab(activeMenu, GameMenu.inventoryTab) &&
-        GameMenuHelper.GetChildMenu(activeMenu) == null)
+    if (
+      GameMenuHelper.IsTab(activeMenu, GameMenu.inventoryTab)
+      && GameMenuHelper.GetChildMenu(activeMenu) == null
+    )
     {
       DrawBillboard();
     }
@@ -171,7 +179,8 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
   private void DrawBillboard()
   {
     IClickableMenu menu = Game1.activeClickableMenu;
-    if (menu == null) return;
+    if (menu == null)
+      return;
 
     // Mod compatibility offsets
     int offset = 294;
@@ -204,8 +213,10 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
     b.Draw(Game1.objectSpriteSheet, questDest, new Rectangle(144, 592, 16, 16), Color.White);
 
     // Exclamation mark for available daily quests
-    if (Game1.CanAcceptDailyQuest() ||
-        GetAvailableModQuestBoards().Any(mb => HasRsvUnacceptedQuest(mb.BoardType)))
+    if (
+      Game1.CanAcceptDailyQuest()
+      || GetAvailableModQuestBoards().Any(mb => HasRsvUnacceptedQuest(mb.BoardType))
+    )
     {
       float scale = 1.6f;
       b.Draw(
@@ -226,23 +237,25 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
     {
       int soWidth = DrawSize * 17 / 13;
       Rectangle specialOrdersDest = new(
-        questDest.X - 4, questDest.Y + DrawSize + IconSpacing, soWidth, DrawSize
+        questDest.X - 4,
+        questDest.Y + DrawSize + IconSpacing,
+        soWidth,
+        DrawSize
       );
       _specialOrdersBounds.Value = specialOrdersDest;
 
       _townTexture ??= _helper.GameContent.Load<Texture2D>("Maps/spring_town");
-      b.Draw(
-        _townTexture, specialOrdersDest,
-        new Rectangle(480, 1001, 17, 13), Color.White
-      );
+      b.Draw(_townTexture, specialOrdersDest, new Rectangle(480, 1001, 17, 13), Color.White);
 
       // Pulse when new orders available
-      if (HasUnviewedOrders("") ||
-          GetAvailableModBoards().Any(mb => HasUnviewedOrders(mb.BoardType)))
+      if (
+        HasUnviewedOrders("") || GetAvailableModBoards().Any(mb => HasUnviewedOrders(mb.BoardType))
+      )
       {
-        DrawPulsingExclamation(b, new Vector2(
-          specialOrdersDest.X + specialOrdersDest.Width - 4f,
-          specialOrdersDest.Y + 5f));
+        DrawPulsingExclamation(
+          b,
+          new Vector2(specialOrdersDest.X + specialOrdersDest.Width - 4f, specialOrdersDest.Y + 5f)
+        );
       }
     }
     else
@@ -257,27 +270,22 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
       int qiHeight = 14 * 2;
       Rectangle soBounds = _specialOrdersBounds.Value;
       Rectangle qiOrdersDest = new(
-        soBounds != Rectangle.Empty
-          ? soBounds.X - qiWidth - IconSpacing + 4
-          : questDest.X - 4,
-        (soBounds != Rectangle.Empty
-          ? soBounds.Y
-          : questDest.Y + DrawSize + IconSpacing) + 2,
-        qiWidth, qiHeight
+        soBounds != Rectangle.Empty ? soBounds.X - qiWidth - IconSpacing + 4 : questDest.X - 4,
+        (soBounds != Rectangle.Empty ? soBounds.Y : questDest.Y + DrawSize + IconSpacing) + 2,
+        qiWidth,
+        qiHeight
       );
       _qiOrdersBounds.Value = qiOrdersDest;
 
-      b.Draw(
-        Game1.objectSpriteSheet, qiOrdersDest,
-        new Rectangle(288, 561, 15, 14), Color.White
-      );
+      b.Draw(Game1.objectSpriteSheet, qiOrdersDest, new Rectangle(288, 561, 15, 14), Color.White);
 
       // Pulse when new Qi orders available
       if (HasUnviewedOrders("Qi"))
       {
-        DrawPulsingExclamation(b, new Vector2(
-          qiOrdersDest.X + qiOrdersDest.Width - 4f,
-          qiOrdersDest.Y + 3f));
+        DrawPulsingExclamation(
+          b,
+          new Vector2(qiOrdersDest.X + qiOrdersDest.Width - 4f, qiOrdersDest.Y + 3f)
+        );
       }
     }
     else
@@ -287,17 +295,21 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
 
     if (_heldItem.Value != null)
     {
-      _heldItem.Value.drawInMenu(b, new Vector2(Game1.getOldMouseX() + 16, Game1.getOldMouseY() + 16), 1f);
+      _heldItem.Value.drawInMenu(
+        b,
+        new Vector2(Game1.getOldMouseX() + 16, Game1.getOldMouseY() + 16),
+        1f
+      );
     }
 
     if (_hoverItem.Value != null)
     {
       IClickableMenu.drawToolTip(
-          b,
-          _hoverItem.Value.getDescription(),
-          _hoverItem.Value.DisplayName,
-          _hoverItem.Value,
-          _heldItem.Value != null
+        b,
+        _hoverItem.Value.getDescription(),
+        _hoverItem.Value.DisplayName,
+        _hoverItem.Value,
+        _heldItem.Value != null
       );
     }
 
@@ -356,14 +368,17 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
   private void InjectSnapComponents(IClickableMenu menu)
   {
     IClickableMenu? page = GameMenuHelper.GetCurrentPage(menu);
-    if (page == null) return;
+    if (page == null)
+      return;
 
     if (page.allClickableComponents == null)
       page.populateClickableComponentList();
-    if (page.allClickableComponents == null) return;
+    if (page.allClickableComponents == null)
+      return;
 
     page.allClickableComponents.RemoveAll(c =>
-      c.myID is CalendarSnapId or QuestSnapId or SpecialOrdersSnapId or QiOrdersSnapId);
+      c.myID is CalendarSnapId or QuestSnapId or SpecialOrdersSnapId or QiOrdersSnapId
+    );
 
     // Always visible: calendar + quest
     _calendarSnap.Value.bounds = _calendarBounds.Value;
@@ -468,11 +483,13 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
 
   private static string GetBoardSignature(string boardType)
   {
-    return string.Join(",",
-      Game1.player.team.availableSpecialOrders
-        .Where(o => o.orderType.Value == boardType)
+    return string.Join(
+      ",",
+      Game1
+        .player.team.availableSpecialOrders.Where(o => o.orderType.Value == boardType)
         .Select(o => o.questKey.Value)
-        .OrderBy(k => k));
+        .OrderBy(k => k)
+    );
   }
 
   private static bool HasUnviewedOrders(string boardType)
@@ -501,9 +518,15 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
     var boards = new List<(string, string)>();
     if (_hasRidgesideVillage && Game1.player.eventsSeen.Contains("75160207"))
       boards.Add(("RSVTownSO", I18n.SpecialOrdersRSVTown()));
-    if (_hasSunberryVillage && Game1.MasterPlayer.mailReceived.Contains("skellady.SBVCP_SpecialOrderBoardReady"))
+    if (
+      _hasSunberryVillage
+      && Game1.MasterPlayer.mailReceived.Contains("skellady.SBVCP_SpecialOrderBoardReady")
+    )
       boards.Add(("SunberryBoard", I18n.SpecialOrdersSunberry()));
-    if (_hasEscasModdingPlugins && Game1.player.eventsSeen.Contains("Lumisteria.MtVapius_Hamlet_OrderBoard"))
+    if (
+      _hasEscasModdingPlugins
+      && Game1.player.eventsSeen.Contains("Lumisteria.MtVapius_Hamlet_OrderBoard")
+    )
       boards.Add(("Esca.EMP/MtVapiusBoard", I18n.SpecialOrdersMtVapius()));
 
     _cachedModBoards = boards;
@@ -513,8 +536,10 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
 
   private bool ActivateBillboard()
   {
-    if (!GameMenuHelper.IsTab(Game1.activeClickableMenu, GameMenu.inventoryTab) ||
-        _heldItem.Value != null)
+    if (
+      !GameMenuHelper.IsTab(Game1.activeClickableMenu, GameMenu.inventoryTab)
+      || _heldItem.Value != null
+    )
     {
       return false;
     }
@@ -552,7 +577,11 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
           if (!HasUnviewedOrders(boardType))
             viewedTypes.Add(boardType);
         }
-        Game1.activeClickableMenu = new SpecialOrdersBoardSelector(modBoards, OnBoardSelected, viewedTypes);
+        Game1.activeClickableMenu = new SpecialOrdersBoardSelector(
+          modBoards,
+          OnBoardSelected,
+          viewedTypes
+        );
       }
       else
       {
@@ -576,7 +605,11 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
           if (!HasRsvUnacceptedQuest(boardType))
             viewedTypes.Add(boardType);
         }
-        Game1.activeClickableMenu = new QuestBoardSelector(modQuestBoards, OnQuestBoardSelected, viewedTypes);
+        Game1.activeClickableMenu = new QuestBoardSelector(
+          modQuestBoards,
+          OnQuestBoardSelected,
+          viewedTypes
+        );
         return true;
       }
     }
@@ -599,7 +632,8 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
       return;
     }
 
-    List<(string BoardType, string DisplayName)> modQuestBoards = _instance.GetAvailableModQuestBoards();
+    List<(string BoardType, string DisplayName)> modQuestBoards =
+      _instance.GetAvailableModQuestBoards();
     if (modQuestBoards.Count > 0)
     {
       var viewedTypes = new HashSet<string>();
@@ -610,7 +644,11 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
         if (!_instance.HasRsvUnacceptedQuest(boardType))
           viewedTypes.Add(boardType);
       }
-      Game1.activeClickableMenu = new QuestBoardSelector(modQuestBoards, _instance.OnQuestBoardSelected, viewedTypes);
+      Game1.activeClickableMenu = new QuestBoardSelector(
+        modQuestBoards,
+        _instance.OnQuestBoardSelected,
+        viewedTypes
+      );
       return;
     }
 
@@ -640,7 +678,11 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
         if (!HasUnviewedOrders(boardType))
           viewedTypes.Add(boardType);
       }
-      Game1.activeClickableMenu = new SpecialOrdersBoardSelector(modBoards, _instance.OnBoardSelected, viewedTypes);
+      Game1.activeClickableMenu = new SpecialOrdersBoardSelector(
+        modBoards,
+        _instance.OnBoardSelected,
+        viewedTypes
+      );
       return;
     }
 
@@ -651,9 +693,11 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
   #region RSV Quest Board Support
   private void InitRsvQuestReflection()
   {
-    if (_rsvQuestReflectionInit) return;
+    if (_rsvQuestReflectionInit)
+      return;
     _rsvQuestReflectionInit = true;
-    if (!_hasRidgesideVillage) return;
+    if (!_hasRidgesideVillage)
+      return;
 
     try
     {
@@ -666,24 +710,35 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
           break;
         }
       }
-      if (rsvAssembly == null) return;
+      if (rsvAssembly == null)
+        return;
 
       Type? questControllerType = rsvAssembly.GetType("RidgesideVillage.Questing.QuestController");
       Type? questBoardType = rsvAssembly.GetType("RidgesideVillage.Questing.RSVQuestBoard");
       Type? questDataType = rsvAssembly.GetType("RidgesideVillage.Questing.QuestData");
-      if (questControllerType == null || questBoardType == null || questDataType == null) return;
+      if (questControllerType == null || questBoardType == null || questDataType == null)
+        return;
 
-      _rsvDailyQuestDataField = questControllerType.GetField("dailyQuestData",
-        BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
+      _rsvDailyQuestDataField = questControllerType.GetField(
+        "dailyQuestData",
+        BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public
+      );
 
       _rsvQuestBoardCtor = questBoardType.GetConstructor(
         BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,
-        null, [questDataType, typeof(string)], null);
+        null,
+        [questDataType, typeof(string)],
+        null
+      );
 
-      _rsvAcceptedDailyQuestField = questDataType.GetField("acceptedDailyQuest",
-        BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-      _rsvDailyTownQuestField = questDataType.GetField("dailyTownQuest",
-        BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+      _rsvAcceptedDailyQuestField = questDataType.GetField(
+        "acceptedDailyQuest",
+        BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public
+      );
+      _rsvDailyTownQuestField = questDataType.GetField(
+        "dailyTownQuest",
+        BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public
+      );
     }
     catch (Exception)
     {
@@ -693,7 +748,8 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
 
   private object? GetRsvQuestData()
   {
-    if (_rsvDailyQuestDataField == null) return null;
+    if (_rsvDailyQuestDataField == null)
+      return null;
     try
     {
       object? perScreen = _rsvDailyQuestDataField.GetValue(null);
@@ -709,7 +765,8 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
   {
     InitRsvQuestReflection();
     object? questData = GetRsvQuestData();
-    if (questData == null) return false;
+    if (questData == null)
+      return false;
 
     try
     {
@@ -719,7 +776,6 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
         bool accepted = (bool?)_rsvAcceptedDailyQuestField?.GetValue(questData) ?? true;
         return quest != null && !accepted;
       }
-
     }
     catch
     {
@@ -731,12 +787,14 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
   private bool TryOpenRsvQuestBoard(string boardType)
   {
     InitRsvQuestReflection();
-    if (_rsvQuestBoardCtor == null) return false;
+    if (_rsvQuestBoardCtor == null)
+      return false;
 
     try
     {
       object? questData = GetRsvQuestData();
-      if (questData == null) return false;
+      if (questData == null)
+        return false;
 
       object? board = _rsvQuestBoardCtor.Invoke([questData, boardType]);
       if (board is IClickableMenu menu)

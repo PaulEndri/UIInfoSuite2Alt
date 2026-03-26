@@ -16,7 +16,13 @@ namespace UIInfoSuite2Alt.UIElements;
 internal class ShowFestivalIcon : IDisposable
 {
   #region Properties
-  private enum FestivalType { None, Regular, Passive, FishingDerby }
+  private enum FestivalType
+  {
+    None,
+    Regular,
+    Passive,
+    FishingDerby,
+  }
 
   private static readonly HashSet<string> FishingDerbyIds = ["TroutDerby", "SquidFest"];
 
@@ -28,7 +34,9 @@ internal class ShowFestivalIcon : IDisposable
   // Deferred festival time loading — avoids content loads during DayStarted
   // which can trigger Content Patcher token re-evaluation and cascading
   // texture invalidations that break mods like CP Animations.
-  private readonly PerScreen<List<(string key, bool isToday)>> _pendingRegularFestivals = new(() => []);
+  private readonly PerScreen<List<(string key, bool isToday)>> _pendingRegularFestivals = new(() =>
+    []
+  );
 
   private Texture2D? _billboardTexture;
 
@@ -41,22 +49,12 @@ internal class ShowFestivalIcon : IDisposable
   // Fishing derby icon (from Cursors_1_6 spritesheet)
   private static readonly Rectangle FishingDerbySourceRect = new(103, 2, 10, 11);
 
-  private readonly PerScreen<ClickableTextureComponent> _todayIcon = new(
-    () => new ClickableTextureComponent(
-      new Rectangle(0, 0, 40, 40),
-      null,
-      FlagSourceRect,
-      40 / 13f
-    )
+  private readonly PerScreen<ClickableTextureComponent> _todayIcon = new(() =>
+    new ClickableTextureComponent(new Rectangle(0, 0, 40, 40), null, FlagSourceRect, 40 / 13f)
   );
 
-  private readonly PerScreen<ClickableTextureComponent> _tomorrowIcon = new(
-    () => new ClickableTextureComponent(
-      new Rectangle(0, 0, 40, 40),
-      null,
-      FlagSourceRect,
-      40 / 13f
-    )
+  private readonly PerScreen<ClickableTextureComponent> _tomorrowIcon = new(() =>
+    new ClickableTextureComponent(new Rectangle(0, 0, 40, 40), null, FlagSourceRect, 40 / 13f)
   );
 
   private readonly IModHelper _helper;
@@ -107,27 +105,38 @@ internal class ShowFestivalIcon : IDisposable
     if (Utility.isFestivalDay())
     {
       todayIconType = FestivalType.Regular;
-      Dictionary<string, string> festivalDates = DataLoader.Festivals_FestivalDates(Game1.temporaryContent);
+      Dictionary<string, string> festivalDates = DataLoader.Festivals_FestivalDates(
+        Game1.temporaryContent
+      );
       string todayKey = $"{Utility.getSeasonKey(Game1.season)}{Game1.dayOfMonth}";
       string name = festivalDates.TryGetValue(todayKey, out string? n) ? n : todayKey;
       todayFestivals.Add((name, ""));
       _pendingRegularFestivals.Value.Add((todayKey, true));
     }
 
-    foreach ((string id, PassiveFestivalData data) in GetActivePassiveFestivals(Game1.dayOfMonth, Game1.season))
+    foreach (
+      (string id, PassiveFestivalData data) in GetActivePassiveFestivals(
+        Game1.dayOfMonth,
+        Game1.season
+      )
+    )
     {
       todayFestivals.Add((GetPassiveFestivalName(id, data), GetPassiveFestivalTime(data)));
       if (todayIconType == FestivalType.None)
       {
-        todayIconType = FishingDerbyIds.Contains(id) ? FestivalType.FishingDerby : FestivalType.Passive;
+        todayIconType = FishingDerbyIds.Contains(id)
+          ? FestivalType.FishingDerby
+          : FestivalType.Passive;
       }
     }
 
     if (todayFestivals.Count > 0)
     {
       _todayType.Value = todayIconType;
-      _todayHoverText.Value = string.Join(Environment.NewLine,
-        todayFestivals.ConvertAll(f => FormatFestivalEntry(I18n.FestivalToday(), f.name, f.time)));
+      _todayHoverText.Value = string.Join(
+        Environment.NewLine,
+        todayFestivals.ConvertAll(f => FormatFestivalEntry(I18n.FestivalToday(), f.name, f.time))
+      );
     }
 
     // Calculate tomorrow
@@ -143,7 +152,7 @@ internal class ShowFestivalIcon : IDisposable
         Season.Summer => Season.Fall,
         Season.Fall => Season.Winter,
         Season.Winter => Season.Spring,
-        _ => tomorrowSeason
+        _ => tomorrowSeason,
       };
     }
 
@@ -154,7 +163,9 @@ internal class ShowFestivalIcon : IDisposable
     if (Utility.isFestivalDay(tomorrowDay, tomorrowSeason))
     {
       tomorrowIconType = FestivalType.Regular;
-      Dictionary<string, string> festivalDates = DataLoader.Festivals_FestivalDates(Game1.temporaryContent);
+      Dictionary<string, string> festivalDates = DataLoader.Festivals_FestivalDates(
+        Game1.temporaryContent
+      );
       string festivalKey = $"{Utility.getSeasonKey(tomorrowSeason)}{tomorrowDay}";
       string name = festivalDates.TryGetValue(festivalKey, out string? n) ? n : festivalKey;
       tomorrowFestivals.Add((name, ""));
@@ -162,20 +173,31 @@ internal class ShowFestivalIcon : IDisposable
     }
 
     // Passive festivals — first day only for tomorrow
-    foreach ((string id, PassiveFestivalData data) in GetPassiveFestivalsStartingOn(tomorrowDay, tomorrowSeason))
+    foreach (
+      (string id, PassiveFestivalData data) in GetPassiveFestivalsStartingOn(
+        tomorrowDay,
+        tomorrowSeason
+      )
+    )
     {
       tomorrowFestivals.Add((GetPassiveFestivalName(id, data), GetPassiveFestivalTime(data)));
       if (tomorrowIconType == FestivalType.None)
       {
-        tomorrowIconType = FishingDerbyIds.Contains(id) ? FestivalType.FishingDerby : FestivalType.Passive;
+        tomorrowIconType = FishingDerbyIds.Contains(id)
+          ? FestivalType.FishingDerby
+          : FestivalType.Passive;
       }
     }
 
     if (tomorrowFestivals.Count > 0)
     {
       _tomorrowType.Value = tomorrowIconType;
-      _tomorrowHoverText.Value = string.Join(Environment.NewLine,
-        tomorrowFestivals.ConvertAll(f => FormatFestivalEntry(I18n.FestivalTomorrow(), f.name, f.time)));
+      _tomorrowHoverText.Value = string.Join(
+        Environment.NewLine,
+        tomorrowFestivals.ConvertAll(f =>
+          FormatFestivalEntry(I18n.FestivalTomorrow(), f.name, f.time)
+        )
+      );
     }
   }
 
@@ -210,15 +232,20 @@ internal class ShowFestivalIcon : IDisposable
 
   // Get all active passive festivals for a given day (including mid-festival)
   private static IEnumerable<(string id, PassiveFestivalData data)> GetActivePassiveFestivals(
-    int day, Season season)
+    int day,
+    Season season
+  )
   {
     Dictionary<string, PassiveFestivalData> allPassive = DataLoader.PassiveFestivals(Game1.content);
 
     foreach (KeyValuePair<string, PassiveFestivalData> entry in allPassive)
     {
-      if (entry.Value.Season == season
-          && day >= entry.Value.StartDay && day <= entry.Value.EndDay
-          && GameStateQuery.CheckConditions(entry.Value.Condition))
+      if (
+        entry.Value.Season == season
+        && day >= entry.Value.StartDay
+        && day <= entry.Value.EndDay
+        && GameStateQuery.CheckConditions(entry.Value.Condition)
+      )
       {
         yield return (entry.Key, entry.Value);
       }
@@ -227,14 +254,19 @@ internal class ShowFestivalIcon : IDisposable
 
   // Get all passive festivals starting on a specific day (not mid-festival)
   private static IEnumerable<(string id, PassiveFestivalData data)> GetPassiveFestivalsStartingOn(
-    int day, Season season)
+    int day,
+    Season season
+  )
   {
     Dictionary<string, PassiveFestivalData> allPassive = DataLoader.PassiveFestivals(Game1.content);
 
     foreach (KeyValuePair<string, PassiveFestivalData> entry in allPassive)
     {
-      if (entry.Value.Season == season && entry.Value.StartDay == day
-          && GameStateQuery.CheckConditions(entry.Value.Condition))
+      if (
+        entry.Value.Season == season
+        && entry.Value.StartDay == day
+        && GameStateQuery.CheckConditions(entry.Value.Condition)
+      )
       {
         yield return (entry.Key, entry.Value);
       }
@@ -252,8 +284,13 @@ internal class ShowFestivalIcon : IDisposable
 
     // Some passive festivals (TroutDerby, SquidFest) have empty DisplayName but store
     // their localized name in Strings/1_6_Strings using the festival ID as the key
-    Dictionary<string, string> strings = Game1.content.Load<Dictionary<string, string>>("Strings\\1_6_Strings");
-    if (strings.TryGetValue(festivalId, out string? localizedName) && !string.IsNullOrWhiteSpace(localizedName))
+    Dictionary<string, string> strings = Game1.content.Load<Dictionary<string, string>>(
+      "Strings\\1_6_Strings"
+    );
+    if (
+      strings.TryGetValue(festivalId, out string? localizedName)
+      && !string.IsNullOrWhiteSpace(localizedName)
+    )
     {
       return localizedName;
     }
@@ -270,18 +307,25 @@ internal class ShowFestivalIcon : IDisposable
       // instead of Event.tryToLoadFestivalData which creates a static FestivalReadContentLoader
       // that persists for the session and may cause side effects with other mods' content patches.
       string assetName = "Data\\Festivals\\" + festivalKey;
-      Dictionary<string, string> data = Game1.temporaryContent.Load<Dictionary<string, string>>(assetName);
+      Dictionary<string, string> data = Game1.temporaryContent.Load<Dictionary<string, string>>(
+        assetName
+      );
       if (data.TryGetValue("conditions", out string? conditions))
       {
         string[] parts = conditions.Split('/');
         if (parts.Length >= 2)
         {
           string[] times = ArgUtility.SplitBySpace(parts[1]);
-          if (ArgUtility.TryGetInt(times, 0, out int startTime, out _)
-              && ArgUtility.TryGetInt(times, 1, out int endTime, out _))
+          if (
+            ArgUtility.TryGetInt(times, 0, out int startTime, out _)
+            && ArgUtility.TryGetInt(times, 1, out int endTime, out _)
+          )
           {
-            return string.Format(I18n.FestivalTimeRange(),
-              Game1.getTimeOfDayString(startTime), Game1.getTimeOfDayString(endTime));
+            return string.Format(
+              I18n.FestivalTimeRange(),
+              Game1.getTimeOfDayString(startTime),
+              Game1.getTimeOfDayString(endTime)
+            );
           }
         }
       }
@@ -345,12 +389,21 @@ internal class ShowFestivalIcon : IDisposable
 
     if (HasTomorrow)
     {
-      EnqueueFestivalIcon(_tomorrowIcon.Value, _tomorrowType.Value, _tomorrowHoverText.Value, false);
+      EnqueueFestivalIcon(
+        _tomorrowIcon.Value,
+        _tomorrowType.Value,
+        _tomorrowHoverText.Value,
+        false
+      );
     }
   }
 
   private void EnqueueFestivalIcon(
-    ClickableTextureComponent icon, FestivalType type, string hoverText, bool isToday)
+    ClickableTextureComponent icon,
+    FestivalType type,
+    string hoverText,
+    bool isToday
+  )
   {
     switch (type)
     {

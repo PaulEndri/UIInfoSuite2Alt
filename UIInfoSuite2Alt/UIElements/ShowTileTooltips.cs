@@ -58,25 +58,19 @@ internal class ShowTileTooltips : IDisposable
   private static readonly Color WateredColor = Tools.TooltipBlue;
   private static readonly Color NotWateredColor = Tools.TooltipRed;
 
-  private static readonly List<Func<Building?, List<HoverLine>, bool>> BuildingDetailRenderers = new()
-  {
-    DetailRenderers.BuildingOutput
-  };
+  private static readonly List<Func<Building?, List<HoverLine>, bool>> BuildingDetailRenderers =
+    new() { DetailRenderers.BuildingOutput };
 
   private static readonly List<Func<Object?, List<HoverLine>, bool>> MachineDetailRenderers = new()
   {
-    DetailRenderers.MachineTime
+    DetailRenderers.MachineTime,
   };
 
-  private static readonly List<Func<TerrainFeature?, List<HoverLine>, bool>> CropDetailRenderers = new()
-  {
-    DetailRenderers.CropRender
-  };
+  private static readonly List<Func<TerrainFeature?, List<HoverLine>, bool>> CropDetailRenderers =
+    new() { DetailRenderers.CropRender };
 
-  private static readonly List<Func<TerrainFeature?, List<HoverLine>, bool>> TreeDetailRenderers = new()
-  {
-    DetailRenderers.TreeRender, DetailRenderers.FruitTreeRender, DetailRenderers.TeaBush
-  };
+  private static readonly List<Func<TerrainFeature?, List<HoverLine>, bool>> TreeDetailRenderers =
+    new() { DetailRenderers.TreeRender, DetailRenderers.FruitTreeRender, DetailRenderers.TeaBush };
 
   private readonly PerScreen<TerrainFeature?> _currentTerrain = new();
   private readonly PerScreen<Object?> _currentTile = new();
@@ -152,12 +146,14 @@ internal class ShowTileTooltips : IDisposable
     _currentTile.Value = null;
     _currentTerrain.Value = null;
 
-    Vector2 gamepadTile = Game1.player.CurrentTool != null
-      ? Utility.snapToInt(Game1.player.GetToolLocation() / Game1.tileSize)
-      : Utility.snapToInt(Game1.player.GetGrabTile());
+    Vector2 gamepadTile =
+      Game1.player.CurrentTool != null
+        ? Utility.snapToInt(Game1.player.GetToolLocation() / Game1.tileSize)
+        : Utility.snapToInt(Game1.player.GetGrabTile());
     Vector2 mouseTile = Game1.currentCursorTile;
 
-    Vector2 tile = Game1.options.gamepadControls && Game1.timerUntilMouseFade <= 0 ? gamepadTile : mouseTile;
+    Vector2 tile =
+      Game1.options.gamepadControls && Game1.timerUntilMouseFade <= 0 ? gamepadTile : mouseTile;
 
     if (Game1.currentLocation == null)
     {
@@ -174,7 +170,9 @@ internal class ShowTileTooltips : IDisposable
       _currentTile.Value = currentObject;
     }
 
-    if (Game1.currentLocation.terrainFeatures?.TryGetValue(tile, out TerrainFeature? terrain) ?? false)
+    if (
+      Game1.currentLocation.terrainFeatures?.TryGetValue(tile, out TerrainFeature? terrain) ?? false
+    )
     {
       _currentTerrain.Value = terrain;
     }
@@ -211,15 +209,22 @@ internal class ShowTileTooltips : IDisposable
 
     if (_showBarrelTooltip && currentTileBuilding is not null)
     {
-      foreach (Func<Building?, List<HoverLine>, bool> buildingDetailRenderer in BuildingDetailRenderers)
+      foreach (
+        Func<Building?, List<HoverLine>, bool> buildingDetailRenderer in BuildingDetailRenderers
+      )
       {
         if (!buildingDetailRenderer(currentTileBuilding, lines))
         {
           continue;
         }
 
-        Vector2 buildingTile = new(currentTileBuilding.tileX.Value, currentTileBuilding.tileY.Value);
-        tile = Utility.ModifyCoordinatesForUIScale(Game1.GlobalToLocal(buildingTile * Game1.tileSize));
+        Vector2 buildingTile = new(
+          currentTileBuilding.tileX.Value,
+          currentTileBuilding.tileY.Value
+        );
+        tile = Utility.ModifyCoordinatesForUIScale(
+          Game1.GlobalToLocal(buildingTile * Game1.tileSize)
+        );
       }
     }
 
@@ -228,7 +233,9 @@ internal class ShowTileTooltips : IDisposable
       if (DetailRenderers.FishPondRender(fishPond, lines))
       {
         Vector2 buildingTile = new(fishPond.tileX.Value, fishPond.tileY.Value);
-        tile = Utility.ModifyCoordinatesForUIScale(Game1.GlobalToLocal(buildingTile * Game1.tileSize));
+        tile = Utility.ModifyCoordinatesForUIScale(
+          Game1.GlobalToLocal(buildingTile * Game1.tileSize)
+        );
       }
     }
 
@@ -239,7 +246,9 @@ internal class ShowTileTooltips : IDisposable
         if (machineDetailRenderer(currentTile, lines))
         {
           tile = Utility.ModifyCoordinatesForUIScale(
-            Game1.GlobalToLocal(new Vector2(currentTile.TileLocation.X, currentTile.TileLocation.Y) * Game1.tileSize)
+            Game1.GlobalToLocal(
+              new Vector2(currentTile.TileLocation.X, currentTile.TileLocation.Y) * Game1.tileSize
+            )
           );
         }
       }
@@ -247,22 +256,30 @@ internal class ShowTileTooltips : IDisposable
 
     if (_showCropTooltip && terrain is not null)
     {
-      foreach (Func<TerrainFeature?, List<HoverLine>, bool> cropDetailRenderer in CropDetailRenderers)
+      foreach (
+        Func<TerrainFeature?, List<HoverLine>, bool> cropDetailRenderer in CropDetailRenderers
+      )
       {
         if (cropDetailRenderer(terrain, lines))
         {
-          tile = Utility.ModifyCoordinatesForUIScale(Game1.GlobalToLocal(terrain.Tile * Game1.tileSize));
+          tile = Utility.ModifyCoordinatesForUIScale(
+            Game1.GlobalToLocal(terrain.Tile * Game1.tileSize)
+          );
         }
       }
     }
 
     if (_showTreeTooltip && terrain is not null && !_itemEffectRanges.IsRangeTooltipActive)
     {
-      foreach (Func<TerrainFeature?, List<HoverLine>, bool> treeDetailRenderer in TreeDetailRenderers)
+      foreach (
+        Func<TerrainFeature?, List<HoverLine>, bool> treeDetailRenderer in TreeDetailRenderers
+      )
       {
         if (treeDetailRenderer(terrain, lines))
         {
-          tile = Utility.ModifyCoordinatesForUIScale(Game1.GlobalToLocal(terrain.Tile * Game1.tileSize));
+          tile = Utility.ModifyCoordinatesForUIScale(
+            Game1.GlobalToLocal(terrain.Tile * Game1.tileSize)
+          );
         }
       }
     }
@@ -278,16 +295,35 @@ internal class ShowTileTooltips : IDisposable
       overrideY = (int)(tile.Y + Utility.ModifyCoordinateForUIScale(32));
     }
 
-    (Texture2D? spriteTexture, Rectangle? spriteSourceRect) = GetTooltipSprite(currentTile, currentTileBuilding, terrain);
-    DrawColoredHoverText(Game1.spriteBatch, lines, Game1.smallFont, overrideX, overrideY, spriteTexture, spriteSourceRect);
+    (Texture2D? spriteTexture, Rectangle? spriteSourceRect) = GetTooltipSprite(
+      currentTile,
+      currentTileBuilding,
+      terrain
+    );
+    DrawColoredHoverText(
+      Game1.spriteBatch,
+      lines,
+      Game1.smallFont,
+      overrideX,
+      overrideY,
+      spriteTexture,
+      spriteSourceRect
+    );
   }
 
   private static (Texture2D? Texture, Rectangle? SourceRect) GetTooltipSprite(
-    Object? tileObject, Building? building, TerrainFeature? terrain)
+    Object? tileObject,
+    Building? building,
+    TerrainFeature? terrain
+  )
   {
     // Machine: show the output item (e.g. Wine, Juice) - complements the machine icon which shows the input
-    if (tileObject != null && tileObject.bigCraftable.Value &&
-        tileObject.heldObject.Value != null && tileObject.MinutesUntilReady > 0)
+    if (
+      tileObject != null
+      && tileObject.bigCraftable.Value
+      && tileObject.heldObject.Value != null
+      && tileObject.MinutesUntilReady > 0
+    )
     {
       return FromItemData(ItemRegistry.GetData(tileObject.heldObject.Value.QualifiedItemId));
     }
@@ -298,7 +334,8 @@ internal class ShowTileTooltips : IDisposable
       List<Item?> inputItems = new();
       List<Item?> outputItems = new();
       MachineHelper.GetBuildingChestItems(building, inputItems, outputItems);
-      Item? firstItem = outputItems.FirstOrDefault(i => i != null) ?? inputItems.FirstOrDefault(i => i != null);
+      Item? firstItem =
+        outputItems.FirstOrDefault(i => i != null) ?? inputItems.FirstOrDefault(i => i != null);
       if (firstItem != null)
       {
         return FromItemData(ItemRegistry.GetData(firstItem.QualifiedItemId));
@@ -306,7 +343,11 @@ internal class ShowTileTooltips : IDisposable
     }
 
     // Fish pond: show the fish
-    if (building is FishPond fishPond && fishPond.fishType.Value != null && fishPond.currentOccupants.Value > 0)
+    if (
+      building is FishPond fishPond
+      && fishPond.fishType.Value != null
+      && fishPond.currentOccupants.Value > 0
+    )
     {
       return FromItemData(ItemRegistry.GetData(fishPond.GetFishObject().QualifiedItemId));
     }
@@ -326,14 +367,16 @@ internal class ShowTileTooltips : IDisposable
         {
           "1" => "(O)399",
           "2" => "(O)829",
-          _ => $"(O){crop.whichForageCrop.Value}"
+          _ => $"(O){crop.whichForageCrop.Value}",
         };
         return FromItemData(ItemRegistry.GetData(forageCropItemId));
       }
 
       if (crop.indexOfHarvest.Value != null)
       {
-        string itemId = crop.isWildSeedCrop() ? crop.whichForageCrop.Value : crop.indexOfHarvest.Value;
+        string itemId = crop.isWildSeedCrop()
+          ? crop.whichForageCrop.Value
+          : crop.indexOfHarvest.Value;
         return FromItemData(ItemRegistry.GetData($"(O){itemId}"));
       }
     }
@@ -353,8 +396,10 @@ internal class ShowTileTooltips : IDisposable
     // Tea/custom bush: show drop item
     if (terrain is Bush bush && bush.size.Value == Bush.greenTeaBush)
     {
-      if (ApiManager.GetApi(ModCompat.CustomBush, out ICustomBushApi? customBushApi) &&
-          customBushApi.TryGetBush(bush, out ICustomBushData? customBushData, out string? id))
+      if (
+        ApiManager.GetApi(ModCompat.CustomBush, out ICustomBushApi? customBushApi)
+        && customBushApi.TryGetBush(bush, out ICustomBushData? customBushData, out string? id)
+      )
       {
         if (customBushApi.TryGetShakeOffItem(bush, out Item? shakeOffItem))
         {
@@ -382,14 +427,21 @@ internal class ShowTileTooltips : IDisposable
   }
 
   private static void DrawColoredHoverText(
-    SpriteBatch b, List<HoverLine> lines, SpriteFont font,
-    int overrideX = -1, int overrideY = -1,
-    Texture2D? spriteTexture = null, Rectangle? spriteSourceRect = null)
+    SpriteBatch b,
+    List<HoverLine> lines,
+    SpriteFont font,
+    int overrideX = -1,
+    int overrideY = -1,
+    Texture2D? spriteTexture = null,
+    Rectangle? spriteSourceRect = null
+  )
   {
     const int spriteSize = 32;
     const int spritePadding = 4;
     bool hasSprite = spriteTexture != null && spriteSourceRect != null;
-    float spriteScale = hasSprite ? spriteSize / (float)Math.Max(spriteSourceRect!.Value.Width, spriteSourceRect.Value.Height) : 0;
+    float spriteScale = hasSprite
+      ? spriteSize / (float)Math.Max(spriteSourceRect!.Value.Width, spriteSourceRect.Value.Height)
+      : 0;
     int renderedSpriteWidth = hasSprite ? (int)(spriteSourceRect!.Value.Width * spriteScale) : 0;
     int spriteSpace = hasSprite ? renderedSpriteWidth + spritePadding : 0;
 
@@ -453,8 +505,15 @@ internal class ShowTileTooltips : IDisposable
     width += 4;
 
     IClickableMenu.drawTextureBox(
-      b, Game1.menuTexture, new Rectangle(0, 256, 60, 60),
-      x, y, width, height, Color.White);
+      b,
+      Game1.menuTexture,
+      new Rectangle(0, 256, 60, 60),
+      x,
+      y,
+      width,
+      height,
+      Color.White
+    );
 
     Color defaultColor = Game1.textColor;
     Color shadowColor = Game1.textShadowColor;
@@ -492,7 +551,17 @@ internal class ShowTileTooltips : IDisposable
         float scale = spriteSize / (float)Math.Max(sourceRect.Width, sourceRect.Height);
         float spriteCenterY = lineY + font.LineSpacing / 2f - (sourceRect.Height * scale) / 2f - 2f;
         Vector2 spritePos = new(x + 16, spriteCenterY);
-        b.Draw(spriteTexture!, spritePos, sourceRect, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0.9f);
+        b.Draw(
+          spriteTexture!,
+          spritePos,
+          sourceRect,
+          Color.White,
+          0f,
+          Vector2.Zero,
+          scale,
+          SpriteEffects.None,
+          0.9f
+        );
         isFirst = false;
       }
 
@@ -515,13 +584,14 @@ internal class ShowTileTooltips : IDisposable
       fertilizerNames[name] = count + 1;
     }
 
-    return fertilizerNames.OrderBy(kv => kv.Value)
-                          .ThenBy(kv => kv.Key)
-                          .Select(kv =>
-                          {
-                            string quantityStr = kv.Value == 1 ? "" : $" x{kv.Value}";
-                            return $"{kv.Key}{quantityStr}";
-                          });
+    return fertilizerNames
+      .OrderBy(kv => kv.Value)
+      .ThenBy(kv => kv.Key)
+      .Select(kv =>
+      {
+        string quantityStr = kv.Value == 1 ? "" : $" x{kv.Value}";
+        return $"{kv.Key}{quantityStr}";
+      });
   }
 
   // See: stardewvalleywiki.com/Trees
@@ -594,7 +664,10 @@ internal class ShowTileTooltips : IDisposable
       case "Wildflour.SASS_Frilly_Gilly_Tree":
         return I18n.SbvFrillyGilly();
       default:
-        ModEntry.MonitorObject.LogOnce($"Unknown tree type: {treeType} (Post a Bug Report on NexusMods)", LogLevel.Warn);
+        ModEntry.MonitorObject.LogOnce(
+          $"Unknown tree type: {treeType} (Post a Bug Report on NexusMods)",
+          LogLevel.Warn
+        );
         return $"Unknown (#{treeType})";
     }
   }
@@ -608,8 +681,14 @@ internal class ShowTileTooltips : IDisposable
       string chanceStr = 1.0f.Equals(chance) ? "" : $" ({chance * 100:2F}%)";
       int daysUntilReady = nextDayToProduce - Game1.dayOfMonth;
       return daysUntilReady <= 0
-        ? new HoverLine($"{parsedItemData.DisplayName}: ", new HoverSegment(I18n.ReadyToHarvest(), ReadyColor))
-        : new HoverLine($"{parsedItemData.DisplayName}: ", new HoverSegment($"{daysUntilReady} {I18n.Days()}{chanceStr}", WaitingColor));
+        ? new HoverLine(
+          $"{parsedItemData.DisplayName}: ",
+          new HoverSegment(I18n.ReadyToHarvest(), ReadyColor)
+        )
+        : new HoverLine(
+          $"{parsedItemData.DisplayName}: ",
+          new HoverSegment($"{daysUntilReady} {I18n.Days()}{chanceStr}", WaitingColor)
+        );
     }
 
     private static Dictionary<string, int> GetItemCountMap(List<Item?> items)
@@ -651,7 +730,9 @@ internal class ShowTileTooltips : IDisposable
       {
         string itemName = fishPond.neededItem.Value.DisplayName;
         int itemCount = fishPond.neededItemCount.Value;
-        entries.Add(new HoverLine(I18n.FishPondQuestItem(itemName, count: itemCount), WaitingColor));
+        entries.Add(
+          new HoverLine(I18n.FishPondQuestItem(itemName, count: itemCount), WaitingColor)
+        );
       }
 
       // Next spawn / quest timing
@@ -665,9 +746,13 @@ internal class ShowTileTooltips : IDisposable
           // Not at max — show days until next fish spawns
           entries.Add(new HoverLine(I18n.FishPondNextSpawn(daysUntilSpawn), WaitingColor));
         }
-        else if (current >= max && fishPond.neededItem.Value == null && daysUntilSpawn > 0
-                 && pondData.PopulationGates != null
-                 && pondData.PopulationGates.ContainsKey(max + 1))
+        else if (
+          current >= max
+          && fishPond.neededItem.Value == null
+          && daysUntilSpawn > 0
+          && pondData.PopulationGates != null
+          && pondData.PopulationGates.ContainsKey(max + 1)
+        )
         {
           // At max, no quest yet, but a gate exists — show days until quest appears
           entries.Add(new HoverLine(I18n.FishPondNextQuest(daysUntilSpawn), WaitingColor));
@@ -722,17 +807,18 @@ internal class ShowTileTooltips : IDisposable
         entries.Add($"{displayName} x{count}");
       }
 
-
       return true;
     }
 
     public static bool MachineTime(Object? tileObject, List<HoverLine> entries)
     {
-      if (tileObject == null ||
-          !tileObject.bigCraftable.Value ||
-          tileObject.MinutesUntilReady <= 0 ||
-          tileObject.heldObject.Value == null ||
-          tileObject.Name == "Heater")
+      if (
+        tileObject == null
+        || !tileObject.bigCraftable.Value
+        || tileObject.MinutesUntilReady <= 0
+        || tileObject.heldObject.Value == null
+        || tileObject.Name == "Heater"
+      )
       {
         return false;
       }
@@ -740,7 +826,9 @@ internal class ShowTileTooltips : IDisposable
       entries.Add(tileObject.heldObject.Value.DisplayName);
       if (tileObject is Cask cask)
       {
-        entries.Add($"{(int)Math.Ceiling(cask.daysToMature.Value / cask.agingRate.Value)} {I18n.DaysToMature()}");
+        entries.Add(
+          $"{(int)Math.Ceiling(cask.daysToMature.Value / cask.agingRate.Value)} {I18n.DaysToMature()}"
+        );
         return true;
       }
 
@@ -923,11 +1011,15 @@ internal class ShowTileTooltips : IDisposable
 
       if (bush.tileSheetOffset.Value == 1)
       {
-        droppedItems.Add(new PossibleDroppedItem(Game1.dayOfMonth, ItemRegistry.GetData("(O)815"), 1.0f));
+        droppedItems.Add(
+          new PossibleDroppedItem(Game1.dayOfMonth, ItemRegistry.GetData("(O)815"), 1.0f)
+        );
       }
       else if (Game1.dayOfMonth >= 21 && Game1.dayOfMonth < 28)
       {
-        droppedItems.Add(new PossibleDroppedItem(Game1.dayOfMonth + 1, ItemRegistry.GetData("(O)815"), 1.0f));
+        droppedItems.Add(
+          new PossibleDroppedItem(Game1.dayOfMonth + 1, ItemRegistry.GetData("(O)815"), 1.0f)
+        );
       }
 
       if (ApiManager.GetApi(ModCompat.CustomBush, out ICustomBushApi? customBushApi))
@@ -948,7 +1040,14 @@ internal class ShowTileTooltips : IDisposable
 
           if (customBushApi.TryGetShakeOffItem(bush, out Item? shakeOffItem))
           {
-            droppedItems.Add(new PossibleDroppedItem(Game1.dayOfMonth, ItemRegistry.GetData(shakeOffItem.QualifiedItemId), 1.0f, id));
+            droppedItems.Add(
+              new PossibleDroppedItem(
+                Game1.dayOfMonth,
+                ItemRegistry.GetData(shakeOffItem.QualifiedItemId),
+                1.0f,
+                id
+              )
+            );
           }
           else
           {

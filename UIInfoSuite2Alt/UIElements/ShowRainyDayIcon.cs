@@ -322,6 +322,11 @@ internal class ShowRainyDayIcon : IDisposable
     {
       SetIslandWeatherSprite();
     }
+
+    ModEntry.MonitorObject.LogOnce(
+      $"ShowRainyDayIcon: tomorrow's weather, valley={GetWeatherForTomorrow()}, island={(HasVisitedIsland() ? GetIslandWeatherForTomorrow() : "n/a")}",
+      LogLevel.Trace
+    );
   }
 
   private void SetValleyWeatherSprite()
@@ -422,7 +427,7 @@ internal class ShowRainyDayIcon : IDisposable
     catch (Exception ex)
     {
       ModEntry.MonitorObject.Log(
-        $"Failed to load weather icon texture '{data.IconTexture}' for weather '{weatherId}': {ex.Message}",
+        $"ShowRainyDayIcon: failed to load weather texture '{data.IconTexture}', weatherId={weatherId}, {ex.Message}",
         LogLevel.Warn
       );
       weather.IsRainyTomorrow = false;

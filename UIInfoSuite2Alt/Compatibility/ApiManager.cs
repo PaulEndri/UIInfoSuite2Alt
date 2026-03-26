@@ -44,7 +44,7 @@ public static class ApiManager
     if (minimumVersion != null && modInfo.Manifest.Version.IsOlderThan(minimumVersion))
     {
       ModEntry.MonitorObject.Log(
-        $"Requested version {minimumVersion} for mod {modId}, but got {modInfo.Manifest.Version} instead.",
+        $"ApiManager: version mismatch for {modId}, requested={minimumVersion}, got={modInfo.Manifest.Version}",
         LogLevel.Warn
       );
       return null;
@@ -54,7 +54,7 @@ public static class ApiManager
     if (api is null)
     {
       if (warnIfNotPresent)
-        ModEntry.MonitorObject.Log($"Could not find API for mod {modId}", LogLevel.Warn);
+        ModEntry.MonitorObject.Log($"ApiManager: no API found for {modId}", LogLevel.Warn);
       return null;
     }
 
@@ -77,10 +77,7 @@ public static class ApiManager
       return true;
     }
 
-    ModEntry.MonitorObject.Log(
-      $"API was registered for mod {modId} but the requested type is not supported",
-      LogLevel.Warn
-    );
+    ModEntry.MonitorObject.Log($"ApiManager: type mismatch for {modId}", LogLevel.Warn);
     return false;
   }
 }

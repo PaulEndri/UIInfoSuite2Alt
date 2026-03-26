@@ -1,6 +1,7 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using StardewModdingAPI;
 using StardewValley;
@@ -30,6 +31,7 @@ internal static class UnlockableBundleHelper
 
   // Maps qualified item ID -> list of cache entries
   private static readonly Dictionary<string, List<CacheEntry>> Cache = [];
+  private static bool _cachePopulated;
 
   // Maps bundle key -> metadata from the content asset (UnlockableModel fields)
   private record BundleAssetData(string? Name, string? IconTexture, string? ColorHex);
@@ -56,6 +58,7 @@ internal static class UnlockableBundleHelper
   {
     Cache.Clear();
     BundleDataMap.Clear();
+    _cachePopulated = false;
   }
 
   /// <summary>
@@ -180,16 +183,17 @@ internal static class UnlockableBundleHelper
     SubscribeEvent(apiType, "BundlePurchasedEvent");
     SubscribeEvent(apiType, "BundleDiscoveredEvent");
 
-    ModEntry.MonitorObject.Log("Unlockable Bundles API resolved via reflection", LogLevel.Trace);
     return true;
   }
 
   private static void PopulateCache()
   {
-    if (Cache.Count > 0)
+    if (_cachePopulated)
     {
       return;
     }
+
+    _cachePopulated = true;
 
     try
     {
@@ -213,11 +217,19 @@ internal static class UnlockableBundleHelper
           ProcessBundle(bundleObj);
         }
       }
+
+      int bundleCount = new HashSet<string>(
+        Cache.Values.SelectMany(l => l).Select(e => e.BundleKey)
+      ).Count;
+      ModEntry.MonitorObject.Log(
+        $"UnlockableBundleHelper: cached UB bundle needs, items={Cache.Count}, activeBundles={bundleCount}",
+        LogLevel.Trace
+      );
     }
     catch (Exception e)
     {
       ModEntry.MonitorObject.Log(
-        $"UnlockableBundleHelper: failed to parse bundles: {e.Message}",
+        $"UnlockableBundleHelper: failed to parse bundles, {e.Message}",
         LogLevel.Warn
       );
     }
@@ -261,14 +273,14 @@ internal static class UnlockableBundleHelper
       }
 
       ModEntry.MonitorObject.Log(
-        $"UB: loaded {BundleDataMap.Count} bundle entries from content asset",
+        $"UnlockableBundleHelper: loaded UB bundle data, defined={BundleDataMap.Count}",
         LogLevel.Trace
       );
     }
     catch (Exception e)
     {
       ModEntry.MonitorObject.Log(
-        $"UnlockableBundleHelper: failed to load bundle data: {e.Message}",
+        $"UnlockableBundleHelper: failed to load bundle metadata, {e.Message}",
         LogLevel.Debug
       );
     }
@@ -420,7 +432,7 @@ internal static class UnlockableBundleHelper
     catch (Exception e)
     {
       ModEntry.MonitorObject.Log(
-        $"UnlockableBundleHelper: failed to subscribe to {eventName}: {e.Message}",
+        $"UnlockableBundleHelper: failed to subscribe to {eventName}, {e.Message}",
         LogLevel.Trace
       );
     }

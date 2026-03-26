@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
@@ -132,6 +133,14 @@ internal class ShowBirthdayIcon : IDisposable
         }
       }
     }
+
+    if (_birthdayNPCs.Value.Count > 0)
+    {
+      ModEntry.MonitorObject.LogOnce(
+        $"ShowBirthdayIcon: birthdays today, npcs=[{string.Join(", ", _birthdayNPCs.Value.Select(n => n.Name))}]",
+        LogLevel.Trace
+      );
+    }
   }
 
   private static Friendship? GetFriendshipWithNPC(string name)
@@ -148,7 +157,7 @@ internal class ShowBirthdayIcon : IDisposable
     catch (Exception ex)
     {
       ModEntry.MonitorObject.LogOnce(
-        "Error while getting information about the birthday of " + name,
+        $"ShowBirthdayIcon: failed to get friendship data, npc={name}",
         LogLevel.Error
       );
       ModEntry.MonitorObject.Log(ex.ToString());

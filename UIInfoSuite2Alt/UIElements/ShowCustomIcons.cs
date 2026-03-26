@@ -81,7 +81,7 @@ internal class ShowCustomIcons : IDisposable
     catch (Exception ex)
     {
       ModEntry.MonitorObject.Log(
-        $"Failed to load custom icons asset: {ex.Message}",
+        $"ShowCustomIcons: failed to load custom icons asset, {ex.Message}",
         LogLevel.Error
       );
       _needsReload.Value = false;
@@ -93,7 +93,7 @@ internal class ShowCustomIcons : IDisposable
       if (string.IsNullOrWhiteSpace(iconData.Texture))
       {
         ModEntry.MonitorObject.LogOnce(
-          $"Custom icon '{key}' has no texture, skipping",
+          $"ShowCustomIcons: icon '{key}' has no texture, skipping",
           LogLevel.Warn
         );
         continue;
@@ -103,6 +103,14 @@ internal class ShowCustomIcons : IDisposable
     }
 
     _needsReload.Value = false;
+
+    if (_activeIcons.Value.Count > 0)
+    {
+      ModEntry.MonitorObject.Log(
+        $"ShowCustomIcons: loaded custom icons, count={_activeIcons.Value.Count}, keys=[{string.Join(", ", _activeIcons.Value.Keys)}]",
+        LogLevel.Trace
+      );
+    }
   }
 
   private void OnRenderingHud(object? sender, RenderingHudEventArgs e)

@@ -73,7 +73,10 @@ public class SoundHelper
 
     newCueDefinition.SetSound(audio, Game1.audioEngine.GetCategoryIndex(category));
     Game1.soundBank.AddCue(newCueDefinition);
-    ModEntry.MonitorObject.Log($"Registered Sound: {newCueDefinition.name}", LogLevel.Trace);
+    ModEntry.MonitorObject.Log(
+      $"SoundHelper: registered sound, name={newCueDefinition.name}",
+      LogLevel.Trace
+    );
   }
 
   public static void Play(Sounds sound)

@@ -61,7 +61,7 @@ internal class ShowItemHoverInformation : IDisposable
     if (gunther == null)
     {
       ModEntry.MonitorObject.Log(
-        $"{GetType().Name}: Could not find Gunther in the game, creating a fake one for ourselves.",
+        "ShowItemHoverInformation: Gunther not found, creating fallback NPC",
         LogLevel.Warn
       );
       gunther = new NPC
@@ -129,7 +129,7 @@ internal class ShowItemHoverInformation : IDisposable
     catch (Exception)
     {
       ModEntry.MonitorObject.Log(
-        $"{GetType().Name}: Stardew Aquarium is installed but could not load Curator sprite.",
+        "ShowItemHoverInformation: Stardew Aquarium installed but Curator sprite load failed",
         LogLevel.Warn
       );
     }
@@ -631,7 +631,7 @@ internal class ShowItemHoverInformation : IDisposable
     else
     {
       ModEntry.MonitorObject.LogOnce(
-        $"No BundleIconAsset for UB bundle '{ubData.BundleName}', using fallback icon",
+        $"ShowItemHoverInformation: no BundleIconAsset for UB bundle '{ubData.BundleName}', using fallback",
         LogLevel.Trace
       );
     }

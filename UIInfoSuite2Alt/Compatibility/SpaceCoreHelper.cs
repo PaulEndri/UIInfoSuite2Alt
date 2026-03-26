@@ -65,7 +65,7 @@ public static class SpaceCoreHelper
       catch (Exception ex)
       {
         ModEntry.MonitorObject.Log(
-          $"SpaceCore reflection failed for skill '{skillId}': {ex.Message}",
+          $"SpaceCoreHelper: reflection failed for skill '{skillId}', {ex.Message}",
           LogLevel.Warn
         );
       }
@@ -75,7 +75,7 @@ public static class SpaceCoreHelper
 
     SkillCache[skillId] = info;
     ModEntry.MonitorObject.Log(
-      $"SpaceCore skill cached: {skillId}, name={displayName}, barColor={barColor}, levels={experienceCurve.Length}",
+      $"SpaceCoreHelper: skill cached, id={skillId}, name={displayName}, barColor={barColor}, levels={experienceCurve.Length}",
       LogLevel.Trace
     );
     return info;
@@ -118,14 +118,14 @@ public static class SpaceCoreHelper
           null
         );
         ModEntry.MonitorObject.Log(
-          $"SpaceCore reflection: skillsType={skillsType != null}, getSkillMethod={_getSkillMethod != null}",
+          $"SpaceCoreHelper: reflection resolved, skillsType={skillsType != null}, getSkillMethod={_getSkillMethod != null}",
           LogLevel.Trace
         );
       }
       catch (Exception ex)
       {
         ModEntry.MonitorObject.Log(
-          $"SpaceCore Skills type reflection failed: {ex.Message}",
+          $"SpaceCoreHelper: reflection failed, {ex.Message}",
           LogLevel.Warn
         );
       }

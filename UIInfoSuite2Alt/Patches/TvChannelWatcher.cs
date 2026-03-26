@@ -24,7 +24,8 @@ internal static class TvChannelWatcher
 
   private static void OnSelectChannel(string answer)
   {
-    switch (ArgUtility.SplitBySpaceAndGet(answer, 0))
+    string channel = ArgUtility.SplitBySpaceAndGet(answer, 0) ?? "";
+    switch (channel)
     {
       case "Weather":
         HasWatchedWeather.Value = true;
@@ -32,6 +33,14 @@ internal static class TvChannelWatcher
       case "Fortune":
         HasWatchedFortune.Value = true;
         break;
+    }
+
+    if (channel is "Weather" or "Fortune")
+    {
+      ModEntry.MonitorObject.Log(
+        $"TvChannelWatcher: channel watched, channel={channel}",
+        LogLevel.Trace
+      );
     }
   }
 

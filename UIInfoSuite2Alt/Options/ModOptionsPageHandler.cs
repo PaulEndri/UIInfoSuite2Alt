@@ -80,7 +80,7 @@ internal class ModOptionsPageHandler : IDisposable
     _helper = helper;
     _hasBgm = GameMenuHelper.HasBetterGameMenu;
     ModEntry.MonitorObject.LogOnce(
-      $"Initializing ModOptionsPageHandler (BetterGameMenu: {_hasBgm})",
+      $"ModOptionsPageHandler: initializing, betterGameMenu={_hasBgm}",
       LogLevel.Trace
     );
 
@@ -849,10 +849,6 @@ internal class ModOptionsPageHandler : IDisposable
       RegisterBgmTab();
     }
 
-    ModEntry.MonitorObject.LogOnce(
-      $"ModOptionsPageHandler ready - {_elementsToDispose.Count} features, {_optionsElements.Count} UI elements",
-      LogLevel.Trace
-    );
   }
 
   public void Dispose()
@@ -991,7 +987,7 @@ internal class ModOptionsPageHandler : IDisposable
           _changeToOurTabAfterTick.Value = true;
           gameMenu.lastOpenedNonMapTab = GameMenu.optionsTab;
           ModEntry.MonitorObject.Log(
-            $"Map close tab workaround: currentTab={gameMenu.currentTab}, lastNonMap={_modOptionsTabPageNumber.Value}, button={e.Button}",
+            $"ModOptionsPageHandler: map close workaround, currentTab={gameMenu.currentTab}, lastNonMap={_modOptionsTabPageNumber.Value}, button={e.Button}",
             LogLevel.Trace
           );
         }
@@ -1098,7 +1094,7 @@ internal class ModOptionsPageHandler : IDisposable
         }
       });
       ModEntry.MonitorObject.Log(
-        $"Tab re-injected after resize: menu={Game1.activeClickableMenu?.GetType().Name}",
+        $"ModOptionsPageHandler: tab re-injected after resize, menu={Game1.activeClickableMenu?.GetType().Name}",
         LogLevel.Trace
       );
     }
@@ -1115,7 +1111,10 @@ internal class ModOptionsPageHandler : IDisposable
       if (gameMenu != null)
       {
         ChangeToOurTab(gameMenu);
-        ModEntry.MonitorObject.Log("Restored tab after resize", LogLevel.Trace);
+        ModEntry.MonitorObject.Log(
+          "ModOptionsPageHandler: restored tab after resize",
+          LogLevel.Trace
+        );
       }
     }
 
@@ -1219,7 +1218,7 @@ internal class ModOptionsPageHandler : IDisposable
       else
       {
         ModEntry.MonitorObject.LogOnce(
-          $"{GetType().Name}: Did not find the ExitPage tab in the new GameMenu.tabs",
+          "ModOptionsPageHandler: ExitPage tab not found in GameMenu.tabs",
           LogLevel.Error
         );
       }
@@ -1300,7 +1299,7 @@ internal class ModOptionsPageHandler : IDisposable
       if (!gameMenu.hoverText.Equals(""))
       {
         ModEntry.MonitorObject.LogOnce(
-          $"{GetType().Name}: Both our mod options tab and the game are displaying hover text",
+          "ModOptionsPageHandler: both mod and game displaying hover text",
           LogLevel.Warn
         );
       }
@@ -1331,7 +1330,7 @@ internal class ModOptionsPageHandler : IDisposable
     if (_instancesWithOptionsPageOpen.Count > 0)
     {
       ModEntry.MonitorObject.LogOnce(
-        $"Window resizing with options page open, instances={_instancesWithOptionsPageOpen.Count}",
+        $"ModOptionsPageHandler: resize with options page open, instances={_instancesWithOptionsPageOpen.Count}",
         LogLevel.Trace
       );
     }
@@ -1358,7 +1357,7 @@ internal class ModOptionsPageHandler : IDisposable
         });
 
         ModEntry.MonitorObject.Log(
-          $"Window resize complete, reverting to mod tab (instances restored: {_instancesWithOptionsPageOpen.Count})",
+          $"ModOptionsPageHandler: resize complete, restored mod tab, instances={_instancesWithOptionsPageOpen.Count}",
           LogLevel.Trace
         );
         _addOurTabBeforeTick = true;
@@ -1435,7 +1434,7 @@ internal class ModOptionsPageHandler : IDisposable
     }
 
     ModEntry.MonitorObject.LogOnce(
-      $"{typeof(ModOptionsPageHandler).Name}: Couldn't retrieve our own mod information",
+      "ModOptionsPageHandler: could not retrieve mod information",
       LogLevel.Info
     );
 
@@ -1445,9 +1444,7 @@ internal class ModOptionsPageHandler : IDisposable
       return $"v={assemblyVersion}";
     }
 
-    ModEntry.MonitorObject.LogOnce(
-      $"{typeof(ModOptionsPageHandler).Name}: Couldn't retrieve our own assembly version information"
-    );
+    ModEntry.MonitorObject.LogOnce("ModOptionsPageHandler: could not retrieve assembly version");
 
     return "(unknown version)";
   }

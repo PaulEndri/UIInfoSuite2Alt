@@ -45,7 +45,7 @@ public partial class ModEntry : Mod
       if (changes.Count > 0)
       {
         string diff = string.Join(", ", changes);
-        MonitorObject.Log($"ModOptions: {diff}", LogLevel.Trace);
+        MonitorObject.Log($"ModEntry: config saved, {diff}", LogLevel.Trace);
       }
     }
 
@@ -68,7 +68,7 @@ public partial class ModEntry : Mod
     HudMessagePatch.Initialize(harmony, helper.ModRegistry.IsLoaded(ModCompat.SpaceCore));
     MailboxCountPatch.Initialize(harmony);
     Monitor.Log(
-      "Harmony patches: TvChannelWatcher, ShowFishOnCatch, HudMessagePatch, MailboxCountPatch",
+      "ModEntry: Harmony patches applied - TvChannelWatcher, ShowFishOnCatch, HudMessagePatch, MailboxCountPatch",
       LogLevel.Trace
     );
 
@@ -103,9 +103,7 @@ public partial class ModEntry : Mod
       if (helper.ModRegistry.IsLoaded(modId))
       {
         Monitor.Log(
-          $"Detected '{name}' ({modId}) installed alongside UI Info Suite 2 Alternative. "
-            + "Both mods provide the same features and will conflict. "
-            + "Please remove one to avoid issues.",
+          $"ModEntry: conflict detected - '{name}' ({modId}), both mods provide the same features, please remove one",
           LogLevel.Warn
         );
       }
@@ -134,7 +132,7 @@ public partial class ModEntry : Mod
       if (!helper.ModRegistry.IsLoaded(modId))
       {
         MonitorObject.Log(
-          $"Recommended mod not installed: {name} [Nexus:{nexusId}] - {reason}.",
+          $"ModEntry: recommended mod not installed - {name} [Nexus:{nexusId}], {reason}",
           LogLevel.Info
         );
       }
@@ -180,19 +178,19 @@ public partial class ModEntry : Mod
     if (_lastConfigSnapshot == null)
     {
       string all = string.Join(", ", currentSnapshot.Select(kv => $"{kv.Key}={kv.Value}"));
-      MonitorObject.Log($"Config: {all}", LogLevel.Trace);
+      MonitorObject.Log($"ModEntry: initial config, {all}", LogLevel.Trace);
     }
     else
     {
       List<string> changes = ModConfig.DiffToggles(_lastConfigSnapshot, currentSnapshot);
       if (changes.Count == 1)
       {
-        MonitorObject.Log($"GMCM config changed: {changes[0]}", LogLevel.Trace);
+        MonitorObject.Log($"ModEntry: GMCM config changed, {changes[0]}", LogLevel.Trace);
       }
       else if (changes.Count > 1)
       {
         string diff = string.Join("\n - ", changes);
-        MonitorObject.Log($"GMCM config changed:\n - {diff}", LogLevel.Trace);
+        MonitorObject.Log($"ModEntry: GMCM config changed\n - {diff}", LogLevel.Trace);
       }
     }
 

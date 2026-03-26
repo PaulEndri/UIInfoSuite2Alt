@@ -158,7 +158,7 @@ internal class ShowRobinBuildingStatusIcon : IDisposable
     else
     {
       ModEntry.MonitorObject.Log(
-        $"{GetType().Name}: Could not find Robin spritesheet.",
+        "ShowRobinBuildingStatusIcon: Robin spritesheet not found",
         LogLevel.Warn
       );
     }

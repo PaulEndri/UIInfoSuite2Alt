@@ -63,7 +63,7 @@ public static class DropsHelper
     if (crop.indexOfHarvest.Value is null)
     {
       ModEntry.MonitorObject.LogOnce(
-        $"Crop has no harvest item ID (seed: {crop.netSeedIndex.Value}, forage: {crop.forageCrop.Value}). Displaying as 'Unknown Crop'.",
+        $"DropsHelper: crop has no harvest item ID, seed={crop.netSeedIndex.Value}, forage={crop.forageCrop.Value}",
         LogLevel.Warn
       );
       return "Unknown Crop";
@@ -198,7 +198,7 @@ public static class DropsHelper
       if (itemData == null)
       {
         ModEntry.MonitorObject.LogOnce(
-          $"DropsHelper: Could not parse the correct item '{displayName}' will drop. (ItemId: {dropInfo.ItemId})",
+          $"DropsHelper: could not parse item '{displayName}', itemId={dropInfo.ItemId}",
           LogLevel.Debug
         );
         continue;

@@ -349,11 +349,19 @@ public class ShowTravelingMerchant : IDisposable
       List<string> ubNames = UnlockableBundleHelper.GetMerchantBundleItemNames(stock.Keys);
       _ubBundleItemNames.AddRange(ubNames);
       _merchantHasUbBundleItems = _ubBundleItemNames.Count > 0;
+
+      if (_merchantHasBundleItems || _merchantHasUbBundleItems)
+      {
+        ModEntry.MonitorObject.Log(
+          $"ShowTravelingMerchant: bundle items in stock, cc=[{string.Join(", ", _bundleItemNames)}], ub=[{string.Join(", ", _ubBundleItemNames)}]",
+          LogLevel.Trace
+        );
+      }
     }
     catch (Exception e)
     {
       ModEntry.MonitorObject.Log(
-        "Failed to check merchant stock for bundle items: " + e.Message,
+        $"ShowTravelingMerchant: merchant stock check failed, {e.Message}",
         LogLevel.Warn
       );
       _merchantHasBundleItems = false;

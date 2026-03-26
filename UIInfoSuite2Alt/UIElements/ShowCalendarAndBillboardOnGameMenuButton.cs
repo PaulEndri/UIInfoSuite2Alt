@@ -486,7 +486,10 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
   {
     menu.exitFunction = ReturnToInventory;
     Game1.activeClickableMenu = menu;
-    ModEntry.MonitorObject.Log($"ReturnToInventory armed: {menu.GetType().Name}", LogLevel.Trace);
+    ModEntry.MonitorObject.Log(
+      $"ShowCalendarAndBillboard: watching menu close, menu={menu.GetType().Name}",
+      LogLevel.Trace
+    );
   }
 
   internal static void ReturnToInventory()
@@ -495,7 +498,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
     // but before the game's input loop can open its own GameMenu.
     if (Game1.activeClickableMenu == null && !Game1.eventUp && !Game1.dialogueUp)
     {
-      ModEntry.MonitorObject.Log("ReturnToInventory: reopening", LogLevel.Trace);
+      ModEntry.MonitorObject.Log("ShowCalendarAndBillboard: reopening GameMenu", LogLevel.Trace);
       Game1.activeClickableMenu = new GameMenu(GameMenu.inventoryTab, playOpeningSound: false);
 
       // Suppress menu buttons (E/ESC) so the game's input loop doesn't
@@ -505,7 +508,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
     else
     {
       ModEntry.MonitorObject.Log(
-        $"ReturnToInventory skipped: active={Game1.activeClickableMenu?.GetType().Name}",
+        $"ShowCalendarAndBillboard: return-to-inventory skipped, active={Game1.activeClickableMenu?.GetType().Name}",
         LogLevel.Trace
       );
     }

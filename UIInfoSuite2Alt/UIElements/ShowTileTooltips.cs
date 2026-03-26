@@ -665,7 +665,7 @@ internal class ShowTileTooltips : IDisposable
         return I18n.SbvFrillyGilly();
       default:
         ModEntry.MonitorObject.LogOnce(
-          $"Unknown tree type: {treeType} (Post a Bug Report on NexusMods)",
+          $"ShowTileTooltips: unknown tree type, treeType={treeType}",
           LogLevel.Warn
         );
         return $"Unknown (#{treeType})";

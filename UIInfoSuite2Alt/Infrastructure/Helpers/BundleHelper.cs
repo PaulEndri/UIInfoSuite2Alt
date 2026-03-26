@@ -301,10 +301,13 @@ internal static class BundleHelper
       }
       catch (Exception)
       {
-        ModEntry.MonitorObject.Log(
-          $"Failed to parse info for bundle {bundleInfo.ToString()}, some information may be unavailable"
-        );
+        ModEntry.MonitorObject.Log($"BundleHelper: failed to parse bundle {bundleInfo.ToString()}");
       }
     }
+
+    ModEntry.MonitorObject.Log(
+      $"BundleHelper: cached CC bundles, bundles={BundleIdToBundleKeyDataMap.Count}, ingredients={AllBundleIngredients.Count}, areas={BundleIdToAreaMap.Values.Distinct().Count()}",
+      LogLevel.Trace
+    );
   }
 }

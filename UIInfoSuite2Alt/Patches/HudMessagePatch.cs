@@ -10,7 +10,7 @@ internal static class HudMessagePatch
   public static void Initialize(Harmony harmony, bool spaceCoreLoaded)
   {
     ModEntry.MonitorObject.Log(
-      $"HudMessagePatch: spaceCoreLoaded={spaceCoreLoaded}",
+      $"HudMessagePatch: initialized, spaceCoreLoaded={spaceCoreLoaded}",
       LogLevel.Trace
     );
 

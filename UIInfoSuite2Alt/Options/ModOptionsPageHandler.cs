@@ -11,6 +11,7 @@ using StardewValley.Menus;
 using UIInfoSuite2Alt.Compatibility;
 using UIInfoSuite2Alt.Infrastructure;
 using UIInfoSuite2Alt.Infrastructure.Extensions;
+using UIInfoSuite2Alt.Infrastructure.Helpers;
 using UIInfoSuite2Alt.Patches;
 using UIInfoSuite2Alt.UIElements;
 
@@ -522,6 +523,16 @@ internal class ModOptionsPageHandler : IDisposable
         showCustomIcons.ToggleOption,
         () => config.ShowCustomIcons,
         Set(v => config.ShowCustomIcons = v)
+      )
+    );
+
+    _optionsElements.Add(
+      new ModOptionsCheckbox(
+        _helper.SafeGetString(nameof(config.ShowLockedBundleItems)),
+        whichOption++,
+        v => BundleHelper.ShowLockedBundles = v,
+        () => config.ShowLockedBundleItems,
+        Set(v => config.ShowLockedBundleItems = v)
       )
     );
 

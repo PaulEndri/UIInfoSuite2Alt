@@ -57,9 +57,14 @@
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
 - **v2.8.6**
+  - Add [Unlockable Bundles](https://www.nexusmods.com/stardewvalley/mods/17265) API integration
+    - Bundle tooltip now shows the actual bundle icon(UB content patcher data supported)
+    - Item/Traveling merchant tooltip now detect UB bundle items
+    - Item/Traveling merchant now respect room discovery and UB discovered bundles
+      - Added "Reveal locked CC bundle items"-option to completly remove room discovery checks
   - Fix vertical HUD icons overlapping the quest log icon by matching the game's own visibility check
   - Fix bundle item detection(tooltips + traveling merchant) missing items on save load due to stale game cache
-  - Bundle tooltip now shows the actual bundle icon instead of generic scroll
+  - Added more trace-level logging for easier troubleshooting
 - **v2.8.5**
   - Show mail count on the mailbox bubble so you can see how many letters are waiting (toggable option)
   - Add Golden Walnut tracker on Ginger Island with hover panel showing collection progress by area (toggable options)
@@ -239,6 +244,7 @@ All mods listed here are **optional** and not required for UI Info Suite 2 Alter
 - [Level Extender](https://www.nexusmods.com/stardewvalley/mods/1471)
 - [Better Farm Animal Variety](https://www.nexusmods.com/stardewvalley/mods/3273)
 - [Ferngill Simple Economy](https://www.nexusmods.com/stardewvalley/mods/21414)
+- [Unlockable Bundles](https://www.nexusmods.com/stardewvalley/mods/17265)
 - [Stardew Aquarium](https://www.nexusmods.com/stardewvalley/mods/6372)
 - [The Love of Cooking](https://www.nexusmods.com/stardewvalley/mods/6830)
 

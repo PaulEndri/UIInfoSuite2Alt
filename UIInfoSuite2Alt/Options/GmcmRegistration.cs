@@ -7,6 +7,7 @@ using StardewValley;
 using UIInfoSuite2Alt.Compatibility;
 using UIInfoSuite2Alt.Infrastructure;
 using UIInfoSuite2Alt.Infrastructure.Extensions;
+using UIInfoSuite2Alt.Infrastructure.Helpers;
 
 namespace UIInfoSuite2Alt;
 
@@ -25,7 +26,8 @@ public partial class ModEntry
     ApiManager.TryRegisterApi<IBetterGameMenuApi>(Helper, ModCompat.BetterGameMenu);
     ApiManager.TryRegisterApi<IFerngillSimpleEconomyApi>(Helper, ModCompat.FerngillEconomy);
 
-    ApiManager.LogLoadedApis();
+    UnlockableBundleHelper.Initialize(Helper);
+    BundleHelper.ShowLockedBundles = ModConfig.ShowLockedBundleItems;
 
     LogModRecommendations(Helper);
 
@@ -325,6 +327,15 @@ public partial class ModEntry
       nameof(ModConfig.ShowCustomIcons),
       () => ModConfig.ShowCustomIcons,
       v => ModConfig.ShowCustomIcons = v
+    );
+    AddBool(
+      nameof(ModConfig.ShowLockedBundleItems),
+      () => ModConfig.ShowLockedBundleItems,
+      v =>
+      {
+        ModConfig.ShowLockedBundleItems = v;
+        BundleHelper.ShowLockedBundles = v;
+      }
     );
 
     // --- Farm & Field ---

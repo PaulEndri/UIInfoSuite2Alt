@@ -66,6 +66,7 @@
   - Fix vertical HUD icons overlapping the quest log icon by matching the game's own visibility check
   - Fix bundle item detection(tooltips + traveling merchant) missing items on save load due to stale game cache
   - Added more trace-level logging for easier troubleshooting
+  - Cached item range distance calculations to reduce lag with many or modded large-radius scarecrows
 - **v2.8.5**
   - Show mail count on the mailbox bubble so you can see how many letters are waiting (toggable option)
   - Add Golden Walnut tracker on Ginger Island with hover panel showing collection progress by area (toggable options)

@@ -848,7 +848,6 @@ internal class ModOptionsPageHandler : IDisposable
     {
       RegisterBgmTab();
     }
-
   }
 
   public void Dispose()

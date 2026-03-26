@@ -29,6 +29,10 @@ internal static class BundleHelper
 {
   private static readonly Dictionary<int, BundleKeyData> BundleIdToBundleKeyDataMap = [];
   private static readonly BundleIngredientsCache AllBundleIngredients = [];
+  private static readonly Dictionary<int, int> BundleIdToAreaMap = [];
+
+  /// <summary>When true, show bundle items for all CC areas regardless of room unlock state.</summary>
+  public static bool ShowLockedBundles { get; set; }
 
   public static BundleKeyData? GetBundleKeyDataFromIndex(int bundleIdx, bool forceRefresh = false)
   {
@@ -81,7 +85,7 @@ internal static class BundleHelper
 
   private static int GetBundleBannerWidthForName(string bundleName)
   {
-    return 45 + (int)Game1.dialogueFont.MeasureString(bundleName).X;
+    return 36 + (int)Game1.smallFont.MeasureString(bundleName).X;
   }
 
   public static BundleRequiredItem? GetBundleItemIfNotDonated(Item item)
@@ -91,9 +95,14 @@ internal static class BundleHelper
       return null;
     }
 
-    // No bundles to track if player chose Joja route
+    // No bundles to track if player chose Joja route or can't read junimo text yet
     var communityCenter = Game1.RequireLocation<CommunityCenter>("CommunityCenter");
     if (Game1.MasterPlayer.mailReceived.Contains("JojaMember"))
+    {
+      return null;
+    }
+
+    if (!ShowLockedBundles && !Game1.player.hasOrWillReceiveMail("canReadJunimoText"))
     {
       return null;
     }
@@ -112,7 +121,11 @@ internal static class BundleHelper
 
     if (AllBundleIngredients.TryGetValue(donatedItem.QualifiedItemId, out bundleRequiredItemsList))
     {
-      output = GetBundleItemIfNotDonatedFromList(bundleRequiredItemsList, donatedItem);
+      output = GetBundleItemIfNotDonatedFromList(
+        bundleRequiredItemsList,
+        donatedItem,
+        communityCenter
+      );
       if (output != null)
       {
         return output;
@@ -130,13 +143,18 @@ internal static class BundleHelper
       return null;
     }
 
-    output = GetBundleItemIfNotDonatedFromList(bundleRequiredItemsList, donatedItem);
+    output = GetBundleItemIfNotDonatedFromList(
+      bundleRequiredItemsList,
+      donatedItem,
+      communityCenter
+    );
     return output;
   }
 
   private static BundleRequiredItem? GetBundleItemIfNotDonatedFromList(
     List<List<int>>? lists,
-    ISalable obj
+    ISalable obj,
+    CommunityCenter communityCenter
   )
   {
     if (lists == null)
@@ -151,7 +169,19 @@ internal static class BundleHelper
         continue;
       }
 
-      BundleKeyData? bundleKeyData = GetBundleKeyDataFromIndex(list[0]);
+      int bundleIdx = list[0];
+
+      // Skip bundles in undiscovered rooms unless "Show locked bundle items" is on
+      if (
+        !ShowLockedBundles
+        && BundleIdToAreaMap.TryGetValue(bundleIdx, out int area)
+        && !communityCenter.shouldNoteAppearInArea(area)
+      )
+      {
+        continue;
+      }
+
+      BundleKeyData? bundleKeyData = GetBundleKeyDataFromIndex(bundleIdx);
       if (bundleKeyData == null)
       {
         continue;
@@ -160,7 +190,7 @@ internal static class BundleHelper
       return new BundleRequiredItem(
         bundleKeyData.Name,
         GetBundleBannerWidthForName(bundleKeyData.Name),
-        list[0],
+        bundleIdx,
         obj.QualifiedItemId,
         obj.Quality
       );
@@ -183,6 +213,7 @@ internal static class BundleHelper
 
     BundleIdToBundleKeyDataMap.Clear();
     AllBundleIngredients.Clear();
+    BundleIdToAreaMap.Clear();
 
     Dictionary<string, string> bundleData = Game1.netWorldState.Value.BundleData;
     Dictionary<int, bool[]> donationStatus = Game1.netWorldState.Value.Bundles.Pairs.ToDictionary(
@@ -196,6 +227,8 @@ internal static class BundleHelper
       {
         string[] bundleLocationInfo = bundleInfo.Key.Split('/');
         int bundleIdx = Convert.ToInt32(bundleLocationInfo[1]);
+        int areaNumber = CommunityCenter.getAreaNumberFromName(bundleLocationInfo[0]);
+        BundleIdToAreaMap[bundleIdx] = areaNumber;
         string[] bundleContentsData = bundleInfo.Value.Split('/');
 
         // Populate name/color/sprite map

@@ -35,6 +35,8 @@ internal class ShowItemHoverInformation : IDisposable
   private ClickableTextureComponent? _aquariumIcon;
   private bool _aquariumIconInitialized;
 
+  private (Texture2D texture, Rectangle sourceRect)? _ubIconOverride;
+
   private readonly ClickableTextureComponent _shippingBottomIcon = new(
     new Rectangle(0, 0, Game1.tileSize, Game1.tileSize),
     Game1.mouseCursors,
@@ -214,6 +216,19 @@ internal class ShowItemHoverInformation : IDisposable
             _bundleColorCache[bundleDisplayData.Id] = bundleColor;
           }
         }
+        else
+        {
+          // Check Unlockable Bundles (lower priority than CC)
+          UbBundleRequiredItem? ubData = UnlockableBundleHelper.GetBundleItemIfNotDonated(
+            hoveredObject
+          );
+          if (ubData != null)
+          {
+            requiredBundleName = ubData.BundleName;
+            bundleColor = ParseUbColor(ubData.ColorHex);
+            _ubIconOverride = ResolveUbIcon(ubData);
+          }
+        }
       }
 
       var drawPositionOffset = new Vector2();
@@ -223,7 +238,7 @@ internal class ShowItemHoverInformation : IDisposable
       var bundleHeaderWidth = 0;
       if (!string.IsNullOrEmpty(requiredBundleName))
       {
-        bundleHeaderWidth = 45 + (int)Game1.dialogueFont.MeasureString(requiredBundleName).X;
+        bundleHeaderWidth = 36 + (int)Game1.dialogueFont.MeasureString(requiredBundleName).X;
       }
 
       var itemTextWidth = (int)Game1.smallFont.MeasureString(itemPrice.ToString()).X;
@@ -428,8 +443,10 @@ internal class ShowItemHoverInformation : IDisposable
           bundleId,
           windowPos + new Vector2(-7, -17),
           windowWidth,
-          bundleColor
+          bundleColor,
+          _ubIconOverride
         );
+        _ubIconOverride = null;
       }
 
       if (notShippedYet)
@@ -457,15 +474,16 @@ internal class ShowItemHoverInformation : IDisposable
     int bundleId,
     Vector2 position,
     int windowWidth,
-    Color? color = null
+    Color? color = null,
+    (Texture2D texture, Rectangle sourceRect)? iconOverride = null
   )
   {
     Color drawColor = color ?? Color.Crimson;
 
     var bundleBannerX = (int)position.X;
-    int bundleBannerY = (int)position.Y;
-    var cellCount = 36;
-    var solidCells = 8;
+    int bundleBannerY = (int)position.Y + 2;
+    var cellCount = 48;
+    var solidCells = 10;
     int cellWidth = windowWidth / cellCount;
     for (var cell = 0; cell < cellCount; ++cell)
     {
@@ -473,111 +491,189 @@ internal class ShowItemHoverInformation : IDisposable
         0.97f - (cell < solidCells ? 0 : 1.0f * (cell - solidCells) / (cellCount - solidCells));
       spriteBatch.Draw(
         Game1.staminaRect,
-        new Rectangle(bundleBannerX + cell * cellWidth, bundleBannerY, cellWidth, 36),
+        new Rectangle(bundleBannerX + cell * cellWidth, bundleBannerY, cellWidth, 32),
         drawColor * fadeAmount
       );
     }
 
-    // Draw per-bundle icon, fall back to generic scroll if unavailable
-    var spriteInfo = BundleHelper.GetBundleSpriteInfo(bundleId);
+    // Draw per-bundle icon at 1:1 pixel scale, fall back to generic scroll if unavailable
+    var spriteInfo = iconOverride ?? BundleHelper.GetBundleSpriteInfo(bundleId);
     float iconWidth;
-    const float bundleIconScale = 1.3125f;
+    const int iconDisplaySize = 32;
     if (spriteInfo is var (texture, sourceRect))
     {
-      int iconSize = (int)(32 * bundleIconScale);
-      var iconPos = new Point((int)position.X, (int)position.Y - 3);
+      var iconPos = new Point((int)position.X, (int)position.Y + 2);
 
       // filled rectangle behind the icon acts as a 2px border in bundle color and 1px shadow border
       spriteBatch.Draw(
         Game1.staminaRect,
-        new Rectangle(iconPos.X - 2, iconPos.Y - 2, iconSize + 4, iconSize + 4),
+        new Rectangle(iconPos.X - 2, iconPos.Y - 2, iconDisplaySize + 4, iconDisplaySize + 4),
         drawColor
       );
       spriteBatch.Draw(
         Game1.staminaRect,
-        new Rectangle(iconPos.X - 1, iconPos.Y - 1, iconSize + 2, iconSize + 2),
+        new Rectangle(iconPos.X - 1, iconPos.Y - 1, iconDisplaySize + 2, iconDisplaySize + 2),
         Color.Black * 0.3f
+      );
+      // incase the icons are smaller then expected triangle fill background with drawColor
+      spriteBatch.Draw(
+        Game1.staminaRect,
+        new Rectangle(iconPos.X, iconPos.Y, iconDisplaySize, iconDisplaySize),
+        drawColor
       );
 
       spriteBatch.Draw(
         texture,
-        new Vector2(position.X, position.Y - 3),
+        new Rectangle((int)position.X, (int)position.Y + 2, iconDisplaySize, iconDisplaySize),
         sourceRect,
         Color.White,
         0f,
         Vector2.Zero,
-        bundleIconScale,
         SpriteEffects.None,
         0.86f
       );
 
-      // Small CC Icon
-      int ccIconW = 13;
-      int ccIconH = 11;
-      Rectangle ccIconRect = new(332, 375, ccIconW, ccIconH);
+      // Small overlay icon (bottom-right corner) - CC icon or UB book
+      Texture2D? overlayTexture = null;
+      Rectangle overlayRect;
+      int overlayW,
+        overlayH;
 
-      spriteBatch.Draw(
-        Game1.staminaRect,
-        new Rectangle(
-          iconPos.X + iconSize - ccIconW,
-          iconPos.Y + iconSize - ccIconH,
-          ccIconW,
-          ccIconH
-        ),
-        drawColor
-      );
-      spriteBatch.Draw(
-        Game1.staminaRect,
-        new Rectangle(
-          iconPos.X + iconSize - ccIconW,
-          iconPos.Y + iconSize - ccIconH,
-          ccIconW,
-          ccIconH
-        ),
-        Color.Black * 0.3f
-      );
+      if (iconOverride == null)
+      {
+        // CC bundle - use community center icon from cursors
+        overlayW = 13;
+        overlayH = 11;
+        overlayRect = new Rectangle(332, 375, overlayW, overlayH);
+        overlayTexture = Game1.mouseCursors;
+      }
+      else
+      {
+        // UB bundle - load book icon from UB's content, stretched to CC overlay size
+        try
+        {
+          overlayTexture = Game1.content.Load<Texture2D>("UnlockableBundles/UI/OverviewBookOpen");
+          overlayRect = new Rectangle(0, 0, overlayTexture.Width, overlayTexture.Height);
+          overlayW = 13;
+          overlayH = 11;
+        }
+        catch (Exception)
+        {
+          overlayW = 0;
+          overlayH = 0;
+          overlayRect = Rectangle.Empty;
+          overlayTexture = null;
+        }
+      }
 
-      spriteBatch.Draw(
-        Game1.mouseCursors,
-        position,
-        ccIconRect,
-        Color.White,
-        0f,
-        new Vector2(0 - (iconSize - ccIconW) - 1, 0 - (iconSize - (ccIconH + 2))),
-        1f,
-        SpriteEffects.None,
-        1f
-      );
+      if (overlayTexture != null)
+      {
+        int overlayX = iconPos.X + iconDisplaySize - overlayW;
+        int overlayY = iconPos.Y + iconDisplaySize - overlayH;
 
-      iconWidth = iconSize;
+        spriteBatch.Draw(
+          overlayTexture,
+          new Rectangle(overlayX, overlayY, overlayW, overlayH),
+          overlayRect,
+          Color.White,
+          0f,
+          Vector2.Zero,
+          SpriteEffects.None,
+          1f
+        );
+      }
+
+      iconWidth = iconDisplaySize;
     }
     else
     {
       spriteBatch.Draw(
         Game1.mouseCursors,
-        position,
+        new Rectangle((int)position.X, (int)position.Y + 5, iconDisplaySize, iconDisplaySize),
         _bundleIcon.sourceRect,
         Color.White,
         0f,
         Vector2.Zero,
-        _bundleIcon.scale,
         SpriteEffects.None,
         0.86f
       );
-      iconWidth = _bundleIcon.sourceRect.Width * _bundleIcon.scale;
+      iconWidth = iconDisplaySize;
     }
 
-    Utility.drawTextWithColoredShadow(
-      spriteBatch,
+    var textPos = position + new Vector2(iconWidth + 3, 3);
+    spriteBatch.DrawString(
+      Game1.smallFont,
       bundleName,
-      Game1.dialogueFont,
-      position + new Vector2(iconWidth + 3, -4),
-      Color.Ivory,
-      Color.DarkSlateGray,
-      horizontalShadowOffset: 2,
-      verticalShadowOffset: 2,
-      numShadows: 3
+      textPos + new Vector2(1, 1),
+      Color.Black * 0.3f
     );
+    spriteBatch.DrawString(Game1.smallFont, bundleName, textPos, Color.White);
+  }
+
+  private static (Texture2D texture, Rectangle sourceRect)? ResolveUbIcon(
+    UbBundleRequiredItem ubData
+  )
+  {
+    // Try UB's BundleIconAsset first (complete icon texture)
+    if (!string.IsNullOrEmpty(ubData.IconTexturePath))
+    {
+      try
+      {
+        Texture2D texture = Game1.content.Load<Texture2D>(ubData.IconTexturePath);
+        return (texture, new Rectangle(0, 0, texture.Width, texture.Height));
+      }
+      catch (Exception)
+      {
+        // BundleIconAsset was set but failed - show error scroll (CP logs the details)
+        return (Game1.mouseCursors, new Rectangle(208, 272, 32, 32));
+      }
+    }
+    else
+    {
+      ModEntry.MonitorObject.LogOnce(
+        $"No BundleIconAsset for UB bundle '{ubData.BundleName}', using fallback icon",
+        LogLevel.Trace
+      );
+    }
+
+    // No BundleIconAsset set - use UB's book icon, then Cursors scroll as last resort
+    try
+    {
+      Texture2D bookIcon = Game1.content.Load<Texture2D>("UnlockableBundles/UI/BundleOverviewIcon");
+      return (bookIcon, new Rectangle(0, 0, bookIcon.Width, bookIcon.Height));
+    }
+    catch (Exception)
+    {
+      return (Game1.mouseCursors, new Rectangle(208, 272, 32, 32));
+    }
+  }
+
+  private static readonly Color DefaultUbBundleColor = new(0xDC, 0x7B, 0x05);
+
+  private static Color ParseUbColor(string? hex)
+  {
+    if (string.IsNullOrEmpty(hex))
+    {
+      return DefaultUbBundleColor;
+    }
+
+    try
+    {
+      ReadOnlySpan<char> span = hex.AsSpan().TrimStart('#');
+      if (span.Length >= 6)
+      {
+        int r = int.Parse(span[..2], System.Globalization.NumberStyles.HexNumber);
+        int g = int.Parse(span[2..4], System.Globalization.NumberStyles.HexNumber);
+        int b = int.Parse(span[4..6], System.Globalization.NumberStyles.HexNumber);
+        return new Color(r, g, b);
+      }
+    }
+    catch (Exception)
+    {
+      // Invalid hex - use default
+    }
+
+    return DefaultUbBundleColor;
   }
 
   private void DrawShippingBin(SpriteBatch b, Vector2 position, Vector2 origin)

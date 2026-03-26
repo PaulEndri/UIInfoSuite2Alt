@@ -18,6 +18,7 @@ public static class ModCompat
   public const string NpcMapLocations = "Bouhm.NPCMapLocations";
   public const string SpaceCore = "spacechase0.SpaceCore";
   public const string VanillaPlusProfessions = "KediDili.VanillaPlusProfessions";
+  public const string UnlockableBundles = "DLX.Bundles";
 
   // original UIInfoSuite variants
   public const string UIInfoSuite2 = "Annosz.UiInfoSuite2";
@@ -27,8 +28,6 @@ public static class ModCompat
 public static class ApiManager
 {
   private static readonly Dictionary<string, object> RegisteredApis = [];
-
-  private static readonly List<string> RegistrationResults = [];
 
   public static T? TryRegisterApi<T>(
     IModHelper helper,
@@ -60,21 +59,7 @@ public static class ApiManager
     }
 
     RegisteredApis[modId] = api;
-    RegistrationResults.Add(
-      $"{modId} v{modInfo.Manifest.Version} - registered as {typeof(T).Name}"
-    );
     return api;
-  }
-
-  public static void LogLoadedApis()
-  {
-    if (RegistrationResults.Count > 0)
-    {
-      string results = string.Join("\n - ", RegistrationResults);
-      ModEntry.MonitorObject.Log($"Registered APIs:\n - {results}", LogLevel.Trace);
-
-      RegistrationResults.Clear();
-    }
   }
 
   public static bool GetApi<T>(string modId, [NotNullWhen(true)] out T? apiInstance)

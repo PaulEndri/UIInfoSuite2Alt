@@ -8,6 +8,7 @@ using StardewValley;
 using StardewValley.Menus;
 using UIInfoSuite2Alt.Compatibility;
 using UIInfoSuite2Alt.Infrastructure;
+using UIInfoSuite2Alt.Infrastructure.Helpers;
 using UIInfoSuite2Alt.Infrastructure.Structures;
 using UIInfoSuite2Alt.Options;
 using UIInfoSuite2Alt.Patches;
@@ -59,7 +60,7 @@ public partial class ModEntry : Mod
     MonitorObject = Monitor;
     _modHelper = helper;
 
-    Monitor.Log($"v{ModManifest.Version} - Loaded", LogLevel.Info);
+    Monitor.Log($"Loaded v{ModManifest.Version}", LogLevel.Info);
 
     var harmony = new Harmony(ModManifest.UniqueID);
     TvChannelWatcher.Initialize(harmony, helper);
@@ -82,9 +83,7 @@ public partial class ModEntry : Mod
     RegisterCalendarAndQuestKeyBindings(helper, true);
     RegisterMonsterEradicationKeyBindings(helper, true);
 
-    IconHandler.Handler.IsQuestLogPermanent = helper.ModRegistry.IsLoaded(
-      "MolsonCAD.DeluxeJournal"
-    );
+    IconHandler.Handler.IsQuestLogPermanent = helper.ModRegistry.IsLoaded(ModCompat.DeluxeJournal);
 
     CheckForConflictingMods(helper);
   }
@@ -164,6 +163,7 @@ public partial class ModEntry : Mod
 
     // Re-read config (may have been edited externally)
     ModConfig = Helper.ReadConfig<ModConfig>();
+    UnlockableBundleHelper.ClearCache();
     ApplyFeatures();
   }
 

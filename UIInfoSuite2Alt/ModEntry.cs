@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using HarmonyLib;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
@@ -23,6 +24,7 @@ public partial class ModEntry : Mod
 
   private static IModHelper _modHelper = null!;
   private ModOptionsPageHandler? _modOptionsPageHandler;
+  private static Dictionary<string, string>? _lastConfigSnapshot;
 
   public static IReflectionHelper Reflection { get; private set; } = null!;
 
@@ -34,6 +36,19 @@ public partial class ModEntry : Mod
   public static void SaveConfig()
   {
     _modHelper.WriteConfig(ModConfig);
+
+    var newSnapshot = ModConfig.SnapshotToggles();
+    if (_lastConfigSnapshot != null)
+    {
+      List<string> changes = ModConfig.DiffToggles(_lastConfigSnapshot, newSnapshot);
+      if (changes.Count > 0)
+      {
+        string diff = string.Join(", ", changes);
+        MonitorObject.Log($"ModOptions: {diff}", LogLevel.Trace);
+      }
+    }
+
+    _lastConfigSnapshot = newSnapshot;
   }
 
   #region Entry
@@ -44,11 +59,17 @@ public partial class ModEntry : Mod
     MonitorObject = Monitor;
     _modHelper = helper;
 
+    Monitor.Log($"v{ModManifest.Version} - Loaded", LogLevel.Info);
+
     var harmony = new Harmony(ModManifest.UniqueID);
     TvChannelWatcher.Initialize(harmony, helper);
     ShowFishOnCatch.Initialize(harmony);
     HudMessagePatch.Initialize(harmony, helper.ModRegistry.IsLoaded(ModCompat.SpaceCore));
     MailboxCountPatch.Initialize(harmony);
+    Monitor.Log(
+      "Harmony patches: TvChannelWatcher, ShowFishOnCatch, HudMessagePatch, MailboxCountPatch",
+      LogLevel.Trace
+    );
 
     ModConfig = Helper.ReadConfig<ModConfig>();
 
@@ -86,7 +107,7 @@ public partial class ModEntry : Mod
           $"Detected '{name}' ({modId}) installed alongside UI Info Suite 2 Alternative. "
             + "Both mods provide the same features and will conflict. "
             + "Please remove one to avoid issues.",
-          LogLevel.Alert
+          LogLevel.Warn
         );
       }
     }
@@ -153,6 +174,29 @@ public partial class ModEntry : Mod
     {
       return;
     }
+
+    var currentSnapshot = ModConfig.SnapshotToggles();
+
+    if (_lastConfigSnapshot == null)
+    {
+      string all = string.Join(", ", currentSnapshot.Select(kv => $"{kv.Key}={kv.Value}"));
+      MonitorObject.Log($"Config: {all}", LogLevel.Trace);
+    }
+    else
+    {
+      List<string> changes = ModConfig.DiffToggles(_lastConfigSnapshot, currentSnapshot);
+      if (changes.Count == 1)
+      {
+        MonitorObject.Log($"GMCM config changed: {changes[0]}", LogLevel.Trace);
+      }
+      else if (changes.Count > 1)
+      {
+        string diff = string.Join("\n - ", changes);
+        MonitorObject.Log($"GMCM config changed:\n - {diff}", LogLevel.Trace);
+      }
+    }
+
+    _lastConfigSnapshot = currentSnapshot;
 
     IconHandler.Handler.IconOrder = ModConfig.IconOrder;
     IconHandler.Handler.UseVerticalLayout = ModConfig.UseVerticalIconLayout;

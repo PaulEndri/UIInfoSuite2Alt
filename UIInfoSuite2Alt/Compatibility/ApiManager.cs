@@ -28,7 +28,7 @@ public static class ApiManager
 {
   private static readonly Dictionary<string, object> RegisteredApis = [];
 
-  private static readonly List<string> SuccessfullyLoadedModIds = [];
+  private static readonly List<string> RegistrationResults = [];
 
   public static T? TryRegisterApi<T>(
     IModHelper helper,
@@ -60,18 +60,20 @@ public static class ApiManager
     }
 
     RegisteredApis[modId] = api;
-    SuccessfullyLoadedModIds.Add(modId);
+    RegistrationResults.Add(
+      $"{modId} v{modInfo.Manifest.Version} - registered as {typeof(T).Name}"
+    );
     return api;
   }
 
   public static void LogLoadedApis()
   {
-    if (SuccessfullyLoadedModIds.Count > 0)
+    if (RegistrationResults.Count > 0)
     {
-      string allMods = string.Join(", ", SuccessfullyLoadedModIds);
-      ModEntry.MonitorObject.Log($"Loaded APIs: {allMods}", LogLevel.Info);
+      string results = string.Join("\n - ", RegistrationResults);
+      ModEntry.MonitorObject.Log($"Registered APIs:\n - {results}", LogLevel.Trace);
 
-      SuccessfullyLoadedModIds.Clear();
+      RegistrationResults.Clear();
     }
   }
 

@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using StardewModdingAPI;
 using StardewModdingAPI.Utilities;
 
@@ -6,6 +8,41 @@ namespace UIInfoSuite2Alt.Options;
 
 public class ModConfig
 {
+  private static readonly PropertyInfo[] ToggleProperties = typeof(ModConfig)
+    .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+    .Where(p => p.PropertyType == typeof(bool) || p.PropertyType == typeof(int))
+    .ToArray();
+
+  /// <summary>Snapshots all bool/int toggle properties as name=value pairs.</summary>
+  public Dictionary<string, string> SnapshotToggles()
+  {
+    var snapshot = new Dictionary<string, string>();
+    foreach (PropertyInfo prop in ToggleProperties)
+    {
+      snapshot[prop.Name] = prop.GetValue(this)?.ToString() ?? "";
+    }
+
+    return snapshot;
+  }
+
+  /// <summary>Returns list of "Name: old -> new" strings for changed toggles.</summary>
+  public static List<string> DiffToggles(
+    Dictionary<string, string> before,
+    Dictionary<string, string> after
+  )
+  {
+    var changes = new List<string>();
+    foreach ((string key, string newVal) in after)
+    {
+      if (before.TryGetValue(key, out string? oldVal) && oldVal != newVal)
+      {
+        changes.Add($"{key}: {oldVal} > {newVal}");
+      }
+    }
+
+    return changes;
+  }
+
   // --- Global settings ---
   public bool ShowOptionsTabInMenu { get; set; } = true;
   public KeybindList OpenCalendarKeybind { get; set; } = KeybindList.ForSingle(SButton.B);

@@ -78,6 +78,10 @@ internal class ModOptionsPageHandler : IDisposable
   {
     _helper = helper;
     _hasBgm = GameMenuHelper.HasBetterGameMenu;
+    ModEntry.MonitorObject.LogOnce(
+      $"Initializing ModOptionsPageHandler (BetterGameMenu: {_hasBgm})",
+      LogLevel.Trace
+    );
 
     // Persist config.json on each change
     Action<bool> Set(Action<bool> setter) =>
@@ -833,6 +837,11 @@ internal class ModOptionsPageHandler : IDisposable
     {
       RegisterBgmTab();
     }
+
+    ModEntry.MonitorObject.LogOnce(
+      $"ModOptionsPageHandler ready - {_elementsToDispose.Count} features, {_optionsElements.Count} UI elements",
+      LogLevel.Trace
+    );
   }
 
   public void Dispose()
@@ -971,7 +980,8 @@ internal class ModOptionsPageHandler : IDisposable
           _changeToOurTabAfterTick.Value = true;
           gameMenu.lastOpenedNonMapTab = GameMenu.optionsTab;
           ModEntry.MonitorObject.Log(
-            $"{GetType().Name}: The map page is about to close and the menu will switch to our tab, applying workaround"
+            $"Map close tab workaround: currentTab={gameMenu.currentTab}, lastNonMap={_modOptionsTabPageNumber.Value}, button={e.Button}",
+            LogLevel.Trace
           );
         }
 
@@ -1077,7 +1087,8 @@ internal class ModOptionsPageHandler : IDisposable
         }
       });
       ModEntry.MonitorObject.Log(
-        $"{GetType().Name}: Our tab was added back as the final step of the window resize workaround"
+        $"Tab re-injected after resize: menu={Game1.activeClickableMenu?.GetType().Name}",
+        LogLevel.Trace
       );
     }
   }
@@ -1093,7 +1104,7 @@ internal class ModOptionsPageHandler : IDisposable
       if (gameMenu != null)
       {
         ChangeToOurTab(gameMenu);
-        ModEntry.MonitorObject.Log($"{GetType().Name}: Changed back to our tab");
+        ModEntry.MonitorObject.Log("Restored tab after resize", LogLevel.Trace);
       }
     }
 
@@ -1308,8 +1319,9 @@ internal class ModOptionsPageHandler : IDisposable
     });
     if (_instancesWithOptionsPageOpen.Count > 0)
     {
-      ModEntry.MonitorObject.Log(
-        $"{GetType().Name}: The window is being resized while our options page is opened, applying workaround"
+      ModEntry.MonitorObject.LogOnce(
+        $"Window resizing with options page open, instances={_instancesWithOptionsPageOpen.Count}",
+        LogLevel.Trace
       );
     }
   }
@@ -1335,7 +1347,8 @@ internal class ModOptionsPageHandler : IDisposable
         });
 
         ModEntry.MonitorObject.Log(
-          $"{GetType().Name}: The window was resized, reverting to our tab"
+          $"Window resize complete, reverting to mod tab (instances restored: {_instancesWithOptionsPageOpen.Count})",
+          LogLevel.Trace
         );
         _addOurTabBeforeTick = true;
       }

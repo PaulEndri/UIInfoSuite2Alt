@@ -218,8 +218,6 @@ public class ModOptionsPage : IClickableMenu
 
       if (currentlySnappedComponent.myID < visibleSlots)
       {
-        ModEntry.MonitorObject.Log($"{GetType().Name}: Using default snap position for a slot");
-
         // Positioning taken from OptionsPage.snapCursorToCurrentSnappedComponent
         Game1.setMousePosition(
           currentlySnappedComponent.bounds.Left + 48,

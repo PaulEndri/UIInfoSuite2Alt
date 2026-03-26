@@ -74,6 +74,10 @@ public static class SpaceCoreHelper
     var info = new CachedCustomSkillInfo(icon, barColor, experienceCurve, displayName);
 
     SkillCache[skillId] = info;
+    ModEntry.MonitorObject.Log(
+      $"SpaceCore skill cached: {skillId}, name={displayName}, barColor={barColor}, levels={experienceCurve.Length}",
+      LogLevel.Trace
+    );
     return info;
   }
 
@@ -112,6 +116,10 @@ public static class SpaceCoreHelper
           null,
           [typeof(string)],
           null
+        );
+        ModEntry.MonitorObject.Log(
+          $"SpaceCore reflection: skillsType={skillsType != null}, getSkillMethod={_getSkillMethod != null}",
+          LogLevel.Trace
         );
       }
       catch (Exception ex)

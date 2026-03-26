@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using StardewModdingAPI;
 using StardewValley;
 using UIInfoSuite2Alt.UIElements;
 
@@ -8,6 +9,11 @@ internal static class HudMessagePatch
 {
   public static void Initialize(Harmony harmony, bool spaceCoreLoaded)
   {
+    ModEntry.MonitorObject.Log(
+      $"HudMessagePatch: spaceCoreLoaded={spaceCoreLoaded}",
+      LogLevel.Trace
+    );
+
     if (!spaceCoreLoaded)
     {
       return;

@@ -24,6 +24,8 @@ public class ShowTravelingMerchant : IDisposable
   private bool _travelingMerchantIsVisited;
   private bool _merchantHasBundleItems;
   private readonly List<string> _bundleItemNames = new();
+  private bool _merchantHasUbBundleItems;
+  private readonly List<string> _ubBundleItemNames = new();
   private ClickableTextureComponent _travelingMerchantIcon = null!;
   private Texture2D _merchantTexture = null!;
   private int _bundlePulseTimer;
@@ -67,6 +69,7 @@ public class ShowTravelingMerchant : IDisposable
     _helper.Events.GameLoop.DayStarted -= OnDayStarted;
     _helper.Events.GameLoop.UpdateTicked -= OnUpdateTicked;
     _helper.Events.Display.MenuChanged -= OnMenuChanged;
+    UnlockableBundleHelper.BundleStateChanged -= OnUbBundleStateChanged;
 
     if (showTravelingMerchant)
     {
@@ -79,6 +82,7 @@ public class ShowTravelingMerchant : IDisposable
       _helper.Events.GameLoop.DayStarted += OnDayStarted;
       _helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
       _helper.Events.Display.MenuChanged += OnMenuChanged;
+      UnlockableBundleHelper.BundleStateChanged += OnUbBundleStateChanged;
     }
   }
 
@@ -120,18 +124,46 @@ public class ShowTravelingMerchant : IDisposable
       _travelingMerchantIsVisited = true;
       _merchantHasBundleItems = false;
       _bundleItemNames.Clear();
+      _merchantHasUbBundleItems = false;
+      _ubBundleItemNames.Clear();
     }
     else if (locationName == RsvMerchantLocation && menu.forSale.Any(s => s is not Hat))
     {
       _rsvMerchantIsVisited = true;
       _merchantHasBundleItems = false;
       _bundleItemNames.Clear();
+      _merchantHasUbBundleItems = false;
+      _ubBundleItemNames.Clear();
+    }
+  }
+
+  private void OnUbBundleStateChanged()
+  {
+    if (!_travelingMerchantIsHere && !_rsvMerchantIsHere)
+    {
+      return;
+    }
+
+    CheckMerchantForBundleItems();
+
+    // Re-show icon if merchant has new UB bundle items, even if already visited
+    if (_merchantHasUbBundleItems)
+    {
+      if (_travelingMerchantIsHere)
+      {
+        _travelingMerchantIsVisited = false;
+      }
+
+      if (_rsvMerchantIsHere)
+      {
+        _rsvMerchantIsVisited = false;
+      }
     }
   }
 
   private void OnUpdateTicked(object? sender, UpdateTickedEventArgs e)
   {
-    if (!_merchantHasBundleItems || !ShowBundleIcon)
+    if ((!_merchantHasBundleItems && !_merchantHasUbBundleItems) || !ShowBundleIcon)
     {
       return;
     }
@@ -176,7 +208,7 @@ public class ShowTravelingMerchant : IDisposable
           );
           _travelingMerchantIcon.draw(batch);
 
-          if (_merchantHasBundleItems && ShowBundleIcon)
+          if ((_merchantHasBundleItems || _merchantHasUbBundleItems) && ShowBundleIcon)
           {
             float baseScale = 1.6f;
             float scale = baseScale;
@@ -225,19 +257,42 @@ public class ShowTravelingMerchant : IDisposable
                   lines.Add(string.Join(", ", _bundleItemNames));
                 }
               }
+
+              if (_merchantHasUbBundleItems && ShowBundleIcon)
+              {
+                lines.Add(I18n.TravelingMerchantHasUbBundleItem());
+
+                if (ShowBundleItemNames && _ubBundleItemNames.Count > 0)
+                {
+                  lines.Add(string.Join(", ", _ubBundleItemNames));
+                }
+              }
             }
 
             if (_rsvMerchantIsHere && (!_rsvMerchantIsVisited || !HideWhenVisited))
             {
               lines.Add(I18n.RsvTravelingMerchantIsAtHike());
 
-              if (!_travelingMerchantIsHere && _merchantHasBundleItems && ShowBundleIcon)
+              if (!_travelingMerchantIsHere)
               {
-                lines.Add(I18n.TravelingMerchantHasBundleItem());
-
-                if (ShowBundleItemNames && _bundleItemNames.Count > 0)
+                if (_merchantHasBundleItems && ShowBundleIcon)
                 {
-                  lines.Add(string.Join(", ", _bundleItemNames));
+                  lines.Add(I18n.TravelingMerchantHasBundleItem());
+
+                  if (ShowBundleItemNames && _bundleItemNames.Count > 0)
+                  {
+                    lines.Add(string.Join(", ", _bundleItemNames));
+                  }
+                }
+
+                if (_merchantHasUbBundleItems && ShowBundleIcon)
+                {
+                  lines.Add(I18n.TravelingMerchantHasUbBundleItem());
+
+                  if (ShowBundleItemNames && _ubBundleItemNames.Count > 0)
+                  {
+                    lines.Add(string.Join(", ", _ubBundleItemNames));
+                  }
                 }
               }
             }
@@ -260,6 +315,8 @@ public class ShowTravelingMerchant : IDisposable
     _travelingMerchantIsVisited = false;
     _merchantHasBundleItems = false;
     _bundleItemNames.Clear();
+    _merchantHasUbBundleItems = false;
+    _ubBundleItemNames.Clear();
 
     _rsvMerchantIsHere = _rsvIsLoaded && Game1.dayOfMonth % 7 == 3;
     _rsvMerchantIsVisited = false;
@@ -276,6 +333,7 @@ public class ShowTravelingMerchant : IDisposable
     {
       Dictionary<ISalable, ItemStockInformation> stock = ShopBuilder.GetShopStock("Traveler");
       _bundleItemNames.Clear();
+      _ubBundleItemNames.Clear();
 
       foreach (ISalable salable in stock.Keys)
       {
@@ -286,6 +344,11 @@ public class ShowTravelingMerchant : IDisposable
       }
 
       _merchantHasBundleItems = _bundleItemNames.Count > 0;
+
+      // Check Unlockable Bundles separately
+      List<string> ubNames = UnlockableBundleHelper.GetMerchantBundleItemNames(stock.Keys);
+      _ubBundleItemNames.AddRange(ubNames);
+      _merchantHasUbBundleItems = _ubBundleItemNames.Count > 0;
     }
     catch (Exception e)
     {
@@ -294,6 +357,7 @@ public class ShowTravelingMerchant : IDisposable
         LogLevel.Warn
       );
       _merchantHasBundleItems = false;
+      _merchantHasUbBundleItems = false;
     }
   }
 

@@ -196,7 +196,56 @@ internal class ShowItemEffectRanges : IDisposable
     int maxTileX = (viewport.X + viewport.Width) / Game1.tileSize + 1;
     int maxTileY = (viewport.Y + viewport.Height) / Game1.tileSize + 1;
 
-    foreach (Point point in _effectiveAreaOther.Value)
+    // Placed items: faded, softer texture
+    float otherOpacity = 0.5f;
+    DrawTileHighlights(
+      e,
+      _effectiveAreaOther.Value,
+      _tileBombTexture.Value,
+      tileColor * otherOpacity,
+      minTileX,
+      minTileY,
+      maxTileX,
+      maxTileY
+    );
+
+    // Held item: prominent
+    DrawTileHighlights(
+      e,
+      _effectiveAreaCurrent.Value,
+      texture,
+      tileColor * tileOpacity,
+      minTileX,
+      minTileY,
+      maxTileX,
+      maxTileY
+    );
+
+    // Overlap: orange
+    DrawTileHighlights(
+      e,
+      _effectiveAreaIntersection.Value,
+      texture,
+      Color.DarkOrange * (tileOpacity + 0.2f),
+      minTileX,
+      minTileY,
+      maxTileX,
+      maxTileY
+    );
+  }
+
+  private static void DrawTileHighlights(
+    RenderingHudEventArgs e,
+    IEnumerable<Point> tiles,
+    Texture2D texture,
+    Color color,
+    int minTileX,
+    int minTileY,
+    int maxTileX,
+    int maxTileY
+  )
+  {
+    foreach (Point point in tiles)
     {
       if (point.X < minTileX || point.X > maxTileX || point.Y < minTileY || point.Y > maxTileY)
       {
@@ -213,33 +262,7 @@ internal class ShowItemEffectRanges : IDisposable
           Game1.GlobalToLocal(Utility.ModifyCoordinatesForUIScale(position))
         ),
         null,
-        tileColor * tileOpacity,
-        0.0f,
-        Vector2.Zero,
-        Utility.ModifyCoordinateForUIScale(Game1.pixelZoom),
-        SpriteEffects.None,
-        0.01f
-      );
-    }
-
-    foreach (Point point in _effectiveAreaIntersection.Value)
-    {
-      if (point.X < minTileX || point.X > maxTileX || point.Y < minTileY || point.Y > maxTileY)
-      {
-        continue;
-      }
-
-      var position = new Vector2(
-        point.X * Utility.ModifyCoordinateFromUIScale(Game1.tileSize),
-        point.Y * Utility.ModifyCoordinateFromUIScale(Game1.tileSize)
-      );
-      e.SpriteBatch.Draw(
-        texture,
-        Utility.ModifyCoordinatesForUIScale(
-          Game1.GlobalToLocal(Utility.ModifyCoordinatesForUIScale(position))
-        ),
-        null,
-        Color.DarkOrange * (tileOpacity + 0.2f),
+        color,
         0.0f,
         Vector2.Zero,
         Utility.ModifyCoordinateForUIScale(Game1.pixelZoom),
@@ -427,7 +450,7 @@ internal class ShowItemEffectRanges : IDisposable
     List<Object> similarObjects;
     _rangeTooltipInfo.Value = null;
 
-    if (_showItemEffectRanges && ButtonControlShow && (ButtonShowOneRange || ButtonShowAllRanges))
+    if (ButtonControlShow && (ButtonShowOneRange || ButtonShowAllRanges))
     {
       Building building = Game1.currentLocation.getBuildingAt(Game1.GetPlacementGrabTile());
 
@@ -475,7 +498,7 @@ internal class ShowItemEffectRanges : IDisposable
     }
 
     // Wild tree seed spread — seed spread only occurs on Farm locations
-    if (_showItemEffectRanges && ButtonControlShow && (ButtonShowOneRange || ButtonShowAllRanges))
+    if (ButtonControlShow && (ButtonShowOneRange || ButtonShowAllRanges))
     {
       Vector2 gamepadTile =
         Game1.player.CurrentTool != null
@@ -583,7 +606,7 @@ internal class ShowItemEffectRanges : IDisposable
     }
 
     // Placed objects (button-controlled range display)
-    if (_showItemEffectRanges && ButtonControlShow && (ButtonShowOneRange || ButtonShowAllRanges))
+    if (ButtonControlShow && (ButtonShowOneRange || ButtonShowAllRanges))
     {
       Vector2 gamepadTile =
         Game1.player.CurrentTool != null
@@ -770,19 +793,9 @@ internal class ShowItemEffectRanges : IDisposable
     {
       string itemName = currentItem.Name;
 
-      Vector2 currentTile = Game1.GetPlacementGrabTile();
-      Game1.isCheckingNonMousePlacement = !Game1.IsPerformingMousePlacement();
-      Vector2 validTile =
-        Utility.snapToInt(
-          Utility.GetNearbyValidPlacementPosition(
-            Game1.player,
-            Game1.currentLocation,
-            currentItem,
-            (int)currentTile.X * Game1.tileSize,
-            (int)currentTile.Y * Game1.tileSize
-          )
-        ) / Game1.tileSize;
-      Game1.isCheckingNonMousePlacement = false;
+      // Use the raw cursor tile for range visualization so the preview stays under the cursor
+      // even when the game's valid-placement snap would jump to a distant tile (e.g. over flooring).
+      Vector2 cursorTile = Utility.snapToInt(Game1.GetPlacementGrabTile());
 
       if (_showItemEffectRanges)
       {
@@ -794,8 +807,8 @@ internal class ShowItemEffectRanges : IDisposable
           AddTilesToHighlightedArea(
             arrayToUse,
             true,
-            (int)validTile.X,
-            (int)validTile.Y,
+            (int)cursorTile.X,
+            (int)cursorTile.Y,
             skipNonTillable: true
           );
 
@@ -819,10 +832,10 @@ internal class ShowItemEffectRanges : IDisposable
         {
           // GetSprinklerTiles returns absolute positions in 1.6+ — offset to valid placement tile
           IEnumerable<Vector2> unplacedSprinklerTiles = currentItem.GetSprinklerTiles();
-          if (currentItem.TileLocation != validTile)
+          if (currentItem.TileLocation != cursorTile)
           {
             unplacedSprinklerTiles = unplacedSprinklerTiles.Select(tile =>
-              tile - currentItem.TileLocation + validTile
+              tile - currentItem.TileLocation + cursorTile
             );
           }
 
@@ -837,17 +850,17 @@ internal class ShowItemEffectRanges : IDisposable
         else if (itemName.IndexOf("bee house", StringComparison.OrdinalIgnoreCase) >= 0)
         {
           arrayToUse = GetDistanceArray(ObjectsWithDistance.Beehouse);
-          AddTilesToHighlightedArea(arrayToUse, false, (int)validTile.X, (int)validTile.Y);
+          AddTilesToHighlightedArea(arrayToUse, false, (int)cursorTile.X, (int)cursorTile.Y);
         }
         else if (itemName.IndexOf("mushroom log", StringComparison.OrdinalIgnoreCase) >= 0)
         {
           arrayToUse = GetDistanceArray(ObjectsWithDistance.MushroomLog);
-          AddTilesToHighlightedArea(arrayToUse, false, (int)validTile.X, (int)validTile.Y);
+          AddTilesToHighlightedArea(arrayToUse, false, (int)cursorTile.X, (int)cursorTile.Y);
         }
         else if (itemName.IndexOf("mossy seed", StringComparison.OrdinalIgnoreCase) >= 0)
         {
           arrayToUse = GetDistanceArray(ObjectsWithDistance.MossySeed);
-          AddTilesToHighlightedArea(arrayToUse, false, (int)validTile.X, (int)validTile.Y);
+          AddTilesToHighlightedArea(arrayToUse, false, (int)cursorTile.X, (int)cursorTile.Y);
         }
       }
 
@@ -866,7 +879,7 @@ internal class ShowItemEffectRanges : IDisposable
           arrayToUse = GetDistanceArray(ObjectsWithDistance.Bomb);
         }
 
-        AddTilesToHighlightedArea(arrayToUse, false, (int)validTile.X, (int)validTile.Y);
+        AddTilesToHighlightedArea(arrayToUse, false, (int)cursorTile.X, (int)cursorTile.Y);
         _isBombRange.Value = true;
       }
     }
@@ -1109,12 +1122,22 @@ internal class ShowItemEffectRanges : IDisposable
   {
     if (_effectiveAreaCurrent.Value.Count == 0)
     {
-      // Show-all mode: overlaps already detected via _seenTiles during tile addition
-      _effectiveAreaOther.Value.ExceptWith(_effectiveAreaIntersection.Value);
+      if (_rangeTooltipInfo.Value != null)
+      {
+        // Show-all keybind mode: overlaps already detected via _seenTiles during tile addition
+        _effectiveAreaOther.Value.ExceptWith(_effectiveAreaIntersection.Value);
+      }
+      else
+      {
+        // Held-item mode but all tiles were filtered (e.g. pointing at flooring).
+        // The _seenTiles intersections between placed items are not meaningful here.
+        _effectiveAreaIntersection.Value.Clear();
+      }
+
       return;
     }
 
-    // Show-one mode: compute overlap between hovered (current) and others using in-place set operations
+    // Show-one mode: compute overlap between hovered (current) and others
     var currentSet = new HashSet<Point>(_effectiveAreaCurrent.Value);
     _effectiveAreaIntersection.Value.Clear();
     foreach (Point p in currentSet)
@@ -1125,15 +1148,9 @@ internal class ShowItemEffectRanges : IDisposable
       }
     }
 
-    // Other = (Other - Current) + (Current - Other) = symmetric difference
-    // Current tiles not in Other get added; shared tiles get removed from Other
-    foreach (Point p in currentSet)
-    {
-      if (!_effectiveAreaOther.Value.Remove(p))
-      {
-        _effectiveAreaOther.Value.Add(p);
-      }
-    }
+    // Remove intersection tiles from both sets so they only render once (as overlap)
+    _effectiveAreaOther.Value.ExceptWith(_effectiveAreaIntersection.Value);
+    _effectiveAreaCurrent.Value.RemoveAll(_effectiveAreaIntersection.Value.Contains);
   }
 
   #region Distance map
@@ -1202,6 +1219,9 @@ internal class ShowItemEffectRanges : IDisposable
     }
   }
 
+  private static readonly Dictionary<(double, double?, bool?, int?), int[][]> CircularMaskCache =
+  [];
+
   private static int[][] GetCircularMask(
     double maxDistance,
     double? exceptionalDistance = null,
@@ -1209,6 +1229,12 @@ internal class ShowItemEffectRanges : IDisposable
     int? maxDisplaySquareRadius = null
   )
   {
+    var key = (maxDistance, exceptionalDistance, onlyClearExceptions, maxDisplaySquareRadius);
+    if (CircularMaskCache.TryGetValue(key, out int[][]? cached))
+    {
+      return cached;
+    }
+
     int radius = Math.Max(
       (int)Math.Ceiling(maxDistance),
       exceptionalDistance.HasValue ? (int)Math.Ceiling(exceptionalDistance.Value) : 0
@@ -1238,6 +1264,7 @@ internal class ShowItemEffectRanges : IDisposable
       }
     }
 
+    CircularMaskCache[key] = result;
     return result;
   }
 

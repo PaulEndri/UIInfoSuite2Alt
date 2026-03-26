@@ -434,7 +434,7 @@ internal class ShowItemHoverInformation : IDisposable
     Color drawColor = color ?? Color.Crimson;
 
     var bundleBannerX = (int)position.X;
-    int bundleBannerY = (int)position.Y + 7;
+    int bundleBannerY = (int)position.Y;
     var cellCount = 36;
     var solidCells = 8;
     int cellWidth = windowWidth / cellCount;
@@ -455,33 +455,15 @@ internal class ShowItemHoverInformation : IDisposable
     if (spriteInfo is var (texture, sourceRect))
     {
       int iconSize = (int)(32 * bundleIconScale);
-      var iconPos = new Point((int)position.X, (int)position.Y);
+      var iconPos = new Point((int)position.X, (int)position.Y - 3);
 
-      // 1px shadow on right and bottom edges (bottom uses same fade as banner)
-      spriteBatch.Draw(Game1.staminaRect, new Rectangle(iconPos.X - 2, iconPos.Y - 2, iconSize + 4, iconSize + 3), Color.Black * 0.15f);
-
-      int shadowY = iconPos.Y + iconSize + 1;
-      int shadowStartX = iconPos.X;
-      int shadowWidth = windowWidth - 5;
-      for (var cell = 0; cell < cellCount; ++cell)
-      {
-        float fadeAmount = 0.15f * (0.97f - (cell < solidCells ? 0 : 1.0f * (cell - solidCells) / (cellCount - solidCells)));
-        spriteBatch.Draw(
-          Game1.staminaRect,
-          new Rectangle(shadowStartX + cell * (shadowWidth / cellCount) - 2, shadowY, shadowWidth / cellCount, 1),
-          Color.Black * fadeAmount
-        );
-      }
-
-      // 1px border in bundle color
-      spriteBatch.Draw(Game1.staminaRect, new Rectangle(iconPos.X - 1, iconPos.Y - 1, iconSize + 2, 1), drawColor);
-      spriteBatch.Draw(Game1.staminaRect, new Rectangle(iconPos.X - 1, iconPos.Y + iconSize, iconSize + 2, 1), drawColor);
-      spriteBatch.Draw(Game1.staminaRect, new Rectangle(iconPos.X - 1, iconPos.Y, 1, iconSize), drawColor);
-      spriteBatch.Draw(Game1.staminaRect, new Rectangle(iconPos.X + iconSize, iconPos.Y, 1, iconSize), drawColor);
+      // filled rectangle behind the icon acts as a 2px border in bundle color and 1px shadow border
+      spriteBatch.Draw(Game1.staminaRect, new Rectangle(iconPos.X - 2, iconPos.Y - 2, iconSize + 4, iconSize + 4), drawColor);
+      spriteBatch.Draw(Game1.staminaRect, new Rectangle(iconPos.X - 1, iconPos.Y - 1, iconSize + 2, iconSize + 2), Color.Black * 0.3f);
 
       spriteBatch.Draw(
         texture,
-        position,
+        new Vector2(position.X, position.Y - 3),
         sourceRect,
         Color.White,
         0f,
@@ -492,13 +474,20 @@ internal class ShowItemHoverInformation : IDisposable
       );
 
       // Small CC Icon
+      int ccIconW = 13;
+      int ccIconH = 11;
+      Rectangle ccIconRect = new(332, 375, ccIconW, ccIconH);
+
+      spriteBatch.Draw(Game1.staminaRect, new Rectangle(iconPos.X + iconSize - ccIconW, iconPos.Y + iconSize - ccIconH, ccIconW, ccIconH), drawColor);
+      spriteBatch.Draw(Game1.staminaRect, new Rectangle(iconPos.X + iconSize - ccIconW, iconPos.Y + iconSize - ccIconH, ccIconW, ccIconH), Color.Black * 0.3f);
+
       spriteBatch.Draw(
         Game1.mouseCursors,
         position,
-        new Rectangle(332, 375, 13, 11),
+        ccIconRect,
         Color.White,
         0f,
-        new Vector2(0 - (iconSize - 13), 0 - (iconSize - 11)),
+        new Vector2(0 - (iconSize - ccIconW) - 1, 0 - (iconSize - (ccIconH + 2))),
         1f,
         SpriteEffects.None,
         1f
@@ -526,7 +515,7 @@ internal class ShowItemHoverInformation : IDisposable
       spriteBatch,
       bundleName,
       Game1.dialogueFont,
-      position + new Vector2(iconWidth + 3, 0),
+      position + new Vector2(iconWidth + 3, -4),
       Color.Ivory,
       Color.DarkSlateGray,
       horizontalShadowOffset: 2,

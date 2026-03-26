@@ -62,6 +62,7 @@
     - Item/Traveling merchant tooltip now detect UB bundle items
     - Item/Traveling merchant now respect room discovery and UB discovered bundles
       - Added "Reveal locked CC bundle items"-option to completly remove room discovery checks
+  - Closing a Calendar, Billboard, Special Orders or Qi Board opened from inventory icons now returns to player inventory
   - Fix vertical HUD icons overlapping the quest log icon by matching the game's own visibility check
   - Fix bundle item detection(tooltips + traveling merchant) missing items on save load due to stale game cache
   - Added more trace-level logging for easier troubleshooting

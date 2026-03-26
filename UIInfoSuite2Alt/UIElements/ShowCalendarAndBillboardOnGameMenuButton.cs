@@ -61,6 +61,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
 
   private readonly PerScreen<int> _soPulseTimer = new();
   private readonly PerScreen<int> _soPulseDelay = new();
+
   private const string BoardSigPrefix = "UIInfoSuite2Alt.BoardSig.";
   private List<(string BoardType, string DisplayName)>? _cachedModBoards;
   private int _cachedModBoardsDay = -1;
@@ -481,6 +482,46 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
     MarkBoardViewed(boardType);
   }
 
+  private static void OpenMenuFromIcon(IClickableMenu menu)
+  {
+    menu.exitFunction = ReturnToInventory;
+    Game1.activeClickableMenu = menu;
+    ModEntry.MonitorObject.Log($"ReturnToInventory armed: {menu.GetType().Name}", LogLevel.Trace);
+  }
+
+  internal static void ReturnToInventory()
+  {
+    // exitFunction fires after exitActiveMenu sets activeClickableMenu = null,
+    // but before the game's input loop can open its own GameMenu.
+    if (Game1.activeClickableMenu == null && !Game1.eventUp && !Game1.dialogueUp)
+    {
+      ModEntry.MonitorObject.Log("ReturnToInventory: reopening", LogLevel.Trace);
+      Game1.activeClickableMenu = new GameMenu(GameMenu.inventoryTab, playOpeningSound: false);
+
+      // Suppress menu buttons (E/ESC) so the game's input loop doesn't
+      // immediately close our newly opened GameMenu in the same frame.
+      SuppressMenuButtons();
+    }
+    else
+    {
+      ModEntry.MonitorObject.Log(
+        $"ReturnToInventory skipped: active={Game1.activeClickableMenu?.GetType().Name}",
+        LogLevel.Trace
+      );
+    }
+  }
+
+  private static void SuppressMenuButtons()
+  {
+    if (_instance == null)
+      return;
+
+    foreach (InputButton button in Game1.options.menuButton)
+    {
+      _instance._helper.Input.Suppress(button.ToSButton());
+    }
+  }
+
   private static string GetBoardSignature(string boardType)
   {
     return string.Join(
@@ -560,7 +601,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
     if (isQiOrders)
     {
       MarkBoardViewed("Qi");
-      Game1.activeClickableMenu = new SpecialOrdersBoard("Qi");
+      OpenMenuFromIcon(new SpecialOrdersBoard("Qi"));
       return true;
     }
 
@@ -577,16 +618,19 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
           if (!HasUnviewedOrders(boardType))
             viewedTypes.Add(boardType);
         }
-        Game1.activeClickableMenu = new SpecialOrdersBoardSelector(
-          modBoards,
-          OnBoardSelected,
-          viewedTypes
+        OpenMenuFromIcon(
+          new SpecialOrdersBoardSelector(
+            modBoards,
+            OnBoardSelected,
+            viewedTypes,
+            returnToInventory: true
+          )
         );
       }
       else
       {
         MarkBoardViewed("");
-        Game1.activeClickableMenu = new SpecialOrdersBoard();
+        OpenMenuFromIcon(new SpecialOrdersBoard());
       }
       return true;
     }
@@ -605,11 +649,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
           if (!HasRsvUnacceptedQuest(boardType))
             viewedTypes.Add(boardType);
         }
-        Game1.activeClickableMenu = new QuestBoardSelector(
-          modQuestBoards,
-          OnQuestBoardSelected,
-          viewedTypes
-        );
+        OpenMenuFromIcon(new QuestBoardSelector(modQuestBoards, OnQuestBoardSelected, viewedTypes));
         return true;
       }
     }
@@ -619,7 +659,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
       Game1.questOfTheDay.currentObjective = "wat?";
     }
 
-    Game1.activeClickableMenu = new Billboard(dailyQuest: isQuest);
+    OpenMenuFromIcon(new Billboard(dailyQuest: isQuest));
     return true;
   }
 
@@ -799,7 +839,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
       object? board = _rsvQuestBoardCtor.Invoke([questData, boardType]);
       if (board is IClickableMenu menu)
       {
-        Game1.activeClickableMenu = menu;
+        OpenMenuFromIcon(menu);
         return true;
       }
     }
@@ -830,14 +870,13 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
     {
       if (Game1.questOfTheDay != null && string.IsNullOrEmpty(Game1.questOfTheDay.currentObjective))
         Game1.questOfTheDay.currentObjective = "wat?";
-      Game1.activeClickableMenu = new Billboard(dailyQuest: true);
+      OpenMenuFromIcon(new Billboard(dailyQuest: true));
     }
     else
     {
       if (!TryOpenRsvQuestBoard(boardType))
       {
-        // Fallback to vanilla billboard if reflection fails
-        Game1.activeClickableMenu = new Billboard(dailyQuest: true);
+        OpenMenuFromIcon(new Billboard(dailyQuest: true));
       }
     }
   }

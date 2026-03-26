@@ -22,17 +22,20 @@ internal class SpecialOrdersBoardSelector : IClickableMenu
   private readonly List<ClickableComponent> _optionComponents = new();
   private readonly Action<string>? _onBoardSelected;
   private readonly HashSet<string> _viewedBoardTypes;
+  private readonly bool _returnToInventory;
   private int _hoveredIndex = -1;
 
   public SpecialOrdersBoardSelector(
     List<(string BoardType, string DisplayName)> modBoards,
     Action<string>? onBoardSelected = null,
-    HashSet<string>? viewedBoardTypes = null
+    HashSet<string>? viewedBoardTypes = null,
+    bool returnToInventory = false
   )
     : base(0, 0, 0, 0, showUpperRightCloseButton: true)
   {
     _onBoardSelected = onBoardSelected;
     _viewedBoardTypes = viewedBoardTypes ?? new HashSet<string>();
+    _returnToInventory = returnToInventory;
 
     // Vanilla first, then mod boards
     _options.Add(new BoardOption("", I18n.SpecialOrdersVanilla()));
@@ -158,7 +161,12 @@ internal class SpecialOrdersBoardSelector : IClickableMenu
   {
     Game1.playSound("bigSelect");
     _onBoardSelected?.Invoke(_options[index].BoardType);
-    Game1.activeClickableMenu = new SpecialOrdersBoard(_options[index].BoardType);
+    var board = new SpecialOrdersBoard(_options[index].BoardType);
+    if (_returnToInventory)
+    {
+      board.exitFunction = ShowCalendarAndBillboardOnGameMenuButton.ReturnToInventory;
+    }
+    Game1.activeClickableMenu = board;
   }
 
   public override void draw(SpriteBatch b)

@@ -63,6 +63,8 @@
     - Item/Traveling merchant now respect room discovery and UB discovered bundles
     - Added "Reveal locked CC bundle items"-option to completly remove room discovery checks
   - Add sub-option to toggle placed item ranges (scarecrows, sprinklers, etc.) while holding an item
+  - GMCM config now uses multi-page layout with page links for each feature section
+    - In-game options tab now has collapsible sections with expand/collapse icons per category
   - Closing a Calendar, Billboard, Special Orders or Qi Board opened from inventory icons now returns to player inventory
   - Fix calendar/billboard/quest keybinds not working when "Show calendar/billboard button" option is unchecked
   - Fix vertical HUD icons overlapping the quest log icon by matching the game's own visibility check

@@ -238,7 +238,7 @@ internal class ShowItemHoverInformation : IDisposable
       var bundleHeaderWidth = 0;
       if (!string.IsNullOrEmpty(requiredBundleName))
       {
-        bundleHeaderWidth = 36 + (int)Game1.dialogueFont.MeasureString(requiredBundleName).X;
+        bundleHeaderWidth = 36 + (int)Game1.smallFont.MeasureString(requiredBundleName).X;
       }
 
       var itemTextWidth = (int)Game1.smallFont.MeasureString(itemPrice.ToString()).X;

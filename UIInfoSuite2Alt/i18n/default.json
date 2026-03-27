@@ -184,6 +184,7 @@
   "MachineProcessingMode.Hold": "Hold",
   "ShowFishPondIcons": "Show fish species icon on ponds",
   "ShowItemEffectRanges": "Show held item placement range",
+  "ShowPlacedItemRanges": "Show placed item ranges while holding",
   "EnableItemRangeKeybinds": "Enable item range keybinds",
   "ShowRangeTooltip": "Show range tooltip",
   "ShowBombRange": "Show bomb destroying range",

@@ -32,6 +32,7 @@ internal class ShowItemEffectRanges : IDisposable
   private readonly PerScreen<bool> _isBombRange = new(() => false);
 
   private bool _showItemEffectRanges;
+  private bool _showPlacedItemRanges = true;
 
   private bool ButtonControlShow { get; set; }
   private bool ShowRangeTooltip { get; set; } = true;
@@ -92,6 +93,11 @@ internal class ShowItemEffectRanges : IDisposable
   {
     _showItemEffectRanges = showItemEffectRanges;
     UpdateEventSubscriptions();
+  }
+
+  public void ToggleShowPlacedItemRangesOption(bool showPlacedItemRanges)
+  {
+    _showPlacedItemRanges = showPlacedItemRanges;
   }
 
   public void ToggleButtonControlShowOption(bool buttonControlShow)
@@ -812,20 +818,23 @@ internal class ShowItemEffectRanges : IDisposable
             skipNonTillable: true
           );
 
-          similarObjects = GetSimilarObjectsInLocation("arecrow");
-          foreach (Object next in similarObjects)
+          if (_showPlacedItemRanges)
           {
-            arrayToUse =
-              next.Name.IndexOf("eluxe", StringComparison.OrdinalIgnoreCase) >= 0
-                ? GetDistanceArray(ObjectsWithDistance.DeluxeScarecrow, false, next)
-                : GetDistanceArray(ObjectsWithDistance.Scarecrow, false, next);
-            AddTilesToHighlightedArea(
-              arrayToUse,
-              false,
-              (int)next.TileLocation.X,
-              (int)next.TileLocation.Y,
-              skipNonTillable: true
-            );
+            similarObjects = GetSimilarObjectsInLocation("arecrow");
+            foreach (Object next in similarObjects)
+            {
+              arrayToUse =
+                next.Name.IndexOf("eluxe", StringComparison.OrdinalIgnoreCase) >= 0
+                  ? GetDistanceArray(ObjectsWithDistance.DeluxeScarecrow, false, next)
+                  : GetDistanceArray(ObjectsWithDistance.Scarecrow, false, next);
+              AddTilesToHighlightedArea(
+                arrayToUse,
+                false,
+                (int)next.TileLocation.X,
+                (int)next.TileLocation.Y,
+                skipNonTillable: true
+              );
+            }
           }
         }
         else if (itemName.IndexOf("sprinkler", StringComparison.OrdinalIgnoreCase) >= 0)
@@ -841,10 +850,13 @@ internal class ShowItemEffectRanges : IDisposable
 
           AddTilesToHighlightedArea(unplacedSprinklerTiles, true, skipNonTillable: true);
 
-          similarObjects = GetSimilarObjectsInLocation("sprinkler");
-          foreach (Object next in similarObjects)
+          if (_showPlacedItemRanges)
           {
-            AddTilesToHighlightedArea(next.GetSprinklerTiles(), false, skipNonTillable: true);
+            similarObjects = GetSimilarObjectsInLocation("sprinkler");
+            foreach (Object next in similarObjects)
+            {
+              AddTilesToHighlightedArea(next.GetSprinklerTiles(), false, skipNonTillable: true);
+            }
           }
         }
         else if (itemName.IndexOf("bee house", StringComparison.OrdinalIgnoreCase) >= 0)

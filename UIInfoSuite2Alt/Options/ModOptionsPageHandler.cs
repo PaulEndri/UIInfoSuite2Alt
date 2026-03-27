@@ -526,16 +526,6 @@ internal class ModOptionsPageHandler : IDisposable
       )
     );
 
-    _optionsElements.Add(
-      new ModOptionsCheckbox(
-        _helper.SafeGetString(nameof(config.ShowLockedBundleItems)),
-        whichOption++,
-        v => BundleHelper.ShowLockedBundles = v,
-        () => config.ShowLockedBundleItems,
-        Set(v => config.ShowLockedBundleItems = v)
-      )
-    );
-
     // --- Farm & Field ---
     _optionsElements.Add(new ModOptionsElement(I18n.Section_FarmAndField(), isVertCentered: true));
     _optionsElements.Add(
@@ -628,13 +618,22 @@ internal class ModOptionsPageHandler : IDisposable
         Set(v => config.ShowFishPondIcons = v)
       )
     );
+    var showItemEffectRanges = new ModOptionsCheckbox(
+      I18n.ShowItemEffectRanges(),
+      whichOption++,
+      showScarecrowAndSprinklerRange.ToggleOption,
+      () => config.ShowItemEffectRanges,
+      Set(v => config.ShowItemEffectRanges = v)
+    );
+    _optionsElements.Add(showItemEffectRanges);
     _optionsElements.Add(
       new ModOptionsCheckbox(
-        I18n.ShowItemEffectRanges(),
+        I18n.ShowPlacedItemRanges(),
         whichOption++,
-        showScarecrowAndSprinklerRange.ToggleOption,
-        () => config.ShowItemEffectRanges,
-        Set(v => config.ShowItemEffectRanges = v)
+        showScarecrowAndSprinklerRange.ToggleShowPlacedItemRangesOption,
+        () => config.ShowPlacedItemRanges,
+        Set(v => config.ShowPlacedItemRanges = v),
+        showItemEffectRanges
       )
     );
     _optionsElements.Add(
@@ -753,6 +752,15 @@ internal class ModOptionsPageHandler : IDisposable
       )
     );
 
+    _optionsElements.Add(
+      new ModOptionsCheckbox(
+        _helper.SafeGetString(nameof(config.ShowLockedBundleItems)),
+        whichOption++,
+        v => BundleHelper.ShowLockedBundles = v,
+        () => config.ShowLockedBundleItems,
+        Set(v => config.ShowLockedBundleItems = v)
+      )
+    );
     _optionsElements.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.ShowExtraItemInformation)),

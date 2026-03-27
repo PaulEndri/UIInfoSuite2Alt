@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
@@ -328,15 +328,6 @@ public partial class ModEntry
       () => ModConfig.ShowCustomIcons,
       v => ModConfig.ShowCustomIcons = v
     );
-    AddBool(
-      nameof(ModConfig.ShowLockedBundleItems),
-      () => ModConfig.ShowLockedBundleItems,
-      v =>
-      {
-        ModConfig.ShowLockedBundleItems = v;
-        BundleHelper.ShowLockedBundles = v;
-      }
-    );
 
     // --- Farm & Field ---
     configMenu.AddSectionTitle(ModManifest, text: () => I18n.Section_FarmAndField());
@@ -403,6 +394,11 @@ public partial class ModEntry
       name: () => I18n.ShowItemEffectRanges(),
       getValue: () => ModConfig.ShowItemEffectRanges,
       setValue: v => ModConfig.ShowItemEffectRanges = v
+    );
+    AddSubBool(
+      nameof(ModConfig.ShowPlacedItemRanges),
+      () => ModConfig.ShowPlacedItemRanges,
+      v => ModConfig.ShowPlacedItemRanges = v
     );
     Spacer();
     configMenu.AddBoolOption(
@@ -485,6 +481,15 @@ public partial class ModEntry
       scale: 1
     );
 
+    AddBool(
+      nameof(ModConfig.ShowLockedBundleItems),
+      () => ModConfig.ShowLockedBundleItems,
+      v =>
+      {
+        ModConfig.ShowLockedBundleItems = v;
+        BundleHelper.ShowLockedBundles = v;
+      }
+    );
     AddBool(
       nameof(ModConfig.ShowExtraItemInformation),
       () => ModConfig.ShowExtraItemInformation,

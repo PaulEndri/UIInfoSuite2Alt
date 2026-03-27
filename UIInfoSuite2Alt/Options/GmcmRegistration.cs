@@ -137,9 +137,51 @@ public partial class ModEntry
         setValue: set
       );
 
-    void Spacer() => configMenu.AddParagraph(ModManifest, text: () => "");
-
-    // --- HUD Icons ---
+    void Spacer(int count = 1)
+    {
+      for (int i = 0; i < count; i++)
+        configMenu.AddParagraph(ModManifest, text: () => "");
+    }
+    Spacer(3);
+    // --- Main page: page links with banners ---
+    configMenu.AddPageLink(ModManifest, "hud-icons", () => I18n.Section_HudIcons());
+    configMenu.AddImage(
+      ModManifest,
+      () => Helper.ModContent.Load<Texture2D>("assets/banner_hud.png"),
+      scale: 1
+    );
+    configMenu.AddPageLink(ModManifest, "farm-field", () => I18n.Section_FarmAndField());
+    configMenu.AddImage(
+      ModManifest,
+      () => Helper.ModContent.Load<Texture2D>("assets/banner_ffield.png"),
+      scale: 1
+    );
+    configMenu.AddPageLink(
+      ModManifest,
+      "experience-skills",
+      () => I18n.Section_ExperienceAndSkills()
+    );
+    configMenu.AddImage(
+      ModManifest,
+      () => Helper.ModContent.Load<Texture2D>("assets/banner_exp.png"),
+      scale: 1
+    );
+    configMenu.AddPageLink(ModManifest, "items-shopping", () => I18n.Section_ItemsAndShopping());
+    configMenu.AddImage(
+      ModManifest,
+      () => Helper.ModContent.Load<Texture2D>("assets/banner_items.png"),
+      scale: 1
+    );
+    configMenu.AddPageLink(ModManifest, "npc-social", () => I18n.Section_NpcAndSocial());
+    configMenu.AddImage(
+      ModManifest,
+      () => Helper.ModContent.Load<Texture2D>("assets/banner_npc.png"),
+      scale: 1
+    );
+    // =====================
+    // HUD Icons page
+    // =====================
+    configMenu.AddPage(ModManifest, "hud-icons", () => I18n.Section_HudIcons());
     configMenu.AddSectionTitle(ModManifest, text: () => I18n.Section_HudIcons());
     configMenu.AddImage(
       ModManifest,
@@ -329,7 +371,10 @@ public partial class ModEntry
       v => ModConfig.ShowCustomIcons = v
     );
 
-    // --- Farm & Field ---
+    // =====================
+    // Farm & Field page
+    // =====================
+    configMenu.AddPage(ModManifest, "farm-field", () => I18n.Section_FarmAndField());
     configMenu.AddSectionTitle(ModManifest, text: () => I18n.Section_FarmAndField());
     configMenu.AddImage(
       ModManifest,
@@ -434,7 +479,10 @@ public partial class ModEntry
       height: () => (int)(Game1.smallFont.MeasureString("T").Y * 5)
     );
 
-    // --- Experience & Skills ---
+    // =====================
+    // Experience & Skills page
+    // =====================
+    configMenu.AddPage(ModManifest, "experience-skills", () => I18n.Section_ExperienceAndSkills());
     configMenu.AddSectionTitle(ModManifest, text: () => I18n.Section_ExperienceAndSkills());
     configMenu.AddImage(
       ModManifest,
@@ -473,7 +521,10 @@ public partial class ModEntry
       v => ModConfig.ShowFishQualityStar = v
     );
 
-    // --- Items & Shopping ---
+    // =====================
+    // Items & Shopping page
+    // =====================
+    configMenu.AddPage(ModManifest, "items-shopping", () => I18n.Section_ItemsAndShopping());
     configMenu.AddSectionTitle(ModManifest, text: () => I18n.Section_ItemsAndShopping());
     configMenu.AddImage(
       ModManifest,
@@ -501,7 +552,10 @@ public partial class ModEntry
       v => ModConfig.ShowHarvestPricesInShop = v
     );
 
-    // --- NPC & Social ---
+    // =====================
+    // NPC & Social page
+    // =====================
+    configMenu.AddPage(ModManifest, "npc-social", () => I18n.Section_NpcAndSocial());
     configMenu.AddSectionTitle(ModManifest, text: () => I18n.Section_NpcAndSocial());
     configMenu.AddImage(
       ModManifest,
@@ -525,7 +579,9 @@ public partial class ModEntry
       v => ModConfig.DisplayCalendarAndBillboard = v
     );
 
-    // --- Icon Order ---
+    // --- Icon Order (main page) ---
+    configMenu.AddPage(ModManifest, "");
+    Spacer(3);
     configMenu.AddSectionTitle(ModManifest, text: () => I18n.Section_IconOrder());
 
     foreach (string key in IconHandler.IconKeys)

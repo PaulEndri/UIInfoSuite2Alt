@@ -98,8 +98,6 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
 
   public void ToggleOption(bool showCalendarAndBillboard)
   {
-    ModEntry.RegisterCalendarAndQuestKeyBindings(_helper, showCalendarAndBillboard);
-
     _helper.Events.Display.RenderedActiveMenu -= OnRenderedActiveMenu;
     _helper.Events.Input.ButtonPressed -= OnButtonPressed;
     _helper.Events.GameLoop.UpdateTicked -= OnUpdateTicked;

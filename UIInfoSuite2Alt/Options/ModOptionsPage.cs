@@ -489,6 +489,22 @@ public class ModOptionsPage : IClickableMenu
     state.currentComponent = currentlySnappedComponent?.myID;
   }
 
+  /// <summary>Clamp scroll position after the options list has been modified externally.</summary>
+  internal void ClampScrollPosition()
+  {
+    if (_options.Count <= visibleSlots)
+    {
+      _currentItemIndex = 0;
+    }
+    else
+    {
+      _currentItemIndex = Math.Min(_currentItemIndex, _options.Count - visibleSlots);
+      _currentItemIndex = Math.Max(0, _currentItemIndex);
+    }
+
+    SetScrollBarToCurrentItem();
+  }
+
   internal void LoadState(ModOptionsPageState state)
   {
     if (state.currentIndex is int index)

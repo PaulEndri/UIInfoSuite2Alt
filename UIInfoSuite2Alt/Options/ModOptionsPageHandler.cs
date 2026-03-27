@@ -46,19 +46,39 @@ internal class ModOptionsPageHandler : IDisposable
 
   private readonly PerScreen<int?> _modOptionsTabPageNumber = new();
 
+  /// <summary>The visible options list passed to ModOptionsPage. Rebuilt on section toggle.</summary>
   private readonly List<ModOptionsElement> _optionsElements = new();
+
+  // Collapsible section infrastructure
+  private readonly List<ModOptionsElement> _topElements = new();
+  private readonly List<OptionsSection> _sections = new();
+  private readonly List<ModOptionsElement> _bottomElements = new();
+
+  /// <summary>Tracks expanded/collapsed state per section across menu open/close within a session.</summary>
+  private static readonly PerScreen<Dictionary<string, bool>> _sectionExpandedState = new(() =>
+    new Dictionary<string, bool>()
+  );
+
+  private record OptionsSection(
+    string Id,
+    ModOptionsSectionHeader Header,
+    ModOptionsImage? Banner,
+    List<ModOptionsElement> Children
+  );
+
+  private List<ModOptionsElement> _currentTarget = null!;
 
   private void OptionsSpacer(int rows = 1)
   {
     for (int i = 0; i < rows; i++)
     {
-      _optionsElements.Add(new ModOptionsElement(""));
+      _currentTarget.Add(new ModOptionsElement(""));
     }
   }
 
   private void OptionsHR()
   {
-    _optionsElements.Add(
+    _currentTarget.Add(
       new ModOptionsElement(
         "------------------------------------------------------------------------",
         isCentered: true,
@@ -66,6 +86,67 @@ internal class ModOptionsPageHandler : IDisposable
         isSmallText: true
       )
     );
+  }
+
+  private void RebuildVisibleList()
+  {
+    _optionsElements.Clear();
+    _optionsElements.AddRange(_topElements);
+
+    foreach (OptionsSection section in _sections)
+    {
+      _optionsElements.Add(section.Header);
+      if (section.Banner != null)
+      {
+        _optionsElements.Add(section.Banner);
+      }
+
+      if (section.Header.IsExpanded)
+      {
+        _optionsElements.AddRange(section.Children);
+      }
+    }
+
+    _optionsElements.AddRange(_bottomElements);
+
+    // Clamp scroll on any active ModOptionsPage instances
+    _modOptionsPage.Value?.ClampScrollPosition();
+  }
+
+  private void ToggleSection(string sectionId)
+  {
+    OptionsSection? section = _sections.Find(s => s.Id == sectionId);
+    if (section == null)
+    {
+      return;
+    }
+
+    section.Header.IsExpanded = !section.Header.IsExpanded;
+
+    // Persist state for session
+    _sectionExpandedState.Value[sectionId] = section.Header.IsExpanded;
+    RebuildVisibleList();
+  }
+
+  private void BeginSection(string sectionId, Func<string> title, Func<Texture2D>? bannerTexture)
+  {
+    bool isExpanded = _sectionExpandedState.Value.TryGetValue(sectionId, out bool saved) && saved;
+
+    var children = new List<ModOptionsElement>();
+    Action onToggle = () => ToggleSection(sectionId);
+
+    var header = new ModOptionsSectionHeader(title(), onToggle, isExpanded);
+
+    ModOptionsImage? banner =
+      bannerTexture != null
+        ? new ModOptionsImage(bannerTexture, scale: 1, onClick: onToggle)
+        : null;
+
+    var section = new OptionsSection(sectionId, header, banner, children);
+    _sections.Add(section);
+
+    // Direct subsequent adds into this section's children list
+    _currentTarget = children;
   }
 
   private readonly PerScreen<ModOptionsPageState?> _savedPageState = new();
@@ -173,10 +254,13 @@ internal class ModOptionsPageHandler : IDisposable
     };
 
     var whichOption = 1;
-    _optionsElements.Add(
+
+    // --- Top section (always visible) ---
+    _currentTarget = _topElements;
+    _currentTarget.Add(
       new ModOptionsElement($"UI Info Suite 2 Alt. {GetVersionString(helper)}", isCentered: true)
     );
-    _optionsElements.Add(
+    _currentTarget.Add(
       new ModOptionsElement(
         I18n.Paragraph_KeybindsInGmcm(),
         isSmallText: true,
@@ -190,7 +274,7 @@ internal class ModOptionsPageHandler : IDisposable
       IModInfo? modInfo = helper.ModRegistry.Get(helper.ModRegistry.ModID);
       if (modInfo != null)
       {
-        _optionsElements.Add(
+        _currentTarget.Add(
           new ModOptionsSmallButton(
             I18n.Button_OpenGmcmOptions(),
             whichOption++,
@@ -202,7 +286,7 @@ internal class ModOptionsPageHandler : IDisposable
     }
     else
     {
-      _optionsElements.Add(
+      _currentTarget.Add(
         new ModOptionsElement(
           I18n.SmallText_GmcmMissing(),
           isSmallText: true,
@@ -215,15 +299,13 @@ internal class ModOptionsPageHandler : IDisposable
     OptionsHR();
 
     // --- HUD Icons ---
-    _optionsElements.Add(new ModOptionsElement(I18n.Section_HudIcons(), isVertCentered: true));
-    _optionsElements.Add(
-      new ModOptionsImage(
-        () => _helper.ModContent.Load<Texture2D>("assets/banner_hud.png"),
-        scale: 1
-      )
+    BeginSection(
+      "hud-icons",
+      () => I18n.Section_HudIcons(),
+      () => _helper.ModContent.Load<Texture2D>("assets/banner_hud.png")
     );
 
-    _optionsElements.Add(
+    _currentTarget.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.UseVerticalIconLayout)),
         whichOption++,
@@ -232,7 +314,7 @@ internal class ModOptionsPageHandler : IDisposable
         Set(v => config.UseVerticalIconLayout = v)
       )
     );
-    _optionsElements.Add(
+    _currentTarget.Add(
       new ModOptionsDropdown(
         _helper.SafeGetString(nameof(config.IconsPerRow)),
         whichOption++,
@@ -252,8 +334,8 @@ internal class ModOptionsPageHandler : IDisposable
       () => config.ShowLuckIcon,
       Set(v => config.ShowLuckIcon = v)
     );
-    _optionsElements.Add(luckIcon);
-    _optionsElements.Add(
+    _currentTarget.Add(luckIcon);
+    _currentTarget.Add(
       new ModOptionsDropdown(
         _helper.SafeGetString(nameof(config.LuckIconStyle)),
         whichOption++,
@@ -273,7 +355,7 @@ internal class ModOptionsPageHandler : IDisposable
       )
     );
     luckOfDay.SetIconStyle(config.LuckIconStyle);
-    _optionsElements.Add(
+    _currentTarget.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.ShowExactValue)),
         whichOption++,
@@ -283,7 +365,7 @@ internal class ModOptionsPageHandler : IDisposable
         luckIcon
       )
     );
-    _optionsElements.Add(
+    _currentTarget.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.RequireTvForLuck)),
         whichOption++,
@@ -300,8 +382,8 @@ internal class ModOptionsPageHandler : IDisposable
       () => config.ShowRainyDay,
       Set(v => config.ShowRainyDay = v)
     );
-    _optionsElements.Add(rainyDayIcon);
-    _optionsElements.Add(
+    _currentTarget.Add(rainyDayIcon);
+    _currentTarget.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.RequireTvForWeather)),
         whichOption++,
@@ -318,8 +400,8 @@ internal class ModOptionsPageHandler : IDisposable
       () => config.ShowBirthdayIcon,
       Set(v => config.ShowBirthdayIcon = v)
     );
-    _optionsElements.Add(birthdayIcon);
-    _optionsElements.Add(
+    _currentTarget.Add(birthdayIcon);
+    _currentTarget.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.HideBirthdayIfFullFriendShip)),
         whichOption++,
@@ -336,8 +418,8 @@ internal class ModOptionsPageHandler : IDisposable
       () => config.ShowTravelingMerchant,
       Set(v => config.ShowTravelingMerchant = v)
     );
-    _optionsElements.Add(travellingMerchantIcon);
-    _optionsElements.Add(
+    _currentTarget.Add(travellingMerchantIcon);
+    _currentTarget.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.HideMerchantWhenVisited)),
         whichOption++,
@@ -355,8 +437,8 @@ internal class ModOptionsPageHandler : IDisposable
       Set(v => config.ShowMerchantBundleIcon = v),
       travellingMerchantIcon
     );
-    _optionsElements.Add(merchantBundleIcon);
-    _optionsElements.Add(
+    _currentTarget.Add(merchantBundleIcon);
+    _currentTarget.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.ShowMerchantBundleItemNames)),
         whichOption++,
@@ -373,8 +455,8 @@ internal class ModOptionsPageHandler : IDisposable
       () => config.ShowBookseller,
       Set(v => config.ShowBookseller = v)
     );
-    _optionsElements.Add(booksellerIcon);
-    _optionsElements.Add(
+    _currentTarget.Add(booksellerIcon);
+    _currentTarget.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.HideBooksellerWhenVisited)),
         whichOption++,
@@ -384,7 +466,7 @@ internal class ModOptionsPageHandler : IDisposable
         booksellerIcon
       )
     );
-    _optionsElements.Add(
+    _currentTarget.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.ShowFestivalIcon)),
         whichOption++,
@@ -400,8 +482,8 @@ internal class ModOptionsPageHandler : IDisposable
       () => config.ShowWhenNewRecipesAreAvailable,
       Set(v => config.ShowWhenNewRecipesAreAvailable = v)
     );
-    _optionsElements.Add(queenOfSauceCheckbox);
-    _optionsElements.Add(
+    _currentTarget.Add(queenOfSauceCheckbox);
+    _currentTarget.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.ShowRecipeItemIcon)),
         whichOption++,
@@ -411,7 +493,7 @@ internal class ModOptionsPageHandler : IDisposable
         queenOfSauceCheckbox
       )
     );
-    _optionsElements.Add(
+    _currentTarget.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.ShowToolUpgradeStatus)),
         whichOption++,
@@ -420,7 +502,7 @@ internal class ModOptionsPageHandler : IDisposable
         Set(v => config.ShowToolUpgradeStatus = v)
       )
     );
-    _optionsElements.Add(
+    _currentTarget.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.ShowRobinBuildingStatusIcon)),
         whichOption++,
@@ -436,8 +518,8 @@ internal class ModOptionsPageHandler : IDisposable
       () => config.ShowSeasonalBerry,
       Set(v => config.ShowSeasonalBerry = v)
     );
-    _optionsElements.Add(seasonalBerryIcon);
-    _optionsElements.Add(
+    _currentTarget.Add(seasonalBerryIcon);
+    _currentTarget.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.ShowSeasonalBerryHazelnut)),
         whichOption++,
@@ -447,7 +529,7 @@ internal class ModOptionsPageHandler : IDisposable
         seasonalBerryIcon
       )
     );
-    _optionsElements.Add(
+    _currentTarget.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.ShowTodaysGifts)),
         whichOption++,
@@ -456,7 +538,7 @@ internal class ModOptionsPageHandler : IDisposable
         Set(v => config.ShowTodaysGifts = v)
       )
     );
-    _optionsElements.Add(
+    _currentTarget.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.ShowQuestCount)),
         whichOption++,
@@ -476,8 +558,8 @@ internal class ModOptionsPageHandler : IDisposable
       () => config.ShowGoldenWalnutCount,
       Set(v => config.ShowGoldenWalnutCount = v)
     );
-    _optionsElements.Add(walnutCheckbox);
-    _optionsElements.Add(
+    _currentTarget.Add(walnutCheckbox);
+    _currentTarget.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.ShowGoldenWalnutAnywhere)),
         whichOption++,
@@ -487,7 +569,7 @@ internal class ModOptionsPageHandler : IDisposable
         walnutCheckbox
       )
     );
-    _optionsElements.Add(
+    _currentTarget.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.GoldenWalnutFadeOut)),
         whichOption++,
@@ -504,8 +586,8 @@ internal class ModOptionsPageHandler : IDisposable
       () => config.ShowBuffTimers,
       Set(v => config.ShowBuffTimers = v)
     );
-    _optionsElements.Add(buffTimersCheckbox);
-    _optionsElements.Add(
+    _currentTarget.Add(buffTimersCheckbox);
+    _currentTarget.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.PlayBuffExpireSound)),
         whichOption++,
@@ -516,7 +598,7 @@ internal class ModOptionsPageHandler : IDisposable
       )
     );
 
-    _optionsElements.Add(
+    _currentTarget.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.ShowCustomIcons)),
         whichOption++,
@@ -527,12 +609,10 @@ internal class ModOptionsPageHandler : IDisposable
     );
 
     // --- Farm & Field ---
-    _optionsElements.Add(new ModOptionsElement(I18n.Section_FarmAndField(), isVertCentered: true));
-    _optionsElements.Add(
-      new ModOptionsImage(
-        () => _helper.ModContent.Load<Texture2D>("assets/banner_ffield.png"),
-        scale: 1
-      )
+    BeginSection(
+      "farm-field",
+      () => I18n.Section_FarmAndField(),
+      () => _helper.ModContent.Load<Texture2D>("assets/banner_ffield.png")
     );
 
     var animalPetIcon = new ModOptionsCheckbox(
@@ -542,8 +622,8 @@ internal class ModOptionsPageHandler : IDisposable
       () => config.ShowAnimalsNeedPets,
       Set(v => config.ShowAnimalsNeedPets = v)
     );
-    _optionsElements.Add(animalPetIcon);
-    _optionsElements.Add(
+    _currentTarget.Add(animalPetIcon);
+    _currentTarget.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.HideAnimalPetOnMaxFriendship)),
         whichOption++,
@@ -553,7 +633,7 @@ internal class ModOptionsPageHandler : IDisposable
         animalPetIcon
       )
     );
-    _optionsElements.Add(
+    _currentTarget.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.ShowCropTooltip)),
         whichOption++,
@@ -562,7 +642,7 @@ internal class ModOptionsPageHandler : IDisposable
         Set(v => config.ShowCropTooltip = v)
       )
     );
-    _optionsElements.Add(
+    _currentTarget.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.ShowTreeTooltip)),
         whichOption++,
@@ -571,7 +651,7 @@ internal class ModOptionsPageHandler : IDisposable
         Set(v => config.ShowTreeTooltip = v)
       )
     );
-    _optionsElements.Add(
+    _currentTarget.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.ShowBarrelTooltip)),
         whichOption++,
@@ -580,7 +660,7 @@ internal class ModOptionsPageHandler : IDisposable
         Set(v => config.ShowBarrelTooltip = v)
       )
     );
-    _optionsElements.Add(
+    _currentTarget.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.ShowFishPondTooltip)),
         whichOption++,
@@ -590,7 +670,7 @@ internal class ModOptionsPageHandler : IDisposable
       )
     );
     showMachineProcessingItem.SetMode(config.MachineProcessingIconsMode);
-    _optionsElements.Add(
+    _currentTarget.Add(
       new ModOptionsDropdown(
         _helper.SafeGetString(nameof(config.MachineProcessingIconsMode)),
         whichOption++,
@@ -609,7 +689,7 @@ internal class ModOptionsPageHandler : IDisposable
         }
       )
     );
-    _optionsElements.Add(
+    _currentTarget.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.ShowFishPondIcons)),
         whichOption++,
@@ -625,8 +705,8 @@ internal class ModOptionsPageHandler : IDisposable
       () => config.ShowItemEffectRanges,
       Set(v => config.ShowItemEffectRanges = v)
     );
-    _optionsElements.Add(showItemEffectRanges);
-    _optionsElements.Add(
+    _currentTarget.Add(showItemEffectRanges);
+    _currentTarget.Add(
       new ModOptionsCheckbox(
         I18n.ShowPlacedItemRanges(),
         whichOption++,
@@ -636,7 +716,7 @@ internal class ModOptionsPageHandler : IDisposable
         showItemEffectRanges
       )
     );
-    _optionsElements.Add(
+    _currentTarget.Add(
       new ModOptionsCheckbox(
         I18n.ShowBombRange(),
         whichOption++,
@@ -652,8 +732,8 @@ internal class ModOptionsPageHandler : IDisposable
       () => config.ButtonControlShow,
       Set(v => config.ButtonControlShow = v)
     );
-    _optionsElements.Add(enableItemRangeKeybinds);
-    _optionsElements.Add(
+    _currentTarget.Add(enableItemRangeKeybinds);
+    _currentTarget.Add(
       new ModOptionsCheckbox(
         I18n.ShowRangeTooltip(),
         whichOption++,
@@ -663,7 +743,7 @@ internal class ModOptionsPageHandler : IDisposable
         enableItemRangeKeybinds
       )
     );
-    _optionsElements.Add(
+    _currentTarget.Add(
       new ModOptionsElement(
         $"{I18n.EnableItemRangeKeybinds()}\n"
           + $"  {I18n.Keybinds_ShowOneRange_DisplayedName()}:\n"
@@ -676,17 +756,13 @@ internal class ModOptionsPageHandler : IDisposable
     OptionsSpacer();
 
     // --- Experience & Skills ---
-    _optionsElements.Add(
-      new ModOptionsElement(I18n.Section_ExperienceAndSkills(), isVertCentered: true)
-    );
-    _optionsElements.Add(
-      new ModOptionsImage(
-        () => _helper.ModContent.Load<Texture2D>("assets/banner_exp.png"),
-        scale: 1
-      )
+    BeginSection(
+      "experience-skills",
+      () => I18n.Section_ExperienceAndSkills(),
+      () => _helper.ModContent.Load<Texture2D>("assets/banner_exp.png")
     );
 
-    _optionsElements.Add(
+    _currentTarget.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.ShowLevelUpAnimation)),
         whichOption++,
@@ -695,7 +771,7 @@ internal class ModOptionsPageHandler : IDisposable
         Set(v => config.ShowLevelUpAnimation = v)
       )
     );
-    _optionsElements.Add(
+    _currentTarget.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.ShowExperienceBar)),
         whichOption++,
@@ -704,7 +780,7 @@ internal class ModOptionsPageHandler : IDisposable
         Set(v => config.ShowExperienceBar = v)
       )
     );
-    _optionsElements.Add(
+    _currentTarget.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.AllowExperienceBarToFadeOut)),
         whichOption++,
@@ -713,7 +789,7 @@ internal class ModOptionsPageHandler : IDisposable
         Set(v => config.AllowExperienceBarToFadeOut = v)
       )
     );
-    _optionsElements.Add(
+    _currentTarget.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.ShowExperienceGain)),
         whichOption++,
@@ -729,8 +805,8 @@ internal class ModOptionsPageHandler : IDisposable
       () => config.ShowFishOnCatch,
       Set(v => config.ShowFishOnCatch = v)
     );
-    _optionsElements.Add(fishOnCatchIcon);
-    _optionsElements.Add(
+    _currentTarget.Add(fishOnCatchIcon);
+    _currentTarget.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.ShowFishQualityStar)),
         whichOption++,
@@ -742,17 +818,13 @@ internal class ModOptionsPageHandler : IDisposable
     );
 
     // --- Items & Shopping ---
-    _optionsElements.Add(
-      new ModOptionsElement(I18n.Section_ItemsAndShopping(), isVertCentered: true)
-    );
-    _optionsElements.Add(
-      new ModOptionsImage(
-        () => _helper.ModContent.Load<Texture2D>("assets/banner_items.png"),
-        scale: 1
-      )
+    BeginSection(
+      "items-shopping",
+      () => I18n.Section_ItemsAndShopping(),
+      () => _helper.ModContent.Load<Texture2D>("assets/banner_items.png")
     );
 
-    _optionsElements.Add(
+    _currentTarget.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.ShowLockedBundleItems)),
         whichOption++,
@@ -761,7 +833,7 @@ internal class ModOptionsPageHandler : IDisposable
         Set(v => config.ShowLockedBundleItems = v)
       )
     );
-    _optionsElements.Add(
+    _currentTarget.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.ShowExtraItemInformation)),
         whichOption++,
@@ -770,7 +842,7 @@ internal class ModOptionsPageHandler : IDisposable
         Set(v => config.ShowExtraItemInformation = v)
       )
     );
-    _optionsElements.Add(
+    _currentTarget.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.ShowHarvestPricesInShop)),
         whichOption++,
@@ -781,15 +853,13 @@ internal class ModOptionsPageHandler : IDisposable
     );
 
     // --- NPC & Social ---
-    _optionsElements.Add(new ModOptionsElement(I18n.Section_NpcAndSocial(), isVertCentered: true));
-    _optionsElements.Add(
-      new ModOptionsImage(
-        () => _helper.ModContent.Load<Texture2D>("assets/banner_npc.png"),
-        scale: 1
-      )
+    BeginSection(
+      "npc-social",
+      () => I18n.Section_NpcAndSocial(),
+      () => _helper.ModContent.Load<Texture2D>("assets/banner_npc.png")
     );
 
-    _optionsElements.Add(
+    _currentTarget.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.ShowMailboxCount)),
         whichOption++,
@@ -798,7 +868,7 @@ internal class ModOptionsPageHandler : IDisposable
         Set(v => config.ShowMailboxCount = v)
       )
     );
-    _optionsElements.Add(
+    _currentTarget.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.ShowHeartFills)),
         whichOption++,
@@ -807,7 +877,7 @@ internal class ModOptionsPageHandler : IDisposable
         Set(v => config.ShowHeartFills = v)
       )
     );
-    _optionsElements.Add(
+    _currentTarget.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.DisplayCalendarAndBillboard)),
         whichOption++,
@@ -817,11 +887,11 @@ internal class ModOptionsPageHandler : IDisposable
       )
     );
 
-    // --- Icon Order ---
-    _optionsElements.Add(new ModOptionsElement(I18n.Section_IconOrder()));
-    _optionsElements.Add(
-      new ModOptionsElement(I18n.Section_IconOrder_Subtitle(), isSmallText: true)
-    );
+    // --- Icon Order (always visible) ---
+    _currentTarget = _bottomElements;
+    OptionsHR();
+    _currentTarget.Add(new ModOptionsElement(I18n.Section_IconOrder()));
+    _currentTarget.Add(new ModOptionsElement(I18n.Section_IconOrder_Subtitle(), isSmallText: true));
 
     foreach (string key in IconHandler.IconKeys)
     {
@@ -842,7 +912,7 @@ internal class ModOptionsPageHandler : IDisposable
       };
 
       string capturedKey = key;
-      _optionsElements.Add(
+      _currentTarget.Add(
         new ModOptionsNumberPicker(
           label,
           whichOption++,
@@ -851,6 +921,9 @@ internal class ModOptionsPageHandler : IDisposable
         )
       );
     }
+
+    // Build the initial visible list from sections + expanded state
+    RebuildVisibleList();
 
     if (_hasBgm)
     {

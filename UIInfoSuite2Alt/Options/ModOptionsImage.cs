@@ -10,21 +10,60 @@ internal class ModOptionsImage : ModOptionsElement
   private readonly Func<Texture2D> _texture;
   private readonly Rectangle? _sourceRect;
   private readonly int _scale;
+  private readonly Action? _onClick;
+  private bool _boundsInitialized;
 
   public ModOptionsImage(
     Func<Texture2D> texture,
     Rectangle? sourceRect = null,
-    int scale = Game1.pixelZoom
+    int scale = Game1.pixelZoom,
+    Action? onClick = null
   )
     : base("", -1)
   {
     _texture = texture;
     _sourceRect = sourceRect;
     _scale = scale;
+    _onClick = onClick;
+  }
+
+  private void EnsureBounds()
+  {
+    if (_boundsInitialized || _onClick == null)
+    {
+      return;
+    }
+
+    _boundsInitialized = true;
+
+    // Cover the full slot so clicking anywhere on the banner row toggles
+    int slotWidth = Game1.activeClickableMenu?.width ?? Game1.uiViewport.Width;
+    int slotHeight =
+      Game1.activeClickableMenu != null
+        ? (Game1.activeClickableMenu.height - Game1.tileSize * 2) / 7 + Game1.pixelZoom
+        : Bounds.Height;
+    Bounds = new Rectangle(0, 0, slotWidth, slotHeight);
+  }
+
+  public override void ReceiveLeftClick(int x, int y)
+  {
+    if (_onClick == null)
+    {
+      return;
+    }
+
+    EnsureBounds();
+    if (Bounds.Contains(x, y))
+    {
+      Game1.playSound("drumkit6");
+      _onClick();
+    }
   }
 
   public override void Draw(SpriteBatch batch, int slotX, int slotY)
   {
+    EnsureBounds();
+
     Texture2D tex = _texture();
     Rectangle source = _sourceRect ?? new Rectangle(0, 0, tex.Width, tex.Height);
 
@@ -56,6 +95,12 @@ internal class ModOptionsImage : ModOptionsElement
 
   public override Point? GetRelativeSnapPoint(Rectangle slotBounds)
   {
+    if (_onClick != null)
+    {
+      EnsureBounds();
+      return new Point(Bounds.Width / 2, slotBounds.Height / 2);
+    }
+
     // Non-interactive, skip snap
     return null;
   }

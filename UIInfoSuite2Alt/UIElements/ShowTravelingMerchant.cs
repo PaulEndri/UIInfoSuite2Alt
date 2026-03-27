@@ -89,19 +89,16 @@ public class ShowTravelingMerchant : IDisposable
   public void ToggleHideWhenVisitedOption(bool hideWhenVisited)
   {
     HideWhenVisited = hideWhenVisited;
-    ToggleOption(Enabled);
   }
 
   public void ToggleShowBundleIconOption(bool showBundleIcon)
   {
     ShowBundleIcon = showBundleIcon;
-    ToggleOption(Enabled);
   }
 
   public void ToggleShowBundleItemNamesOption(bool showBundleItemNames)
   {
     ShowBundleItemNames = showBundleItemNames;
-    ToggleOption(Enabled);
   }
   #endregion
 

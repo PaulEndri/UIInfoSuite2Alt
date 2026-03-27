@@ -37,19 +37,7 @@ internal class ShowItemHoverInformation : IDisposable
 
   private (Texture2D texture, Rectangle sourceRect)? _ubIconOverride;
 
-  private readonly ClickableTextureComponent _shippingBottomIcon = new(
-    new Rectangle(0, 0, Game1.tileSize, Game1.tileSize),
-    Game1.mouseCursors,
-    new Rectangle(526, 218, 30, 22),
-    1.2f
-  );
-
-  private readonly ClickableTextureComponent _shippingTopIcon = new(
-    new Rectangle(0, 0, Game1.tileSize, Game1.tileSize),
-    Game1.mouseCursors,
-    new Rectangle(134, 236, 30, 15),
-    1.2f
-  );
+  private static readonly Rectangle CollectionsTabSourceRect = new(640, 81, 16, 16);
 
   private LibraryMuseum? _libraryMuseum;
 
@@ -451,13 +439,8 @@ internal class ShowItemHoverInformation : IDisposable
 
       if (notShippedYet)
       {
-        // Shipping bin icon
-        var shippingBinDims = new Vector2(30, 24);
-        DrawShippingBin(
-          spriteBatch,
-          windowPos + new Vector2(windowWidth - 6, 8),
-          shippingBinDims / 2
-        );
+        // Collections tab icon on right side
+        DrawCollectionsTab(spriteBatch, windowPos + new Vector2(windowWidth - 4, 12), 2f);
       }
     }
   }
@@ -676,29 +659,17 @@ internal class ShowItemHoverInformation : IDisposable
     return DefaultUbBundleColor;
   }
 
-  private void DrawShippingBin(SpriteBatch b, Vector2 position, Vector2 origin)
+  private static void DrawCollectionsTab(SpriteBatch b, Vector2 position, float scale)
   {
-    var shippingBinOffset = new Vector2(0, 2);
     b.Draw(
-      _shippingBottomIcon.texture,
+      Game1.mouseCursors,
       position,
-      _shippingBottomIcon.sourceRect,
+      CollectionsTabSourceRect,
       Color.White,
       0f,
-      origin - shippingBinOffset,
-      _shippingBottomIcon.scale,
-      SpriteEffects.None,
-      0.86f
-    );
-    b.Draw(
-      _shippingTopIcon.texture,
-      position,
-      _shippingTopIcon.sourceRect,
-      Color.White,
-      0f,
-      origin,
-      _shippingTopIcon.scale,
-      SpriteEffects.None,
+      Vector2.Zero,
+      scale,
+      SpriteEffects.FlipHorizontally,
       0.86f
     );
   }

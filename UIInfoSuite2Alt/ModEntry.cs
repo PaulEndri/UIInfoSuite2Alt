@@ -161,6 +161,7 @@ public partial class ModEntry : Mod
 
     // Re-read config (may have been edited externally)
     ModConfig = Helper.ReadConfig<ModConfig>();
+    BundleHelper.ClearCaches();
     UnlockableBundleHelper.ClearCache();
     ApplyFeatures();
   }

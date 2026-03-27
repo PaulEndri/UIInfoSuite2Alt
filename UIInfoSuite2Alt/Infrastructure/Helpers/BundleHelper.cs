@@ -34,6 +34,13 @@ internal static class BundleHelper
   /// <summary>When true, show bundle items for all CC areas regardless of room unlock state.</summary>
   public static bool ShowLockedBundles { get; set; }
 
+  public static void ClearCaches()
+  {
+    BundleIdToBundleKeyDataMap.Clear();
+    AllBundleIngredients.Clear();
+    BundleIdToAreaMap.Clear();
+  }
+
   public static BundleKeyData? GetBundleKeyDataFromIndex(int bundleIdx, bool forceRefresh = false)
   {
     PopulateBundleCaches(forceRefresh);

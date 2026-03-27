@@ -61,12 +61,14 @@
     - Bundle tooltip now shows the actual bundle icon(UB content patcher data supported)
     - Item/Traveling merchant tooltip now detect UB bundle items
     - Item/Traveling merchant now respect room discovery and UB discovered bundles
-      - Added "Reveal locked CC bundle items"-option to completly remove room discovery checks
+    - Added "Reveal locked CC bundle items"-option to completly remove room discovery checks
+  - Add sub-option to toggle placed item ranges (scarecrows, sprinklers, etc.) while holding an item
   - Closing a Calendar, Billboard, Special Orders or Qi Board opened from inventory icons now returns to player inventory
+  - Fix calendar/billboard/quest keybinds not working when "Show calendar/billboard button" option is unchecked
   - Fix vertical HUD icons overlapping the quest log icon by matching the game's own visibility check
   - Fix bundle item detection(tooltips + traveling merchant) missing items on save load due to stale game cache
+  - Cached item range distance calculations to increase performance with many or modded large-radius scarecrows
   - Added more trace-level logging for easier troubleshooting
-  - Cached item range distance calculations to reduce lag with many or modded large-radius scarecrows
 - **v2.8.5**
   - Show mail count on the mailbox bubble so you can see how many letters are waiting (toggable option)
   - Add Golden Walnut tracker on Ginger Island with hover panel showing collection progress by area (toggable options)

@@ -238,27 +238,25 @@
 ![Added Mod Compatibility](.github/assets/added-mod-compatibility.png)
 
 All mods listed here are **optional** and not required for UI Info Suite 2 Alternative.
+The compatability ranges from small fixes to bigger integration with mod provided APIs.
 
+- [Content Patcher](https://www.nexusmods.com/stardewvalley/mods/1915) ([Custom Icons](https://github.com/dazuki/UIInfoSuite2Alt/blob/main/docs/custom-icons.md) documentation for mod authors)
+- [SpaceCore](https://www.nexusmods.com/stardewvalley/mods/1348)
+- [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098)
+- [Custom Bush](https://www.nexusmods.com/stardewvalley/mods/20619)
+- [Better Game Menu](https://www.nexusmods.com/stardewvalley/mods/32032)
+- [Cloudy Skies](https://www.nexusmods.com/stardewvalley/mods/23135)
+- [Unlockable Bundles](https://www.nexusmods.com/stardewvalley/mods/17265)
+- [Vanilla Plus Professions](https://www.nexusmods.com/stardewvalley/mods/20956)
+- [Ferngill Simple Economy](https://www.nexusmods.com/stardewvalley/mods/21414)
+- [Bigger Backpack](https://www.nexusmods.com/stardewvalley/mods/1845)
+- [Better Ranching](https://www.nexusmods.com/stardewvalley/mods/859)
+- [Stardew Aquarium](https://www.nexusmods.com/stardewvalley/mods/6372)
+- [The Love of Cooking](https://www.nexusmods.com/stardewvalley/mods/6830)
+- [Deluxe Journal](https://www.nexusmods.com/stardewvalley/mods/11436)
 - [Ridgeside Village](https://www.nexusmods.com/stardewvalley/mods/7286)
 - [Sunberry Village](https://www.nexusmods.com/stardewvalley/mods/11111)
 - [Visit Mount Vapius](https://www.nexusmods.com/stardewvalley/mods/9600)
-- [Better Game Menu](https://www.nexusmods.com/stardewvalley/mods/12667)
-- [Content Patcher](https://www.nexusmods.com/stardewvalley/mods/1915) (Custom Icons)
-- [Cloudy Skies](https://www.nexusmods.com/stardewvalley/mods/23868)
-- [Custom Bush](https://www.nexusmods.com/stardewvalley/mods/20619)
-- [Deluxe Journal](https://www.nexusmods.com/stardewvalley/mods/11436)
-- [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098)
-- [NPC Map Locations](https://www.nexusmods.com/stardewvalley/mods/239)
-- [Bigger Backpack](https://www.nexusmods.com/stardewvalley/mods/1845)
-- [SpaceCore](https://www.nexusmods.com/stardewvalley/mods/1348)
-- [Vanilla Plus Professions](https://www.nexusmods.com/stardewvalley/mods/20956)
-- [Level Extender](https://www.nexusmods.com/stardewvalley/mods/1471)
-- [Better Farm Animal Variety](https://www.nexusmods.com/stardewvalley/mods/3273)
-- [Better Ranching](https://www.nexusmods.com/stardewvalley/mods/859)
-- [Ferngill Simple Economy](https://www.nexusmods.com/stardewvalley/mods/21414)
-- [Unlockable Bundles](https://www.nexusmods.com/stardewvalley/mods/17265)
-- [Stardew Aquarium](https://www.nexusmods.com/stardewvalley/mods/6372)
-- [The Love of Cooking](https://www.nexusmods.com/stardewvalley/mods/6830)
 
 <p align="center">
   <a href="https://ko-fi.com/dazuki89" target="_BLANK">

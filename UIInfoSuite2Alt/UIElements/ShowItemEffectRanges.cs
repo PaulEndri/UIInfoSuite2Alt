@@ -80,8 +80,8 @@ internal class ShowItemEffectRanges : IDisposable
     _tileBombTexture = new Lazy<Texture2D>(() =>
       _helper.ModContent.Load<Texture2D>("assets/tile_muted.png")
     );
-    _wildTreeTexture = new Lazy<Texture2D>(
-      () => _helper.ModContent.Load<Texture2D>("assets/wild_tree_tooltip.png")
+    _wildTreeTexture = new Lazy<Texture2D>(() =>
+      _helper.ModContent.Load<Texture2D>("assets/wild_tree_tooltip.png")
     );
   }
 

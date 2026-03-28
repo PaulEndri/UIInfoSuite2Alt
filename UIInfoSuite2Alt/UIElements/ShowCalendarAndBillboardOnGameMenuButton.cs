@@ -13,7 +13,9 @@ using StardewValley.Locations;
 using StardewValley.Menus;
 using StardewValley.SpecialOrders;
 using UIInfoSuite2Alt.Compatibility;
+using UIInfoSuite2Alt.Compatibility.Helpers;
 using UIInfoSuite2Alt.Infrastructure;
+using UIInfoSuite2Alt.UIElements.Menus;
 
 namespace UIInfoSuite2Alt.UIElements;
 

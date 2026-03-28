@@ -10,7 +10,7 @@ using StardewValley.GameData.FruitTrees;
 using StardewValley.Menus;
 using StardewValley.TerrainFeatures;
 using StardewValley.WorldMaps;
-using UIInfoSuite2Alt.Compatibility;
+using UIInfoSuite2Alt.Compatibility.Helpers;
 using SObject = StardewValley.Object;
 
 namespace UIInfoSuite2Alt.Infrastructure;

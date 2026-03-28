@@ -10,6 +10,7 @@ using StardewValley.Locations;
 using StardewValley.Menus;
 using StardewValley.Tools;
 using UIInfoSuite2Alt.Compatibility;
+using UIInfoSuite2Alt.Compatibility.Helpers;
 using UIInfoSuite2Alt.Infrastructure;
 using UIInfoSuite2Alt.Infrastructure.Extensions;
 using UIInfoSuite2Alt.Infrastructure.Helpers;

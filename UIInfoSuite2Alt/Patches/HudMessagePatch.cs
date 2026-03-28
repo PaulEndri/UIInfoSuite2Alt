@@ -1,7 +1,7 @@
 ﻿using HarmonyLib;
 using StardewModdingAPI;
 using StardewValley;
-using UIInfoSuite2Alt.UIElements;
+using UIInfoSuite2Alt.UIElements.Experience;
 
 namespace UIInfoSuite2Alt.Patches;
 

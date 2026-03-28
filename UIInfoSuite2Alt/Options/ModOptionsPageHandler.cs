@@ -9,11 +9,13 @@ using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Menus;
 using UIInfoSuite2Alt.Compatibility;
+using UIInfoSuite2Alt.Compatibility.Helpers;
 using UIInfoSuite2Alt.Infrastructure;
 using UIInfoSuite2Alt.Infrastructure.Extensions;
 using UIInfoSuite2Alt.Infrastructure.Helpers;
 using UIInfoSuite2Alt.Patches;
 using UIInfoSuite2Alt.UIElements;
+using UIInfoSuite2Alt.UIElements.Experience;
 
 namespace UIInfoSuite2Alt.Options;
 

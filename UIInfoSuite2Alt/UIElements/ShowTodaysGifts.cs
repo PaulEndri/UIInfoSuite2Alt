@@ -6,6 +6,7 @@ using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Menus;
 using UIInfoSuite2Alt.Compatibility;
+using UIInfoSuite2Alt.Compatibility.Helpers;
 
 namespace UIInfoSuite2Alt.UIElements;
 

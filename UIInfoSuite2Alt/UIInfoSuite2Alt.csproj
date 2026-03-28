@@ -1,20 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Version>2.8.6</Version>
+    <Version>2.8.7</Version>
     <TargetFramework>net6.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
-    <ModZipPath>$(SolutionDir)\Releases</ModZipPath>
     <EnableHarmony>true</EnableHarmony>
-
-    <TranslationClassBuilder_AddGetByKey>true</TranslationClassBuilder_AddGetByKey>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DebugType>full</DebugType>
-
-    <ModZipPath>$(SolutionDir)\DebugBuilds</ModZipPath>
+  <PropertyGroup>
+    <TranslationClassBuilder_AddGetByKey>true</TranslationClassBuilder_AddGetByKey>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,8 +17,5 @@
     <PackageReference Include="Pathoschild.Stardew.ModTranslationClassBuilder" Version="2.2.1" />
   </ItemGroup>
 
-  <Import
-    Project="UIInfoSuite2Alt.csproj.local"
-    Condition="Exists('UIInfoSuite2Alt.csproj.local')"
-  />
+  <Import Project="stardewvalley.targets" Condition="Exists('stardewvalley.targets')" />
 </Project>

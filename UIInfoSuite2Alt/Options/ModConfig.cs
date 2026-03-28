@@ -114,7 +114,6 @@ public class ModConfig
   public bool PlayBuffExpireSound { get; set; } = true;
   public bool ShowCustomIcons { get; set; } = true;
   public bool ShowLockedBundleItems { get; set; } = false;
-  public Dictionary<string, bool> ShowLocationOfFriends { get; set; } = new();
   public Dictionary<string, int> IconOrder { get; set; } =
     new()
     {

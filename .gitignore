@@ -25,6 +25,7 @@ bld/
 [Oo]bj/
 [Ll]og/
 _releases/
+_debugs/
 
 # Visual Studio 2015 cache/options directory
 .vs/
@@ -294,6 +295,5 @@ __pycache__/
 .D[Ss]_Store
 .vscode
 
-# Photoshop Files
-PSD/
-*.psd
+# Target files
+*.targets

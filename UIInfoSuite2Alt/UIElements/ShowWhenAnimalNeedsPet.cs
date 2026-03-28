@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -10,7 +10,6 @@ using StardewValley;
 using StardewValley.Characters;
 using StardewValley.GameData.FarmAnimals;
 using StardewValley.ItemTypeDefinitions;
-using StardewValley.Locations;
 using StardewValley.Network;
 
 namespace UIInfoSuite2Alt.UIElements;
@@ -25,13 +24,15 @@ internal class ShowWhenAnimalNeedsPet : IDisposable
   private bool HideOnMaxFriendship { get; set; }
 
   private readonly IModHelper _helper;
+  private readonly bool _betterRanchingInstalled;
   #endregion
 
 
   #region Lifecycle
-  public ShowWhenAnimalNeedsPet(IModHelper helper)
+  public ShowWhenAnimalNeedsPet(IModHelper helper, bool hasBetterRanching)
   {
     _helper = helper;
+    _betterRanchingInstalled = hasBetterRanching;
   }
 
   public void Dispose()
@@ -44,13 +45,16 @@ internal class ShowWhenAnimalNeedsPet : IDisposable
     Enabled = showWhenAnimalNeedsPet;
 
     _helper.Events.Display.RenderingHud -= OnRenderingHud_DrawAnimalHasProduct;
-    _helper.Events.Display.RenderingHud -= OnRenderingHud_DrawNeedsPetTooltip;
+    _helper.Events.Display.RenderedWorld -= OnRenderedWorld_DrawNeedsPetTooltip;
     _helper.Events.GameLoop.UpdateTicked -= UpdateTicked;
 
     if (showWhenAnimalNeedsPet)
     {
-      _helper.Events.Display.RenderingHud += OnRenderingHud_DrawAnimalHasProduct;
-      _helper.Events.Display.RenderingHud += OnRenderingHud_DrawNeedsPetTooltip;
+      if (!_betterRanchingInstalled)
+      {
+        _helper.Events.Display.RenderingHud += OnRenderingHud_DrawAnimalHasProduct;
+      }
+      _helper.Events.Display.RenderedWorld += OnRenderedWorld_DrawNeedsPetTooltip;
       _helper.Events.GameLoop.UpdateTicked += UpdateTicked;
     }
   }
@@ -64,17 +68,9 @@ internal class ShowWhenAnimalNeedsPet : IDisposable
 
 
   #region Event subscriptions
-  private void OnRenderingHud_DrawNeedsPetTooltip(object? sender, RenderingHudEventArgs e)
+  private void OnRenderedWorld_DrawNeedsPetTooltip(object? sender, RenderedWorldEventArgs e)
   {
-    if (
-      UIElementUtils.IsRenderingNormally()
-      && Game1.activeClickableMenu == null
-      && (
-        Game1.currentLocation is AnimalHouse
-        || Game1.currentLocation is Farm
-        || Game1.currentLocation is FarmHouse
-      )
-    )
+    if (UIElementUtils.IsRenderingNormally() && Game1.activeClickableMenu == null)
     {
       DrawIconForFarmAnimals();
       DrawIconForPets();
@@ -83,11 +79,7 @@ internal class ShowWhenAnimalNeedsPet : IDisposable
 
   private void OnRenderingHud_DrawAnimalHasProduct(object? sender, RenderingHudEventArgs e)
   {
-    if (
-      UIElementUtils.IsRenderingNormally()
-      && Game1.activeClickableMenu == null
-      && (Game1.currentLocation is AnimalHouse || Game1.currentLocation is Farm)
-    )
+    if (UIElementUtils.IsRenderingNormally() && Game1.activeClickableMenu == null)
     {
       DrawAnimalHasProduct();
     }
@@ -95,15 +87,7 @@ internal class ShowWhenAnimalNeedsPet : IDisposable
 
   private void UpdateTicked(object? sender, UpdateTickedEventArgs e)
   {
-    if (
-      !UIElementUtils.IsRenderingNormally()
-      || Game1.activeClickableMenu != null
-      || !(
-        Game1.currentLocation is AnimalHouse
-        || Game1.currentLocation is Farm
-        || Game1.currentLocation is FarmHouse
-      )
-    )
+    if (!UIElementUtils.IsRenderingNormally() || Game1.activeClickableMenu != null)
     {
       return;
     }
@@ -117,12 +101,8 @@ internal class ShowWhenAnimalNeedsPet : IDisposable
   #region Logic
   private void DrawAnimalHasProduct()
   {
-    NetLongDictionary<FarmAnimal, NetRef<FarmAnimal>>? animalsInCurrentLocation =
+    NetLongDictionary<FarmAnimal, NetRef<FarmAnimal>> animalsInCurrentLocation =
       GetAnimalsInCurrentLocation();
-    if (animalsInCurrentLocation == null)
-    {
-      return;
-    }
 
     foreach (KeyValuePair<long, FarmAnimal> animal in animalsInCurrentLocation.Pairs)
     {
@@ -131,9 +111,7 @@ internal class ShowWhenAnimalNeedsPet : IDisposable
       if (
         harvestType == FarmAnimalHarvestType.DropOvernight
         || animal.Value.IsEmoting
-        || animal.Value.currentProduce.Value == "430"
-        || // 430 is truffle
-        animal.Value.currentProduce.Value == null
+        || animal.Value.currentProduce.Value == null
         || (animalData != null && animal.Value.age.Value < animalData.DaysToMature)
       )
       {
@@ -147,17 +125,14 @@ internal class ShowWhenAnimalNeedsPet : IDisposable
         continue;
       }
 
-      Vector2 positionAboveAnimal = GetPetPositionAboveAnimal(animal.Value);
-      positionAboveAnimal.Y += (float)(
-        Math.Sin(
-          Game1.currentGameTime.TotalGameTime.TotalMilliseconds / 300.0
-            + animal.Value.Name.GetHashCode()
-        ) * 5.0
-      );
+      Vector2 positionAboveAnimal = animal.Value.getLocalPosition(Game1.viewport);
+      positionAboveAnimal.X += 10;
+      positionAboveAnimal.Y -= 34;
+      positionAboveAnimal.Y += _yMovementPerDraw.Value;
       Game1.spriteBatch.Draw(
         Game1.emoteSpriteSheet,
         Utility.ModifyCoordinatesForUIScale(
-          new Vector2(positionAboveAnimal.X + 14f, positionAboveAnimal.Y)
+          new Vector2(positionAboveAnimal.X - 4f, positionAboveAnimal.Y - 16f)
         ),
         new Rectangle(
           3 * (Game1.tileSize / 4) % Game1.emoteSpriteSheet.Width,
@@ -177,13 +152,13 @@ internal class ShowWhenAnimalNeedsPet : IDisposable
       Game1.spriteBatch.Draw(
         produceData.GetTexture(),
         Utility.ModifyCoordinatesForUIScale(
-          new Vector2(positionAboveAnimal.X + 28f, positionAboveAnimal.Y + 8f)
+          new Vector2(positionAboveAnimal.X + 16f, positionAboveAnimal.Y - 6f)
         ),
         sourceRectangle,
         Color.White * 0.9f,
         0.0f,
         Vector2.Zero,
-        2.2f,
+        2f,
         SpriteEffects.None,
         1f
       );
@@ -211,30 +186,45 @@ internal class ShowWhenAnimalNeedsPet : IDisposable
         continue;
       }
 
-      Vector2 positionAboveAnimal = GetPetPositionAboveAnimal(animal.Value);
-      string animalType = animal.Value.type.Value.ToLower();
+      Vector2 positionAboveAnimal = GetPositionAboveAnimal(animal.Value);
 
-      if (
-        animalType.Contains("cow")
-        || animalType.Contains("sheep")
-        || animalType.Contains("goat")
-        || animalType.Contains("pig")
-      )
+      if (animal.Value.GetSpriteWidthForPositioning() > 16)
       {
         positionAboveAnimal.X += 50f;
         positionAboveAnimal.Y += 50f;
       }
 
+      float yBob = _yMovementPerDraw.Value;
+      float alpha = _alpha.Value;
+
+      // Hand icon
       Game1.spriteBatch.Draw(
         Game1.mouseCursors,
-        Utility.ModifyCoordinatesForUIScale(
-          new Vector2(positionAboveAnimal.X, positionAboveAnimal.Y + _yMovementPerDraw.Value)
+        Game1.GlobalToLocal(
+          Game1.viewport,
+          new Vector2(positionAboveAnimal.X, positionAboveAnimal.Y + yBob)
         ),
         new Rectangle(32, 0, 16, 16),
-        Color.White * _alpha.Value,
+        Color.White * alpha,
         0.0f,
         Vector2.Zero,
         4f,
+        SpriteEffects.None,
+        1f
+      );
+
+      // Heart overlay
+      Game1.spriteBatch.Draw(
+        Game1.mouseCursors,
+        Game1.GlobalToLocal(
+          Game1.viewport,
+          new Vector2(positionAboveAnimal.X + 32f, positionAboveAnimal.Y + yBob + 32f)
+        ),
+        new Rectangle(211, 428, 7, 6),
+        Color.White * alpha,
+        0.0f,
+        Vector2.Zero,
+        3f,
         SpriteEffects.None,
         1f
       );
@@ -254,20 +244,42 @@ internal class ShowWhenAnimalNeedsPet : IDisposable
         continue;
       }
 
-      Vector2 positionAboveAnimal = GetPetPositionAboveAnimal(character);
+      Vector2 positionAboveAnimal = GetPositionAboveAnimal(character);
 
       positionAboveAnimal.X += 50f;
       positionAboveAnimal.Y += 20f;
+
+      float yBob = _yMovementPerDraw.Value;
+      float alpha = _alpha.Value;
+
+      // Hand icon
       Game1.spriteBatch.Draw(
         Game1.mouseCursors,
-        Utility.ModifyCoordinatesForUIScale(
-          new Vector2(positionAboveAnimal.X, positionAboveAnimal.Y + _yMovementPerDraw.Value)
+        Game1.GlobalToLocal(
+          Game1.viewport,
+          new Vector2(positionAboveAnimal.X, positionAboveAnimal.Y + yBob)
         ),
         new Rectangle(32, 0, 16, 16),
-        Color.White * _alpha.Value,
+        Color.White * alpha,
         0.0f,
         Vector2.Zero,
         4f,
+        SpriteEffects.None,
+        1f
+      );
+
+      // Heart overlay
+      Game1.spriteBatch.Draw(
+        Game1.mouseCursors,
+        Game1.GlobalToLocal(
+          Game1.viewport,
+          new Vector2(positionAboveAnimal.X + 32f, positionAboveAnimal.Y + yBob + 32f)
+        ),
+        new Rectangle(211, 428, 7, 6),
+        Color.White * alpha,
+        0.0f,
+        Vector2.Zero,
+        3f,
         SpriteEffects.None,
         1f
       );
@@ -287,24 +299,17 @@ internal class ShowWhenAnimalNeedsPet : IDisposable
     return false;
   }
 
-  private Vector2 GetPetPositionAboveAnimal(Character animal)
+  private Vector2 GetPositionAboveAnimal(Character animal)
   {
-    Vector2 animalPosition = animal.getLocalPosition(Game1.viewport);
+    Vector2 animalPosition = animal.Position;
     animalPosition.X += 10;
     animalPosition.Y -= 34;
     return animalPosition;
   }
 
-  private NetLongDictionary<FarmAnimal, NetRef<FarmAnimal>>? GetAnimalsInCurrentLocation()
+  private static NetLongDictionary<FarmAnimal, NetRef<FarmAnimal>> GetAnimalsInCurrentLocation()
   {
-    NetLongDictionary<FarmAnimal, NetRef<FarmAnimal>>? animals = Game1.currentLocation switch
-    {
-      AnimalHouse animalHouse => animalHouse.Animals,
-      Farm farm => farm.Animals,
-      _ => null,
-    };
-
-    return animals;
+    return Game1.currentLocation.animals;
   }
   #endregion
 }

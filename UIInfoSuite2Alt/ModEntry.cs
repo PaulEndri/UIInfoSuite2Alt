@@ -85,6 +85,14 @@ public partial class ModEntry : Mod
 
     IconHandler.Handler.IsQuestLogPermanent = helper.ModRegistry.IsLoaded(ModCompat.DeluxeJournal);
 
+    if (helper.ModRegistry.IsLoaded(ModCompat.BetterRanching))
+    {
+      Monitor.Log(
+        "ModEntry: Better Ranching detected, disabling overlapping animal indicators",
+        LogLevel.Info
+      );
+    }
+
     CheckForConflictingMods(helper);
   }
   #endregion

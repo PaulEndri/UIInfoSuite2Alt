@@ -56,6 +56,9 @@
 
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
+- **v2.8.7**
+  - Improved animal petting and produce indicators with [Better Ranching](https://www.nexusmods.com/stardewvalley/mods/859) compatibility
+  - Fix farm animal icons (needs petting, produce ready) not showing on non-farm locations
 - **v2.8.6**
   - Add [Unlockable Bundles](https://www.nexusmods.com/stardewvalley/mods/17265) API integration
     - Bundle tooltip now shows the actual bundle icon(UB content patcher data supported)
@@ -249,6 +252,7 @@ All mods listed here are **optional** and not required for UI Info Suite 2 Alter
 - [Vanilla Plus Professions](https://www.nexusmods.com/stardewvalley/mods/20956)
 - [Level Extender](https://www.nexusmods.com/stardewvalley/mods/1471)
 - [Better Farm Animal Variety](https://www.nexusmods.com/stardewvalley/mods/3273)
+- [Better Ranching](https://www.nexusmods.com/stardewvalley/mods/859)
 - [Ferngill Simple Economy](https://www.nexusmods.com/stardewvalley/mods/21414)
 - [Unlockable Bundles](https://www.nexusmods.com/stardewvalley/mods/17265)
 - [Stardew Aquarium](https://www.nexusmods.com/stardewvalley/mods/6372)

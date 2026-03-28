@@ -19,6 +19,7 @@ public static class ModCompat
   public const string SpaceCore = "spacechase0.SpaceCore";
   public const string VanillaPlusProfessions = "KediDili.VanillaPlusProfessions";
   public const string UnlockableBundles = "DLX.Bundles";
+  public const string BetterRanching = "BetterRanching";
 
   // original UIInfoSuite variants
   public const string UIInfoSuite2 = "Annosz.UiInfoSuite2";

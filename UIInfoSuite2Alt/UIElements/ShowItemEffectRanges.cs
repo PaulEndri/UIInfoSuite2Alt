@@ -79,7 +79,7 @@ internal class ShowItemEffectRanges : IDisposable
     _helper = helper;
     _tileTexture = new Lazy<Texture2D>(() => _helper.ModContent.Load<Texture2D>("assets/tile.png"));
     _tileBombTexture = new Lazy<Texture2D>(() =>
-      _helper.ModContent.Load<Texture2D>("assets/tile_nolines.png")
+      _helper.ModContent.Load<Texture2D>("assets/tile_muted.png")
     );
   }
 

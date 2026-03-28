@@ -32,8 +32,8 @@ public class SoundHelper
 
     _modId = helper.ModContent.ModID;
 
-    RegisterSound(helper, Sounds.LevelUp, "LevelUp.wav");
-    RegisterSound(helper, Sounds.BuffExpired, "buff_expire.wav");
+    RegisterSound(helper, Sounds.LevelUp, "level_up.ogg");
+    RegisterSound(helper, Sounds.BuffExpired, "buff_expire.ogg");
 
     _initialized = true;
   }
@@ -66,9 +66,10 @@ public class SoundHelper
 
     SoundEffect audio;
     string filePath = Path.Combine(helper.DirectoryPath, "assets", fileName);
+    bool isOgg = Path.GetExtension(filePath).Equals(".ogg", StringComparison.OrdinalIgnoreCase);
     using (var stream = new FileStream(filePath, FileMode.Open))
     {
-      audio = SoundEffect.FromStream(stream);
+      audio = SoundEffect.FromStream(stream, isOgg);
     }
 
     newCueDefinition.SetSound(audio, Game1.audioEngine.GetCategoryIndex(category));

@@ -109,7 +109,7 @@ internal class ShowWhenAnimalNeedsPet : IDisposable
       FarmAnimalHarvestType? harvestType = animal.Value.GetHarvestType();
       FarmAnimalData? animalData = animal.Value.GetAnimalData();
       if (
-        harvestType == FarmAnimalHarvestType.DropOvernight
+        harvestType is FarmAnimalHarvestType.DropOvernight or FarmAnimalHarvestType.DigUp
         || animal.Value.IsEmoting
         || animal.Value.currentProduce.Value == null
         || (animalData != null && animal.Value.age.Value < animalData.DaysToMature)

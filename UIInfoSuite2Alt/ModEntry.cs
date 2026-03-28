@@ -13,6 +13,7 @@ using UIInfoSuite2Alt.Infrastructure.Helpers;
 using UIInfoSuite2Alt.Options;
 using UIInfoSuite2Alt.Patches;
 using UIInfoSuite2Alt.UIElements;
+using UIInfoSuite2Alt.UIElements.Menus;
 
 namespace UIInfoSuite2Alt;
 
@@ -244,20 +245,50 @@ public partial class ModEntry : Mod
 
   private static void HandleCalendarAndQuestKeyBindings(IModHelper helper)
   {
-    if (Context.IsPlayerFree && ModConfig.OpenCalendarKeybind.JustPressed())
+    if (Context.IsPlayerFree)
     {
-      helper.Input.SuppressActiveKeybinds(ModConfig.OpenCalendarKeybind);
-      Game1.activeClickableMenu = new Billboard();
+      if (ModConfig.OpenCalendarKeybind.JustPressed())
+      {
+        helper.Input.SuppressActiveKeybinds(ModConfig.OpenCalendarKeybind);
+        Game1.activeClickableMenu = new Billboard();
+      }
+      else if (ModConfig.OpenQuestBoardKeybind.JustPressed())
+      {
+        helper.Input.SuppressActiveKeybinds(ModConfig.OpenQuestBoardKeybind);
+        ShowCalendarAndBillboardOnGameMenuButton.OpenQuestBoardFromKeybind();
+      }
+      else if (ModConfig.OpenSpecialOrdersBoardKeybind.JustPressed())
+      {
+        helper.Input.SuppressActiveKeybinds(ModConfig.OpenSpecialOrdersBoardKeybind);
+        ShowCalendarAndBillboardOnGameMenuButton.OpenSpecialOrdersBoardFromKeybind();
+      }
     }
-    else if (Context.IsPlayerFree && ModConfig.OpenQuestBoardKeybind.JustPressed())
+    else if (Game1.activeClickableMenu != null)
     {
-      helper.Input.SuppressActiveKeybinds(ModConfig.OpenQuestBoardKeybind);
-      ShowCalendarAndBillboardOnGameMenuButton.OpenQuestBoardFromKeybind();
-    }
-    else if (Context.IsPlayerFree && ModConfig.OpenSpecialOrdersBoardKeybind.JustPressed())
-    {
-      helper.Input.SuppressActiveKeybinds(ModConfig.OpenSpecialOrdersBoardKeybind);
-      ShowCalendarAndBillboardOnGameMenuButton.OpenSpecialOrdersBoardFromKeybind();
+      if (ModConfig.OpenCalendarKeybind.JustPressed() && Game1.activeClickableMenu is Billboard)
+      {
+        helper.Input.SuppressActiveKeybinds(ModConfig.OpenCalendarKeybind);
+        Game1.playSound("bigDeSelect");
+        Game1.exitActiveMenu();
+      }
+      else if (
+        ModConfig.OpenQuestBoardKeybind.JustPressed()
+        && Game1.activeClickableMenu is Billboard or QuestBoardSelector
+      )
+      {
+        helper.Input.SuppressActiveKeybinds(ModConfig.OpenQuestBoardKeybind);
+        Game1.playSound("bigDeSelect");
+        Game1.exitActiveMenu();
+      }
+      else if (
+        ModConfig.OpenSpecialOrdersBoardKeybind.JustPressed()
+        && Game1.activeClickableMenu is SpecialOrdersBoard or SpecialOrdersBoardSelector
+      )
+      {
+        helper.Input.SuppressActiveKeybinds(ModConfig.OpenSpecialOrdersBoardKeybind);
+        Game1.playSound("bigDeSelect");
+        Game1.exitActiveMenu();
+      }
     }
   }
 

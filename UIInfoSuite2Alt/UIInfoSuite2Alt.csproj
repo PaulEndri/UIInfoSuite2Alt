@@ -18,4 +18,16 @@
   </ItemGroup>
 
   <Import Project="stardewvalley.targets" Condition="Exists('stardewvalley.targets')" />
+
+  <!-- Clean deployed assets before SMAPI deploy to prevent stale files from lingering -->
+  <Target
+    Name="CleanDeployedAssets"
+    BeforeTargets="AfterBuild"
+    Condition="'$(EnableModDeploy)' != 'false' AND Exists('$(GameModsPath)/$(ModFolderName)/assets')"
+  >
+    <ItemGroup>
+      <DeployedAssets Include="$(GameModsPath)/$(ModFolderName)/assets/**/*" />
+    </ItemGroup>
+    <Delete Files="@(DeployedAssets)" />
+  </Target>
 </Project>

@@ -1,5 +1,9 @@
 name: Build releases
-on: [push, workflow_dispatch]
+on:
+  push:
+    tags-ignore:
+      - "**"
+  workflow_dispatch:
 jobs:
   build:
     runs-on: ubuntu-latest

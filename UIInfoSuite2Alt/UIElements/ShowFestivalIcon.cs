@@ -99,7 +99,7 @@ internal class ShowFestivalIcon : IDisposable
     _pendingRegularFestivals.Value.Clear();
 
     // Collect all festivals for today
-    List<(string name, string time)> todayFestivals = new();
+    List<(string name, string time)> todayFestivals = [];
     FestivalType todayIconType = FestivalType.None;
 
     if (Utility.isFestivalDay())
@@ -157,7 +157,7 @@ internal class ShowFestivalIcon : IDisposable
     }
 
     // Collect all festivals for tomorrow
-    List<(string name, string time)> tomorrowFestivals = new();
+    List<(string name, string time)> tomorrowFestivals = [];
     FestivalType tomorrowIconType = FestivalType.None;
 
     if (Utility.isFestivalDay(tomorrowDay, tomorrowSeason))

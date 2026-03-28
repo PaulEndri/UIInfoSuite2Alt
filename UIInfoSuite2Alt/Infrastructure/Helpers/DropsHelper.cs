@@ -133,7 +133,7 @@ public static class DropsHelper
 
     if (drops.Count > 1)
     {
-      drops = new List<PossibleDroppedItem> { drops[0] };
+      drops = [drops[0]];
     }
 
     if (string.IsNullOrEmpty(displayName) && drops.Count > 0)

@@ -55,33 +55,30 @@ internal class ShowGoldenWalnutCount : IDisposable
     new(
       "IslandJungle",
       I18n.WalnutArea_IslandJungle,
-      new[]
-      {
+      [
         "Bush_IslandEast_17_37",
         "Bush_IslandShrine_23_34",
         "BananaShrine",
         "IslandShrinePuzzle",
         "TreeNut",
-      }
+      ]
     ),
     new(
       "IslandSouth",
       I18n.WalnutArea_IslandSouth,
-      new[]
-      {
+      [
         "Bush_IslandSouth_31_5",
         "Buried_IslandSouthEast_25_17",
         "Buried_IslandSouthEastCave_36_26",
         "StardropPool",
         "Mermaid",
         "Darts",
-      }
+      ]
     ),
     new(
       "IslandNorth",
       I18n.WalnutArea_IslandNorth,
-      new[]
-      {
+      [
         "Bush_IslandNorth_13_33",
         "Bush_IslandNorth_5_30",
         "Bush_IslandNorth_4_42",
@@ -99,13 +96,12 @@ internal class ShowGoldenWalnutCount : IDisposable
         "Buried_IslandNorth_26_81",
         "TreeNutShot",
         "Island_N_BuriedTreasureNut",
-      }
+      ]
     ),
     new(
       "IslandWest",
       I18n.WalnutArea_IslandWest,
-      new[]
-      {
+      [
         "Bush_IslandWest_104_3",
         "Bush_IslandWest_31_24",
         "Bush_IslandWest_38_56",
@@ -127,13 +123,12 @@ internal class ShowGoldenWalnutCount : IDisposable
         "Island_W_BuriedTreasureNut",
         "Island_W_BuriedTreasureNut2",
         "MusselStone",
-      }
+      ]
     ),
     new(
       "Volcano",
       I18n.WalnutArea_Volcano,
-      new[]
-      {
+      [
         "Bush_Caldera_28_36",
         "Bush_Caldera_9_34",
         "VolcanoNormalChest",
@@ -141,30 +136,29 @@ internal class ShowGoldenWalnutCount : IDisposable
         "VolcanoBarrel",
         "VolcanoMining",
         "VolcanoMonsterDrop",
-      }
+      ]
     ),
-    new("Fishing", I18n.WalnutArea_Fishing, new[] { "IslandFishing" }),
-    new("Farming", I18n.WalnutArea_Farming, new[] { "IslandFarming" }),
+    new("Fishing", I18n.WalnutArea_Fishing, ["IslandFishing"]),
+    new("Farming", I18n.WalnutArea_Farming, ["IslandFarming"]),
     new(
       "FieldOffice",
       I18n.WalnutArea_FieldOffice,
-      new[]
-      {
+      [
         "IslandLeftPlantRestored",
         "IslandRightPlantRestored",
         "IslandCenterSkeletonRestored",
         "IslandSnakeRestored",
         "IslandBatRestored",
         "IslandFrogRestored",
-      }
+      ]
     ),
-    new("GoldenCoconut", I18n.WalnutArea_GoldenCoconut, new[] { "GoldenCoconut" }),
+    new("GoldenCoconut", I18n.WalnutArea_GoldenCoconut, ["GoldenCoconut"]),
     new(
       "GourmandFrog",
       I18n.WalnutArea_GourmandFrog,
-      new[] { "IslandGourmand1", "IslandGourmand2", "IslandGourmand3" }
+      ["IslandGourmand1", "IslandGourmand2", "IslandGourmand3"]
     ),
-    new("PiratesWife", I18n.WalnutArea_PiratesWife, new[] { "Birdie" }),
+    new("PiratesWife", I18n.WalnutArea_PiratesWife, ["Birdie"]),
   };
 
   private record WalnutInfo(int Count, string Name, string Description);

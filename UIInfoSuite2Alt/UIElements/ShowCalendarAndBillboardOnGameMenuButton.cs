@@ -557,7 +557,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
     if (_cachedModBoards != null && _cachedModBoardsDay == Game1.dayOfMonth)
       return _cachedModBoards;
 
-    var boards = new List<(string, string)>();
+    List<(string, string)> boards = [];
     if (_hasRidgesideVillage && Game1.player.eventsSeen.Contains("75160207"))
       boards.Add(("RSVTownSO", I18n.SpecialOrdersRSVTown()));
     if (
@@ -611,7 +611,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
       List<(string BoardType, string DisplayName)> modBoards = GetAvailableModBoards();
       if (modBoards.Count > 0)
       {
-        var viewedTypes = new HashSet<string>();
+        HashSet<string> viewedTypes = [];
         if (!HasUnviewedOrders(""))
           viewedTypes.Add("");
         foreach ((string boardType, _) in modBoards)
@@ -642,7 +642,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
       List<(string BoardType, string DisplayName)> modQuestBoards = GetAvailableModQuestBoards();
       if (modQuestBoards.Count > 0)
       {
-        var viewedTypes = new HashSet<string>();
+        HashSet<string> viewedTypes = [];
         if (!Game1.CanAcceptDailyQuest())
           viewedTypes.Add("");
         foreach ((string boardType, _) in modQuestBoards)
@@ -856,7 +856,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
     if (_cachedModQuestBoards != null && _cachedModQuestBoardsDay == Game1.dayOfMonth)
       return _cachedModQuestBoards;
 
-    var boards = new List<(string, string)>();
+    List<(string, string)> boards = [];
     if (_hasRidgesideVillage)
       boards.Add(("VillageQuestBoard", I18n.SpecialOrdersRSVTown()));
 

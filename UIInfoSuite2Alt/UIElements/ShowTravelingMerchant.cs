@@ -23,9 +23,9 @@ public class ShowTravelingMerchant : IDisposable
   private bool _travelingMerchantIsHere;
   private bool _travelingMerchantIsVisited;
   private bool _merchantHasBundleItems;
-  private readonly List<string> _bundleItemNames = new();
+  private readonly List<string> _bundleItemNames = [];
   private bool _merchantHasUbBundleItems;
-  private readonly List<string> _ubBundleItemNames = new();
+  private readonly List<string> _ubBundleItemNames = [];
   private ClickableTextureComponent _travelingMerchantIcon = null!;
   private Texture2D _merchantTexture = null!;
   private int _bundlePulseTimer;
@@ -239,7 +239,7 @@ public class ShowTravelingMerchant : IDisposable
         {
           if (_travelingMerchantIcon?.containsPoint(Game1.getMouseX(), Game1.getMouseY()) ?? false)
           {
-            var lines = new List<string>();
+            List<string> lines = [];
 
             if (_travelingMerchantIsHere && (!_travelingMerchantIsVisited || !HideWhenVisited))
             {

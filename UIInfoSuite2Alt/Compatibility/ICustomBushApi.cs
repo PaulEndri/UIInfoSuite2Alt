@@ -94,12 +94,12 @@ internal static class CustomBushExtensions
   {
     if (string.IsNullOrEmpty(id))
     {
-      return new List<PossibleDroppedItem>();
+      return [];
     }
 
     api.TryGetDrops(id, out IList<ICustomBushDrop>? drops);
     return drops == null
-      ? new List<PossibleDroppedItem>()
+      ? []
       : DropsHelper.GetGenericDropItems(
         drops,
         id,

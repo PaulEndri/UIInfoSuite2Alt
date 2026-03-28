@@ -572,7 +572,7 @@ internal class ShowTileTooltips : IDisposable
   private static IEnumerable<string> GetFertilizerList(HoeDirt dirtTile)
   {
     if (string.IsNullOrWhiteSpace(dirtTile.fertilizer.Value))
-      return Enumerable.Empty<string>();
+      return [];
 
     var fertilizerNames = new Dictionary<string, int>();
 
@@ -877,7 +877,7 @@ internal class ShowTileTooltips : IDisposable
         return false;
       }
 
-      IEnumerable<string> fertilizers = Enumerable.Empty<string>();
+      IEnumerable<string> fertilizers = [];
 
       if (!string.IsNullOrEmpty(hoeDirt.fertilizer.Value) && !"0".Equals(hoeDirt.fertilizer.Value))
       {

@@ -25,7 +25,7 @@ internal class ShowBuffTimers : IDisposable
   private static readonly Color FadingDotColor = FadeColor * 0.9f;
 
   private readonly IModHelper _helper;
-  private readonly HashSet<string> _previousBuffIds = new();
+  private readonly HashSet<string> _previousBuffIds = [];
   private bool _playExpireSound;
 
   public ShowBuffTimers(IModHelper helper)
@@ -63,7 +63,7 @@ internal class ShowBuffTimers : IDisposable
       return;
     }
 
-    var currentBuffIds = new HashSet<string>();
+    HashSet<string> currentBuffIds = [];
     foreach (KeyValuePair<string, Buff> pair in Game1.player.buffs.AppliedBuffs)
     {
       // Only track non-permanent buffs

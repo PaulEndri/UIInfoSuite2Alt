@@ -299,11 +299,11 @@ internal static class BundleHelper
 
           if (!AllBundleIngredients.TryGetValue(key, out List<List<int>>? entryList))
           {
-            entryList = new List<List<int>>();
+            entryList = [];
             AllBundleIngredients[key] = entryList;
           }
 
-          entryList.Add(new List<int> { bundleIdx, quantity, quality });
+          entryList.Add([bundleIdx, quantity, quality]);
         }
       }
       catch (Exception)

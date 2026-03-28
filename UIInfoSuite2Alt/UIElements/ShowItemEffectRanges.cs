@@ -19,12 +19,10 @@ namespace UIInfoSuite2Alt.UIElements;
 internal class ShowItemEffectRanges : IDisposable
 {
   #region Properties
-  private readonly PerScreen<List<Point>> _effectiveAreaCurrent = new(() => new List<Point>());
-  private readonly PerScreen<HashSet<Point>> _effectiveAreaOther = new(() => new HashSet<Point>());
-  private readonly PerScreen<HashSet<Point>> _effectiveAreaIntersection = new(() =>
-    new HashSet<Point>()
-  );
-  private readonly PerScreen<HashSet<Point>> _seenTiles = new(() => new HashSet<Point>());
+  private readonly PerScreen<List<Point>> _effectiveAreaCurrent = new(() => []);
+  private readonly PerScreen<HashSet<Point>> _effectiveAreaOther = new(() => []);
+  private readonly PerScreen<HashSet<Point>> _effectiveAreaIntersection = new(() => []);
+  private readonly PerScreen<HashSet<Point>> _seenTiles = new(() => []);
 
   private readonly IModHelper _helper;
   private readonly Lazy<Texture2D> _tileTexture;
@@ -316,7 +314,7 @@ internal class ShowItemEffectRanges : IDisposable
     // Build tooltip lines
     string header = info.ShowingAll ? $"{info.ObjectName} x{info.ObjectCount}" : info.ObjectName;
 
-    var lines = new List<(string text, Color color)> { (header, Game1.textColor) };
+    List<(string text, Color color)> lines = [(header, Game1.textColor)];
 
     if (info.SubHeader != null)
     {
@@ -1111,7 +1109,7 @@ internal class ShowItemEffectRanges : IDisposable
 
   private List<Object> GetSimilarObjectsInLocation(string nameContains)
   {
-    var result = new List<Object>();
+    List<Object> result = [];
 
     if (!string.IsNullOrEmpty(nameContains))
     {
@@ -1190,45 +1188,34 @@ internal class ShowItemEffectRanges : IDisposable
     Object? instance = null
   )
   {
-    switch (type)
+    return type switch
     {
-      case ObjectsWithDistance.JunimoHut:
-        return GetCircularMask(100, maxDisplaySquareRadius: 8);
-      case ObjectsWithDistance.Beehouse:
-        return GetCircularMask(4.19, 5, true);
-      case ObjectsWithDistance.Scarecrow:
-        return GetCircularMask((instance?.GetRadiusForScarecrow() ?? 9) - 0.01);
-      case ObjectsWithDistance.DeluxeScarecrow:
-        return GetCircularMask((instance?.GetRadiusForScarecrow() ?? 17) - 0.01);
-      case ObjectsWithDistance.Sprinkler:
-        return hasPressureNozzle
-          ? GetCircularMask(100, maxDisplaySquareRadius: 1)
-          : GetCircularMask(1);
-      case ObjectsWithDistance.QualitySprinkler:
-        return hasPressureNozzle
-          ? GetCircularMask(100, maxDisplaySquareRadius: 2)
-          : GetCircularMask(100, maxDisplaySquareRadius: 1);
-      case ObjectsWithDistance.IridiumSprinkler:
-        return hasPressureNozzle
-          ? GetCircularMask(100, maxDisplaySquareRadius: 3)
-          : GetCircularMask(100, maxDisplaySquareRadius: 2);
-      case ObjectsWithDistance.PrismaticSprinkler:
-        return GetCircularMask(3.69, Math.Sqrt(18), false);
-      case ObjectsWithDistance.MushroomLog:
-        return GetCircularMask(100, maxDisplaySquareRadius: 3);
-      case ObjectsWithDistance.MossySeed:
-        return GetCircularMask(100, maxDisplaySquareRadius: 2);
-      case ObjectsWithDistance.WildTreeSeedSpread:
-        return GetCircularMask(100, maxDisplaySquareRadius: 3);
-      case ObjectsWithDistance.CherryBomb:
-        return GetCircularMask(3.39);
-      case ObjectsWithDistance.Bomb:
-        return GetCircularMask(5.52);
-      case ObjectsWithDistance.MegaBomb:
-        return GetCircularMask(7.45);
-      default:
-        throw new ArgumentOutOfRangeException(nameof(type), type, null);
-    }
+      ObjectsWithDistance.JunimoHut => GetCircularMask(100, maxDisplaySquareRadius: 8),
+      ObjectsWithDistance.Beehouse => GetCircularMask(4.19, 5, true),
+      ObjectsWithDistance.Scarecrow => GetCircularMask(
+        (instance?.GetRadiusForScarecrow() ?? 9) - 0.01
+      ),
+      ObjectsWithDistance.DeluxeScarecrow => GetCircularMask(
+        (instance?.GetRadiusForScarecrow() ?? 17) - 0.01
+      ),
+      ObjectsWithDistance.Sprinkler => hasPressureNozzle
+        ? GetCircularMask(100, maxDisplaySquareRadius: 1)
+        : GetCircularMask(1),
+      ObjectsWithDistance.QualitySprinkler => hasPressureNozzle
+        ? GetCircularMask(100, maxDisplaySquareRadius: 2)
+        : GetCircularMask(100, maxDisplaySquareRadius: 1),
+      ObjectsWithDistance.IridiumSprinkler => hasPressureNozzle
+        ? GetCircularMask(100, maxDisplaySquareRadius: 3)
+        : GetCircularMask(100, maxDisplaySquareRadius: 2),
+      ObjectsWithDistance.PrismaticSprinkler => GetCircularMask(3.69, Math.Sqrt(18), false),
+      ObjectsWithDistance.MushroomLog => GetCircularMask(100, maxDisplaySquareRadius: 3),
+      ObjectsWithDistance.MossySeed => GetCircularMask(100, maxDisplaySquareRadius: 2),
+      ObjectsWithDistance.WildTreeSeedSpread => GetCircularMask(100, maxDisplaySquareRadius: 3),
+      ObjectsWithDistance.CherryBomb => GetCircularMask(3.39),
+      ObjectsWithDistance.Bomb => GetCircularMask(5.52),
+      ObjectsWithDistance.MegaBomb => GetCircularMask(7.45),
+      _ => throw new ArgumentOutOfRangeException(nameof(type), type, null),
+    };
   }
 
   private static readonly Dictionary<(double, double?, bool?, int?), int[][]> CircularMaskCache =

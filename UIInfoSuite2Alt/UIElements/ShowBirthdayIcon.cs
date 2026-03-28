@@ -16,11 +16,9 @@ namespace UIInfoSuite2Alt.UIElements;
 internal class ShowBirthdayIcon : IDisposable
 {
   #region Properties
-  private readonly PerScreen<List<NPC>> _birthdayNPCs = new(() => new List<NPC>());
+  private readonly PerScreen<List<NPC>> _birthdayNPCs = new(() => []);
 
-  private readonly PerScreen<List<ClickableTextureComponent>> _birthdayIcons = new(() =>
-    new List<ClickableTextureComponent>()
-  );
+  private readonly PerScreen<List<ClickableTextureComponent>> _birthdayIcons = new(() => []);
 
   private bool Enabled { get; set; }
   private bool HideBirthdayIfFullFriendShip { get; set; }

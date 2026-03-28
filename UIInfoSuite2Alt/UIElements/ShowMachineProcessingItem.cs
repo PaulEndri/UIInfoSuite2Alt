@@ -17,7 +17,7 @@ internal class ShowMachineProcessingItem : IDisposable
   // Custom icon offsets from the machine's sprite center
   private static readonly Dictionary<string, Vector2> CustomOffsets = new()
   {
-    { "Cask", new Vector2(0f, -20f) },
+    ["Cask"] = new Vector2(0f, -20f),
   };
 
   private readonly PerScreen<List<MachineIconData>> _visibleMachines = new(() => []);

@@ -31,7 +31,7 @@ internal class ModOptionsPageHandler : IDisposable
   private readonly IModHelper _helper;
   private readonly bool _hasBgm;
 
-  private readonly List<int> _instancesWithOptionsPageOpen = new(); // window resize workaround (vanilla)
+  private readonly List<int> _instancesWithOptionsPageOpen = []; // window resize workaround (vanilla)
   private readonly PerScreen<IClickableMenu?> _lastMenu = new();
 
   private readonly PerScreen<int?> _lastMenuTab = new();
@@ -47,17 +47,15 @@ internal class ModOptionsPageHandler : IDisposable
   private readonly PerScreen<int?> _modOptionsTabPageNumber = new();
 
   /// <summary>The visible options list passed to ModOptionsPage. Rebuilt on section toggle.</summary>
-  private readonly List<ModOptionsElement> _optionsElements = new();
+  private readonly List<ModOptionsElement> _optionsElements = [];
 
   // Collapsible section infrastructure
-  private readonly List<ModOptionsElement> _topElements = new();
-  private readonly List<OptionsSection> _sections = new();
-  private readonly List<ModOptionsElement> _bottomElements = new();
+  private readonly List<ModOptionsElement> _topElements = [];
+  private readonly List<OptionsSection> _sections = [];
+  private readonly List<ModOptionsElement> _bottomElements = [];
 
   /// <summary>Tracks expanded/collapsed state per section across menu open/close within a session.</summary>
-  private static readonly PerScreen<Dictionary<string, bool>> _sectionExpandedState = new(() =>
-    new Dictionary<string, bool>()
-  );
+  private static readonly PerScreen<Dictionary<string, bool>> _sectionExpandedState = new(() => []);
 
   private record OptionsSection(
     string Id,
@@ -132,7 +130,7 @@ internal class ModOptionsPageHandler : IDisposable
   {
     bool isExpanded = _sectionExpandedState.Value.TryGetValue(sectionId, out bool saved) && saved;
 
-    var children = new List<ModOptionsElement>();
+    List<ModOptionsElement> children = [];
     Action onToggle = () => ToggleSection(sectionId);
 
     var header = new ModOptionsSectionHeader(title(), onToggle, isExpanded);
@@ -224,8 +222,8 @@ internal class ModOptionsPageHandler : IDisposable
     var showCustomIcons = new ShowCustomIcons(helper);
     var showFishOnCatch = new ShowFishOnCatch();
 
-    _elementsToDispose = new List<IDisposable>
-    {
+    _elementsToDispose =
+    [
       luckOfDay,
       showBirthdayIcon,
       showAccurateHearts,
@@ -251,7 +249,7 @@ internal class ModOptionsPageHandler : IDisposable
       showCustomIcons,
       showFishOnCatch,
       experienceBar,
-    };
+    ];
 
     var whichOption = 1;
 
@@ -318,7 +316,7 @@ internal class ModOptionsPageHandler : IDisposable
       new ModOptionsDropdown(
         _helper.SafeGetString(nameof(config.IconsPerRow)),
         whichOption++,
-        new List<string> { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" },
+        ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
         () => config.IconsPerRow - 1,
         SetInt(v =>
         {

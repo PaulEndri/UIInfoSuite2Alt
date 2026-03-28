@@ -31,7 +31,7 @@ public class ModConfig
     Dictionary<string, string> after
   )
   {
-    var changes = new List<string>();
+    List<string> changes = [];
     foreach ((string key, string newVal) in after)
     {
       if (before.TryGetValue(key, out string? oldVal) && oldVal != newVal)
@@ -117,16 +117,16 @@ public class ModConfig
   public Dictionary<string, int> IconOrder { get; set; } =
     new()
     {
-      { "Luck", 1 },
-      { "Weather", 2 },
-      { "Birthday", 3 },
-      { "Festival", 4 },
-      { "QueenOfSauce", 5 },
-      { "ToolUpgrade", 6 },
-      { "RobinBuilding", 7 },
-      { "SeasonalBerry", 8 },
-      { "TravelingMerchant", 9 },
-      { "Bookseller", 10 },
-      { "CustomIcons", 11 },
+      ["Luck"] = 1,
+      ["Weather"] = 2,
+      ["Birthday"] = 3,
+      ["Festival"] = 4,
+      ["QueenOfSauce"] = 5,
+      ["ToolUpgrade"] = 6,
+      ["RobinBuilding"] = 7,
+      ["SeasonalBerry"] = 8,
+      ["TravelingMerchant"] = 9,
+      ["Bookseller"] = 10,
+      ["CustomIcons"] = 11,
     };
 }

@@ -18,8 +18,8 @@ internal class QuestBoardSelector : IClickableMenu
 
   private readonly record struct BoardOption(string BoardType, string DisplayName);
 
-  private readonly List<BoardOption> _options = new();
-  private readonly List<ClickableComponent> _optionComponents = new();
+  private readonly List<BoardOption> _options = [];
+  private readonly List<ClickableComponent> _optionComponents = [];
   private readonly Action<string>? _onBoardSelected;
   private readonly HashSet<string> _viewedBoardTypes;
   private int _hoveredIndex = -1;
@@ -32,7 +32,7 @@ internal class QuestBoardSelector : IClickableMenu
     : base(0, 0, 0, 0, showUpperRightCloseButton: true)
   {
     _onBoardSelected = onBoardSelected;
-    _viewedBoardTypes = viewedBoardTypes ?? new HashSet<string>();
+    _viewedBoardTypes = viewedBoardTypes ?? [];
 
     // Vanilla first, then mod boards
     _options.Add(new BoardOption("", I18n.SpecialOrdersVanilla()));

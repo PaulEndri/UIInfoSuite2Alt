@@ -101,6 +101,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
   public void ToggleOption(bool showCalendarAndBillboard)
   {
     _helper.Events.Display.RenderedActiveMenu -= OnRenderedActiveMenu;
+    StopWatchingMenuClose();
     _helper.Events.Input.ButtonPressed -= OnButtonPressed;
     _helper.Events.GameLoop.UpdateTicked -= OnUpdateTicked;
 
@@ -482,18 +483,72 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
     MarkBoardViewed(boardType);
   }
 
+  private static bool _waitingForMenuClose;
+
   private static void OpenMenuFromIcon(IClickableMenu menu)
   {
     menu.exitFunction = ReturnToInventory;
+
+    // Clear flag before setting activeClickableMenu. The assignment may fire the
+    // previous menu's exitFunction (which could be ReturnToInventory from a prior
+    // OpenMenuFromIcon call, e.g. selector -> billboard). The false flag makes
+    // that stale ReturnToInventory call no-op.
+    _waitingForMenuClose = false;
     Game1.activeClickableMenu = menu;
+    _waitingForMenuClose = true;
+
+    // Some mods (e.g. Help Wanted) replace our menu with their own and overwrite
+    // exitFunction, so our ReturnToInventory callback is lost.
+    // Watch MenuChanged to catch when the final menu closes to null.
+    // Unsubscribe first to prevent double-subscription when called in sequence
+    // (e.g. selector menu -> billboard menu).
+    if (_instance != null)
+    {
+      _instance._helper.Events.Display.MenuChanged -= OnMenuClosedWhileWatching;
+      _instance._helper.Events.Display.MenuChanged += OnMenuClosedWhileWatching;
+    }
+
     ModEntry.MonitorObject.Log(
       $"ShowCalendarAndBillboard: watching menu close, menu={menu.GetType().Name}",
       LogLevel.Trace
     );
   }
 
+  private static void StopWatchingMenuClose()
+  {
+    _waitingForMenuClose = false;
+    if (_instance != null)
+    {
+      _instance._helper.Events.Display.MenuChanged -= OnMenuClosedWhileWatching;
+    }
+  }
+
+  private static void OnMenuClosedWhileWatching(object? sender, MenuChangedEventArgs e)
+  {
+    if (e.NewMenu != null)
+    {
+      return;
+    }
+
+    // Menu closed to null - unsubscribe handler, then call ReturnToInventory
+    // which checks the flag and handles cleanup.
+    if (_instance != null)
+    {
+      _instance._helper.Events.Display.MenuChanged -= OnMenuClosedWhileWatching;
+    }
+
+    ReturnToInventory();
+  }
+
   internal static void ReturnToInventory()
   {
+    if (!_waitingForMenuClose)
+    {
+      return;
+    }
+
+    StopWatchingMenuClose();
+
     // exitFunction fires after exitActiveMenu sets activeClickableMenu = null,
     // but before the game's input loop can open its own GameMenu.
     if (Game1.activeClickableMenu == null && !Game1.eventUp && !Game1.dialogueUp)
@@ -842,7 +897,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
       object? board = _rsvQuestBoardCtor.Invoke([questData, boardType]);
       if (board is IClickableMenu menu)
       {
-        OpenMenuFromIcon(menu);
+        OpenQuestBoard(menu);
         return true;
       }
     }
@@ -873,14 +928,30 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
     {
       if (Game1.questOfTheDay != null && string.IsNullOrEmpty(Game1.questOfTheDay.currentObjective))
         Game1.questOfTheDay.currentObjective = "wat?";
-      OpenMenuFromIcon(new Billboard(dailyQuest: true));
+      OpenQuestBoard(new Billboard(dailyQuest: true));
     }
     else
     {
       if (!TryOpenRsvQuestBoard(boardType))
       {
-        OpenMenuFromIcon(new Billboard(dailyQuest: true));
+        OpenQuestBoard(new Billboard(dailyQuest: true));
       }
+    }
+  }
+
+  /// <summary>
+  /// Opens a quest board menu. Uses OpenMenuFromIcon when in an icon-opened flow
+  /// (so return-to-inventory works), otherwise sets the menu directly (keybind flow).
+  /// </summary>
+  private static void OpenQuestBoard(IClickableMenu menu)
+  {
+    if (_waitingForMenuClose)
+    {
+      OpenMenuFromIcon(menu);
+    }
+    else
+    {
+      Game1.activeClickableMenu = menu;
     }
   }
   #endregion

@@ -59,6 +59,7 @@
 - **v2.8.7**
   - Improved animal petting and produce indicators with [Better Ranching](https://www.nexusmods.com/stardewvalley/mods/859) compatibility
   - Fix farm animal icons (needs petting, produce ready) not showing on non-farm locations
+  - Fix return-to-inventory not working when mods replace the quest board menu (e.g. [Help Wanted](https://www.nexusmods.com/stardewvalley/mods/14640))
 - **v2.8.6**
   - Add [Unlockable Bundles](https://www.nexusmods.com/stardewvalley/mods/17265) API integration
     - Bundle tooltip now shows the actual bundle icon(UB content patcher data supported)

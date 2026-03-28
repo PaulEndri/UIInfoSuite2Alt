@@ -196,7 +196,7 @@ internal class ModOptionsPageHandler : IDisposable
       helper.Events.Display.WindowResized += OnWindowResized;
     }
 
-    var luckOfDay = new LuckOfDay(helper);
+    var luckOfDay = new ShowLuckOfDay(helper);
     var showBirthdayIcon = new ShowBirthdayIcon(helper);
     var showAccurateHearts = new ShowAccurateHearts(helper.Events);
     var showWhenAnimalNeedsPet = new ShowWhenAnimalNeedsPet(
@@ -209,7 +209,7 @@ internal class ModOptionsPageHandler : IDisposable
     var showScarecrowAndSprinklerRange = new ShowItemEffectRanges(helper);
     var experienceBar = new ExperienceBar(helper);
     var showItemHoverInformation = new ShowItemHoverInformation(helper);
-    var shopHarvestPrices = new ShopHarvestPrices(helper);
+    var shopHarvestPrices = new ShowShopHarvestPrices(helper);
     var showQueenOfSauceIcon = new ShowQueenOfSauceIcon(helper);
     var showTravelingMerchant = new ShowTravelingMerchant(helper);
     var showBookseller = new ShowBookseller(helper);

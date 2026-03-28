@@ -56,6 +56,8 @@
 
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
+- **v2.8.8**
+  - (Hotfix) Soundfix for level_up.ogg
 - **v2.8.7**
   - Improved animal petting and produce indicators with [Better Ranching](https://www.nexusmods.com/stardewvalley/mods/859) compatibility
     - Fix farm animal icons (needs petting, produce ready) not showing on non-farm locations

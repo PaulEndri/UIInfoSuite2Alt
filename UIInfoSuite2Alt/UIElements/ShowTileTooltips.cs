@@ -78,6 +78,7 @@ internal class ShowTileTooltips : IDisposable
 
   private readonly IModHelper _helper;
   private readonly ShowItemEffectRanges _itemEffectRanges;
+  private readonly Lazy<Texture2D> _wildTreeTexture;
   private bool _showCropTooltip;
   private bool _showTreeTooltip;
   private bool _showBarrelTooltip;
@@ -87,6 +88,9 @@ internal class ShowTileTooltips : IDisposable
   {
     _helper = helper;
     _itemEffectRanges = itemEffectRanges;
+    _wildTreeTexture = new Lazy<Texture2D>(
+      () => _helper.ModContent.Load<Texture2D>("assets/wild_tree_tooltip.png")
+    );
   }
 
   public void Dispose()
@@ -311,7 +315,7 @@ internal class ShowTileTooltips : IDisposable
     );
   }
 
-  private static (Texture2D? Texture, Rectangle? SourceRect) GetTooltipSprite(
+  private (Texture2D? Texture, Rectangle? SourceRect) GetTooltipSprite(
     Object? tileObject,
     Building? building,
     TerrainFeature? terrain
@@ -387,10 +391,10 @@ internal class ShowTileTooltips : IDisposable
       return FromItemData(ItemRegistry.GetData(fruitTree.treeId.Value));
     }
 
-    // Wild tree: generic tree icon from cursors (trimmed 4px right whitespace)
+    // Wild tree: bundled asset to avoid conflicts with mods that replace profession icons on Cursors
     if (terrain is Tree)
     {
-      return (Game1.mouseCursors, new Rectangle(0, 656, 12, 16));
+      return (_wildTreeTexture.Value, new Rectangle(0, 0, 12, 16));
     }
 
     // Tea/custom bush: show drop item
@@ -469,7 +473,7 @@ internal class ShowTileTooltips : IDisposable
     }
 
     int width = (int)maxWidth + 32;
-    int height = Math.Max(60, lines.Count * font.LineSpacing + 32);
+    int height = Math.Max(60, lines.Count * font.LineSpacing + 40);
 
     int x = Game1.getOldMouseX() + 32;
     int y = Game1.getOldMouseY() + 32;

@@ -27,6 +27,7 @@ internal class ShowItemEffectRanges : IDisposable
   private readonly IModHelper _helper;
   private readonly Lazy<Texture2D> _tileTexture;
   private readonly Lazy<Texture2D> _tileBombTexture;
+  private readonly Lazy<Texture2D> _wildTreeTexture;
   private readonly PerScreen<bool> _isBombRange = new(() => false);
 
   private bool _showItemEffectRanges;
@@ -78,6 +79,9 @@ internal class ShowItemEffectRanges : IDisposable
     _tileTexture = new Lazy<Texture2D>(() => _helper.ModContent.Load<Texture2D>("assets/tile.png"));
     _tileBombTexture = new Lazy<Texture2D>(() =>
       _helper.ModContent.Load<Texture2D>("assets/tile_muted.png")
+    );
+    _wildTreeTexture = new Lazy<Texture2D>(
+      () => _helper.ModContent.Load<Texture2D>("assets/wild_tree_tooltip.png")
     );
   }
 
@@ -372,7 +376,7 @@ internal class ShowItemEffectRanges : IDisposable
     }
 
     int boxWidth = (int)maxWidth + 32;
-    int boxHeight = Math.Max(60, lines.Count * font.LineSpacing + 32);
+    int boxHeight = Math.Max(60, lines.Count * font.LineSpacing + 40);
 
     // Position near mouse, keep on screen
     int x = Game1.getMouseX() + 32;
@@ -528,8 +532,8 @@ internal class ShowItemEffectRanges : IDisposable
           {
             ObjectName = treeName,
             WarningMessage = I18n.NoSeedSpread(),
-            SpriteTexture = Game1.mouseCursors,
-            SpriteSourceRect = new Rectangle(0, 656, 12, 16),
+            SpriteTexture = _wildTreeTexture.Value,
+            SpriteSourceRect = new Rectangle(0, 0, 12, 16),
           };
         }
         else if (Game1.currentLocation is Farm)
@@ -559,8 +563,8 @@ internal class ShowItemEffectRanges : IDisposable
             ShowingAll = ButtonShowAllRanges,
             OccupiedTiles = 0,
             RawTotalTiles = reachableTiles,
-            SpriteTexture = Game1.mouseCursors,
-            SpriteSourceRect = new Rectangle(0, 656, 12, 16),
+            SpriteTexture = _wildTreeTexture.Value,
+            SpriteSourceRect = new Rectangle(0, 0, 12, 16),
           };
 
           if (ButtonShowAllRanges)
@@ -602,8 +606,8 @@ internal class ShowItemEffectRanges : IDisposable
           {
             ObjectName = treeName,
             WarningMessage = I18n.LocationNotFarm(),
-            SpriteTexture = Game1.mouseCursors,
-            SpriteSourceRect = new Rectangle(0, 656, 12, 16),
+            SpriteTexture = _wildTreeTexture.Value,
+            SpriteSourceRect = new Rectangle(0, 0, 12, 16),
           };
         }
       }

@@ -60,6 +60,7 @@
   - Fix pigs incorrectly showing truffle produce bubble
   - Fix buff expiry sound playing constantly in co-op/split-screen
   - Fix "Show fish on catch/quality star" not working for player 2 in co-op/split-screen
+  - Fix bookseller icon, golden walnut tracker, and machine icons not using per-screen state in split-screen
 - **v2.8.8**
   - (Hotfix) Soundfix for level_up.ogg
 - **v2.8.7**

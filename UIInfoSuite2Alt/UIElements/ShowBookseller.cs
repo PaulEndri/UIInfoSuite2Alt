@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
+using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Menus;
 using UIInfoSuite2Alt.Infrastructure;
@@ -12,8 +13,8 @@ public class ShowBookseller : IDisposable
 {
   #region Properties
   private bool _booksellerIsHere;
-  private bool _booksellerIsVisited;
-  private ClickableTextureComponent _booksellerIcon = null!;
+  private readonly PerScreen<bool> _booksellerIsVisited = new();
+  private readonly PerScreen<ClickableTextureComponent> _booksellerIcon = new();
 
   private bool Enabled { get; set; }
   private bool HideWhenVisited { get; set; }
@@ -68,7 +69,7 @@ public class ShowBookseller : IDisposable
   {
     if (e.NewMenu is ShopMenu menu && menu.ShopId == "Bookseller")
     {
-      _booksellerIsVisited = true;
+      _booksellerIsVisited.Value = true;
     }
   }
 
@@ -80,17 +81,17 @@ public class ShowBookseller : IDisposable
         "Bookseller",
         (batch, pos) =>
         {
-          _booksellerIcon = new ClickableTextureComponent(
+          _booksellerIcon.Value = new ClickableTextureComponent(
             new Rectangle(pos.X, pos.Y, 40, 40),
             Game1.mouseCursors_1_6,
             new Rectangle(52, 477, 20, 20),
             2f
           );
-          _booksellerIcon.draw(batch);
+          _booksellerIcon.Value.draw(batch);
         },
         batch =>
         {
-          if (_booksellerIcon?.containsPoint(Game1.getMouseX(), Game1.getMouseY()) ?? false)
+          if (_booksellerIcon.Value?.containsPoint(Game1.getMouseX(), Game1.getMouseY()) ?? false)
           {
             IClickableMenu.drawHoverText(batch, I18n.BooksellerIsInTown(), Game1.dialogueFont);
           }
@@ -106,12 +107,12 @@ public class ShowBookseller : IDisposable
   {
     var booksellerDays = Utility.getDaysOfBooksellerThisSeason();
     _booksellerIsHere = booksellerDays.Contains(Game1.dayOfMonth);
-    _booksellerIsVisited = false;
+    _booksellerIsVisited.Value = false;
   }
 
   private bool ShouldDrawIcon()
   {
-    return _booksellerIsHere && (!_booksellerIsVisited || !HideWhenVisited);
+    return _booksellerIsHere && (!_booksellerIsVisited.Value || !HideWhenVisited);
   }
   #endregion
 }

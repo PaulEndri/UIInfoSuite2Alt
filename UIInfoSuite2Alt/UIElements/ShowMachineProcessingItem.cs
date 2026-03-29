@@ -26,12 +26,12 @@ internal class ShowMachineProcessingItem : IDisposable
   private readonly IModHelper _helper;
   private bool _showMachineIcons;
   private bool _showFishPondIcons;
-  private bool _toggleState;
+  private readonly PerScreen<bool> _toggleState = new();
 
   public ShowMachineProcessingItem(IModHelper helper)
   {
     _helper = helper;
-    _toggleState = ModEntry.ModConfig.MachineProcessingIconsVisible;
+    _toggleState.Value = ModEntry.ModConfig.MachineProcessingIconsVisible;
     _helper.Events.Input.ButtonsChanged += OnButtonsChanged;
     _helper.Events.GameLoop.Saving += OnSaving;
   }
@@ -48,7 +48,7 @@ internal class ShowMachineProcessingItem : IDisposable
   {
     _showMachineIcons = mode switch
     {
-      1 => _toggleState,
+      1 => _toggleState.Value,
       2 => true,
       _ => false,
     };
@@ -94,14 +94,14 @@ internal class ShowMachineProcessingItem : IDisposable
     }
 
     _helper.Input.SuppressActiveKeybinds(keybind);
-    _toggleState = !_toggleState;
-    ModEntry.ModConfig.MachineProcessingIconsVisible = _toggleState;
-    ToggleOption(_toggleState);
+    _toggleState.Value = !_toggleState.Value;
+    ModEntry.ModConfig.MachineProcessingIconsVisible = _toggleState.Value;
+    ToggleOption(_toggleState.Value);
   }
 
   private void OnSaving(object? sender, SavingEventArgs e)
   {
-    ModEntry.ModConfig.MachineProcessingIconsVisible = _toggleState;
+    ModEntry.ModConfig.MachineProcessingIconsVisible = _toggleState.Value;
     ModEntry.SaveConfig();
   }
 

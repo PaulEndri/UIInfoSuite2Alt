@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
+using StardewModdingAPI.Utilities;
 using StardewValley;
 using UIInfoSuite2Alt.Infrastructure;
 
@@ -44,8 +45,8 @@ internal class ShowGoldenWalnutCount : IDisposable
   private readonly Dictionary<string, WalnutInfo> _walnutData;
   private bool _showAnywhere;
   private bool _fadeOutEnabled;
-  private int _fadeTimer;
-  private bool _isHovering;
+  private readonly PerScreen<int> _fadeTimer = new();
+  private readonly PerScreen<bool> _isHovering = new();
   #endregion
 
   #region Area Definitions
@@ -202,7 +203,7 @@ internal class ShowGoldenWalnutCount : IDisposable
     _fadeOutEnabled = enabled;
     if (!enabled)
     {
-      _fadeTimer = 0;
+      _fadeTimer.Value = 0;
     }
   }
   #endregion
@@ -210,14 +211,14 @@ internal class ShowGoldenWalnutCount : IDisposable
   #region Event subscriptions
   private void OnUpdateTicked(object? sender, UpdateTickedEventArgs e)
   {
-    if (!_fadeOutEnabled || _isHovering)
+    if (!_fadeOutEnabled || _isHovering.Value)
     {
       return;
     }
 
-    if (_fadeTimer < FadeDelayTicks + FadeDurationTicks)
+    if (_fadeTimer.Value < FadeDelayTicks + FadeDurationTicks)
     {
-      _fadeTimer++;
+      _fadeTimer.Value++;
     }
   }
 
@@ -250,8 +251,8 @@ internal class ShowGoldenWalnutCount : IDisposable
     bool hovering = counterRect.Contains(Game1.getOldMouseX(), Game1.getOldMouseY());
     if (hovering)
     {
-      _isHovering = true;
-      _fadeTimer = 0;
+      _isHovering.Value = true;
+      _fadeTimer.Value = 0;
 
       // Redraw at full opacity if it was faded
       if (alpha < 1f)
@@ -263,7 +264,7 @@ internal class ShowGoldenWalnutCount : IDisposable
     }
     else
     {
-      _isHovering = false;
+      _isHovering.Value = false;
     }
   }
 
@@ -274,12 +275,12 @@ internal class ShowGoldenWalnutCount : IDisposable
       return 1f;
     }
 
-    if (_fadeTimer < FadeDelayTicks)
+    if (_fadeTimer.Value < FadeDelayTicks)
     {
       return 1f;
     }
 
-    int fadeTicks = _fadeTimer - FadeDelayTicks;
+    int fadeTicks = _fadeTimer.Value - FadeDelayTicks;
     if (fadeTicks >= FadeDurationTicks)
     {
       return MinFadeAlpha;

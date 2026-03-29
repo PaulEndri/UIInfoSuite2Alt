@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using HarmonyLib;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Menus;
 
@@ -11,8 +10,8 @@ namespace UIInfoSuite2Alt.Patches;
 
 internal class ShowFishOnCatch : IDisposable
 {
-  private static readonly PerScreen<bool> _enabled = new();
-  private static readonly PerScreen<bool> _showQualityStar = new();
+  private static bool _enabled;
+  private static bool _showQualityStar;
 
   public static void Initialize(Harmony harmony)
   {
@@ -34,19 +33,19 @@ internal class ShowFishOnCatch : IDisposable
 
   public void ToggleOption(bool enabled)
   {
-    _enabled.Value = enabled;
+    _enabled = enabled;
   }
 
   public void ToggleQualityStarOption(bool enabled)
   {
-    _showQualityStar.Value = enabled;
+    _showQualityStar = enabled;
   }
 
   // Temporarily add SonarBobber to the bobbers list so the game's own
   // rendering code draws the fish identity inside the correct coordinate space
   private static void BeforeDraw(List<string> ___bobbers)
   {
-    if (_enabled.Value && !___bobbers.Contains("(O)SonarBobber"))
+    if (_enabled && !___bobbers.Contains("(O)SonarBobber"))
     {
       ___bobbers.Add("(O)SonarBobber");
     }
@@ -61,7 +60,7 @@ internal class ShowFishOnCatch : IDisposable
     Vector2 ___everythingShake
   )
   {
-    if (!_enabled.Value)
+    if (!_enabled)
     {
       return;
     }
@@ -69,7 +68,7 @@ internal class ShowFishOnCatch : IDisposable
     ___bobbers.Remove("(O)SonarBobber");
 
     // Only show star when enabled, minigame is fully visible, and actively playing
-    if (!_showQualityStar.Value || __instance.scale < 1f || __instance.fadeOut)
+    if (!_showQualityStar || __instance.scale < 1f || __instance.fadeOut)
     {
       return;
     }

@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
+using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Menus;
 using UIInfoSuite2Alt.Infrastructure;
@@ -25,8 +26,8 @@ internal class ShowBuffTimers : IDisposable
   private static readonly Color FadingDotColor = FadeColor * 0.9f;
 
   private readonly IModHelper _helper;
-  private readonly HashSet<string> _previousBuffIds = [];
-  private bool _playExpireSound;
+  private readonly PerScreen<HashSet<string>> _previousBuffIds = new(() => []);
+  private readonly PerScreen<bool> _playExpireSound = new();
 
   public ShowBuffTimers(IModHelper helper)
   {
@@ -52,14 +53,14 @@ internal class ShowBuffTimers : IDisposable
 
   public void ToggleExpireSound(bool playExpireSound)
   {
-    _playExpireSound = playExpireSound;
+    _playExpireSound.Value = playExpireSound;
   }
 
   private void OnUpdateTicked(object? sender, UpdateTickedEventArgs e)
   {
     if (!Context.IsWorldReady)
     {
-      _previousBuffIds.Clear();
+      _previousBuffIds.Value.Clear();
       return;
     }
 
@@ -74,9 +75,9 @@ internal class ShowBuffTimers : IDisposable
     }
 
     // Play sound for each buff that was present last tick but is now gone
-    if (_playExpireSound && _previousBuffIds.Count > 0)
+    if (_playExpireSound.Value && _previousBuffIds.Value.Count > 0)
     {
-      foreach (string id in _previousBuffIds)
+      foreach (string id in _previousBuffIds.Value)
       {
         if (!currentBuffIds.Contains(id))
         {
@@ -86,10 +87,10 @@ internal class ShowBuffTimers : IDisposable
       }
     }
 
-    _previousBuffIds.Clear();
+    _previousBuffIds.Value.Clear();
     foreach (string id in currentBuffIds)
     {
-      _previousBuffIds.Add(id);
+      _previousBuffIds.Value.Add(id);
     }
   }
 

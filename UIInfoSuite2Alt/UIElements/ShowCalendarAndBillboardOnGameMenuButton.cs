@@ -116,7 +116,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
 
 
   #region Event subscriptions
-  private void OnUpdateTicked(object? sender, EventArgs e)
+  private void OnUpdateTicked(object? sender, UpdateTickedEventArgs e)
   {
     // Pulse timer for SO exclamation
     int elapsed = (int)Game1.currentGameTime.ElapsedGameTime.TotalMilliseconds;

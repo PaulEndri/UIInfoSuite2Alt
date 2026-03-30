@@ -261,6 +261,11 @@ public partial class ModEntry
       () => ModConfig.HideBirthdayIfFullFriendShip,
       v => ModConfig.HideBirthdayIfFullFriendShip = v
     );
+    AddSubBool(
+      nameof(ModConfig.UseStackedBirthdayIcons),
+      () => ModConfig.UseStackedBirthdayIcons,
+      v => ModConfig.UseStackedBirthdayIcons = v
+    );
     Spacer();
     AddBool(
       nameof(ModConfig.ShowTravelingMerchant),

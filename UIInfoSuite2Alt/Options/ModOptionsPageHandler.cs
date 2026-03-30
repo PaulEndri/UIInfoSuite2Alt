@@ -414,6 +414,16 @@ internal class ModOptionsPageHandler : IDisposable
         birthdayIcon
       )
     );
+    _currentTarget.Add(
+      new ModOptionsCheckbox(
+        _helper.SafeGetString(nameof(config.UseStackedBirthdayIcons)),
+        whichOption++,
+        showBirthdayIcon.ToggleStackedOption,
+        () => config.UseStackedBirthdayIcons,
+        Set(v => config.UseStackedBirthdayIcons = v),
+        birthdayIcon
+      )
+    );
     var travellingMerchantIcon = new ModOptionsCheckbox(
       _helper.SafeGetString(nameof(config.ShowTravelingMerchant)),
       whichOption++,

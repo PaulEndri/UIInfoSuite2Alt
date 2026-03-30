@@ -22,6 +22,7 @@ internal class ShowBirthdayIcon : IDisposable
 
   private bool Enabled { get; set; }
   private bool HideBirthdayIfFullFriendShip { get; set; }
+  private bool UseStackedBirthdayIcons { get; set; }
   private readonly IModHelper _helper;
   #endregion
 
@@ -58,6 +59,12 @@ internal class ShowBirthdayIcon : IDisposable
   {
     HideBirthdayIfFullFriendShip = hideBirthdayIfFullFriendShip;
     ToggleOption(Enabled);
+  }
+
+  public void ToggleStackedOption(bool useStackedBirthdayIcons)
+  {
+    UseStackedBirthdayIcons = useStackedBirthdayIcons;
+    _birthdayIcons.Value.Clear();
   }
   #endregion
 
@@ -165,13 +172,33 @@ internal class ShowBirthdayIcon : IDisposable
   }
 
   private static readonly Rectangle BirthdayBackgroundSource = new(228, 409, 16, 16);
+  private const float IconScale = 2.9f;
+  private const float HeadshotScale = 2f;
+  private const int HeadshotSize = 16;
 
   private void EnqueueBirthdayIcons()
   {
     List<NPC> npcs = _birthdayNPCs.Value;
-    List<ClickableTextureComponent> icons = _birthdayIcons.Value;
-    var scale = 2.9f;
+    if (npcs.Count == 0)
+    {
+      return;
+    }
 
+    List<ClickableTextureComponent> icons = _birthdayIcons.Value;
+
+    // Use stacked mode only when enabled AND 2+ NPCs have birthdays
+    if (UseStackedBirthdayIcons && npcs.Count >= 2)
+    {
+      EnqueueStackedIcon(npcs, icons);
+    }
+    else
+    {
+      EnqueueIndividualIcons(npcs, icons);
+    }
+  }
+
+  private static void EnqueueIndividualIcons(List<NPC> npcs, List<ClickableTextureComponent> icons)
+  {
     // Rebuild icon list only when NPC count changes
     if (icons.Count != npcs.Count)
     {
@@ -186,7 +213,7 @@ internal class ShowBirthdayIcon : IDisposable
             npc.Name,
             npc.Sprite.Texture,
             npc.GetHeadShot(),
-            2f
+            HeadshotScale
           )
         );
       }
@@ -199,24 +226,8 @@ internal class ShowBirthdayIcon : IDisposable
         "Birthday",
         (batch, pos) =>
         {
-          batch.Draw(
-            Game1.mouseCursors,
-            new Vector2(pos.X, pos.Y - 3),
-            BirthdayBackgroundSource,
-            Color.White,
-            0.0f,
-            Vector2.Zero,
-            scale,
-            SpriteEffects.None,
-            1f
-          );
-
-          icons[capturedI].bounds = new Rectangle(
-            pos.X - 7,
-            pos.Y - 5,
-            (int)(16.0 * scale),
-            (int)(16.0 * scale)
-          );
+          DrawBirthdayBackground(batch, pos);
+          icons[capturedI].bounds = GetIconBounds(pos);
           icons[capturedI].sourceRect = npcs[capturedI].GetHeadShot();
           icons[capturedI].draw(batch);
         },
@@ -229,6 +240,173 @@ internal class ShowBirthdayIcon : IDisposable
           }
         }
       );
+    }
+  }
+
+  private static void EnqueueStackedIcon(List<NPC> npcs, List<ClickableTextureComponent> icons)
+  {
+    // Use a single icon entry for the stacked view
+    if (icons.Count != 1 || icons[0].name != "Stacked")
+    {
+      icons.Clear();
+      icons.Add(
+        new ClickableTextureComponent(
+          "Stacked",
+          Rectangle.Empty,
+          null,
+          "Stacked",
+          Game1.mouseCursors,
+          BirthdayBackgroundSource,
+          IconScale
+        )
+      );
+    }
+
+    IconHandler.Handler.EnqueueIcon(
+      "Birthday",
+      (batch, pos) =>
+      {
+        DrawBirthdayBackground(batch, pos);
+
+        // Draw digit count centered on the birthday icon
+        int count = npcs.Count;
+        int digitCount = count == 0 ? 1 : (int)Math.Floor(Math.Log10(count)) + 1;
+        int totalDigitWidth = digitCount * Tools.TinyDigitStep;
+        float iconCenterX = pos.X + 16f * IconScale / 2f;
+        float iconCenterY = pos.Y - 3f + 20f * IconScale / 2f;
+        float xOffset = 0f;
+        var digitPos = new Vector2(iconCenterX - totalDigitWidth / 2f, iconCenterY - 7f);
+        Tools.DrawTinyDigits(
+          batch,
+          count,
+          digitPos,
+          ref xOffset,
+          Tools.TinyDigitStep,
+          Color.White,
+          Color.Black * 0.3f
+        );
+
+        icons[0].bounds = GetIconBounds(pos);
+      },
+      batch =>
+      {
+        if (icons[0].containsPoint(Game1.getMouseX(), Game1.getMouseY()))
+        {
+          DrawStackedTooltip(batch, npcs);
+        }
+      }
+    );
+  }
+
+  private static void DrawBirthdayBackground(SpriteBatch batch, Point pos)
+  {
+    batch.Draw(
+      Game1.mouseCursors,
+      new Vector2(pos.X, pos.Y - 3),
+      BirthdayBackgroundSource,
+      Color.White,
+      0.0f,
+      Vector2.Zero,
+      IconScale,
+      SpriteEffects.None,
+      1f
+    );
+  }
+
+  private static Rectangle GetIconBounds(Point pos)
+  {
+    return new Rectangle(pos.X - 7, pos.Y - 5, (int)(16.0 * IconScale), (int)(16.0 * IconScale));
+  }
+
+  private static void DrawStackedTooltip(SpriteBatch batch, List<NPC> npcs)
+  {
+    SpriteFont font = Game1.smallFont;
+    string header = I18n.BirthdaysToday();
+
+    // Measure tooltip dimensions
+    float headshotDrawSize = HeadshotSize * HeadshotScale;
+    float headshotPadding = 4f;
+    float lineHeight = Math.Max(font.LineSpacing, headshotDrawSize);
+    float headerWidth = font.MeasureString(header).X;
+    float maxNameWidth = 0f;
+    foreach (NPC npc in npcs)
+    {
+      float nameWidth = font.MeasureString(npc.displayName).X;
+      if (nameWidth > maxNameWidth)
+      {
+        maxNameWidth = nameWidth;
+      }
+    }
+
+    float npcLineWidth = headshotDrawSize + headshotPadding + maxNameWidth;
+    float contentWidth = Math.Max(headerWidth, npcLineWidth);
+    int padding = 16;
+    int tooltipWidth = (int)contentWidth + padding * 2;
+    int tooltipHeight = (int)(font.LineSpacing + 4 + npcs.Count * lineHeight) + padding * 2;
+
+    // Position tooltip near mouse
+    int mouseX = Game1.getMouseX();
+    int mouseY = Game1.getMouseY();
+    int x = mouseX + 32;
+    int y = mouseY + 32;
+    Rectangle safeArea = Utility.getSafeArea();
+    if (x + tooltipWidth > safeArea.Right)
+    {
+      x = safeArea.Right - tooltipWidth;
+    }
+
+    if (y + tooltipHeight > safeArea.Bottom)
+    {
+      y = safeArea.Bottom - tooltipHeight;
+    }
+
+    // Draw tooltip background
+    IClickableMenu.drawTextureBox(
+      batch,
+      Game1.menuTexture,
+      new Rectangle(0, 256, 60, 60),
+      x,
+      y,
+      tooltipWidth,
+      tooltipHeight,
+      Color.White
+    );
+
+    // Draw header
+    float textX = x + padding;
+    float textY = y + padding;
+    Utility.drawTextWithShadow(batch, header, font, new Vector2(textX, textY), Game1.textColor);
+    textY += font.LineSpacing + 4;
+
+    // Draw each NPC line: headshot + name
+    foreach (NPC npc in npcs)
+    {
+      Rectangle headShot = npc.GetHeadShot();
+      float scale = headshotDrawSize / headShot.Width;
+      float headshotY = textY + (lineHeight - headShot.Height * scale) / 2f - 10f;
+
+      batch.Draw(
+        npc.Sprite.Texture,
+        new Vector2(textX, headshotY),
+        headShot,
+        Color.White,
+        0f,
+        Vector2.Zero,
+        scale,
+        SpriteEffects.None,
+        1f
+      );
+
+      float nameY = textY + (lineHeight - font.LineSpacing) / 2f;
+      Utility.drawTextWithShadow(
+        batch,
+        npc.displayName,
+        font,
+        new Vector2(textX + headshotDrawSize + headshotPadding, nameY),
+        Game1.textColor
+      );
+
+      textY += lineHeight;
     }
   }
   #endregion

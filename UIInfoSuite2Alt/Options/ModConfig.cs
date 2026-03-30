@@ -101,6 +101,7 @@ public class ModConfig
   public bool ShowSeasonalBerryHazelnut { get; set; } = false;
   public bool ShowTodaysGifts { get; set; } = true;
   public bool HideBirthdayIfFullFriendShip { get; set; } = true;
+  public bool UseStackedBirthdayIcons { get; set; } = false;
   public bool ShowQuestCount { get; set; } = true;
   public bool ShowGoldenWalnutCount { get; set; } = true;
   public bool ShowGoldenWalnutAnywhere { get; set; } = false;

@@ -135,6 +135,7 @@
   "DaysUntilToolIsUpgraded": "{0} day(s) until {1} is finished being upgraded",
   "ToolIsFinishedBeingUpgraded": "{0} is finished!",
   "NpcBirthday": "{0}'s birthday",
+  "BirthdaysToday": "Birthday(s) today!",
   "RobinBuildingStatus": "Robin will finish your new building in {0} day(s)",
   "RobinHouseUpgradeStatus": "Robin will finish upgrading your house in {0} day(s)",
   // Display icons - Foragables
@@ -198,6 +199,7 @@
   //Settings - Show icons
   "ShowBirthdayIcon": "Show Birthday icon",
   "HideBirthdayIfFullFriendShip": "Hide on max friendship",
+  "UseStackedBirthdayIcons": "Stack multiple birthdays",
   "ShowTravelingMerchant": "Show Traveling Merchant",
   "HideMerchantWhenVisited": "Hide when visited",
   "ShowMerchantBundleIcon": "Show bundle items indicator",

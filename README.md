@@ -57,6 +57,8 @@
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
 - **v2.8.10**
+  - Add "Stack multiple birthdays" option
+    - Consolidates 2+ birthday icons into one with count overlay and grouped tooltip
   - Add [Informant](https://www.nexusmods.com/stardewvalley/mods/21286) compatibility
     - Auto-disables overlapping tooltips (crop, tree, machine, item prices, bundles, museum, shipping) when Informant is installed
     - Registers [Stardew Aquarium](https://www.nexusmods.com/stardewvalley/mods/6372) donation indicator as an Informant item decorator

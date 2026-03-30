@@ -79,6 +79,7 @@ internal class ShowTileTooltips : IDisposable
   private readonly IModHelper _helper;
   private readonly ShowItemEffectRanges _itemEffectRanges;
   private readonly Lazy<Texture2D> _wildTreeTexture;
+  private readonly bool _informantIsLoaded;
   private bool _showCropTooltip;
   private bool _showTreeTooltip;
   private bool _showBarrelTooltip;
@@ -88,6 +89,15 @@ internal class ShowTileTooltips : IDisposable
   {
     _helper = helper;
     _itemEffectRanges = itemEffectRanges;
+    _informantIsLoaded = helper.ModRegistry.IsLoaded(ModCompat.Informant);
+    if (_informantIsLoaded)
+    {
+      ModEntry.MonitorObject.Log(
+        "ShowTileTooltips: crop, tree, and machine tooltips disabled, Informant mod provides these features",
+        LogLevel.Info
+      );
+    }
+
     _wildTreeTexture = new Lazy<Texture2D>(() =>
       _helper.ModContent.Load<Texture2D>("assets/wild_tree_tooltip.png")
     );
@@ -103,19 +113,19 @@ internal class ShowTileTooltips : IDisposable
 
   public void ToggleCropOption(bool showCropTooltip)
   {
-    _showCropTooltip = showCropTooltip;
+    _showCropTooltip = showCropTooltip && !_informantIsLoaded;
     UpdateEventSubscriptions();
   }
 
   public void ToggleTreeOption(bool showTreeTooltip)
   {
-    _showTreeTooltip = showTreeTooltip;
+    _showTreeTooltip = showTreeTooltip && !_informantIsLoaded;
     UpdateEventSubscriptions();
   }
 
   public void ToggleBarrelOption(bool showBarrelTooltip)
   {
-    _showBarrelTooltip = showBarrelTooltip;
+    _showBarrelTooltip = showBarrelTooltip && !_informantIsLoaded;
     UpdateEventSubscriptions();
   }
 

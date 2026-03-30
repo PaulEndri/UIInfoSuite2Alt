@@ -56,6 +56,10 @@
 
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
+- **v2.8.10**
+  - Add [Informant](https://www.nexusmods.com/stardewvalley/mods/21286) compatibility
+    - Auto-disables overlapping tooltips (crop, tree, machine, item prices, bundles, museum, shipping) when Informant is installed
+    - Registers [Stardew Aquarium](https://www.nexusmods.com/stardewvalley/mods/6372) donation indicator as an Informant item decorator
 - **v2.8.9**
   - Fix pigs incorrectly showing truffle produce bubble
   - Fix buff expiry sound playing constantly in co-op/split-screen
@@ -258,6 +262,7 @@ The compatability ranges from small fixes to bigger integration with mod provide
 - [Ferngill Simple Economy](https://www.nexusmods.com/stardewvalley/mods/21414)
 - [Bigger Backpack](https://www.nexusmods.com/stardewvalley/mods/1845)
 - [Better Ranching](https://www.nexusmods.com/stardewvalley/mods/859)
+- [Informant](https://www.nexusmods.com/stardewvalley/mods/21286)
 - [Stardew Aquarium](https://www.nexusmods.com/stardewvalley/mods/6372)
 - [The Love of Cooking](https://www.nexusmods.com/stardewvalley/mods/6830)
 - [Deluxe Journal](https://www.nexusmods.com/stardewvalley/mods/11436)

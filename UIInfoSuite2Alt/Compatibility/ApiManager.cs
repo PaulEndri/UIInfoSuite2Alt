@@ -20,6 +20,8 @@ public static class ModCompat
   public const string VanillaPlusProfessions = "KediDili.VanillaPlusProfessions";
   public const string UnlockableBundles = "DLX.Bundles";
   public const string BetterRanching = "BetterRanching";
+  public const string Informant = "Slothsoft.Informant";
+  public const string StardewAquarium = "Cherry.StardewAquarium";
 
   // original UIInfoSuite variants
   public const string UIInfoSuite2 = "Annosz.UiInfoSuite2";

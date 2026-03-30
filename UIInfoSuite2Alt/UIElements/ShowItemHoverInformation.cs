@@ -28,6 +28,7 @@ internal class ShowItemHoverInformation : IDisposable
   );
 
   private readonly IModHelper _helper;
+  private readonly bool _informantIsLoaded;
 
   private readonly Dictionary<int, Color?> _bundleColorCache = new();
   private readonly PerScreen<Item?> _hoverItem = new();
@@ -45,6 +46,7 @@ internal class ShowItemHoverInformation : IDisposable
   public ShowItemHoverInformation(IModHelper helper)
   {
     _helper = helper;
+    _informantIsLoaded = helper.ModRegistry.IsLoaded(ModCompat.Informant);
 
     NPC? gunther = Game1.getCharacterFromName("Gunther");
     if (gunther == null)
@@ -163,7 +165,9 @@ internal class ShowItemHoverInformation : IDisposable
     {
       var hoveredObject = _hoverItem.Value as Object;
 
-      int itemPrice = Tools.GetSellToStorePrice(_hoverItem.Value);
+      // When Informant is loaded, skip sections it already provides:
+      // sell price, stack price, crop price, CC bundles, museum, shipping
+      int itemPrice = _informantIsLoaded ? 0 : Tools.GetSellToStorePrice(_hoverItem.Value);
 
       var stackPrice = 0;
       if (itemPrice > 0 && _hoverItem.Value.Stack > 1)
@@ -171,14 +175,18 @@ internal class ShowItemHoverInformation : IDisposable
         stackPrice = itemPrice * _hoverItem.Value.Stack;
       }
 
-      int cropPrice = Tools.GetHarvestPrice(_hoverItem.Value);
+      int cropPrice = _informantIsLoaded ? 0 : Tools.GetHarvestPrice(_hoverItem.Value);
 
-      bool notDonatedYet = _libraryMuseum?.isItemSuitableForDonation(_hoverItem.Value) ?? false;
+      bool notDonatedYet =
+        !_informantIsLoaded
+        && (_libraryMuseum?.isItemSuitableForDonation(_hoverItem.Value) ?? false);
 
-      bool notDonatedToAquarium = AquariumHelper.IsUndonatedAquariumFish(_hoverItem.Value);
+      bool notDonatedToAquarium =
+        !_informantIsLoaded && AquariumHelper.IsUndonatedAquariumFish(_hoverItem.Value);
 
       bool notShippedYet =
-        hoveredObject != null
+        !_informantIsLoaded
+        && hoveredObject != null
         && hoveredObject.countsForShippedCollection()
         && !Game1.player.basicShipped.ContainsKey(hoveredObject.ItemId)
         && hoveredObject.Type != "Fish"
@@ -187,7 +195,7 @@ internal class ShowItemHoverInformation : IDisposable
       string? requiredBundleName = null;
       Color? bundleColor = null;
       int bundleId = -1;
-      if (hoveredObject != null)
+      if (hoveredObject != null && !_informantIsLoaded)
       {
         BundleRequiredItem? bundleDisplayData = BundleHelper.GetBundleItemIfNotDonated(
           hoveredObject

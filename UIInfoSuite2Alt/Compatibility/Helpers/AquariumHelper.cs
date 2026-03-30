@@ -6,7 +6,6 @@ namespace UIInfoSuite2Alt.Compatibility.Helpers;
 
 internal static class AquariumHelper
 {
-  private const string AquariumModId = "Cherry.StardewAquarium";
   private const string AquariumDonatedPrefix = "AquariumDonated:";
 
   private static bool _isModLoaded;
@@ -15,7 +14,7 @@ internal static class AquariumHelper
 
   public static void Initialize(IModHelper helper)
   {
-    _isModLoaded = helper.ModRegistry.IsLoaded(AquariumModId);
+    _isModLoaded = helper.ModRegistry.IsLoaded(ModCompat.StardewAquarium);
   }
 
   public static bool IsUndonatedAquariumFish(Item? item)

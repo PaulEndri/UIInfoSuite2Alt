@@ -264,6 +264,17 @@ public static class Tools
     destinationTexture.SetData(destinationData);
   }
 
+  /// <summary>Extract a source rectangle from a spritesheet into a new standalone texture.</summary>
+  public static Texture2D CropTexture(Texture2D source, Rectangle sourceRect)
+  {
+    var data = new Color[sourceRect.Width * sourceRect.Height];
+    source.GetData(0, sourceRect, data, 0, data.Length);
+
+    var cropped = new Texture2D(Game1.graphics.GraphicsDevice, sourceRect.Width, sourceRect.Height);
+    cropped.SetData(data);
+    return cropped;
+  }
+
   public static IEnumerable<int> GetDaysFromCondition(
     GameStateQuery.ParsedGameStateQuery parsedGameStateQuery
   )

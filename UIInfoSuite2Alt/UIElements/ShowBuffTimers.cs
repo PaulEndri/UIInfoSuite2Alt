@@ -13,9 +13,6 @@ namespace UIInfoSuite2Alt.UIElements;
 
 internal class ShowBuffTimers : IDisposable
 {
-  private const float DigitScale = 2f;
-  private const int DigitWidth = 5;
-  private const int DigitHeight = 7;
   private const int ColonPadding = 2; // padding on each side of the colon dots
   private const int ColonDotGap = 4; // pixel width of the colon region (dot + inner spacing)
   private static readonly Color ShadowColor = Color.Black * 0.35f;
@@ -152,149 +149,51 @@ internal class ShowBuffTimers : IDisposable
   )
   {
     float xOffset = 0;
-    int scaledDigitStep = (int)(DigitWidth * DigitScale) - 1;
+    int scaledDigitStep = Tools.TinyDigitStep;
     Color digitColor = (isFading ? FadingDigitColor : DigitColor) * alpha;
     Color dotColor = (isFading ? FadingDotColor : DotColor) * alpha;
     Color shadowColor = ShadowColor * alpha;
 
     // Draw minutes
-    DrawTinyDigits(b, minutes, position, ref xOffset, scaledDigitStep, digitColor, shadowColor);
+    Tools.DrawTinyDigits(
+      b,
+      minutes,
+      position,
+      ref xOffset,
+      scaledDigitStep,
+      digitColor,
+      shadowColor
+    );
 
     // Draw colon (two dots) with padding
     xOffset += ColonPadding;
-    DrawColon(b, position, xOffset, dotColor, shadowColor);
+    Tools.DrawTinyColon(b, position, xOffset, ColonDotGap, dotColor, shadowColor);
     xOffset += ColonDotGap + ColonPadding;
 
     // Draw seconds (always 2 digits)
-    DrawTinyDigit(b, seconds / 10, position, ref xOffset, scaledDigitStep, digitColor, shadowColor);
-    DrawTinyDigit(b, seconds % 10, position, ref xOffset, scaledDigitStep, digitColor, shadowColor);
-  }
-
-  private static void DrawTinyDigits(
-    SpriteBatch b,
-    int number,
-    Vector2 position,
-    ref float xOffset,
-    int step,
-    Color digitColor,
-    Color shadowColor
-  )
-  {
-    if (number == 0)
-    {
-      DrawTinyDigit(b, 0, position, ref xOffset, step, digitColor, shadowColor);
-      return;
-    }
-
-    // Count digits to draw left-to-right
-    int digitCount = 0;
-    int temp = number;
-    while (temp > 0)
-    {
-      digitCount++;
-      temp /= 10;
-    }
-
-    int divisor = (int)Math.Pow(10, digitCount - 1);
-    for (int i = 0; i < digitCount; i++)
-    {
-      int digit = number / divisor % 10;
-      DrawTinyDigit(b, digit, position, ref xOffset, step, digitColor, shadowColor);
-      divisor /= 10;
-    }
-  }
-
-  private static void DrawTinyDigit(
-    SpriteBatch b,
-    int digit,
-    Vector2 position,
-    ref float xOffset,
-    int step,
-    Color digitColor,
-    Color shadowColor
-  )
-  {
-    var sourceRect = new Rectangle(368 + digit * DigitWidth, 56, DigitWidth, DigitHeight);
-
-    // Shadow
-    b.Draw(
-      Game1.mouseCursors,
-      position + new Vector2(xOffset + 1, 1),
-      sourceRect,
-      shadowColor,
-      0f,
-      Vector2.Zero,
-      DigitScale,
-      SpriteEffects.None,
-      0.99f
-    );
-
-    // Digit
-    b.Draw(
-      Game1.mouseCursors,
-      position + new Vector2(xOffset, 0f),
-      sourceRect,
+    Tools.DrawTinyDigit(
+      b,
+      seconds / 10,
+      position,
+      ref xOffset,
+      scaledDigitStep,
       digitColor,
-      0f,
-      Vector2.Zero,
-      DigitScale,
-      SpriteEffects.None,
-      1f
+      shadowColor
     );
-
-    xOffset += step;
-  }
-
-  private static void DrawColon(
-    SpriteBatch b,
-    Vector2 position,
-    float xOffset,
-    Color dotColor,
-    Color shadowColor
-  )
-  {
-    float dotSize = DigitScale;
-    float scaledHeight = DigitHeight * DigitScale;
-    float dotX = position.X + xOffset + (ColonDotGap - dotSize) / 2f;
-
-    // Upper dot (~30% from top)
-    var upperPos = new Vector2(dotX, position.Y + scaledHeight * 0.25f);
-    // Lower dot (~65% from top)
-    var lowerPos = new Vector2(dotX, position.Y + scaledHeight * 0.6f);
-
-    // Shadow
-    DrawDot(b, upperPos + Vector2.One, dotSize, shadowColor, 0.99f);
-    DrawDot(b, lowerPos + Vector2.One, dotSize, shadowColor, 0.99f);
-
-    // Dots
-    DrawDot(b, upperPos, dotSize, dotColor, 1f);
-    DrawDot(b, lowerPos, dotSize, dotColor, 1f);
-  }
-
-  private static void DrawDot(
-    SpriteBatch b,
-    Vector2 position,
-    float size,
-    Color color,
-    float layerDepth
-  )
-  {
-    // Use a single white pixel from the mouseCursors sheet (solid area)
-    b.Draw(
-      Game1.staminaRect,
-      new Rectangle((int)position.X, (int)position.Y, (int)size, (int)size),
-      null,
-      color,
-      0f,
-      Vector2.Zero,
-      SpriteEffects.None,
-      layerDepth
+    Tools.DrawTinyDigit(
+      b,
+      seconds % 10,
+      position,
+      ref xOffset,
+      scaledDigitStep,
+      digitColor,
+      shadowColor
     );
   }
 
   private static int GetTimerWidth(int minutes)
   {
-    int digitStep = (int)(DigitWidth * DigitScale) - 1;
+    int digitStep = Tools.TinyDigitStep;
     int colonStep = ColonPadding + ColonDotGap + ColonPadding;
 
     int minuteDigits = minutes == 0 ? 1 : (int)Math.Floor(Math.Log10(minutes)) + 1;

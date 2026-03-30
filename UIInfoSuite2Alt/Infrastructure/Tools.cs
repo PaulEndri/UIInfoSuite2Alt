@@ -377,4 +377,143 @@ public static class Tools
 
     return mapAreaPosition ?? WorldMapManager.GetPositionData(Game1.getFarm(), Point.Zero)?.Data;
   }
+
+  #region Tiny Digit Drawing
+  private const float TinyDigitScale = 2f;
+  private const int TinyDigitWidth = 5;
+  private const int TinyDigitHeight = 7;
+
+  /// <summary>Draw a multi-digit number using the tiny digit sprites from Game1.mouseCursors.</summary>
+  public static void DrawTinyDigits(
+    SpriteBatch b,
+    int number,
+    Vector2 position,
+    ref float xOffset,
+    int step,
+    Color digitColor,
+    Color shadowColor
+  )
+  {
+    if (number == 0)
+    {
+      DrawTinyDigit(b, 0, position, ref xOffset, step, digitColor, shadowColor);
+      return;
+    }
+
+    int digitCount = 0;
+    int temp = number;
+    while (temp > 0)
+    {
+      digitCount++;
+      temp /= 10;
+    }
+
+    int divisor = (int)Math.Pow(10, digitCount - 1);
+    for (int i = 0; i < digitCount; i++)
+    {
+      int digit = number / divisor % 10;
+      DrawTinyDigit(b, digit, position, ref xOffset, step, digitColor, shadowColor);
+      divisor /= 10;
+    }
+  }
+
+  /// <summary>Draw a single tiny digit sprite from Game1.mouseCursors.</summary>
+  public static void DrawTinyDigit(
+    SpriteBatch b,
+    int digit,
+    Vector2 position,
+    ref float xOffset,
+    int step,
+    Color digitColor,
+    Color shadowColor
+  )
+  {
+    var sourceRect = new Rectangle(
+      368 + digit * TinyDigitWidth,
+      56,
+      TinyDigitWidth,
+      TinyDigitHeight
+    );
+
+    // Shadow
+    b.Draw(
+      Game1.mouseCursors,
+      position + new Vector2(xOffset + 1, 1),
+      sourceRect,
+      shadowColor,
+      0f,
+      Vector2.Zero,
+      TinyDigitScale,
+      SpriteEffects.None,
+      0.99f
+    );
+
+    // Digit
+    b.Draw(
+      Game1.mouseCursors,
+      position + new Vector2(xOffset, 0f),
+      sourceRect,
+      digitColor,
+      0f,
+      Vector2.Zero,
+      TinyDigitScale,
+      SpriteEffects.None,
+      1f
+    );
+
+    xOffset += step;
+  }
+
+  /// <summary>Default step size for tiny digit drawing.</summary>
+  public static int TinyDigitStep => (int)(TinyDigitWidth * TinyDigitScale) - 1;
+
+  /// <summary>Draw a colon (two vertically stacked dots) sized to match tiny digits.</summary>
+  public static void DrawTinyColon(
+    SpriteBatch b,
+    Vector2 position,
+    float xOffset,
+    int colonDotGap,
+    Color dotColor,
+    Color shadowColor
+  )
+  {
+    float dotSize = TinyDigitScale;
+    float scaledHeight = TinyDigitHeight * TinyDigitScale;
+    float dotX = position.X + xOffset + (colonDotGap - dotSize) / 2f;
+
+    // Upper dot (~30% from top)
+    var upperPos = new Vector2(dotX, position.Y + scaledHeight * 0.25f);
+    // Lower dot (~65% from top)
+    var lowerPos = new Vector2(dotX, position.Y + scaledHeight * 0.6f);
+
+    // Shadow
+    DrawTinyDot(b, upperPos + Vector2.One, dotSize, shadowColor, 0.99f);
+    DrawTinyDot(b, lowerPos + Vector2.One, dotSize, shadowColor, 0.99f);
+
+    // Dots
+    DrawTinyDot(b, upperPos, dotSize, dotColor, 1f);
+    DrawTinyDot(b, lowerPos, dotSize, dotColor, 1f);
+  }
+
+  /// <summary>Draw a small filled square (dot) at the given position.</summary>
+  public static void DrawTinyDot(
+    SpriteBatch b,
+    Vector2 position,
+    float size,
+    Color color,
+    float layerDepth
+  )
+  {
+    b.Draw(
+      Game1.staminaRect,
+      new Rectangle((int)position.X, (int)position.Y, (int)size, (int)size),
+      null,
+      color,
+      0f,
+      Vector2.Zero,
+      SpriteEffects.None,
+      layerDepth
+    );
+  }
+  #endregion
 }

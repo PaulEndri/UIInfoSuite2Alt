@@ -30,7 +30,7 @@ public partial class ModEntry
     UnlockableBundleHelper.Initialize(Helper);
     BundleHelper.ShowLockedBundles = ModConfig.ShowLockedBundleItems;
 
-    InformantHelper.RegisterDecorators(Helper);
+    InformantHelper.Initialize(Helper);
 
     LogModRecommendations(Helper);
 

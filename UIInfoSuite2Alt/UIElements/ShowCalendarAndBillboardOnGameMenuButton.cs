@@ -54,6 +54,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
   private readonly bool _hasRidgesideVillage;
   private readonly bool _hasSunberryVillage;
   private readonly bool _hasEscasModdingPlugins;
+  private readonly bool _hasSwordAndSorcery;
   private readonly bool _hasBiggerBackpack;
   private readonly bool _hasFullInventoryView;
   private readonly bool _hasCpCatValley;
@@ -88,6 +89,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
     _hasRidgesideVillage = helper.ModRegistry.IsLoaded(ModCompat.RidgesideVillage);
     _hasSunberryVillage = helper.ModRegistry.IsLoaded(ModCompat.SunberryVillage);
     _hasEscasModdingPlugins = helper.ModRegistry.IsLoaded(ModCompat.EscasModdingPlugins);
+    _hasSwordAndSorcery = helper.ModRegistry.IsLoaded(ModCompat.SwordAndSorcery);
     _hasBiggerBackpack = helper.ModRegistry.IsLoaded("spacechase0.BiggerBackpack");
     _hasFullInventoryView = helper.ModRegistry.IsLoaded("CpdnCristiano.FullInventoryView");
     _hasCpCatValley = helper.ModRegistry.IsLoaded("RimeNovi.CatValley");
@@ -627,6 +629,11 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
       && Game1.player.eventsSeen.Contains("Lumisteria.MtVapius_Hamlet_OrderBoard")
     )
       boards.Add(("Esca.EMP/MtVapiusBoard", I18n.SpecialOrdersMtVapius()));
+    if (
+      _hasSwordAndSorcery
+      && Game1.player.mailReceived.Contains("Mateo_SpecialOrders_BuildGuildMail")
+    )
+      boards.Add(("SwordSorcery", I18n.SpecialOrdersSwordSorcery()));
 
     _cachedModBoards = boards;
     _cachedModBoardsDay = Game1.dayOfMonth;

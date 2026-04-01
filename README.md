@@ -57,8 +57,9 @@
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
 - **v2.8.11**
+  - Add [Sword & Sorcery](https://www.nexusmods.com/stardewvalley/mods/12369) Special Orders board (Coastal Guild) to board selector
   - Fix heart fills on social page rendering above the mouse cursor and now uses actual heart sprite for Content Patcher compatibility
-  - Prefer Informant's item tooltips when installed instead of blanket-disabling all UIIS2Alt tooltips
+  - Prefer Informant's item tooltips when installed instead of blanket-disabling all UIIS2Alt tooltips from earlier patch
 - **v2.8.10**
   - Add "Stack multiple birthdays" option
     - Consolidates 2+ birthday icons into one with count overlay and grouped tooltip
@@ -274,6 +275,7 @@ The compatability ranges from small fixes to bigger integration with mod provide
 - [Ridgeside Village](https://www.nexusmods.com/stardewvalley/mods/7286)
 - [Sunberry Village](https://www.nexusmods.com/stardewvalley/mods/11111)
 - [Visit Mount Vapius](https://www.nexusmods.com/stardewvalley/mods/9600)
+- [Sword & Sorcery](https://www.nexusmods.com/stardewvalley/mods/12369)
 
 <p align="center">
   <a href="https://ko-fi.com/dazuki89" target="_BLANK">

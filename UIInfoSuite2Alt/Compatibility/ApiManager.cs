@@ -23,6 +23,7 @@ public static class ModCompat
   public const string BetterRanching = "BetterRanching";
   public const string Informant = "Slothsoft.Informant";
   public const string StardewAquarium = "Cherry.StardewAquarium";
+  public const string DailyTasksReportPlus = "Prism99.DailyTasksReportPlus";
 
   // original UIInfoSuite variants
   public const string UIInfoSuite2 = "Annosz.UiInfoSuite2";

@@ -48,6 +48,9 @@ public sealed class IconHandler
   /// <summary>The configured icon order, keyed by icon key. Lower = more right.</summary>
   public Dictionary<string, int> IconOrder { get; set; } = [];
 
+  /// <summary>Extra vertical offset (pixels) to avoid overlapping icons from other mods.</summary>
+  public int ExtraYOffset { get; set; }
+
   /// <summary>When true, icons stack vertically downward instead of horizontally to the left.</summary>
   public bool UseVerticalLayout { get; set; }
 
@@ -95,7 +98,7 @@ public sealed class IconHandler
       _lastSortedCount.Value = icons.Count;
     }
 
-    int yPos = Game1.options.zoomButtons ? 290 : 260;
+    int yPos = (Game1.options.zoomButtons ? 290 : 260) + ExtraYOffset;
     int xBase = Tools.GetWidthInPlayArea() - 70;
 
     if (IsQuestLogPermanent || Game1.player.hasVisibleQuests)

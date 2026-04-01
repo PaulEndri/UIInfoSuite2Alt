@@ -87,6 +87,11 @@ public partial class ModEntry : Mod
 
     IconHandler.Handler.IsQuestLogPermanent = helper.ModRegistry.IsLoaded(ModCompat.DeluxeJournal);
 
+    if (helper.ModRegistry.IsLoaded(ModCompat.DailyTasksReportPlus))
+    {
+      IconHandler.Handler.ExtraYOffset = 18;
+    }
+
     if (helper.ModRegistry.IsLoaded(ModCompat.BetterRanching))
     {
       Monitor.Log(

@@ -264,18 +264,20 @@ The compatability ranges from small fixes to bigger integration with mod provide
 - [Better Game Menu](https://www.nexusmods.com/stardewvalley/mods/32032)
 - [Cloudy Skies](https://www.nexusmods.com/stardewvalley/mods/23135)
 - [Unlockable Bundles](https://www.nexusmods.com/stardewvalley/mods/17265)
+- [Esca's Modding Plugins](https://www.nexusmods.com/stardewvalley/mods/9296)
 - [Vanilla Plus Professions](https://www.nexusmods.com/stardewvalley/mods/20956)
 - [Ferngill Simple Economy](https://www.nexusmods.com/stardewvalley/mods/21414)
 - [Bigger Backpack](https://www.nexusmods.com/stardewvalley/mods/1845)
 - [Better Ranching](https://www.nexusmods.com/stardewvalley/mods/859)
 - [Informant](https://www.nexusmods.com/stardewvalley/mods/21286)
 - [Stardew Aquarium](https://www.nexusmods.com/stardewvalley/mods/6372)
-- [The Love of Cooking](https://www.nexusmods.com/stardewvalley/mods/6830)
 - [Deluxe Journal](https://www.nexusmods.com/stardewvalley/mods/11436)
 - [Ridgeside Village](https://www.nexusmods.com/stardewvalley/mods/7286)
 - [Sunberry Village](https://www.nexusmods.com/stardewvalley/mods/11111)
 - [Visit Mount Vapius](https://www.nexusmods.com/stardewvalley/mods/9600)
 - [Sword & Sorcery](https://www.nexusmods.com/stardewvalley/mods/12369)
+- [Daily Tasks Report Plus](https://www.nexusmods.com/stardewvalley/mods/20871)
+- [Full Inventory View](https://www.nexusmods.com/stardewvalley/mods/32625)
 
 <p align="center">
   <a href="https://ko-fi.com/dazuki89" target="_BLANK">

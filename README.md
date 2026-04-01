@@ -57,7 +57,7 @@
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
 - **v2.8.11**
-  - Fix heart fills on social page rendering above the mouse cursor
+  - Fix heart fills on social page rendering above the mouse cursor and now uses actual heart sprite for Content Patcher compatibility
   - Prefer Informant's item tooltips when installed instead of blanket-disabling all UIIS2Alt tooltips
 - **v2.8.10**
   - Add "Stack multiple birthdays" option

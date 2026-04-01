@@ -13,21 +13,12 @@ internal class ShowAccurateHearts : IDisposable
   #region Properties
   private static bool _enabled;
 
-  // Heart fill shape (5x4 grid of 4px squares, drawn bottom-to-top)
-  // @formatter:off
-  private static readonly int[][] HeartFillShape =
-  [
-    [1, 1, 0, 1, 1],
-    [1, 1, 1, 1, 1],
-    [0, 1, 1, 1, 0],
-    [0, 0, 1, 0, 0],
-  ];
-
-  // @formatter:on
-
-  private const int FillOffsetX = 4;
-  private const int FillOffsetY = 4;
-  private const int PixelSize = 4;
+  // Filled heart sprite on Game1.mouseCursors: 7x6 source pixels at 4x scale = 28x24 on screen.
+  private const int HeartSourceX = 211;
+  private const int HeartSourceY = 428;
+  private const int HeartSourceWidth = 7;
+  private const int HeartSourceHeight = 6;
+  private const int HeartScale = 4;
   #endregion
 
   #region Lifecycle
@@ -92,6 +83,10 @@ internal class ShowAccurateHearts : IDisposable
     }
   }
 
+  /// <summary>
+  /// Draws the filled heart sprite cropped from bottom to top based on friendship progress.
+  /// Uses Game1.mouseCursors so Content Patcher recolors (e.g. Cat Valley) are respected.
+  /// </summary>
   private static void DrawPartialHeart(
     SocialPage socialPage,
     int slotIndex,
@@ -99,34 +94,44 @@ internal class ShowAccurateHearts : IDisposable
     int friendshipPoints
   )
   {
-    var numberOfPointsToDraw = (int)(friendshipPoints / 12.5);
-
-    // Match game's heart positioning from SocialPage.drawNPCSlotHeart:
-    // X = xPositionOnScreen + 320 - 4 + heartIndex * 32
-    // Y (row 1) = sprites[i].bounds.Y + 36
-    // Y (row 2) = sprites[i].bounds.Y + 64
+    // Match game's heart positioning from SocialPage.drawNPCSlotHeart
     int heartIndex = heartLevel < 10 ? heartLevel : heartLevel - 10;
     int heartX = socialPage.xPositionOnScreen + 320 - 4 + heartIndex * 32;
     int heartY = socialPage.sprites[slotIndex].bounds.Y + (heartLevel < 10 ? 64 - 28 : 64);
 
-    for (int row = 3; row >= 0 && numberOfPointsToDraw > 0; --row)
+    // Fill from bottom up at screen pixel granularity (24 steps per heart).
+    // Split into complete source rows and a partial top row.
+    int totalHeight = HeartSourceHeight * HeartScale; // 24 screen pixels
+    int fillHeight = (int)Math.Ceiling((double)friendshipPoints / 250 * totalHeight);
+    int completeRows = fillHeight / HeartScale;
+    int partialPixels = fillHeight % HeartScale;
+    var tint = Color.White * 0.7f;
+
+    // Draw complete source rows from the bottom
+    if (completeRows > 0)
     {
-      for (int col = 0; col < 5 && numberOfPointsToDraw > 0; ++col, --numberOfPointsToDraw)
-      {
-        if (HeartFillShape[row][col] == 1)
-        {
-          Game1.spriteBatch.Draw(
-            Game1.staminaRect,
-            new Rectangle(
-              heartX + FillOffsetX + col * PixelSize,
-              heartY + FillOffsetY + row * PixelSize,
-              PixelSize,
-              PixelSize
-            ),
-            Color.Crimson
-          );
-        }
-      }
+      int srcY = HeartSourceY + HeartSourceHeight - completeRows;
+      int dstY = heartY + (HeartSourceHeight - completeRows) * HeartScale;
+      Game1.spriteBatch.Draw(
+        Game1.mouseCursors,
+        new Rectangle(heartX, dstY, HeartSourceWidth * HeartScale, completeRows * HeartScale),
+        new Rectangle(HeartSourceX, srcY, HeartSourceWidth, completeRows),
+        tint
+      );
+    }
+
+    // Draw partial top row (1 source row clipped to partialPixels height)
+    if (partialPixels > 0)
+    {
+      int srcRow = HeartSourceHeight - completeRows - 1;
+      int srcY = HeartSourceY + srcRow;
+      int dstY = heartY + srcRow * HeartScale + (HeartScale - partialPixels);
+      Game1.spriteBatch.Draw(
+        Game1.mouseCursors,
+        new Rectangle(heartX, dstY, HeartSourceWidth * HeartScale, partialPixels),
+        new Rectangle(HeartSourceX, srcY, HeartSourceWidth, 1),
+        tint
+      );
     }
   }
   #endregion

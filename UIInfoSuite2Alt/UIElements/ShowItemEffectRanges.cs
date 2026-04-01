@@ -745,7 +745,10 @@ internal class ShowItemEffectRanges : IDisposable
               }
             }
           }
-          else if (currentObject.Name.IndexOf("bee house", StringComparison.OrdinalIgnoreCase) >= 0)
+          else if (
+            currentObject.Name.IndexOf("bee house", StringComparison.OrdinalIgnoreCase) >= 0
+            || currentObject.HasContextTag("bee_house")
+          )
           {
             arrayToUse = GetDistanceArray(ObjectsWithDistance.Beehouse);
             _rangeTooltipInfo.Value = new RangeTooltipInfo
@@ -861,7 +864,10 @@ internal class ShowItemEffectRanges : IDisposable
             }
           }
         }
-        else if (itemName.IndexOf("bee house", StringComparison.OrdinalIgnoreCase) >= 0)
+        else if (
+          itemName.IndexOf("bee house", StringComparison.OrdinalIgnoreCase) >= 0
+          || currentItem.HasContextTag("bee_house")
+        )
         {
           arrayToUse = GetDistanceArray(ObjectsWithDistance.Beehouse);
           AddTilesToHighlightedArea(arrayToUse, false, (int)cursorTile.X, (int)cursorTile.Y);

@@ -1,3 +1,7 @@
+// Based on Show Item Quality by Jonqora & Bungus
+// https://github.com/Jonqora/StardewValleyMods/tree/master/ShowItemQuality
+// Licensed under GNU Lesser General Public License v3.0 (LGPL-3.0)
+
 using System;
 using System.Collections.Generic;
 using System.Reflection;

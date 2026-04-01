@@ -56,6 +56,9 @@
 
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
+- **v2.8.12**
+  - Show item quality star on pickup HUD notifications (integrates [Show Item Quality](https://www.nexusmods.com/stardewvalley/mods/22275) by Jonqora & Bungus)
+  - Fix HUD icons overlapping with Daily Tasks Report Plus
 - **v2.8.11**
   - Add [Sword & Sorcery](https://www.nexusmods.com/stardewvalley/mods/12369) Special Orders board (Coastal Guild) to board selector
   - Fix heart fills on social page rendering above the mouse cursor and now uses actual heart sprite for Content Patcher compatibility

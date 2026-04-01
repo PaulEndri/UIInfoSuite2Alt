@@ -140,8 +140,12 @@ public static class SpaceCoreHelper
     {
       return _getSkillMethod.Invoke(null, [skillId]);
     }
-    catch
+    catch (Exception ex)
     {
+      ModEntry.MonitorObject.Log(
+        $"SpaceCoreHelper: GetSkill invocation failed for '{skillId}', {ex.Message}",
+        LogLevel.Trace
+      );
       return null;
     }
   }

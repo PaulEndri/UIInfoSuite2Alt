@@ -218,8 +218,12 @@ internal class ShowBuffTimers : IDisposable
         )
         .GetValue();
     }
-    catch
+    catch (Exception ex)
     {
+      ModEntry.MonitorObject.Log(
+        $"ShowBuffTimers: failed to reflect buffs dictionary, {ex.Message}",
+        LogLevel.Trace
+      );
       return null;
     }
   }

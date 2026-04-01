@@ -96,6 +96,7 @@ internal class ShowFishOnCatch : IDisposable
     int xPos = __instance.xPositionOnScreen;
     int yPos = __instance.yPositionOnScreen;
 
+    // Mirrors BobberBar.draw() fish icon layout - position flips when bar is in right 25% of screen
     int iconX = (xPos > Game1.viewport.Width * 0.75f) ? (xPos - 80) : (xPos + 216);
     bool flipped = iconX < xPos;
 

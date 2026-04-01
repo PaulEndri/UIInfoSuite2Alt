@@ -548,8 +548,12 @@ internal class ShowItemHoverInformation : IDisposable
           overlayW = 13;
           overlayH = 11;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+          ModEntry.MonitorObject.Log(
+            $"ShowItemHoverInformation: failed to load UB overlay texture, {ex.Message}",
+            LogLevel.Trace
+          );
           overlayW = 0;
           overlayH = 0;
           overlayRect = Rectangle.Empty;
@@ -613,9 +617,13 @@ internal class ShowItemHoverInformation : IDisposable
         Texture2D texture = Game1.content.Load<Texture2D>(ubData.IconTexturePath);
         return (texture, new Rectangle(0, 0, texture.Width, texture.Height));
       }
-      catch (Exception)
+      catch (Exception ex)
       {
         // BundleIconAsset was set but failed - show error scroll (CP logs the details)
+        ModEntry.MonitorObject.Log(
+          $"ShowItemHoverInformation: failed to load UB BundleIconAsset '{ubData.IconTexturePath}', {ex.Message}",
+          LogLevel.Trace
+        );
         return (Game1.mouseCursors, new Rectangle(208, 272, 32, 32));
       }
     }
@@ -633,8 +641,12 @@ internal class ShowItemHoverInformation : IDisposable
       Texture2D bookIcon = Game1.content.Load<Texture2D>("UnlockableBundles/UI/BundleOverviewIcon");
       return (bookIcon, new Rectangle(0, 0, bookIcon.Width, bookIcon.Height));
     }
-    catch (Exception)
+    catch (Exception ex)
     {
+      ModEntry.MonitorObject.Log(
+        $"ShowItemHoverInformation: failed to load UB book icon, {ex.Message}",
+        LogLevel.Trace
+      );
       return (Game1.mouseCursors, new Rectangle(208, 272, 32, 32));
     }
   }
@@ -659,9 +671,12 @@ internal class ShowItemHoverInformation : IDisposable
         return new Color(r, g, b);
       }
     }
-    catch (Exception)
+    catch (Exception ex)
     {
-      // Invalid hex - use default
+      ModEntry.MonitorObject.Log(
+        $"ShowItemHoverInformation: invalid UB bundle color hex '{hex}', {ex.Message}",
+        LogLevel.Trace
+      );
     }
 
     return DefaultUbBundleColor;

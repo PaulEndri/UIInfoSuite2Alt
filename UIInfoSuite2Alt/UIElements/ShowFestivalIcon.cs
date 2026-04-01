@@ -330,9 +330,12 @@ internal class ShowFestivalIcon : IDisposable
         }
       }
     }
-    catch
+    catch (Exception ex)
     {
-      // Festival data unavailable
+      ModEntry.MonitorObject.Log(
+        $"ShowFestivalIcon: failed to load festival data for '{festivalKey}', {ex.Message}",
+        LogLevel.Trace
+      );
     }
     return "";
   }

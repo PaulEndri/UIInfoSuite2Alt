@@ -180,8 +180,12 @@ internal static class InformantHelper
         ? null
         : _displayIdsProperty?.GetValue(config) as Dictionary<string, bool>;
     }
-    catch
+    catch (Exception ex)
     {
+      ModEntry.MonitorObject.Log(
+        $"InformantHelper: failed to read Informant config, {ex.Message}",
+        LogLevel.Trace
+      );
       return null;
     }
   }

@@ -845,9 +845,12 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
         BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public
       );
     }
-    catch (Exception)
+    catch (Exception ex)
     {
-      // RSV reflection failed
+      ModEntry.MonitorObject.Log(
+        $"ShowCalendarAndBillboardOnGameMenuButton: RSV quest reflection init failed, {ex.Message}",
+        LogLevel.Trace
+      );
     }
   }
 
@@ -860,8 +863,12 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
       object? perScreen = _rsvDailyQuestDataField.GetValue(null);
       return perScreen?.GetType().GetProperty("Value")?.GetValue(perScreen);
     }
-    catch
+    catch (Exception ex)
     {
+      ModEntry.MonitorObject.Log(
+        $"ShowCalendarAndBillboardOnGameMenuButton: RSV quest data retrieval failed, {ex.Message}",
+        LogLevel.Trace
+      );
       return null;
     }
   }
@@ -882,9 +889,12 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
         return quest != null && !accepted;
       }
     }
-    catch
+    catch (Exception ex)
     {
-      // Reflection failed
+      ModEntry.MonitorObject.Log(
+        $"ShowCalendarAndBillboardOnGameMenuButton: RSV quest check failed for {boardType}, {ex.Message}",
+        LogLevel.Trace
+      );
     }
     return false;
   }
@@ -908,9 +918,12 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
         return true;
       }
     }
-    catch
+    catch (Exception ex)
     {
-      // Reflection failed
+      ModEntry.MonitorObject.Log(
+        $"ShowCalendarAndBillboardOnGameMenuButton: RSV quest board open failed for {boardType}, {ex.Message}",
+        LogLevel.Trace
+      );
     }
     return false;
   }

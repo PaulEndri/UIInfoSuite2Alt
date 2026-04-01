@@ -160,8 +160,12 @@ internal class ShowCustomIcons : IDisposable
     {
       texture = _helper.GameContent.Load<Texture2D>(iconData.Texture);
     }
-    catch
+    catch (Exception ex)
     {
+      ModEntry.MonitorObject.Log(
+        $"ShowCustomIcons: failed to load texture '{iconData.Texture}' for icon '{key}', {ex.Message}",
+        LogLevel.Trace
+      );
       return;
     }
 

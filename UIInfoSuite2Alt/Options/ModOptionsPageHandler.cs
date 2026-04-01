@@ -198,7 +198,7 @@ internal class ModOptionsPageHandler : IDisposable
 
     var luckOfDay = new ShowLuckOfDay(helper);
     var showBirthdayIcon = new ShowBirthdayIcon(helper);
-    var showAccurateHearts = new ShowAccurateHearts(helper.Events);
+    var showAccurateHearts = new ShowAccurateHearts();
     var showWhenAnimalNeedsPet = new ShowWhenAnimalNeedsPet(
       helper,
       helper.ModRegistry.IsLoaded(ModCompat.BetterRanching)

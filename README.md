@@ -56,6 +56,9 @@
 
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
+- **v2.8.11**
+  - Fix heart fills on social page rendering above the mouse cursor
+  - Prefer Informant's item tooltips when installed instead of blanket-disabling all UIIS2Alt tooltips
 - **v2.8.10**
   - Add "Stack multiple birthdays" option
     - Consolidates 2+ birthday icons into one with count overlay and grouped tooltip

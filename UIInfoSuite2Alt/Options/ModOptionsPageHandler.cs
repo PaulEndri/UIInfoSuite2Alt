@@ -837,6 +837,19 @@ internal class ModOptionsPageHandler : IDisposable
       () => _helper.ModContent.Load<Texture2D>("assets/banner_items.png")
     );
 
+    if (!ShowItemQualityPatch.ExternalModLoaded)
+    {
+      _currentTarget.Add(
+        new ModOptionsCheckbox(
+          _helper.SafeGetString(nameof(config.ShowItemQualityOnPickup)),
+          whichOption++,
+          enabled => ShowItemQualityPatch.Enabled = enabled,
+          () => config.ShowItemQualityOnPickup,
+          Set(v => config.ShowItemQualityOnPickup = v)
+        )
+      );
+    }
+
     _currentTarget.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.ShowLockedBundleItems)),

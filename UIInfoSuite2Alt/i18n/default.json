@@ -191,6 +191,7 @@
   "ShowRangeTooltip": "Show range tooltip",
   "ShowBombRange": "Show bomb destroying range",
   "ShowExtraItemInformation": "Show item hover information",
+  "ShowItemQualityOnPickup": "Show item quality on pickup",
   "ShowHarvestPricesInShop": "Show shop harvest prices",
   //Settings - Tabs info
   "ShowMailboxCount": "Show mailbox mail count",

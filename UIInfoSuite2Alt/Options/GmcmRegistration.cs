@@ -9,6 +9,7 @@ using UIInfoSuite2Alt.Compatibility.Helpers;
 using UIInfoSuite2Alt.Infrastructure;
 using UIInfoSuite2Alt.Infrastructure.Extensions;
 using UIInfoSuite2Alt.Infrastructure.Helpers;
+using UIInfoSuite2Alt.Patches;
 
 namespace UIInfoSuite2Alt;
 
@@ -539,6 +540,15 @@ public partial class ModEntry
       () => Helper.ModContent.Load<Texture2D>("assets/banner_items.png"),
       scale: 1
     );
+
+    if (!ShowItemQualityPatch.ExternalModLoaded)
+    {
+      AddBool(
+        nameof(ModConfig.ShowItemQualityOnPickup),
+        () => ModConfig.ShowItemQualityOnPickup,
+        v => ModConfig.ShowItemQualityOnPickup = v
+      );
+    }
 
     AddBool(
       nameof(ModConfig.ShowLockedBundleItems),

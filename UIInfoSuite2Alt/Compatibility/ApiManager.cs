@@ -24,6 +24,7 @@ public static class ModCompat
   public const string Informant = "Slothsoft.Informant";
   public const string StardewAquarium = "Cherry.StardewAquarium";
   public const string DailyTasksReportPlus = "Prism99.DailyTasksReportPlus";
+  public const string ShowItemQuality = "Jonqora.ShowItemQuality";
 
   // original UIInfoSuite variants
   public const string UIInfoSuite2 = "Annosz.UiInfoSuite2";

@@ -77,10 +77,11 @@ internal class ShowTileTooltips : IDisposable
   private readonly IModHelper _helper;
   private readonly ShowItemEffectRanges _itemEffectRanges;
   private readonly Lazy<Texture2D> _wildTreeTexture;
-  private bool _showCropTooltip;
-  private bool _showTreeTooltip;
-  private bool _showBarrelTooltip;
-  private bool _showFishPondTooltip;
+  private bool ShowCropTooltip => ModEntry.ModConfig.ShowCropTooltip;
+  private bool ShowTreeTooltip => ModEntry.ModConfig.ShowTreeTooltip;
+  private bool ShowBarrelTooltip => ModEntry.ModConfig.ShowBarrelTooltip;
+  private bool ShowFishPondTooltip => ModEntry.ModConfig.ShowFishPondTooltip;
+  private bool ShowForageableTooltip => ModEntry.ModConfig.ShowForageableTooltip;
 
   public ShowTileTooltips(IModHelper helper, ShowItemEffectRanges itemEffectRanges)
   {
@@ -94,42 +95,15 @@ internal class ShowTileTooltips : IDisposable
 
   public void Dispose()
   {
-    ToggleCropOption(false);
-    ToggleTreeOption(false);
-    ToggleBarrelOption(false);
-    ToggleFishPondOption(false);
+    ToggleOption(false);
   }
 
-  public void ToggleCropOption(bool showCropTooltip)
-  {
-    _showCropTooltip = showCropTooltip;
-    UpdateEventSubscriptions();
-  }
-
-  public void ToggleTreeOption(bool showTreeTooltip)
-  {
-    _showTreeTooltip = showTreeTooltip;
-    UpdateEventSubscriptions();
-  }
-
-  public void ToggleBarrelOption(bool showBarrelTooltip)
-  {
-    _showBarrelTooltip = showBarrelTooltip;
-    UpdateEventSubscriptions();
-  }
-
-  public void ToggleFishPondOption(bool showFishPondTooltip)
-  {
-    _showFishPondTooltip = showFishPondTooltip;
-    UpdateEventSubscriptions();
-  }
-
-  private void UpdateEventSubscriptions()
+  public void ToggleOption(bool enabled)
   {
     _helper.Events.Display.RenderingHud -= OnRenderingHud;
     _helper.Events.GameLoop.UpdateTicked -= OnUpdateTicked;
 
-    if (!_showCropTooltip && !_showTreeTooltip && !_showBarrelTooltip && !_showFishPondTooltip)
+    if (!enabled)
     {
       return;
     }
@@ -211,7 +185,7 @@ internal class ShowTileTooltips : IDisposable
     int overrideY = -1;
 
     if (
-      _showBarrelTooltip
+      ShowBarrelTooltip
       && !InformantHelper.IsFeatureEnabled("machine")
       && currentTileBuilding is not null
     )
@@ -235,7 +209,7 @@ internal class ShowTileTooltips : IDisposable
       }
     }
 
-    if (_showFishPondTooltip && currentTileBuilding is FishPond fishPond)
+    if (ShowFishPondTooltip && currentTileBuilding is FishPond fishPond)
     {
       if (DetailRenderers.FishPondRender(fishPond, lines))
       {
@@ -253,7 +227,7 @@ internal class ShowTileTooltips : IDisposable
       || (terrain is Tree && InformantHelper.IsFeatureEnabled("tree"));
 
     if (
-      _showBarrelTooltip
+      ShowBarrelTooltip
       && !informantCoversThisMachine
       && currentTile is not null
       && !_itemEffectRanges.IsRangeTooltipActive
@@ -272,7 +246,22 @@ internal class ShowTileTooltips : IDisposable
       }
     }
 
-    if (_showCropTooltip && !InformantHelper.IsFeatureEnabled("crop") && terrain is not null)
+    // Ground forageables (leeks, daffodils, etc.) - show item name with sprite
+    if (
+      ShowForageableTooltip
+      && currentTile is not null
+      && !currentTile.bigCraftable.Value
+      && currentTile.isForage()
+      && lines.Count == 0
+    )
+    {
+      lines.Add(new HoverLine(currentTile.DisplayName));
+      tile = Utility.ModifyCoordinatesForUIScale(
+        Game1.GlobalToLocal(currentTile.TileLocation * Game1.tileSize)
+      );
+    }
+
+    if (ShowCropTooltip && !InformantHelper.IsFeatureEnabled("crop") && terrain is not null)
     {
       foreach (
         Func<TerrainFeature?, List<HoverLine>, bool> cropDetailRenderer in CropDetailRenderers
@@ -287,7 +276,7 @@ internal class ShowTileTooltips : IDisposable
       }
     }
 
-    if (_showTreeTooltip && terrain is not null && !_itemEffectRanges.IsRangeTooltipActive)
+    if (ShowTreeTooltip && terrain is not null && !_itemEffectRanges.IsRangeTooltipActive)
     {
       // Skip tree tooltip if a tapper/machine is on this tile and Informant handles machines
       bool hasMachineOverlap =
@@ -390,6 +379,12 @@ internal class ShowTileTooltips : IDisposable
     )
     {
       return FromItemData(ItemRegistry.GetData(fishPond.GetFishObject().QualifiedItemId));
+    }
+
+    // Ground forageable: show the item itself
+    if (tileObject is not null && !tileObject.bigCraftable.Value && tileObject.isForage())
+    {
+      return FromItemData(ItemRegistry.GetData(tileObject.QualifiedItemId));
     }
 
     if (terrain == null)
@@ -509,7 +504,7 @@ internal class ShowTileTooltips : IDisposable
     }
 
     int width = (int)maxWidth + 32;
-    int height = Math.Max(60, lines.Count * font.LineSpacing + 40);
+    int height = Math.Max(60, lines.Count * font.LineSpacing + 32);
 
     int x = Game1.getOldMouseX() + 32;
     int y = Game1.getOldMouseY() + 32;
@@ -943,12 +938,18 @@ internal class ShowTileTooltips : IDisposable
         }
 
         string cropName = DropsHelper.GetCropHarvestName(crop);
-        string daysLeftStr = daysLeft <= 0 ? I18n.ReadyToHarvest() : $"{daysLeft} {I18n.Days()}";
-        Color cropColor = daysLeft <= 0 ? ReadyColor : WaitingColor;
-        entries.Add(new HoverLine($"{cropName}: ", new HoverSegment(daysLeftStr, cropColor)));
 
-        if (!crop.forageCrop.Value)
+        if (crop.forageCrop.Value)
         {
+          // Forage crops (spring onion, ginger) are always ready
+          entries.Add(new HoverLine(cropName));
+        }
+        else
+        {
+          string daysLeftStr = daysLeft <= 0 ? I18n.ReadyToHarvest() : $"{daysLeft} {I18n.Days()}";
+          Color cropColor = daysLeft <= 0 ? ReadyColor : WaitingColor;
+          entries.Add(new HoverLine($"{cropName}: ", new HoverSegment(daysLeftStr, cropColor)));
+
           bool isWatered = hoeDirt.state.Value == 1;
           string waterStatus = isWatered ? I18n.Watered() : I18n.NotWatered();
           Color waterColor = isWatered ? WateredColor : NotWateredColor;

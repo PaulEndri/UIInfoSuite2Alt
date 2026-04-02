@@ -947,10 +947,13 @@ internal class ShowTileTooltips : IDisposable
         Color cropColor = daysLeft <= 0 ? ReadyColor : WaitingColor;
         entries.Add(new HoverLine($"{cropName}: ", new HoverSegment(daysLeftStr, cropColor)));
 
-        bool isWatered = hoeDirt.state.Value == 1;
-        string waterStatus = isWatered ? I18n.Watered() : I18n.NotWatered();
-        Color waterColor = isWatered ? WateredColor : NotWateredColor;
-        entries.Add(new HoverLine(waterStatus, waterColor));
+        if (!crop.forageCrop.Value)
+        {
+          bool isWatered = hoeDirt.state.Value == 1;
+          string waterStatus = isWatered ? I18n.Watered() : I18n.NotWatered();
+          Color waterColor = isWatered ? WateredColor : NotWateredColor;
+          entries.Add(new HoverLine(waterStatus, waterColor));
+        }
       }
 
       if (fertilizers.Any())

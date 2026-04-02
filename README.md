@@ -57,8 +57,10 @@
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
 - **v2.8.12**
-  - Show item quality star on pickup HUD notifications (integrates [Show Item Quality](https://www.nexusmods.com/stardewvalley/mods/22275) by Jonqora & Bungus)
-  - Fix HUD icons overlapping with Daily Tasks Report Plus
+  - Show item quality star on pickup HUD notifications
+    - Automatically defers to [Show Item Quality](https://www.nexusmods.com/stardewvalley/mods/22275) mod if it is installed
+  - Fix HUD icons overlapping with [Daily Tasks Report Plus](https://www.nexusmods.com/stardewvalley/mods/20871)
+  - Fix range display for modded bee house variants (e.g. [Machine Progression System](https://www.nexusmods.com/stardewvalley/mods/21720))
 - **v2.8.11**
   - Add [Sword & Sorcery](https://www.nexusmods.com/stardewvalley/mods/12369) Special Orders board (Coastal Guild) to board selector
   - Fix heart fills on social page rendering above the mouse cursor and now uses actual heart sprite for Content Patcher compatibility
@@ -279,7 +281,7 @@ The compatability ranges from small fixes to bigger integration with mod provide
 - [Sunberry Village](https://www.nexusmods.com/stardewvalley/mods/11111)
 - [Visit Mount Vapius](https://www.nexusmods.com/stardewvalley/mods/9600)
 - [Sword & Sorcery](https://www.nexusmods.com/stardewvalley/mods/12369)
-- [Daily Tasks Report Plus](https://www.nexusmods.com/stardewvalley/mods/20871)
+- [[Daily Tasks Report Plus](https://www.nexusmods.com/stardewvalley/mods/20871)](https://www.nexusmods.com/stardewvalley/mods/20871)
 - [Full Inventory View](https://www.nexusmods.com/stardewvalley/mods/32625)
 
 <p align="center">

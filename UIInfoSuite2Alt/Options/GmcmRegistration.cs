@@ -403,25 +403,36 @@ public partial class ModEntry
     );
     Spacer();
     AddBool(
+      nameof(ModConfig.ShowWorldTooltip),
+      () => ModConfig.ShowWorldTooltip,
+      v => ModConfig.ShowWorldTooltip = v
+    );
+    AddSubBool(
       nameof(ModConfig.ShowCropTooltip),
       () => ModConfig.ShowCropTooltip,
       v => ModConfig.ShowCropTooltip = v
     );
-    AddBool(
+    AddSubBool(
       nameof(ModConfig.ShowTreeTooltip),
       () => ModConfig.ShowTreeTooltip,
       v => ModConfig.ShowTreeTooltip = v
     );
-    AddBool(
+    AddSubBool(
       nameof(ModConfig.ShowBarrelTooltip),
       () => ModConfig.ShowBarrelTooltip,
       v => ModConfig.ShowBarrelTooltip = v
     );
-    AddBool(
+    AddSubBool(
       nameof(ModConfig.ShowFishPondTooltip),
       () => ModConfig.ShowFishPondTooltip,
       v => ModConfig.ShowFishPondTooltip = v
     );
+    AddSubBool(
+      nameof(ModConfig.ShowForageableTooltip),
+      () => ModConfig.ShowForageableTooltip,
+      v => ModConfig.ShowForageableTooltip = v
+    );
+    Spacer();
     string[] machineIconModes = { "0", "1", "2" };
     configMenu.AddTextOption(
       ModManifest,
@@ -551,6 +562,37 @@ public partial class ModEntry
     }
 
     AddBool(
+      nameof(ModConfig.ShowExtraItemInformation),
+      () => ModConfig.ShowExtraItemInformation,
+      v => ModConfig.ShowExtraItemInformation = v
+    );
+    AddSubBool(
+      nameof(ModConfig.ShowInventoryItemSellPrice),
+      () => ModConfig.ShowInventoryItemSellPrice,
+      v => ModConfig.ShowInventoryItemSellPrice = v
+    );
+    AddSubBool(
+      nameof(ModConfig.ShowInventoryItemBundleBanner),
+      () => ModConfig.ShowInventoryItemBundleBanner,
+      v => ModConfig.ShowInventoryItemBundleBanner = v
+    );
+    AddSubBool(
+      nameof(ModConfig.ShowInventoryItemDonationStatus),
+      () => ModConfig.ShowInventoryItemDonationStatus,
+      v => ModConfig.ShowInventoryItemDonationStatus = v
+    );
+    AddSubBool(
+      nameof(ModConfig.ShowInventoryItemShippingStatus),
+      () => ModConfig.ShowInventoryItemShippingStatus,
+      v => ModConfig.ShowInventoryItemShippingStatus = v
+    );
+    Spacer();
+    AddBool(
+      nameof(ModConfig.ShowHarvestPricesInShop),
+      () => ModConfig.ShowHarvestPricesInShop,
+      v => ModConfig.ShowHarvestPricesInShop = v
+    );
+    AddBool(
       nameof(ModConfig.ShowLockedBundleItems),
       () => ModConfig.ShowLockedBundleItems,
       v =>
@@ -558,16 +600,6 @@ public partial class ModEntry
         ModConfig.ShowLockedBundleItems = v;
         BundleHelper.ShowLockedBundles = v;
       }
-    );
-    AddBool(
-      nameof(ModConfig.ShowExtraItemInformation),
-      () => ModConfig.ShowExtraItemInformation,
-      v => ModConfig.ShowExtraItemInformation = v
-    );
-    AddBool(
-      nameof(ModConfig.ShowHarvestPricesInShop),
-      () => ModConfig.ShowHarvestPricesInShop,
-      v => ModConfig.ShowHarvestPricesInShop = v
     );
 
     // =====================

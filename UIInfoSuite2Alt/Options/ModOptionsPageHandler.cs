@@ -648,40 +648,62 @@ internal class ModOptionsPageHandler : IDisposable
         animalPetIcon
       )
     );
+    var showWorldTooltipCheckbox = new ModOptionsCheckbox(
+      _helper.SafeGetString(nameof(config.ShowWorldTooltip)),
+      whichOption++,
+      showTileTooltips.ToggleOption,
+      () => config.ShowWorldTooltip,
+      Set(v => config.ShowWorldTooltip = v)
+    );
+    _currentTarget.Add(showWorldTooltipCheckbox);
     _currentTarget.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.ShowCropTooltip)),
         whichOption++,
-        showTileTooltips.ToggleCropOption,
+        _ => { },
         () => config.ShowCropTooltip,
-        Set(v => config.ShowCropTooltip = v)
+        Set(v => config.ShowCropTooltip = v),
+        showWorldTooltipCheckbox
       )
     );
     _currentTarget.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.ShowTreeTooltip)),
         whichOption++,
-        showTileTooltips.ToggleTreeOption,
+        _ => { },
         () => config.ShowTreeTooltip,
-        Set(v => config.ShowTreeTooltip = v)
+        Set(v => config.ShowTreeTooltip = v),
+        showWorldTooltipCheckbox
       )
     );
     _currentTarget.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.ShowBarrelTooltip)),
         whichOption++,
-        showTileTooltips.ToggleBarrelOption,
+        _ => { },
         () => config.ShowBarrelTooltip,
-        Set(v => config.ShowBarrelTooltip = v)
+        Set(v => config.ShowBarrelTooltip = v),
+        showWorldTooltipCheckbox
       )
     );
     _currentTarget.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.ShowFishPondTooltip)),
         whichOption++,
-        showTileTooltips.ToggleFishPondOption,
+        _ => { },
         () => config.ShowFishPondTooltip,
-        Set(v => config.ShowFishPondTooltip = v)
+        Set(v => config.ShowFishPondTooltip = v),
+        showWorldTooltipCheckbox
+      )
+    );
+    _currentTarget.Add(
+      new ModOptionsCheckbox(
+        _helper.SafeGetString(nameof(config.ShowForageableTooltip)),
+        whichOption++,
+        _ => { },
+        () => config.ShowForageableTooltip,
+        Set(v => config.ShowForageableTooltip = v),
+        showWorldTooltipCheckbox
       )
     );
     showMachineProcessingItem.SetMode(config.MachineProcessingIconsMode);
@@ -852,22 +874,52 @@ internal class ModOptionsPageHandler : IDisposable
       );
     }
 
+    var showItemHoverCheckbox = new ModOptionsCheckbox(
+      _helper.SafeGetString(nameof(config.ShowExtraItemInformation)),
+      whichOption++,
+      showItemHoverInformation.ToggleOption,
+      () => config.ShowExtraItemInformation,
+      Set(v => config.ShowExtraItemInformation = v)
+    );
+    _currentTarget.Add(showItemHoverCheckbox);
     _currentTarget.Add(
       new ModOptionsCheckbox(
-        _helper.SafeGetString(nameof(config.ShowLockedBundleItems)),
+        _helper.SafeGetString(nameof(config.ShowInventoryItemSellPrice)),
         whichOption++,
-        v => BundleHelper.ShowLockedBundles = v,
-        () => config.ShowLockedBundleItems,
-        Set(v => config.ShowLockedBundleItems = v)
+        _ => { },
+        () => config.ShowInventoryItemSellPrice,
+        Set(v => config.ShowInventoryItemSellPrice = v),
+        showItemHoverCheckbox
       )
     );
     _currentTarget.Add(
       new ModOptionsCheckbox(
-        _helper.SafeGetString(nameof(config.ShowExtraItemInformation)),
+        _helper.SafeGetString(nameof(config.ShowInventoryItemBundleBanner)),
         whichOption++,
-        showItemHoverInformation.ToggleOption,
-        () => config.ShowExtraItemInformation,
-        Set(v => config.ShowExtraItemInformation = v)
+        _ => { },
+        () => config.ShowInventoryItemBundleBanner,
+        Set(v => config.ShowInventoryItemBundleBanner = v),
+        showItemHoverCheckbox
+      )
+    );
+    _currentTarget.Add(
+      new ModOptionsCheckbox(
+        _helper.SafeGetString(nameof(config.ShowInventoryItemDonationStatus)),
+        whichOption++,
+        _ => { },
+        () => config.ShowInventoryItemDonationStatus,
+        Set(v => config.ShowInventoryItemDonationStatus = v),
+        showItemHoverCheckbox
+      )
+    );
+    _currentTarget.Add(
+      new ModOptionsCheckbox(
+        _helper.SafeGetString(nameof(config.ShowInventoryItemShippingStatus)),
+        whichOption++,
+        _ => { },
+        () => config.ShowInventoryItemShippingStatus,
+        Set(v => config.ShowInventoryItemShippingStatus = v),
+        showItemHoverCheckbox
       )
     );
     _currentTarget.Add(
@@ -877,6 +929,15 @@ internal class ModOptionsPageHandler : IDisposable
         shopHarvestPrices.ToggleOption,
         () => config.ShowHarvestPricesInShop,
         Set(v => config.ShowHarvestPricesInShop = v)
+      )
+    );
+    _currentTarget.Add(
+      new ModOptionsCheckbox(
+        _helper.SafeGetString(nameof(config.ShowLockedBundleItems)),
+        whichOption++,
+        v => BundleHelper.ShowLockedBundles = v,
+        () => config.ShowLockedBundleItems,
+        Set(v => config.ShowLockedBundleItems = v)
       )
     );
 

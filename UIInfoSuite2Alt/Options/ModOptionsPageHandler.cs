@@ -301,7 +301,6 @@ internal class ModOptionsPageHandler : IDisposable
         )
       );
     }
-    OptionsHR();
 
     // --- HUD Icons ---
     BeginSection(
@@ -706,6 +705,18 @@ internal class ModOptionsPageHandler : IDisposable
         showWorldTooltipCheckbox
       )
     );
+    _currentTarget.Add(
+      new ModOptionsCheckbox(
+        _helper.SafeGetString(nameof(config.ShowHarvestQuality)),
+        whichOption++,
+        _ => { },
+        () => config.ShowHarvestQuality,
+        Set(v => config.ShowHarvestQuality = v),
+        showWorldTooltipCheckbox
+      )
+    );
+    _currentTarget.Add(new ModOptionsElement(I18n.ShowHarvestQuality_Note(), isSmallText: true));
+    OptionsSpacer();
     showMachineProcessingItem.SetMode(config.MachineProcessingIconsMode);
     _currentTarget.Add(
       new ModOptionsDropdown(

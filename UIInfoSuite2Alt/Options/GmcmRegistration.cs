@@ -432,6 +432,21 @@ public partial class ModEntry
       () => ModConfig.ShowForageableTooltip,
       v => ModConfig.ShowForageableTooltip = v
     );
+    AddSubBool(
+      nameof(ModConfig.ShowHarvestQuality),
+      () => ModConfig.ShowHarvestQuality,
+      v => ModConfig.ShowHarvestQuality = v
+    );
+    configMenu.AddComplexOption(
+      ModManifest,
+      name: () => "",
+      draw: (spriteBatch, pos) =>
+      {
+        string text = I18n.ShowHarvestQuality_Note();
+        Utility.drawTextWithShadow(spriteBatch, text, Game1.smallFont, pos, Game1.textColor);
+      },
+      height: () => (int)(Game1.smallFont.MeasureString(I18n.ShowHarvestQuality_Note()).Y + 8)
+    );
     Spacer();
     string[] machineIconModes = { "0", "1", "2" };
     configMenu.AddTextOption(

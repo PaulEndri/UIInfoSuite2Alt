@@ -205,7 +205,8 @@ internal static class InformantHelper
     }
 
     // Register Aquarium decorator if Stardew Aquarium is installed
-    if (aquarium)
+    // but Informant's own Aquarium addon isn't already handling it
+    if (aquarium && !helper.ModRegistry.IsLoaded(ModCompat.InformantAquarium))
     {
       _helper = helper;
 

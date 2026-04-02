@@ -22,6 +22,7 @@ public static class ModCompat
   public const string UnlockableBundles = "DLX.Bundles";
   public const string BetterRanching = "BetterRanching";
   public const string Informant = "Slothsoft.Informant";
+  public const string InformantAquarium = "Slothsoft.Informant.Aquarium";
   public const string StardewAquarium = "Cherry.StardewAquarium";
   public const string DailyTasksReportPlus = "Prism99.DailyTasksReportPlus";
   public const string ShowItemQuality = "Jonqora.ShowItemQuality";

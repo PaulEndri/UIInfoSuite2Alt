@@ -14,6 +14,7 @@ using UIInfoSuite2Alt.Compatibility.Helpers;
 using UIInfoSuite2Alt.Infrastructure;
 using UIInfoSuite2Alt.Infrastructure.Extensions;
 using UIInfoSuite2Alt.Infrastructure.Helpers;
+using UIInfoSuite2Alt.Options;
 using Object = StardewValley.Object;
 
 namespace UIInfoSuite2Alt.UIElements;
@@ -38,7 +39,7 @@ internal class ShowItemHoverInformation : IDisposable
 
   private (Texture2D texture, Rectangle sourceRect)? _ubIconOverride;
 
-  private static readonly Rectangle CollectionsTabSourceRect = new(640, 81, 16, 16);
+  private static readonly Rectangle CollectionsTabSourceRect = new(640, 80, 16, 17);
 
   private LibraryMuseum? _libraryMuseum;
 
@@ -155,22 +156,21 @@ internal class ShowItemHoverInformation : IDisposable
 
   private void DrawAdvancedTooltip(SpriteBatch spriteBatch)
   {
-    // When Informant is installed, its item decorators handle sell price, museum,
-    // shipping, and bundle icons directly on the vanilla tooltip - skip our overlay entirely.
-    if (InformantHelper.IsLoaded)
-    {
-      return;
-    }
-
     if (
       _hoverItem.Value != null
       && !(_hoverItem.Value is MeleeWeapon weapon && weapon.isScythe())
       && _hoverItem.Value is not FishingRod
     )
     {
+      ModConfig config = ModEntry.ModConfig;
       var hoveredObject = _hoverItem.Value as Object;
 
-      int itemPrice = Tools.GetSellToStorePrice(_hoverItem.Value);
+      bool showPrice = config.ShowInventoryItemSellPrice;
+      bool showBundle = config.ShowInventoryItemBundleBanner;
+      bool showDonation = config.ShowInventoryItemDonationStatus;
+      bool showShipping = config.ShowInventoryItemShippingStatus;
+
+      int itemPrice = showPrice ? Tools.GetSellToStorePrice(_hoverItem.Value) : 0;
 
       var stackPrice = 0;
       if (itemPrice > 0 && _hoverItem.Value.Stack > 1)
@@ -178,14 +178,17 @@ internal class ShowItemHoverInformation : IDisposable
         stackPrice = itemPrice * _hoverItem.Value.Stack;
       }
 
-      int cropPrice = Tools.GetHarvestPrice(_hoverItem.Value);
+      int cropPrice = showPrice ? Tools.GetHarvestPrice(_hoverItem.Value) : 0;
 
-      bool notDonatedYet = _libraryMuseum?.isItemSuitableForDonation(_hoverItem.Value) ?? false;
+      bool notDonatedYet =
+        showDonation && (_libraryMuseum?.isItemSuitableForDonation(_hoverItem.Value) ?? false);
 
-      bool notDonatedToAquarium = AquariumHelper.IsUndonatedAquariumFish(_hoverItem.Value);
+      bool notDonatedToAquarium =
+        showDonation && AquariumHelper.IsUndonatedAquariumFish(_hoverItem.Value);
 
       bool notShippedYet =
-        hoveredObject != null
+        showShipping
+        && hoveredObject != null
         && hoveredObject.countsForShippedCollection()
         && !Game1.player.basicShipped.ContainsKey(hoveredObject.ItemId)
         && hoveredObject.Type != "Fish"
@@ -194,7 +197,7 @@ internal class ShowItemHoverInformation : IDisposable
       string? requiredBundleName = null;
       Color? bundleColor = null;
       int bundleId = -1;
-      if (hoveredObject != null)
+      if (showBundle && hoveredObject != null)
       {
         BundleRequiredItem? bundleDisplayData = BundleHelper.GetBundleItemIfNotDonated(
           hoveredObject
@@ -227,6 +230,8 @@ internal class ShowItemHoverInformation : IDisposable
         }
       }
 
+      bool hasPriceRows = itemPrice > 0 || stackPrice > 0 || cropPrice > 0;
+
       var drawPositionOffset = new Vector2();
       int windowWidth,
         windowHeight;
@@ -237,40 +242,52 @@ internal class ShowItemHoverInformation : IDisposable
         bundleHeaderWidth = 36 + (int)Game1.smallFont.MeasureString(requiredBundleName).X;
       }
 
-      var itemTextWidth = (int)Game1.smallFont.MeasureString(itemPrice.ToString()).X;
-      var stackTextWidth = (int)Game1.smallFont.MeasureString(stackPrice.ToString()).X;
-      var cropTextWidth = (int)Game1.smallFont.MeasureString(cropPrice.ToString()).X;
-      var minTextWidth = (int)Game1.smallFont.MeasureString("000").X;
-      int largestTextWidth =
-        76
-        + Math.Max(minTextWidth, Math.Max(stackTextWidth, Math.Max(itemTextWidth, cropTextWidth)));
-      windowWidth = Math.Max(bundleHeaderWidth, largestTextWidth);
-
-      windowHeight = 20 + 16;
-      if (itemPrice > 0)
+      if (hasPriceRows)
       {
-        windowHeight += 40;
-      }
+        var itemTextWidth = (int)Game1.smallFont.MeasureString(itemPrice.ToString()).X;
+        var stackTextWidth = (int)Game1.smallFont.MeasureString(stackPrice.ToString()).X;
+        var cropTextWidth = (int)Game1.smallFont.MeasureString(cropPrice.ToString()).X;
+        var minTextWidth = (int)Game1.smallFont.MeasureString("000").X;
+        int largestTextWidth =
+          76
+          + Math.Max(
+            minTextWidth,
+            Math.Max(stackTextWidth, Math.Max(itemTextWidth, cropTextWidth))
+          );
+        windowWidth = Math.Max(bundleHeaderWidth, largestTextWidth);
 
-      if (stackPrice > 0)
+        windowHeight = 20 + 16;
+        if (itemPrice > 0)
+        {
+          windowHeight += 40;
+        }
+
+        if (stackPrice > 0)
+        {
+          windowHeight += 40;
+        }
+
+        if (cropPrice > 0)
+        {
+          windowHeight += 40;
+        }
+
+        if (!string.IsNullOrEmpty(requiredBundleName))
+        {
+          windowHeight += 4;
+          drawPositionOffset.Y += 4;
+        }
+
+        // Min window dimensions
+        windowHeight = Math.Max(windowHeight, 40);
+        windowWidth = Math.Max(windowWidth, 40);
+      }
+      else
       {
-        windowHeight += 40;
+        // No price box - use bundle header width as reference for standalone elements
+        windowWidth = Math.Max(bundleHeaderWidth, 40);
+        windowHeight = 0;
       }
-
-      if (cropPrice > 0)
-      {
-        windowHeight += 40;
-      }
-
-      if (!string.IsNullOrEmpty(requiredBundleName))
-      {
-        windowHeight += 4;
-        drawPositionOffset.Y += 4;
-      }
-
-      // Min window dimensions
-      windowHeight = Math.Max(windowHeight, 40);
-      windowWidth = Math.Max(windowWidth, 40);
 
       int windowY = Game1.getMouseY() + 20;
       int windowX = Game1.getMouseX() - 25 - windowWidth;
@@ -289,7 +306,7 @@ internal class ShowItemHoverInformation : IDisposable
       // Adjust overflow
       Rectangle safeArea = Utility.getSafeArea();
 
-      if (windowY + windowHeight > safeArea.Bottom)
+      if (hasPriceRows && windowY + windowHeight > safeArea.Bottom)
       {
         windowY = safeArea.Bottom - windowHeight;
       }
@@ -304,23 +321,16 @@ internal class ShowItemHoverInformation : IDisposable
       }
 
       var windowPos = new Vector2(windowX, windowY);
-      Vector2 drawPosition = windowPos + new Vector2(16, 20) + drawPositionOffset;
 
-      // 32x40 icon cells, small font cap height 18 offset (2,6)
-      var rowHeight = 40;
-      var iconCenterOffset = new Vector2(16, 20);
-      var textOffset = new Vector2(32 + 4, (rowHeight - 18) / 2 - 6);
-
-      if (
-        itemPrice > 0
-        || stackPrice > 0
-        || cropPrice > 0
-        || !string.IsNullOrEmpty(requiredBundleName)
-        || notDonatedYet
-        || notDonatedToAquarium
-        || notShippedYet
-      )
+      if (hasPriceRows)
       {
+        Vector2 drawPosition = windowPos + new Vector2(16, 20) + drawPositionOffset;
+
+        // 32x40 icon cells, small font cap height 18 offset (2,6)
+        var rowHeight = 40;
+        var iconCenterOffset = new Vector2(16, 20);
+        var textOffset = new Vector2(32 + 4, (rowHeight - 18) / 2 - 6);
+
         IClickableMenu.drawTextureBox(
           spriteBatch,
           Game1.menuTexture,
@@ -331,80 +341,110 @@ internal class ShowItemHoverInformation : IDisposable
           windowHeight,
           Color.White
         );
+
+        if (itemPrice > 0)
+        {
+          spriteBatch.Draw(
+            Game1.debrisSpriteSheet,
+            drawPosition + iconCenterOffset,
+            Game1.getSourceRectForStandardTileSheet(Game1.debrisSpriteSheet, 8, 16, 16),
+            Color.White,
+            0,
+            new Vector2(8, 8),
+            Game1.pixelZoom,
+            SpriteEffects.None,
+            0.95f
+          );
+
+          DrawSmallTextWithShadow(spriteBatch, itemPrice.ToString(), drawPosition + textOffset);
+
+          drawPosition.Y += rowHeight;
+        }
+
+        if (stackPrice > 0)
+        {
+          var overlapOffset = new Vector2(0, 10);
+          spriteBatch.Draw(
+            Game1.debrisSpriteSheet,
+            drawPosition + iconCenterOffset - overlapOffset / 2,
+            Game1.getSourceRectForStandardTileSheet(Game1.debrisSpriteSheet, 8, 16, 16),
+            Color.White,
+            0,
+            new Vector2(8, 8),
+            Game1.pixelZoom,
+            SpriteEffects.None,
+            0.95f
+          );
+          spriteBatch.Draw(
+            Game1.debrisSpriteSheet,
+            drawPosition + iconCenterOffset + overlapOffset / 2,
+            Game1.getSourceRectForStandardTileSheet(Game1.debrisSpriteSheet, 8, 16, 16),
+            Color.White,
+            0,
+            new Vector2(8, 8),
+            Game1.pixelZoom,
+            SpriteEffects.None,
+            0.95f
+          );
+
+          DrawSmallTextWithShadow(spriteBatch, stackPrice.ToString(), drawPosition + textOffset);
+
+          drawPosition.Y += rowHeight;
+        }
+
+        if (cropPrice > 0)
+        {
+          spriteBatch.Draw(
+            Game1.mouseCursors,
+            drawPosition + iconCenterOffset,
+            new Rectangle(60, 428, 10, 10),
+            Color.White,
+            0.0f,
+            new Vector2(5, 5),
+            Game1.pixelZoom * 0.75f,
+            SpriteEffects.None,
+            0.85f
+          );
+
+          DrawSmallTextWithShadow(spriteBatch, cropPrice.ToString(), drawPosition + textOffset);
+        }
       }
 
-      if (itemPrice > 0)
+      // For non-price elements, when the price box is hidden we attach to the vanilla tooltip
+      Rectangle vanillaTooltip = Rectangle.Empty;
+      int informantDecoratorHeight = 0;
+      if (!hasPriceRows)
       {
-        spriteBatch.Draw(
-          Game1.debrisSpriteSheet,
-          drawPosition + iconCenterOffset,
-          Game1.getSourceRectForStandardTileSheet(Game1.debrisSpriteSheet, 8, 16, 16),
-          Color.White,
-          0,
-          new Vector2(8, 8),
-          Game1.pixelZoom,
-          SpriteEffects.None,
-          0.95f
-        );
+        bool informantSellPrice =
+          InformantHelper.IsLoaded && InformantHelper.IsFeatureEnabled("sell-price");
+        vanillaTooltip = EstimateVanillaTooltipBounds(_hoverItem.Value, informantSellPrice);
 
-        DrawSmallTextWithShadow(spriteBatch, itemPrice.ToString(), drawPosition + textOffset);
-
-        drawPosition.Y += rowHeight;
-      }
-
-      if (stackPrice > 0)
-      {
-        var overlapOffset = new Vector2(0, 10);
-        spriteBatch.Draw(
-          Game1.debrisSpriteSheet,
-          drawPosition + iconCenterOffset - overlapOffset / 2,
-          Game1.getSourceRectForStandardTileSheet(Game1.debrisSpriteSheet, 8, 16, 16),
-          Color.White,
-          0,
-          new Vector2(8, 8),
-          Game1.pixelZoom,
-          SpriteEffects.None,
-          0.95f
-        );
-        spriteBatch.Draw(
-          Game1.debrisSpriteSheet,
-          drawPosition + iconCenterOffset + overlapOffset / 2,
-          Game1.getSourceRectForStandardTileSheet(Game1.debrisSpriteSheet, 8, 16, 16),
-          Color.White,
-          0,
-          new Vector2(8, 8),
-          Game1.pixelZoom,
-          SpriteEffects.None,
-          0.95f
-        );
-
-        DrawSmallTextWithShadow(spriteBatch, stackPrice.ToString(), drawPosition + textOffset);
-
-        drawPosition.Y += rowHeight;
-      }
-
-      if (cropPrice > 0)
-      {
-        spriteBatch.Draw(
-          Game1.mouseCursors,
-          drawPosition + iconCenterOffset,
-          new Rectangle(60, 428, 10, 10),
-          Color.White,
-          0.0f,
-          new Vector2(5, 5),
-          Game1.pixelZoom * 0.75f,
-          SpriteEffects.None,
-          0.85f
-        );
-
-        DrawSmallTextWithShadow(spriteBatch, cropPrice.ToString(), drawPosition + textOffset);
+        // Estimate Informant's decorator box height if any known decorators would fire
+        if (InformantHelper.IsLoaded)
+        {
+          bool hasAnyDecorator =
+            (notDonatedYet && InformantHelper.IsFeatureEnabled("museum"))
+            || (notShippedYet && InformantHelper.IsFeatureEnabled("shipping"))
+            || (
+              !string.IsNullOrEmpty(requiredBundleName)
+              && InformantHelper.IsFeatureEnabled("bundles")
+            );
+          if (hasAnyDecorator)
+          {
+            // Informant's decorator box: 1 row = Game1.tileSize (64px)
+            informantDecoratorHeight = Game1.tileSize;
+          }
+        }
       }
 
       if (notDonatedYet)
       {
+        Vector2 donationPos = hasPriceRows
+          ? windowPos + new Vector2(2, windowHeight + 8)
+          : new Vector2(vanillaTooltip.Left + 2, vanillaTooltip.Bottom + 8);
         spriteBatch.Draw(
           _museumIcon.texture,
-          windowPos + new Vector2(2, windowHeight + 8),
+          donationPos,
           _museumIcon.sourceRect,
           Color.White,
           0f,
@@ -417,9 +457,12 @@ internal class ShowItemHoverInformation : IDisposable
 
       if (notDonatedToAquarium && GetAquariumIcon() is { } aquariumIcon)
       {
+        Vector2 aquariumPos = hasPriceRows
+          ? windowPos + new Vector2(2, windowHeight + 8)
+          : new Vector2(vanillaTooltip.Left + 2, vanillaTooltip.Bottom + 8);
         spriteBatch.Draw(
           aquariumIcon.texture,
-          windowPos + new Vector2(2, windowHeight + 8),
+          aquariumPos,
           aquariumIcon.sourceRect,
           Color.White,
           0f,
@@ -432,23 +475,60 @@ internal class ShowItemHoverInformation : IDisposable
 
       if (!string.IsNullOrEmpty(requiredBundleName))
       {
-        // Bundle icon + banner
-        DrawBundleBanner(
-          spriteBatch,
-          requiredBundleName,
-          bundleId,
-          windowPos + new Vector2(-7, -17),
-          windowWidth,
-          bundleColor,
-          _ubIconOverride
-        );
+        if (hasPriceRows)
+        {
+          DrawBundleBanner(
+            spriteBatch,
+            requiredBundleName,
+            bundleId,
+            windowPos + new Vector2(-7, -17),
+            windowWidth,
+            bundleColor,
+            _ubIconOverride
+          );
+        }
+        else
+        {
+          // Shift banner above Informant's decorator box if present
+          DrawBundleBanner(
+            spriteBatch,
+            requiredBundleName,
+            bundleId,
+            new Vector2(
+              vanillaTooltip.Left - 7,
+              vanillaTooltip.Top
+                - 17
+                - informantDecoratorHeight
+                + (informantDecoratorHeight > 0 ? 10 : 0)
+            ),
+            vanillaTooltip.Width,
+            bundleColor,
+            _ubIconOverride
+          );
+        }
+
         _ubIconOverride = null;
       }
 
       if (notShippedYet)
       {
-        // Collections tab icon on right side
-        DrawCollectionsTab(spriteBatch, windowPos + new Vector2(windowWidth - 4, 12), 2f);
+        if (hasPriceRows)
+        {
+          DrawCollectionsTab(spriteBatch, windowPos + new Vector2(windowWidth - 4, 28), 2f);
+        }
+        else
+        {
+          // Unreversed, attached to the left of the vanilla tooltip
+          DrawCollectionsTab(
+            spriteBatch,
+            new Vector2(
+              vanillaTooltip.Left - CollectionsTabSourceRect.Width * 2,
+              vanillaTooltip.Top + 28
+            ),
+            2f,
+            flip: false
+          );
+        }
       }
     }
   }
@@ -682,7 +762,12 @@ internal class ShowItemHoverInformation : IDisposable
     return DefaultUbBundleColor;
   }
 
-  private static void DrawCollectionsTab(SpriteBatch b, Vector2 position, float scale)
+  private static void DrawCollectionsTab(
+    SpriteBatch b,
+    Vector2 position,
+    float scale,
+    bool flip = true
+  )
   {
     b.Draw(
       Game1.mouseCursors,
@@ -692,8 +777,87 @@ internal class ShowItemHoverInformation : IDisposable
       0f,
       Vector2.Zero,
       scale,
-      SpriteEffects.FlipHorizontally,
+      flip ? SpriteEffects.FlipHorizontally : SpriteEffects.None,
       0.86f
     );
+  }
+
+  /// <summary>
+  /// Estimates the vanilla tooltip box bounds for an item, replicating the core logic
+  /// from IClickableMenu.drawHoverText. Covers the item types that trigger our icons
+  /// (bundleable objects, museum artifacts/minerals, shippable items, food).
+  /// </summary>
+  /// <param name="item">The hovered item.</param>
+  /// <param name="informantSellPrice">
+  /// When true, Informant injects moneyAmountToShowAtBottom into the vanilla tooltip,
+  /// adding a sell price row at the bottom that increases tooltip height.
+  /// </param>
+  private static Rectangle EstimateVanillaTooltipBounds(Item item, bool informantSellPrice = false)
+  {
+    SpriteFont descFont = Game1.smallFont;
+    SpriteFont titleFont = Game1.dialogueFont;
+
+    string description = item.getDescription();
+    string title = item.DisplayName;
+    string category = item is Object obj ? obj.getCategoryName() : "";
+
+    int width =
+      Math.Max((int)descFont.MeasureString(description).X, (int)titleFont.MeasureString(title).X)
+      + 32;
+    int height =
+      (int)descFont.MeasureString(description).Y + 32 + (int)titleFont.MeasureString(title).Y + 16;
+
+    if (category.Length > 0)
+    {
+      width = Math.Max(width, (int)descFont.MeasureString(category).X + 32);
+      height += (int)descFont.MeasureString("T").Y;
+    }
+
+    // Food items add edibility stats rows
+    if (item is Object edible && edible.Edibility is not (-300 or 0))
+    {
+      int staminaRecovery = edible.staminaRecoveredOnConsumption();
+      int healthRecovery = edible.healthRecoveredOnConsumption();
+      height += 40 * ((staminaRecovery > 0 && healthRecovery > 0) ? 2 : 1);
+    }
+
+    // Informant's sell-price injects moneyAmountToShowAtBottom into drawToolTip,
+    // which the vanilla code adds as: max(font height + 4, 44)
+    if (informantSellPrice && item is Object sellable)
+    {
+      int sellPrice = Utility.getSellToStorePriceOfItem(sellable, false);
+      if (sellPrice >= 0 || sellable.canBeShipped())
+      {
+        height += (int)Math.Max(descFont.MeasureString(sellPrice.ToString()).Y + 4f, 44f);
+      }
+    }
+
+    height = Math.Max(height, 60);
+    width += 4;
+
+    // Position: same as game's drawHoverText
+    int x = Game1.getOldMouseX() + 32;
+    int y = Game1.getOldMouseY() + 32;
+
+    // Screen edge adjustments matching game logic
+    Rectangle safeArea = Utility.getSafeArea();
+    if (x + width > safeArea.Right)
+    {
+      x = safeArea.Right - width;
+      y += 16;
+    }
+
+    if (y + height > safeArea.Bottom)
+    {
+      x += 16;
+      if (x + width > safeArea.Right)
+      {
+        x = safeArea.Right - width;
+      }
+
+      y = safeArea.Bottom - height;
+    }
+
+    return new Rectangle(x, y, width, height);
   }
 }

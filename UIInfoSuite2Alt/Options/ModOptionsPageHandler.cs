@@ -830,20 +830,20 @@ internal class ModOptionsPageHandler : IDisposable
     );
     _currentTarget.Add(
       new ModOptionsCheckbox(
-        _helper.SafeGetString(nameof(config.AllowExperienceBarToFadeOut)),
-        whichOption++,
-        experienceBar.ToggleExperienceBarFade,
-        () => config.AllowExperienceBarToFadeOut,
-        Set(v => config.AllowExperienceBarToFadeOut = v)
-      )
-    );
-    _currentTarget.Add(
-      new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.ShowExperienceGain)),
         whichOption++,
         experienceBar.ToggleShowExperienceGain,
         () => config.ShowExperienceGain,
         Set(v => config.ShowExperienceGain = v)
+      )
+    );
+    _currentTarget.Add(
+      new ModOptionsCheckbox(
+        _helper.SafeGetString(nameof(config.AllowExperienceBarToFadeOut)),
+        whichOption++,
+        experienceBar.ToggleExperienceBarFade,
+        () => config.AllowExperienceBarToFadeOut,
+        Set(v => config.AllowExperienceBarToFadeOut = v)
       )
     );
     var fishOnCatchIcon = new ModOptionsCheckbox(
@@ -904,6 +904,9 @@ internal class ModOptionsPageHandler : IDisposable
       )
     );
     _currentTarget.Add(
+      new ModOptionsElement(I18n.ShowInventoryItemSellPrice_Note(), isSmallText: true)
+    );
+    _currentTarget.Add(
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.ShowInventoryItemBundleBanner)),
         whichOption++,
@@ -923,14 +926,23 @@ internal class ModOptionsPageHandler : IDisposable
         showItemHoverCheckbox
       )
     );
+    var shippingStatusCheckbox = new ModOptionsCheckbox(
+      _helper.SafeGetString(nameof(config.ShowInventoryItemShippingStatus)),
+      whichOption++,
+      _ => { },
+      () => config.ShowInventoryItemShippingStatus,
+      Set(v => config.ShowInventoryItemShippingStatus = v),
+      showItemHoverCheckbox
+    );
+    _currentTarget.Add(shippingStatusCheckbox);
     _currentTarget.Add(
       new ModOptionsCheckbox(
-        _helper.SafeGetString(nameof(config.ShowInventoryItemShippingStatus)),
+        _helper.SafeGetString(nameof(config.UseShippingBinIcon)),
         whichOption++,
         _ => { },
-        () => config.ShowInventoryItemShippingStatus,
-        Set(v => config.ShowInventoryItemShippingStatus = v),
-        showItemHoverCheckbox
+        () => config.UseShippingBinIcon,
+        Set(v => config.UseShippingBinIcon = v),
+        shippingStatusCheckbox
       )
     );
     _currentTarget.Add(

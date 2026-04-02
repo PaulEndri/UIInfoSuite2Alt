@@ -40,6 +40,7 @@ internal class ShowItemHoverInformation : IDisposable
   private (Texture2D texture, Rectangle sourceRect)? _ubIconOverride;
 
   private static readonly Rectangle CollectionsTabSourceRect = new(640, 80, 16, 17);
+  private Texture2D? _shippingBinTexture;
 
   private LibraryMuseum? _libraryMuseum;
 
@@ -68,6 +69,8 @@ internal class ShowItemHoverInformation : IDisposable
       gunther.GetHeadShot(),
       Game1.pixelZoom
     );
+
+    _shippingBinTexture = helper.ModContent.Load<Texture2D>("assets/bin_custom.png");
 
     AquariumHelper.Initialize(helper);
   }
@@ -512,22 +515,49 @@ internal class ShowItemHoverInformation : IDisposable
 
       if (notShippedYet)
       {
+        bool useBinIcon = config.UseShippingBinIcon && _shippingBinTexture != null;
         if (hasPriceRows)
         {
-          DrawCollectionsTab(spriteBatch, windowPos + new Vector2(windowWidth - 4, 28), 2f);
+          Vector2 tabPos = windowPos + new Vector2(windowWidth - 4, 28);
+          if (useBinIcon)
+          {
+            DrawShippingBin(spriteBatch, tabPos + new Vector2(-16, -8), 2f);
+          }
+          else
+          {
+            DrawCollectionsTab(spriteBatch, tabPos, 2f);
+          }
         }
         else
         {
-          // Unreversed, attached to the left of the vanilla tooltip
-          DrawCollectionsTab(
-            spriteBatch,
-            new Vector2(
-              vanillaTooltip.Left - CollectionsTabSourceRect.Width * 2,
-              vanillaTooltip.Top + 28
-            ),
-            2f,
-            flip: false
-          );
+          if (useBinIcon)
+          {
+            DrawShippingBin(
+              spriteBatch,
+              new Vector2(
+                vanillaTooltip.Right - _shippingBinTexture!.Width * 2 + 18,
+                vanillaTooltip.Bottom
+                  + 8
+                  - _shippingBinTexture.Height * 2
+                  - informantDecoratorHeight
+                  + 40
+              ),
+              2f
+            );
+          }
+          else
+          {
+            // Unreversed, attached to the left of the vanilla tooltip
+            DrawCollectionsTab(
+              spriteBatch,
+              new Vector2(
+                vanillaTooltip.Left - CollectionsTabSourceRect.Width * 2,
+                vanillaTooltip.Top + 28
+              ),
+              2f,
+              flip: false
+            );
+          }
         }
       }
     }
@@ -778,6 +808,21 @@ internal class ShowItemHoverInformation : IDisposable
       Vector2.Zero,
       scale,
       flip ? SpriteEffects.FlipHorizontally : SpriteEffects.None,
+      0.86f
+    );
+  }
+
+  private void DrawShippingBin(SpriteBatch b, Vector2 position, float scale)
+  {
+    b.Draw(
+      _shippingBinTexture,
+      position,
+      null,
+      Color.White,
+      0f,
+      Vector2.Zero,
+      scale,
+      SpriteEffects.None,
       0.86f
     );
   }

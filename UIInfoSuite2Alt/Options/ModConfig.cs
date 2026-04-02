@@ -65,6 +65,7 @@ public class ModConfig
   public bool ShowInventoryItemBundleBanner { get; set; } = true;
   public bool ShowInventoryItemDonationStatus { get; set; } = true;
   public bool ShowInventoryItemShippingStatus { get; set; } = true;
+  public bool UseShippingBinIcon { get; set; } = false;
   public bool ShowLuckIcon { get; set; } = true;
   public bool ShowTravelingMerchant { get; set; } = true;
   public bool ShowBookseller { get; set; } = true;

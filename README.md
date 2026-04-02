@@ -62,7 +62,7 @@
   - Show predicted harvest quality on crop and forageable world tooltips (toggleable)
   - Fix mailbox count not showing up on Ginger Island mailbox
   - Fix "Not watered" tooltip for forage crops (Spring Onion, Ginger)
-  - Fix HUD icons overlapping with [Daily Tasks Report Plus](https://www.nexusmods.com/stardewvalley/mods/20871) notification area
+  - Fix HUD icons overlapping with [Daily Tasks Report Plus](https://www.nexusmods.com/stardewvalley/mods/20871) icon
   - Fix range display for modded bee house variants (e.g. [Machine Progression System](https://www.nexusmods.com/stardewvalley/mods/21720))
   - Add sub-options for inventory item information (sell price tooltip, bundle banner, donation status, shipping status)
   - Add optional shipping bin icon for the collection/shipping indicator (off by default)

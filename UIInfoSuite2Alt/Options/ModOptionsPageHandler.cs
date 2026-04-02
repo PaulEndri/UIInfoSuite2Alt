@@ -226,6 +226,7 @@ internal class ModOptionsPageHandler : IDisposable
     var showBuffTimers = new ShowBuffTimers(helper);
     var showCustomIcons = new ShowCustomIcons(helper);
     var showFishOnCatch = new ShowFishOnCatch();
+    var showMailboxCount = new ShowMailboxCount(helper);
 
     _elementsToDispose =
     [
@@ -253,6 +254,7 @@ internal class ModOptionsPageHandler : IDisposable
       showFestivalIcon,
       showCustomIcons,
       showFishOnCatch,
+      showMailboxCount,
       experienceBar,
     ];
 
@@ -889,7 +891,7 @@ internal class ModOptionsPageHandler : IDisposable
       new ModOptionsCheckbox(
         _helper.SafeGetString(nameof(config.ShowMailboxCount)),
         whichOption++,
-        enabled => MailboxCountPatch.Enabled = enabled,
+        showMailboxCount.ToggleOption,
         () => config.ShowMailboxCount,
         Set(v => config.ShowMailboxCount = v)
       )

@@ -67,14 +67,13 @@ public partial class ModEntry : Mod
     TvChannelWatcher.Initialize(harmony, helper);
     ShowFishOnCatch.Initialize(harmony);
     HudMessagePatch.Initialize(harmony, helper.ModRegistry.IsLoaded(ModCompat.SpaceCore));
-    MailboxCountPatch.Initialize(harmony);
     ShowAccurateHearts.Initialize(harmony);
     ShowItemQualityPatch.Initialize(
       harmony,
       helper.ModRegistry.IsLoaded(ModCompat.ShowItemQuality)
     );
     Monitor.Log(
-      "ModEntry: Harmony patches applied - TvChannelWatcher, ShowFishOnCatch, HudMessagePatch, MailboxCountPatch, ShowAccurateHearts, ShowItemQualityPatch",
+      "ModEntry: Harmony patches applied - TvChannelWatcher, ShowFishOnCatch, HudMessagePatch, ShowAccurateHearts, ShowItemQualityPatch",
       LogLevel.Trace
     );
 

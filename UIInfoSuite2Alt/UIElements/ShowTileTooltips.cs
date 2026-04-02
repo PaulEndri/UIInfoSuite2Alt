@@ -82,6 +82,7 @@ internal class ShowTileTooltips : IDisposable
   private bool ShowBarrelTooltip => ModEntry.ModConfig.ShowBarrelTooltip;
   private bool ShowFishPondTooltip => ModEntry.ModConfig.ShowFishPondTooltip;
   private bool ShowForageableTooltip => ModEntry.ModConfig.ShowForageableTooltip;
+  private bool ShowHarvestQuality => ModEntry.ModConfig.ShowHarvestQuality;
 
   public ShowTileTooltips(IModHelper helper, ShowItemEffectRanges itemEffectRanges)
   {
@@ -183,6 +184,7 @@ internal class ShowTileTooltips : IDisposable
 
     int overrideX = -1;
     int overrideY = -1;
+    int predictedQuality = -1;
 
     if (
       ShowBarrelTooltip
@@ -259,6 +261,14 @@ internal class ShowTileTooltips : IDisposable
       tile = Utility.ModifyCoordinatesForUIScale(
         Game1.GlobalToLocal(currentTile.TileLocation * Game1.tileSize)
       );
+      if (ShowHarvestQuality)
+      {
+        predictedQuality = QualityPrediction.PredictForageableQuality(
+          currentTile.TileLocation.X,
+          currentTile.TileLocation.Y,
+          Game1.player
+        );
+      }
     }
 
     if (ShowCropTooltip && !InformantHelper.IsFeatureEnabled("crop") && terrain is not null)
@@ -272,6 +282,14 @@ internal class ShowTileTooltips : IDisposable
           tile = Utility.ModifyCoordinatesForUIScale(
             Game1.GlobalToLocal(terrain.Tile * Game1.tileSize)
           );
+          if (ShowHarvestQuality && terrain is HoeDirt cropSoil)
+          {
+            predictedQuality = QualityPrediction.PredictCropOnTile(
+              cropSoil,
+              (int)terrain.Tile.X,
+              (int)terrain.Tile.Y
+            );
+          }
         }
       }
     }
@@ -336,7 +354,8 @@ internal class ShowTileTooltips : IDisposable
       overrideX,
       overrideY,
       spriteTexture,
-      spriteSourceRect
+      spriteSourceRect,
+      predictedQuality
     );
   }
 
@@ -468,7 +487,8 @@ internal class ShowTileTooltips : IDisposable
     int overrideX = -1,
     int overrideY = -1,
     Texture2D? spriteTexture = null,
-    Rectangle? spriteSourceRect = null
+    Rectangle? spriteSourceRect = null,
+    int quality = -1
   )
   {
     const int spriteSize = 32;
@@ -597,6 +617,36 @@ internal class ShowTileTooltips : IDisposable
           SpriteEffects.None,
           0.9f
         );
+
+        // Draw quality star at bottom-left of sprite, slightly overlapping
+        if (quality > 0)
+        {
+          Rectangle qualityRect =
+            quality < 4
+              ? new Rectangle(338 + (quality - 1) * 8, 400, 8, 8)
+              : new Rectangle(346, 392, 8, 8);
+          float qualityScale = 2f;
+          float iridiumPulse =
+            quality >= 4
+              ? (
+                (float)Math.Cos(Game1.currentGameTime.TotalGameTime.Milliseconds * Math.PI / 512.0)
+                + 1f
+              ) * 0.05f
+              : 0f;
+          Vector2 qualityPos = new(spritePos.X + 6f, spritePos.Y + sourceRect.Height * scale - 8f);
+          b.Draw(
+            Game1.mouseCursors,
+            qualityPos,
+            qualityRect,
+            Color.White,
+            0f,
+            new Vector2(4f, 4f),
+            qualityScale * (1f + iridiumPulse),
+            SpriteEffects.None,
+            0.91f
+          );
+        }
+
         isFirst = false;
       }
 

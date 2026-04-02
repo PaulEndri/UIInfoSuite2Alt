@@ -75,6 +75,7 @@ public class ModConfig
   public bool ShowBarrelTooltip { get; set; } = true;
   public bool ShowFishPondTooltip { get; set; } = true;
   public bool ShowForageableTooltip { get; set; } = true;
+  public bool ShowHarvestQuality { get; set; } = true;
   public int MachineProcessingIconsMode { get; set; } = 1;
   public bool MachineProcessingIconsVisible { get; set; } = true;
   public KeybindList ToggleMachineProcessingIcons { get; set; } =

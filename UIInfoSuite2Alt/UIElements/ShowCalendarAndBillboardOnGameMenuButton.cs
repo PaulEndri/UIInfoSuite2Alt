@@ -522,6 +522,7 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
     if (_instance != null)
     {
       _instance._helper.Events.Display.MenuChanged -= OnMenuClosedWhileWatching;
+      _instance._helper.Events.GameLoop.UpdateTicked -= ReopenGameMenuDeferred;
     }
   }
 
@@ -551,21 +552,55 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
 
     StopWatchingMenuClose();
 
-    // exitFunction fires after exitActiveMenu sets activeClickableMenu = null,
-    // but before the game's input loop can open its own GameMenu.
+    // Defer by two ticks: tick 1 lets the watcher observe null, tick 2 reopens.
     if (Game1.activeClickableMenu == null && !Game1.eventUp && !Game1.dialogueUp)
     {
-      ModEntry.MonitorObject.Log("ShowCalendarAndBillboard: reopening GameMenu", LogLevel.Trace);
-      Game1.activeClickableMenu = new GameMenu(GameMenu.inventoryTab, playOpeningSound: false);
-
-      // Suppress menu buttons (E/ESC) so the game's input loop doesn't
-      // immediately close our newly opened GameMenu in the same frame.
+      // Suppress menu buttons so the game doesn't open its own GameMenu
+      // during the brief null-menu window.
       SuppressMenuButtons();
+
+      _reopenTicksRemaining = 1;
+      if (_instance != null)
+      {
+        _instance._helper.Events.GameLoop.UpdateTicked += ReopenGameMenuDeferred;
+      }
     }
     else
     {
       ModEntry.MonitorObject.Log(
         $"ShowCalendarAndBillboard: return-to-inventory skipped, active={Game1.activeClickableMenu?.GetType().Name}",
+        LogLevel.Trace
+      );
+    }
+  }
+
+  private static int _reopenTicksRemaining;
+
+  private static void ReopenGameMenuDeferred(object? sender, UpdateTickedEventArgs e)
+  {
+    if (_reopenTicksRemaining > 0)
+    {
+      _reopenTicksRemaining--;
+      // Suppress each tick to keep buttons quiet during the wait.
+      SuppressMenuButtons();
+      return;
+    }
+
+    if (_instance != null)
+    {
+      _instance._helper.Events.GameLoop.UpdateTicked -= ReopenGameMenuDeferred;
+    }
+
+    if (Game1.activeClickableMenu == null && !Game1.eventUp && !Game1.dialogueUp)
+    {
+      ModEntry.MonitorObject.Log("ShowCalendarAndBillboard: reopening GameMenu", LogLevel.Trace);
+      Game1.activeClickableMenu = new GameMenu(GameMenu.inventoryTab, playOpeningSound: false);
+      SuppressMenuButtons();
+    }
+    else
+    {
+      ModEntry.MonitorObject.Log(
+        $"ShowCalendarAndBillboard: return-to-inventory deferred but skipped, active={Game1.activeClickableMenu?.GetType().Name}",
         LogLevel.Trace
       );
     }

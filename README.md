@@ -58,9 +58,16 @@
 
 - **v2.8.12**
   - Show item quality star on pickup HUD notifications
-    - Automatically defers to [Show Item Quality](https://www.nexusmods.com/stardewvalley/mods/22275) mod if it is installed
-  - Fix HUD icons overlapping with [Daily Tasks Report Plus](https://www.nexusmods.com/stardewvalley/mods/20871)
+    - Will use [Show Item Quality](https://www.nexusmods.com/stardewvalley/mods/22275) mod if it is installed instead
+  - Show predicted harvest quality on crop and forageable world tooltips (toggleable)
+  - Fix mailbox count not showing up on Ginger Island mailbox
+  - Fix "Not watered" tooltip for forage crops (Spring Onion, Ginger)
+  - Fix HUD icons overlapping with [Daily Tasks Report Plus](https://www.nexusmods.com/stardewvalley/mods/20871) notification area
   - Fix range display for modded bee house variants (e.g. [Machine Progression System](https://www.nexusmods.com/stardewvalley/mods/21720))
+  - Add sub-options for inventory item information (sell price tooltip, bundle banner, donation status, shipping status)
+  - Add optional shipping bin icon for the collection/shipping indicator (off by default)
+  - Add "Show world tooltips" master toggle with sub-options (crop, tree, machine, fish pond, forageable)
+  - Add ground forageable tooltip (leeks, daffodils, etc.)
 - **v2.8.11**
   - Add [Sword & Sorcery](https://www.nexusmods.com/stardewvalley/mods/12369) Special Orders board (Coastal Guild) to board selector
   - Fix heart fills on social page rendering above the mouse cursor and now uses actual heart sprite for Content Patcher compatibility

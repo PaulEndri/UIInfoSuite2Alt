@@ -1083,10 +1083,12 @@ internal class ModOptionsPageHandler : IDisposable
     }
 
     // Register our tab with BGM
+    Texture2D tabIcon = AssetHelper.TryLoadTexture(_helper, "assets/tab_icon.png");
     IBetterGameMenuApi.DrawDelegate iconDraw = bgmApi.CreateDraw(
-      Game1.mouseCursors,
-      new Rectangle(32, 672, 16, 16),
-      scale: 2f
+      tabIcon,
+      new Rectangle(0, 0, 16, 16),
+      scale: 3f,
+      offset: new Vector2(0, 6)
     );
 
     bgmApi.RegisterTab(
@@ -1366,7 +1368,7 @@ internal class ModOptionsPageHandler : IDisposable
 
       if (ShowPersonalConfigButton && _modOptionsPageButton.Value == null)
       {
-        _modOptionsPageButton.Value = new ModOptionsPageButton();
+        _modOptionsPageButton.Value = new ModOptionsPageButton(_helper);
         _modOptionsPageButton.Value.xPositionOnScreen = GetButtonXPosition(newGameMenu);
       }
 

@@ -306,7 +306,7 @@ internal class ModOptionsPageHandler : IDisposable
     BeginSection(
       "hud-icons",
       () => I18n.Section_HudIcons(),
-      () => _helper.ModContent.Load<Texture2D>("assets/banner_hud.png")
+      () => AssetHelper.TryLoadTexture(_helper, "assets/banner_hud.png")
     );
 
     _currentTarget.Add(
@@ -626,7 +626,7 @@ internal class ModOptionsPageHandler : IDisposable
     BeginSection(
       "farm-field",
       () => I18n.Section_FarmAndField(),
-      () => _helper.ModContent.Load<Texture2D>("assets/banner_ffield.png")
+      () => AssetHelper.TryLoadTexture(_helper, "assets/banner_ffield.png")
     );
 
     var animalPetIcon = new ModOptionsCheckbox(
@@ -807,7 +807,7 @@ internal class ModOptionsPageHandler : IDisposable
     BeginSection(
       "experience-skills",
       () => I18n.Section_ExperienceAndSkills(),
-      () => _helper.ModContent.Load<Texture2D>("assets/banner_exp.png")
+      () => AssetHelper.TryLoadTexture(_helper, "assets/banner_exp.png")
     );
 
     _currentTarget.Add(
@@ -869,7 +869,7 @@ internal class ModOptionsPageHandler : IDisposable
     BeginSection(
       "items-shopping",
       () => I18n.Section_ItemsAndShopping(),
-      () => _helper.ModContent.Load<Texture2D>("assets/banner_items.png")
+      () => AssetHelper.TryLoadTexture(_helper, "assets/banner_items.png")
     );
 
     if (!ShowItemQualityPatch.ExternalModLoaded)
@@ -968,7 +968,7 @@ internal class ModOptionsPageHandler : IDisposable
     BeginSection(
       "npc-social",
       () => I18n.Section_NpcAndSocial(),
-      () => _helper.ModContent.Load<Texture2D>("assets/banner_npc.png")
+      () => AssetHelper.TryLoadTexture(_helper, "assets/banner_npc.png")
     );
 
     _currentTarget.Add(

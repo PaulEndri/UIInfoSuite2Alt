@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using Microsoft.Xna.Framework.Audio;
 using StardewModdingAPI;
@@ -16,6 +17,7 @@ public class SoundHelper
 {
   private static readonly Lazy<SoundHelper> LazyInstance = new(() => new SoundHelper());
   private bool _initialized;
+  private readonly HashSet<Sounds> _registeredSounds = [];
 
   private string _modId = "InfoSuite";
 
@@ -43,7 +45,7 @@ public class SoundHelper
     return $"{_modId}.sounds.{sound.ToString()}";
   }
 
-  private static void RegisterSound(
+  private void RegisterSound(
     IModHelper helper,
     Sounds sound,
     string fileName,
@@ -52,7 +54,15 @@ public class SoundHelper
     CueDefinition.LimitBehavior? limitBehavior = null
   )
   {
-    CueDefinition newCueDefinition = new() { name = Instance.GetQualifiedSoundName(sound) };
+    string filePath = Path.Combine(helper.DirectoryPath, "assets", fileName);
+    SoundEffect? audio = AssetHelper.TryLoadSound(filePath);
+
+    if (audio is null)
+    {
+      return;
+    }
+
+    CueDefinition newCueDefinition = new() { name = GetQualifiedSoundName(sound) };
 
     if (instanceLimit > 0)
     {
@@ -64,16 +74,9 @@ public class SoundHelper
       newCueDefinition.limitBehavior = limitBehavior.Value;
     }
 
-    SoundEffect audio;
-    string filePath = Path.Combine(helper.DirectoryPath, "assets", fileName);
-    bool isOgg = Path.GetExtension(filePath).Equals(".ogg", StringComparison.OrdinalIgnoreCase);
-    using (var stream = new FileStream(filePath, FileMode.Open))
-    {
-      audio = SoundEffect.FromStream(stream, isOgg);
-    }
-
     newCueDefinition.SetSound(audio, Game1.audioEngine.GetCategoryIndex(category));
     Game1.soundBank.AddCue(newCueDefinition);
+    _registeredSounds.Add(sound);
     ModEntry.MonitorObject.Log(
       $"SoundHelper: registered sound, name={newCueDefinition.name}",
       LogLevel.Trace
@@ -82,6 +85,15 @@ public class SoundHelper
 
   public static void Play(Sounds sound)
   {
+    if (!Instance._registeredSounds.Contains(sound))
+    {
+      ModEntry.MonitorObject.LogOnce(
+        $"SoundHelper: skipping playback of '{sound}' (asset not loaded)",
+        LogLevel.Trace
+      );
+      return;
+    }
+
     Game1.playSound(Instance.GetQualifiedSoundName(sound));
   }
 }

@@ -50,7 +50,11 @@ internal class ShowRainyDayIcon : IDisposable
   {
     ToggleOption(false);
     _iconSheet.Dispose();
-    _weatherBorderTexture.Dispose();
+
+    if (!AssetHelper.IsFallback(_weatherBorderTexture))
+    {
+      _weatherBorderTexture.Dispose();
+    }
   }
 
   public void ToggleRequireTvOption(bool requireTv)
@@ -170,8 +174,7 @@ internal class ShowRainyDayIcon : IDisposable
       WeatherSheetHeight
     );
     _weatherIconColors = new Color[WeatherSheetWidth * WeatherSheetHeight];
-    _weatherBorderTexture = Texture2D.FromFile(
-      Game1.graphics.GraphicsDevice,
+    _weatherBorderTexture = AssetHelper.TryLoadTextureFromFile(
       Path.Combine(_helper.DirectoryPath, "assets", "weatherbox.png")
     );
     Texture2D weatherBorderTexture = _weatherBorderTexture;

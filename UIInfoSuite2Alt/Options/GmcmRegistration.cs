@@ -146,52 +146,36 @@ public partial class ModEntry
       for (int i = 0; i < count; i++)
         configMenu.AddParagraph(ModManifest, text: () => "");
     }
+
+    // Cache banner textures (fallback to 1px transparent if missing)
+    Texture2D bannerHud = AssetHelper.TryLoadTexture(Helper, "assets/banner_hud.png");
+    Texture2D bannerFfield = AssetHelper.TryLoadTexture(Helper, "assets/banner_ffield.png");
+    Texture2D bannerExp = AssetHelper.TryLoadTexture(Helper, "assets/banner_exp.png");
+    Texture2D bannerItems = AssetHelper.TryLoadTexture(Helper, "assets/banner_items.png");
+    Texture2D bannerNpc = AssetHelper.TryLoadTexture(Helper, "assets/banner_npc.png");
+
     Spacer(3);
     // --- Main page: page links with banners ---
     configMenu.AddPageLink(ModManifest, "hud-icons", () => I18n.Section_HudIcons());
-    configMenu.AddImage(
-      ModManifest,
-      () => Helper.ModContent.Load<Texture2D>("assets/banner_hud.png"),
-      scale: 1
-    );
+    configMenu.AddImage(ModManifest, () => bannerHud, scale: 1);
     configMenu.AddPageLink(ModManifest, "farm-field", () => I18n.Section_FarmAndField());
-    configMenu.AddImage(
-      ModManifest,
-      () => Helper.ModContent.Load<Texture2D>("assets/banner_ffield.png"),
-      scale: 1
-    );
+    configMenu.AddImage(ModManifest, () => bannerFfield, scale: 1);
     configMenu.AddPageLink(
       ModManifest,
       "experience-skills",
       () => I18n.Section_ExperienceAndSkills()
     );
-    configMenu.AddImage(
-      ModManifest,
-      () => Helper.ModContent.Load<Texture2D>("assets/banner_exp.png"),
-      scale: 1
-    );
+    configMenu.AddImage(ModManifest, () => bannerExp, scale: 1);
     configMenu.AddPageLink(ModManifest, "items-shopping", () => I18n.Section_ItemsAndShopping());
-    configMenu.AddImage(
-      ModManifest,
-      () => Helper.ModContent.Load<Texture2D>("assets/banner_items.png"),
-      scale: 1
-    );
+    configMenu.AddImage(ModManifest, () => bannerItems, scale: 1);
     configMenu.AddPageLink(ModManifest, "npc-social", () => I18n.Section_NpcAndSocial());
-    configMenu.AddImage(
-      ModManifest,
-      () => Helper.ModContent.Load<Texture2D>("assets/banner_npc.png"),
-      scale: 1
-    );
+    configMenu.AddImage(ModManifest, () => bannerNpc, scale: 1);
     // =====================
     // HUD Icons page
     // =====================
     configMenu.AddPage(ModManifest, "hud-icons", () => I18n.Section_HudIcons());
     configMenu.AddSectionTitle(ModManifest, text: () => I18n.Section_HudIcons());
-    configMenu.AddImage(
-      ModManifest,
-      () => Helper.ModContent.Load<Texture2D>("assets/banner_hud.png"),
-      scale: 1
-    );
+    configMenu.AddImage(ModManifest, () => bannerHud, scale: 1);
 
     AddBool(
       nameof(ModConfig.UseVerticalIconLayout),
@@ -385,11 +369,7 @@ public partial class ModEntry
     // =====================
     configMenu.AddPage(ModManifest, "farm-field", () => I18n.Section_FarmAndField());
     configMenu.AddSectionTitle(ModManifest, text: () => I18n.Section_FarmAndField());
-    configMenu.AddImage(
-      ModManifest,
-      () => Helper.ModContent.Load<Texture2D>("assets/banner_ffield.png"),
-      scale: 1
-    );
+    configMenu.AddImage(ModManifest, () => bannerFfield, scale: 1);
 
     AddBool(
       nameof(ModConfig.ShowAnimalsNeedPets),
@@ -519,11 +499,7 @@ public partial class ModEntry
     // =====================
     configMenu.AddPage(ModManifest, "experience-skills", () => I18n.Section_ExperienceAndSkills());
     configMenu.AddSectionTitle(ModManifest, text: () => I18n.Section_ExperienceAndSkills());
-    configMenu.AddImage(
-      ModManifest,
-      () => Helper.ModContent.Load<Texture2D>("assets/banner_exp.png"),
-      scale: 1
-    );
+    configMenu.AddImage(ModManifest, () => bannerExp, scale: 1);
 
     AddBool(
       nameof(ModConfig.ShowLevelUpAnimation),
@@ -561,11 +537,7 @@ public partial class ModEntry
     // =====================
     configMenu.AddPage(ModManifest, "items-shopping", () => I18n.Section_ItemsAndShopping());
     configMenu.AddSectionTitle(ModManifest, text: () => I18n.Section_ItemsAndShopping());
-    configMenu.AddImage(
-      ModManifest,
-      () => Helper.ModContent.Load<Texture2D>("assets/banner_items.png"),
-      scale: 1
-    );
+    configMenu.AddImage(ModManifest, () => bannerItems, scale: 1);
 
     if (!ShowItemQualityPatch.ExternalModLoaded)
     {
@@ -639,11 +611,7 @@ public partial class ModEntry
     // =====================
     configMenu.AddPage(ModManifest, "npc-social", () => I18n.Section_NpcAndSocial());
     configMenu.AddSectionTitle(ModManifest, text: () => I18n.Section_NpcAndSocial());
-    configMenu.AddImage(
-      ModManifest,
-      () => Helper.ModContent.Load<Texture2D>("assets/banner_npc.png"),
-      scale: 1
-    );
+    configMenu.AddImage(ModManifest, () => bannerNpc, scale: 1);
 
     AddBool(
       nameof(ModConfig.ShowMailboxCount),

@@ -70,7 +70,7 @@ internal class ShowItemHoverInformation : IDisposable
       Game1.pixelZoom
     );
 
-    _shippingBinTexture = helper.ModContent.Load<Texture2D>("assets/bin_custom.png");
+    _shippingBinTexture = AssetHelper.TryLoadTexture(helper, "assets/bin_custom.png");
 
     AquariumHelper.Initialize(helper);
   }

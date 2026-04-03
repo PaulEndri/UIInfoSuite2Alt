@@ -90,7 +90,7 @@ internal class ShowTileTooltips : IDisposable
     _itemEffectRanges = itemEffectRanges;
 
     _wildTreeTexture = new Lazy<Texture2D>(() =>
-      _helper.ModContent.Load<Texture2D>("assets/wild_tree_tooltip.png")
+      AssetHelper.TryLoadTexture(_helper, "assets/wild_tree_tooltip.png")
     );
   }
 

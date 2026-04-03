@@ -74,7 +74,7 @@ public class ShowTravelingMerchant : IDisposable
 
     if (showTravelingMerchant)
     {
-      _merchantTexture = _helper.ModContent.Load<Texture2D>("assets/merchant.png");
+      _merchantTexture = AssetHelper.TryLoadTexture(_helper, "assets/merchant.png");
       _rsvIconTexture?.Dispose();
       _rsvIconTexture = null;
       _rsvIsLoaded = _helper.ModRegistry.IsLoaded(RsvModId);

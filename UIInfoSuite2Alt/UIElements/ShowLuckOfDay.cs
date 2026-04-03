@@ -54,12 +54,10 @@ internal class ShowLuckOfDay : IDisposable
   public ShowLuckOfDay(IModHelper helper)
   {
     _helper = helper;
-    _cloverTexture = Texture2D.FromFile(
-      Game1.graphics.GraphicsDevice,
+    _cloverTexture = AssetHelper.TryLoadTextureFromFile(
       Path.Combine(helper.DirectoryPath, "assets", "clover_group.png")
     );
-    _tvLuckTexture = Texture2D.FromFile(
-      Game1.graphics.GraphicsDevice,
+    _tvLuckTexture = AssetHelper.TryLoadTextureFromFile(
       Path.Combine(helper.DirectoryPath, "assets", "tv_group.png")
     );
     _icon = new PerScreen<ClickableTextureComponent>(() => CreateIcon());
@@ -68,8 +66,16 @@ internal class ShowLuckOfDay : IDisposable
   public void Dispose()
   {
     ToggleOption(false);
-    _cloverTexture.Dispose();
-    _tvLuckTexture.Dispose();
+
+    if (!AssetHelper.IsFallback(_cloverTexture))
+    {
+      _cloverTexture.Dispose();
+    }
+
+    if (!AssetHelper.IsFallback(_tvLuckTexture))
+    {
+      _tvLuckTexture.Dispose();
+    }
   }
 
   public void ToggleOption(bool showLuckOfDay)

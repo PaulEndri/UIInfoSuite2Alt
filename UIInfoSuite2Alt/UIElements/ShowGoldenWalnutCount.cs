@@ -19,13 +19,10 @@ internal class ShowGoldenWalnutCount : IDisposable
   private const int IconSize = 16; // walnut sprite is 16x16
   private const int TotalWalnuts = 130;
   private const int QiDoorThreshold = 100;
-  private const int PaddingX = 8;
-  private const int PaddingY = 3;
-  private const int PanelGap = 8;
 
-  /// <summary>9-slice source on Cursors (10x10 box with 2px corners).</summary>
-  private static readonly Rectangle PanelSource = new(267, 256, 10, 10);
-  private const int PanelCornerSize = 2;
+  /// <summary>Scaled corner size (6px source * 2x scale). Content is inset by this amount.</summary>
+  private const int CornerScaled = 12;
+  private const int PanelGap = 8;
 
   /// <summary>Golden Walnut sprite on objectSpriteSheet (item 73).</summary>
   private static readonly Rectangle WalnutSourceRect = new(16, 48, 16, 16);
@@ -347,8 +344,8 @@ internal class ShowGoldenWalnutCount : IDisposable
     int gap = 4;
     int contentWidth = scaledIconSize + gap + (int)textSize.X;
     int contentHeight = Math.Max(scaledIconSize, (int)textSize.Y);
-    int panelWidth = contentWidth + PaddingX * 2;
-    int panelHeight = contentHeight + PaddingY * 2 + 2;
+    int panelWidth = contentWidth + CornerScaled * 2;
+    int panelHeight = contentHeight + CornerScaled * 2;
 
     // Top-left corner with margin
     float panelX = 8f;
@@ -356,20 +353,11 @@ internal class ShowGoldenWalnutCount : IDisposable
 
     // Draw 9-slice background
     var dest = new Rectangle((int)panelX, (int)panelY, panelWidth, panelHeight);
-    NineSlice.Draw(
-      batch,
-      Game1.mouseCursors,
-      PanelSource,
-      dest,
-      PanelCornerSize,
-      PanelScale,
-      0.89f,
-      Color.White * 0.9f * alpha
-    );
+    NineSlice.Draw(batch, dest, PanelScale, 0.89f, Color.White * 0.9f * alpha);
 
     // Draw walnut icon (vertically centered in panel)
-    float iconX = panelX + PaddingX;
-    float iconY = panelY + PaddingY + (contentHeight - scaledIconSize) / 2f;
+    float iconX = panelX + CornerScaled;
+    float iconY = panelY + CornerScaled + (contentHeight - scaledIconSize) / 2f;
     batch.Draw(
       Game1.objectSpriteSheet,
       new Vector2(iconX, iconY),
@@ -384,7 +372,7 @@ internal class ShowGoldenWalnutCount : IDisposable
 
     // Draw text with smallFont (vertically centered + 3px down), with 1px shadow
     float textX = iconX + scaledIconSize + gap;
-    float textY = panelY + PaddingY + (contentHeight - textSize.Y) / 2f + 3f;
+    float textY = panelY + CornerScaled + (contentHeight - textSize.Y) / 2f + 3f;
     DrawTextWithShadow(batch, text, new Vector2(textX, textY), Game1.textColor * alpha, 40);
 
     return dest;
@@ -456,30 +444,21 @@ internal class ShowGoldenWalnutCount : IDisposable
       + (areaLines.Count * lineHeight)
       + ((areaLines.Count) * lineSpacing);
 
-    int panelWidth = (int)maxLineWidth + PaddingX * 2 + 20;
-    int panelHeight = (int)totalLineHeight + PaddingY * 2 + 2;
+    int panelWidth = (int)maxLineWidth + CornerScaled * 2;
+    int panelHeight = (int)Math.Ceiling(totalLineHeight) + CornerScaled * 2;
 
     float panelX = counterRect.X;
     float panelY = counterRect.Bottom + PanelGap;
 
     // Draw 9-slice background
     var dest = new Rectangle((int)panelX, (int)panelY, panelWidth, panelHeight);
-    NineSlice.Draw(
-      batch,
-      Game1.mouseCursors,
-      PanelSource,
-      dest,
-      PanelCornerSize,
-      PanelScale,
-      0.89f,
-      Color.White * 0.9f
-    );
+    NineSlice.Draw(batch, dest, PanelScale, 0.89f, Color.White * 0.9f);
 
-    float rightEdge = panelX + panelWidth - PaddingX;
+    float rightEdge = panelX + panelWidth - CornerScaled;
 
     // Draw Qi line: [gem] Qi's Walnut Room    (color)X(/black)/100
-    float lineY = panelY + PaddingY + 3f;
-    float segX = panelX + PaddingX;
+    float lineY = panelY + CornerScaled + 3f;
+    float segX = panelX + CornerScaled;
     float gemY = lineY + (lineHeight - QiGemSourceRect.Height * QiGemScale) / 2f - 2f;
     batch.Draw(
       Game1.objectSpriteSheet,
@@ -536,7 +515,7 @@ internal class ShowGoldenWalnutCount : IDisposable
     )
     {
       Color nameColor = complete ? Tools.TooltipWalnutGreen : Game1.textColor;
-      DrawTextWithShadow(batch, name, new Vector2(panelX + PaddingX, lineY), nameColor, 40);
+      DrawTextWithShadow(batch, name, new Vector2(panelX + CornerScaled, lineY), nameColor, 40);
 
       if (complete)
       {

@@ -524,7 +524,7 @@ internal class ShowTileTooltips : IDisposable
     }
 
     int width = (int)maxWidth + 32;
-    int height = Math.Max(60, lines.Count * font.LineSpacing + 32);
+    int height = Math.Max(66, lines.Count * font.LineSpacing + 32);
 
     int x = Game1.getOldMouseX() + 32;
     int y = Game1.getOldMouseY() + 32;

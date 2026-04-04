@@ -413,6 +413,11 @@ public partial class ModEntry
       v => ModConfig.ShowForageableTooltip = v
     );
     AddSubBool(
+      nameof(ModConfig.ShowArtifactSpotTooltip),
+      () => ModConfig.ShowArtifactSpotTooltip,
+      v => ModConfig.ShowArtifactSpotTooltip = v
+    );
+    AddSubBool(
       nameof(ModConfig.ShowHarvestQuality),
       () => ModConfig.ShowHarvestQuality,
       v => ModConfig.ShowHarvestQuality = v

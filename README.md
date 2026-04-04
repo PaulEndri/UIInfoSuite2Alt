@@ -57,6 +57,7 @@
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
 - **v2.8.13**
+  - Add artifact spot tooltip showing predicted drops (supports [Farm Type Manager](https://www.nexusmods.com/stardewvalley/mods/3231) buried items)
   - Fix calendar return-to-inventory blocking other mods from detecting calendar close (e.g. [Harvest Calendar](https://www.nexusmods.com/stardewvalley/mods/25103))
 - **v2.8.12**
   - Show item quality star on pickup HUD notifications

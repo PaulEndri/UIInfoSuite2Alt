@@ -19,6 +19,7 @@ public static class NineSlice
     Bottom: new(299, 378, 1, 6),
     BottomRight: new(311, 378, 6, 6)
   );
+
   /// <summary>
   /// Draw a 9-slice panel from individual non-contiguous source rectangles.
   /// Corners are fixed, edges stretch to fill, center fills the remaining area.

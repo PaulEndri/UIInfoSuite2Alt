@@ -591,10 +591,7 @@ internal class ShowTileTooltips : IDisposable
         {
           Color segColor = segment.Color ?? defaultColor;
           Vector2 pos = new(segX, lineY);
-          b.DrawString(font, segment.Text, pos + new Vector2(2f, 2f), shadowColor);
-          b.DrawString(font, segment.Text, pos + new Vector2(0f, 2f), shadowColor);
-          b.DrawString(font, segment.Text, pos + new Vector2(2f, 0f), shadowColor);
-          b.DrawString(font, segment.Text, pos, segColor * 0.9f);
+          Tools.DrawShadowedText(b, font, segment.Text, pos, segColor, shadowColor);
           segX += font.MeasureString(segment.Text).X;
         }
       }

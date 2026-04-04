@@ -287,11 +287,18 @@ internal class ShowArtifactSpotTooltip : IDisposable
 
         // Draw item name with shadow
         Vector2 pos = new(textX, textY);
-        DrawTextWithShadow(b, font, itemName, pos, textColor, shadowColor);
+        Tools.DrawShadowedText(b, font, itemName, pos, textColor, shadowColor);
 
         // Draw separator
         float cursorX = textX + font.MeasureString(itemName).X;
-        DrawTextWithShadow(b, font, separator, new Vector2(cursorX, textY), textColor, shadowColor);
+        Tools.DrawShadowedText(
+          b,
+          font,
+          separator,
+          new Vector2(cursorX, textY),
+          textColor,
+          shadowColor
+        );
         cursorX += font.MeasureString(separator).X;
 
         // Draw note icon inline
@@ -317,9 +324,16 @@ internal class ShowArtifactSpotTooltip : IDisposable
         }
 
         // Draw note name in normal color, percentage in yellow
-        DrawTextWithShadow(b, font, noteName, new Vector2(cursorX, textY), textColor, shadowColor);
+        Tools.DrawShadowedText(
+          b,
+          font,
+          noteName,
+          new Vector2(cursorX, textY),
+          textColor,
+          shadowColor
+        );
         cursorX += font.MeasureString(noteName).X;
-        DrawTextWithShadow(
+        Tools.DrawShadowedText(
           b,
           font,
           noteChance,
@@ -335,26 +349,11 @@ internal class ShowArtifactSpotTooltip : IDisposable
             ? $"{drop.Item.DisplayName} x{drop.Item.Stack}"
             : drop.Item.DisplayName;
         Vector2 pos = new(textX, textY);
-        DrawTextWithShadow(b, font, text, pos, textColor, shadowColor);
+        Tools.DrawShadowedText(b, font, text, pos, textColor, shadowColor);
       }
 
       lineY += lineHeight;
     }
-  }
-
-  private static void DrawTextWithShadow(
-    SpriteBatch b,
-    SpriteFont font,
-    string text,
-    Vector2 pos,
-    Color textColor,
-    Color shadowColor
-  )
-  {
-    b.DrawString(font, text, pos + new Vector2(2f, 2f), shadowColor);
-    b.DrawString(font, text, pos + new Vector2(0f, 2f), shadowColor);
-    b.DrawString(font, text, pos + new Vector2(2f, 0f), shadowColor);
-    b.DrawString(font, text, pos, textColor * 0.9f);
   }
 
   private static float MeasureDropLine(PredictedDrop drop, SpriteFont font, int iconSize)

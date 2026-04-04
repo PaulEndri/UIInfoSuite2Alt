@@ -378,6 +378,24 @@ public static class Tools
     return mapAreaPosition ?? WorldMapManager.GetPositionData(Game1.getFarm(), Point.Zero)?.Data;
   }
 
+  #region Text Drawing
+  /// <summary>Draw text with a 3-direction shadow (diagonal, down, right) for readability on varied backgrounds.</summary>
+  public static void DrawShadowedText(
+    SpriteBatch batch,
+    SpriteFont font,
+    string text,
+    Vector2 position,
+    Color textColor,
+    Color shadowColor
+  )
+  {
+    batch.DrawString(font, text, position + new Vector2(2f, 2f), shadowColor);
+    batch.DrawString(font, text, position + new Vector2(0f, 2f), shadowColor);
+    batch.DrawString(font, text, position + new Vector2(2f, 0f), shadowColor);
+    batch.DrawString(font, text, position, textColor * 0.9f);
+  }
+  #endregion
+
   #region Tiny Digit Drawing
   private const float TinyDigitScale = 2f;
   private const int TinyDigitWidth = 5;

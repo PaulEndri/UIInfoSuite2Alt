@@ -421,10 +421,7 @@ internal class ShowItemEffectRanges : IDisposable
       }
 
       var pos = new Vector2(segX, lineY);
-      e.SpriteBatch.DrawString(font, text, pos + new Vector2(2f, 2f), shadowColor);
-      e.SpriteBatch.DrawString(font, text, pos + new Vector2(0f, 2f), shadowColor);
-      e.SpriteBatch.DrawString(font, text, pos + new Vector2(2f, 0f), shadowColor);
-      e.SpriteBatch.DrawString(font, text, pos, color * 0.9f);
+      Tools.DrawShadowedText(e.SpriteBatch, font, text, pos, color, shadowColor);
 
       // Draw sprite on the first line, vertically centered with the text
       if (isFirst && hasSprite)

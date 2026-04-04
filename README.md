@@ -59,6 +59,7 @@
 - **v2.8.13**
   - Add artifact spot tooltip showing predicted drops (supports [Farm Type Manager](https://www.nexusmods.com/stardewvalley/mods/3231) buried items)
   - Fix calendar return-to-inventory blocking other mods from detecting calendar close (e.g. [Harvest Calendar](https://www.nexusmods.com/stardewvalley/mods/25103))
+  - Fix cases where assets couldn't be found and failed to start mod/SMAPI. Logs as an error message now instead
 - **v2.8.12**
   - Show item quality star on pickup HUD notifications
     - Will use [Show Item Quality](https://www.nexusmods.com/stardewvalley/mods/22275) mod if it is installed instead

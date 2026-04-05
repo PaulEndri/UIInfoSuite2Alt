@@ -30,10 +30,37 @@ internal class ShowArtifactSpotTooltip : IDisposable
   private const string FtmBuriedItemsTypeName = "FarmTypeManager.ModEntry+BuriedItems";
   private readonly bool _hasFtm;
 
+  // Archaeology Skill mod: Antiquarian profession guarantees a bonus artifact on every dig.
+  // We show the profession icon in the tooltip corner when the player has it.
+  private const string ArchaeologySkillIconAsset =
+    "Mods/moonslime.ArchaeologySkill/interface/ArchaeologyiconBalt";
+  private readonly int? _antiquarianProfessionId;
+
   public ShowArtifactSpotTooltip(IModHelper helper)
   {
     _helper = helper;
     _hasFtm = helper.ModRegistry.IsLoaded(ModCompat.FarmTypeManager);
+
+    if (
+      helper.ModRegistry.IsLoaded(ModCompat.ArchaeologySkill)
+      && ApiManager.GetApi<ISpaceCoreApi>(ModCompat.SpaceCore, out ISpaceCoreApi? spaceCoreApi)
+    )
+    {
+      try
+      {
+        _antiquarianProfessionId = spaceCoreApi.GetProfessionId(
+          "moonslime.Archaeology",
+          "Archaeology10a1"
+        );
+      }
+      catch (Exception ex)
+      {
+        ModEntry.MonitorObject.Log(
+          $"ShowArtifactSpotTooltip: failed to resolve Antiquarian profession, {ex.Message}",
+          LogLevel.Warn
+        );
+      }
+    }
   }
 
   public void Dispose()
@@ -171,13 +198,19 @@ internal class ShowArtifactSpotTooltip : IDisposable
       return;
     }
 
-    DrawDropListTooltip(Game1.spriteBatch, drops, spot.TileLocation);
+    bool showAntiquarian =
+      _antiquarianProfessionId.HasValue
+      && spot.QualifiedItemId == "(O)590"
+      && Game1.player.professions.Contains(_antiquarianProfessionId.Value);
+
+    DrawDropListTooltip(Game1.spriteBatch, drops, spot.TileLocation, showAntiquarian);
   }
 
-  private static void DrawDropListTooltip(
+  private void DrawDropListTooltip(
     SpriteBatch b,
     List<PredictedDrop> drops,
-    Vector2 spotTile
+    Vector2 spotTile,
+    bool showAntiquarian
   )
   {
     const int spriteSize = 32;
@@ -241,6 +274,47 @@ internal class ShowArtifactSpotTooltip : IDisposable
       height,
       Color.White
     );
+
+    // Antiquarian profession icon in top-right corner
+    if (showAntiquarian)
+    {
+      try
+      {
+        Texture2D antiquarianIcon = _helper.GameContent.Load<Texture2D>(ArchaeologySkillIconAsset);
+        const float iconScale = 3f;
+        float iconSize = Math.Max(antiquarianIcon.Width, antiquarianIcon.Height) * iconScale;
+        Vector2 iconPos = new(x + width - iconSize + 4, y - 8);
+
+        // Shadow: 1px left, 1px down
+        b.Draw(
+          antiquarianIcon,
+          iconPos + new Vector2(-1f, 1f) * iconScale,
+          null,
+          Color.Black * 0.35f,
+          0f,
+          Vector2.Zero,
+          iconScale,
+          SpriteEffects.None,
+          0.9f
+        );
+
+        b.Draw(
+          antiquarianIcon,
+          iconPos,
+          null,
+          Color.White,
+          0f,
+          Vector2.Zero,
+          iconScale,
+          SpriteEffects.None,
+          0.91f
+        );
+      }
+      catch
+      {
+        // Asset not available
+      }
+    }
 
     // Draw each drop
     Color textColor = Game1.textColor;

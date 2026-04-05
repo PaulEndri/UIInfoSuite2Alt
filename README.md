@@ -59,6 +59,7 @@
 - **v2.8.14**
   - Add hide trees keybind (Default: F7)
     - Toggles full-grown tree visibility with animated transitions
+  - Show [Archaeology Skill](https://www.nexusmods.com/stardewvalley/mods/22199) icon on artifact tooltip when player has Antiquarian profession
 - **v2.8.13**
   - Add artifact spot tooltip showing predicted drops (supports [Farm Type Manager](https://www.nexusmods.com/stardewvalley/mods/3231) buried items)
   - Fix calendar return-to-inventory blocking other mods from detecting calendar close (e.g. [Harvest Calendar](https://www.nexusmods.com/stardewvalley/mods/25103))

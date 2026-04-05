@@ -10,4 +10,5 @@ public interface ISpaceCoreApi
   int GetExperienceForCustomSkill(Farmer farmer, string skill);
   Texture2D GetSkillPageIconForCustomSkill(string skill);
   string GetDisplayNameOfCustomSkill(string skill);
+  int GetProfessionId(string skill, string profession);
 }

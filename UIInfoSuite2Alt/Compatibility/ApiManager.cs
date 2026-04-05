@@ -27,6 +27,7 @@ public static class ModCompat
   public const string DailyTasksReportPlus = "Prism99.DailyTasksReportPlus";
   public const string ShowItemQuality = "Jonqora.ShowItemQuality";
   public const string FarmTypeManager = "Esca.FarmTypeManager";
+  public const string ArchaeologySkill = "moonslime.ArchaeologySkill";
 
   // original UIInfoSuite variants
   public const string UIInfoSuite2 = "Annosz.UiInfoSuite2";

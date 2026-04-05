@@ -86,6 +86,13 @@ public partial class ModEntry
     );
     configMenu.AddKeybindList(
       ModManifest,
+      name: () => I18n.Keybinds_HideTreesKeybind_DisplayedName(),
+      tooltip: () => I18n.Keybinds_HideTreesKeybind_Tooltip(),
+      getValue: () => ModConfig.HideTreesKeybind,
+      setValue: value => ModConfig.HideTreesKeybind = value
+    );
+    configMenu.AddKeybindList(
+      ModManifest,
       name: () => I18n.Keybinds_OpenModOptionsKeybind_DisplayedName(),
       tooltip: () => I18n.Keybinds_OpenModOptionsKeybind_Tooltip(),
       getValue: () => ModConfig.OpenModOptionsKeybind,

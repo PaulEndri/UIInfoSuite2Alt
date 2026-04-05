@@ -4,6 +4,7 @@ using System.Linq;
 using HarmonyLib;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
+using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Menus;
 using UIInfoSuite2Alt.Compatibility;
@@ -23,6 +24,7 @@ public partial class ModEntry : Mod
 
   private static EventHandler<ButtonsChangedEventArgs>? _calendarAndQuestKeyBindingsHandler;
   private static EventHandler<ButtonsChangedEventArgs>? _monsterEradicationKeyBindingsHandler;
+  private static EventHandler<ButtonsChangedEventArgs>? _hideTreesKeyBindingsHandler;
 
   private static IModHelper _modHelper = null!;
   private ModOptionsPageHandler? _modOptionsPageHandler;
@@ -72,8 +74,9 @@ public partial class ModEntry : Mod
       harmony,
       helper.ModRegistry.IsLoaded(ModCompat.ShowItemQuality)
     );
+    HideTreesPatch.Initialize(harmony, helper);
     Monitor.Log(
-      "ModEntry: Harmony patches applied - TvChannelWatcher, ShowFishOnCatch, HudMessagePatch, ShowAccurateHearts, ShowItemQualityPatch",
+      "ModEntry: Harmony patches applied - TvChannelWatcher, ShowFishOnCatch, HudMessagePatch, ShowAccurateHearts, ShowItemQualityPatch, HideTreesPatch",
       LogLevel.Trace
     );
 
@@ -87,6 +90,7 @@ public partial class ModEntry : Mod
 
     RegisterCalendarAndQuestKeyBindings(helper, true);
     RegisterMonsterEradicationKeyBindings(helper, true);
+    RegisterHideTreesKeyBinding(helper, true);
 
     IconHandler.Handler.IsQuestLogPermanent = helper.ModRegistry.IsLoaded(ModCompat.DeluxeJournal);
 
@@ -167,6 +171,7 @@ public partial class ModEntry : Mod
       return;
     }
 
+    HideTreesPatch.Reset();
     _modOptionsPageHandler?.Dispose();
   }
 
@@ -323,6 +328,30 @@ public partial class ModEntry : Mod
     {
       helper.Input.SuppressActiveKeybinds(ModConfig.OpenMonsterEradicationKeybind);
       MonsterQuestHelper.ShowMonsterKillList();
+    }
+  }
+
+  public static void RegisterHideTreesKeyBinding(IModHelper helper, bool subscribe)
+  {
+    if (_hideTreesKeyBindingsHandler == null)
+    {
+      _hideTreesKeyBindingsHandler = (sender, e) => HandleHideTreesKeyBinding(helper);
+    }
+
+    helper.Events.Input.ButtonsChanged -= _hideTreesKeyBindingsHandler;
+
+    if (subscribe)
+    {
+      helper.Events.Input.ButtonsChanged += _hideTreesKeyBindingsHandler;
+    }
+  }
+
+  private static void HandleHideTreesKeyBinding(IModHelper helper)
+  {
+    if (Context.IsPlayerFree && ModConfig.HideTreesKeybind.JustPressed())
+    {
+      helper.Input.SuppressActiveKeybinds(ModConfig.HideTreesKeybind);
+      HideTreesPatch.Toggle();
     }
   }
   #endregion

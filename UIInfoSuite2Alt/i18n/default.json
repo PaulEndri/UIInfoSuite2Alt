@@ -46,6 +46,8 @@
   "Minutes": "minutes",
   "MachineProcessing": "Processing",
   "MachineDone": "Done",
+  "MachineReadyPrefix": "Ready: ",
+  "MachineReadyTomorrow": "Tomorrow!",
   //Fish Pond
   "FishPondPopulation": "Population: {{current}}/{{max}}",
   "FishPondNextSpawn": "Next fish: {{days}} day(s)",

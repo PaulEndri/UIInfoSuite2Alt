@@ -27,6 +27,7 @@ public partial class ModEntry
     ApiManager.TryRegisterApi<ICloudySkiesApi>(Helper, ModCompat.CloudySkies);
     ApiManager.TryRegisterApi<IBetterGameMenuApi>(Helper, ModCompat.BetterGameMenu);
     ApiManager.TryRegisterApi<IFerngillSimpleEconomyApi>(Helper, ModCompat.FerngillEconomy);
+    ApiManager.TryRegisterApi<IBetterJunimosApi>(Helper, ModCompat.BetterJunimos);
 
     UnlockableBundleHelper.Initialize(Helper);
     BundleHelper.ShowLockedBundles = ModConfig.ShowLockedBundleItems;

@@ -23,6 +23,7 @@ namespace UIInfoSuite2Alt.Options;
 internal class ModOptionsPageHandler : IDisposable
 {
   private const int downNeighborInInventory = 10; // above 11th inventory cell
+  internal const int ModTabSnapId = 77780;
   private const string optionsTabName = "uiinfosuite2";
 
   private const int bgmTabOrder = 170; // after Options (160), before Exit (200)
@@ -1395,6 +1396,9 @@ internal class ModOptionsPageHandler : IDisposable
         _savedPageState.Value = null;
       }
 
+      // Find the exit tab dynamically (last tab in the list)
+      ClickableComponent? exitTab = newGameMenu.tabs.Count > 0 ? newGameMenu.tabs[^1] : null;
+
       // name = tab id, label = hover text
       _modOptionsTab.Value = new ClickableComponent(
         new Rectangle(
@@ -1407,15 +1411,14 @@ internal class ModOptionsPageHandler : IDisposable
         "ui2_mod_options"
       )
       {
-        myID = 12348, // exit page tab is 12347
+        myID = ModTabSnapId,
 
-        leftNeighborID = 12347,
+        leftNeighborID = exitTab?.myID ?? -99998,
         tryDefaultIfNoDownNeighborExists = true,
         fullyImmutable = true,
       };
 
       // Don't add to GameMenu.tabs — GameMenu.draw breaks when our page is current tab
-      ClickableComponent? exitTab = newGameMenu.tabs.Find(tab => tab.myID == 12347);
       if (exitTab != null)
       {
         exitTab.rightNeighborID = _modOptionsTab.Value.myID;
@@ -1441,6 +1444,15 @@ internal class ModOptionsPageHandler : IDisposable
         if (gameMenu.currentTab == GameMenu.inventoryTab)
         {
           _modOptionsTab.Value.downNeighborID = downNeighborInInventory;
+
+          // Wire inventory slot back up to our tab
+          ClickableComponent? slot = gameMenu
+            .GetCurrentPage()
+            .getComponentWithID(downNeighborInInventory);
+          if (slot != null)
+          {
+            slot.upNeighborID = _modOptionsTab.Value.myID;
+          }
         }
         else if (gameMenu.currentTab == GameMenu.exitTab)
         {

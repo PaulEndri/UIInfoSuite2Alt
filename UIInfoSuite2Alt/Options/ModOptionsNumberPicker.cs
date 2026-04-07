@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using StardewValley;
 
 namespace UIInfoSuite2Alt.Options;
@@ -60,6 +61,25 @@ internal class ModOptionsNumberPicker : ModOptionsElement
     else if (_rightArrowBounds.Contains(x, y))
     {
       _value = _value >= _maxValue ? _minValue : _value + 1;
+      _setOption(_value);
+      Game1.playSound("smallSelect");
+    }
+  }
+
+  public override void ReceiveKeyPress(Keys key)
+  {
+    if (!Game1.options.SnappyMenus)
+      return;
+
+    if (Game1.options.doesInputListContain(Game1.options.moveRightButton, key))
+    {
+      _value = _value >= _maxValue ? _minValue : _value + 1;
+      _setOption(_value);
+      Game1.playSound("smallSelect");
+    }
+    else if (Game1.options.doesInputListContain(Game1.options.moveLeftButton, key))
+    {
+      _value = _value <= _minValue ? _maxValue : _value - 1;
       _setOption(_value);
       Game1.playSound("smallSelect");
     }

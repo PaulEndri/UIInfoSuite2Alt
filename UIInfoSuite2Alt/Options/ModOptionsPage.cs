@@ -186,7 +186,7 @@ public class ModOptionsPage : IClickableMenu
       else
       {
         // Already at the top, move to the menu tab
-        currentlySnappedComponent = getComponentWithID(12348);
+        currentlySnappedComponent = getComponentWithID(ModOptionsPageHandler.ModTabSnapId);
         if (currentlySnappedComponent != null)
         {
           // Set the down neighbor of the tab to the first slot, instead of the default (which is the second slot)
@@ -300,6 +300,24 @@ public class ModOptionsPage : IClickableMenu
     }
     else
     {
+      // Gamepad left/right: forward to snapped element (e.g. number picker arrows)
+      if (
+        Game1.options.snappyMenus
+        && Game1.options.gamepadControls
+        && currentlySnappedComponent != null
+        && (
+          Game1.options.doesInputListContain(Game1.options.moveLeftButton, key)
+          || Game1.options.doesInputListContain(Game1.options.moveRightButton, key)
+        )
+      )
+      {
+        int index = _currentItemIndex + currentlySnappedComponent.myID;
+        if (index >= 0 && index < _options.Count)
+        {
+          _options[index].ReceiveKeyPress(key);
+        }
+      }
+
       // The base implementation handles gamepad movement
       base.receiveKeyPress(key);
     }

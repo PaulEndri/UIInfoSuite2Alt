@@ -89,11 +89,15 @@ internal class ModOptionsDropdown : ModOptionsElement
       Game1.uiViewport.Height - _dropDownBounds.Height - _recentSlotY
     );
 
-    _selectedOption = Math.Clamp(
-      (y - _dropDownBounds.Y) / ItemHeight,
-      0,
-      Math.Max(0, _displayOptions.Count - 1)
-    );
+    // Skip mouse-position tracking with gamepad; selection is changed via ReceiveKeyPress
+    if (!Game1.options.SnappyMenus)
+    {
+      _selectedOption = Math.Clamp(
+        (y - _dropDownBounds.Y) / ItemHeight,
+        0,
+        Math.Max(0, _displayOptions.Count - 1)
+      );
+    }
   }
 
   public override void LeftClickReleased(int x, int y)
@@ -103,7 +107,13 @@ internal class ModOptionsDropdown : ModOptionsElement
 
     _clicked = false;
 
-    if (_displayOptions.Count > 0 && _dropDownBounds.Contains(x, y))
+    if (
+      _displayOptions.Count > 0
+      && (
+        _dropDownBounds.Contains(x, y)
+        || (Game1.options.gamepadControls && !Game1.lastCursorMotionWasMouse)
+      )
+    )
     {
       Game1.playSound("drumkit6");
       _setOption(_selectedOption);

@@ -428,13 +428,26 @@ internal class ShowCalendarAndBillboardOnGameMenuButton : IDisposable
       thirdLastSlot.downNeighborID = CalendarSnapId;
     }
 
+    ClickableComponent? trinketSlot = page.getComponentWithID(InventoryPage.region_trinkets);
+    if (trinketSlot != null)
+    {
+      trinketSlot.rightNeighborID = CalendarSnapId;
+    }
+
+    ClickableComponent? trashCan = page.getComponentWithID(InventoryPage.region_trashCan);
+    if (trashCan != null)
+    {
+      trashCan.leftNeighborID = QuestSnapId;
+    }
+
     // Row 1: Calendar ↔ Quest
     _calendarSnap.Value.rightNeighborID = QuestSnapId;
-    _calendarSnap.Value.leftNeighborID = -99998;
+    _calendarSnap.Value.leftNeighborID =
+      trinketSlot != null ? InventoryPage.region_trinkets : -99998;
     _calendarSnap.Value.upNeighborID = thirdLastSlotId;
 
     _questSnap.Value.leftNeighborID = CalendarSnapId;
-    _questSnap.Value.rightNeighborID = -99998;
+    _questSnap.Value.rightNeighborID = trashCan != null ? InventoryPage.region_trashCan : -99998;
     _questSnap.Value.upNeighborID = lastSlotId;
 
     // Row 2: SO + Qi (conditional)

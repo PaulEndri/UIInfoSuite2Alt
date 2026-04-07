@@ -58,6 +58,7 @@
 
 - **v2.8.15**
   - Fix machine tooltip showing misleading hour/minute countdown for day-based machines
+  - Add Trinket slot and Trash can now navigates to inventory icons (Calendar, Billboard) if using Gamepad-style menus
 - **v2.8.14**
   - Add hide trees keybind (Default: F7)
     - Toggles full-grown tree visibility with animated transitions

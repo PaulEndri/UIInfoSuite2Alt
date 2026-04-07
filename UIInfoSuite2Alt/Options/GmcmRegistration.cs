@@ -27,6 +27,9 @@ public partial class ModEntry
     ApiManager.TryRegisterApi<ICloudySkiesApi>(Helper, ModCompat.CloudySkies);
     ApiManager.TryRegisterApi<IBetterGameMenuApi>(Helper, ModCompat.BetterGameMenu);
     ApiManager.TryRegisterApi<IFerngillSimpleEconomyApi>(Helper, ModCompat.FerngillEconomy);
+    ApiManager.TryRegisterApi<IWalkOfLifeApi>(Helper, ModCompat.WalkOfLife);
+
+    WalkOfLifeHelper.Initialize(Helper);
 
     UnlockableBundleHelper.Initialize(Helper);
     BundleHelper.ShowLockedBundles = ModConfig.ShowLockedBundleItems;

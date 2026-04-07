@@ -57,11 +57,15 @@
 > Most new features can be toggled on/off in the mod's in-game options menu.
 
 - **v2.8.15**
-- Controller:
-  - Trinket slot and Trash can now navigate to inventory icons with controller
-  - Mod options tab is now reachable with controller
-  - Dropdowns and number pickers in mod options now work with controller-style menus
-- Fix machine tooltip showing misleading hour/minute countdown for day-based machines
+  - [Walk of Life](https://www.nexusmods.com/stardewvalley/mods/24355) compatibility:
+    - Experience bar supports prestige levels (11-20) with correct XP curve
+    - Ecologist/Gemologist quality predictions on forageable/mineral tooltips
+  - Add ground mineral tooltip in caves/mines (gems, minerals)
+  - Controller:
+    - Trinket slot and Trash can now navigate to inventory icons with controller
+    - Mod options tab is now reachable with controller
+    - Dropdowns and number pickers in mod options now work with controller-style menus
+  - Fix machine tooltip showing misleading hour/minute countdown for day-based machines
 - **v2.8.14**
   - Add hide trees keybind (Default: F7)
     - Toggles full-grown tree visibility with animated transitions
@@ -292,6 +296,7 @@ The compatability ranges from small fixes to bigger integration with mod provide
 - [Unlockable Bundles](https://www.nexusmods.com/stardewvalley/mods/17265)
 - [Esca's Modding Plugins](https://www.nexusmods.com/stardewvalley/mods/9296)
 - [Vanilla Plus Professions](https://www.nexusmods.com/stardewvalley/mods/20956)
+- [Walk of Life - Rebirth](https://www.nexusmods.com/stardewvalley/mods/24355)
 - [Ferngill Simple Economy](https://www.nexusmods.com/stardewvalley/mods/21414)
 - [Bigger Backpack](https://www.nexusmods.com/stardewvalley/mods/1845)
 - [Better Ranching](https://www.nexusmods.com/stardewvalley/mods/859)

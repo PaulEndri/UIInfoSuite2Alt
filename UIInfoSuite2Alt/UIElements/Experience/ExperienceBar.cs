@@ -260,15 +260,25 @@ public partial class ExperienceBar : IDisposable
     bool skillChanged = TryGetCurrentLevelIndexFromSkillChange(out int currentLevelIndex);
     bool itemChanged = Game1.player.CurrentItem != _previousItem.Value;
 
+    // WoL may redirect XP to mastery without updating experiencePoints[]
+    int currentMasteryXp = (int)Game1.stats.Get("MasteryExp");
+    bool masteryXpChanged = !skillChanged && currentMasteryXp != _previousMasteryExperience.Value;
+
     if (itemChanged)
     {
       currentLevelIndex = GetCurrentLevelIndexFromItemChange(Game1.player.CurrentItem);
       _previousItem.Value = Game1.player.CurrentItem;
     }
 
-    if (skillChanged || itemChanged)
+    if (masteryXpChanged && !itemChanged)
     {
-      UpdateExperience(currentLevelIndex, skillChanged);
+      // Use the skill index from the current item since experiencePoints didn't change
+      currentLevelIndex = GetCurrentLevelIndexFromItemChange(Game1.player.CurrentItem);
+    }
+
+    if (skillChanged || itemChanged || masteryXpChanged)
+    {
+      UpdateExperience(currentLevelIndex, skillChanged || masteryXpChanged);
     }
 
     // Check SpaceCore custom skills - may show as secondary bar if vanilla also changed
@@ -535,6 +545,18 @@ public partial class ExperienceBar : IDisposable
     _currentSkillLevel.Value = Game1.player.GetUnmodifiedSkillLevel(currentLevelIndex);
 
     _experienceRequiredToLevel.Value = GetExperienceRequiredToLevel(_currentSkillLevel.Value);
+
+    // WoL prestige: only active at level 10 if skill is mastered
+    if (
+      _currentSkillLevel.Value == 10
+      && WalkOfLifeHelper.PrestigeEnabled
+      && _experienceRequiredToLevel.Value > 0
+      && Game1.player.stats.Get($"mastery_{currentLevelIndex}") == 0
+    )
+    {
+      _experienceRequiredToLevel.Value = -1;
+    }
+
     _experienceFromPreviousLevels.Value = GetExperienceRequiredToLevel(
       _currentSkillLevel.Value - 1
     );
@@ -866,30 +888,32 @@ public partial class ExperienceBar : IDisposable
       7 => 6900,
       8 => 10000,
       9 => 15000,
-      _ => GetVppExperienceRequiredToLevel(currentLevel),
+      _ => GetExtendedExperienceRequiredToLevel(currentLevel),
     };
   }
 
-  /// <summary>
-  /// Returns the cumulative XP required for VPP extended levels (10-19).
-  /// VPP's LevelExperiences array: index 0 = level 11, index 9 = level 20.
-  /// We receive currentLevel 10-19 (asking for XP to reach level 11-20).
-  /// </summary>
-  private int GetVppExperienceRequiredToLevel(int currentLevel)
+  /// <summary>Cumulative XP for extended levels (10+). Checks WoL then VPP.</summary>
+  private int GetExtendedExperienceRequiredToLevel(int currentLevel)
   {
-    if (_vppApi == null)
+    // Walk of Life prestige levels (11-20)
+    int wolXp = WalkOfLifeHelper.GetExperienceRequiredForPrestigeLevel(currentLevel);
+    if (wolXp > 0)
     {
-      return -1;
+      return wolXp;
     }
 
-    int[] levelXp = _vppApi.LevelExperiences;
-    int index = currentLevel - 10; // level 10 -> index 0, level 19 -> index 9
-    if (index < 0 || index >= levelXp.Length)
+    // VPP extended levels
+    if (_vppApi != null)
     {
-      return -1;
+      int[] levelXp = _vppApi.LevelExperiences;
+      int index = currentLevel - 10; // level 10 -> index 0, level 19 -> index 9
+      if (index >= 0 && index < levelXp.Length)
+      {
+        return levelXp[index];
+      }
     }
 
-    return levelXp[index];
+    return -1;
   }
   #endregion Logic
 

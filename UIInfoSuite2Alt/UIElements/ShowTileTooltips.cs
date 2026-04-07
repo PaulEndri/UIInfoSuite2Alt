@@ -272,6 +272,30 @@ internal class ShowTileTooltips : IDisposable
       }
     }
 
+    // Ground minerals in caves/mines - show item name with sprite, quality if WoL Gemologist
+    if (
+      ShowForageableTooltip
+      && currentTile is not null
+      && !currentTile.bigCraftable.Value
+      && currentTile.IsSpawnedObject
+      && !currentTile.isForage()
+      && (
+        currentTile.Category == Object.GemCategory
+        || currentTile.Category == Object.mineralsCategory
+      )
+      && lines.Count == 0
+    )
+    {
+      lines.Add(new HoverLine(currentTile.DisplayName));
+      tile = Utility.ModifyCoordinatesForUIScale(
+        Game1.GlobalToLocal(currentTile.TileLocation * Game1.tileSize)
+      );
+      if (ShowHarvestQuality)
+      {
+        predictedQuality = QualityPrediction.GetGemologistMineralQuality(Game1.player);
+      }
+    }
+
     if (ShowCropTooltip && !InformantHelper.IsFeatureEnabled("crop") && terrain is not null)
     {
       foreach (
@@ -401,8 +425,21 @@ internal class ShowTileTooltips : IDisposable
       return FromItemData(ItemRegistry.GetData(fishPond.GetFishObject().QualifiedItemId));
     }
 
-    // Ground forageable: show the item itself
-    if (tileObject is not null && !tileObject.bigCraftable.Value && tileObject.isForage())
+    // Ground forageable or mineral: show the item itself
+    if (
+      tileObject is not null
+      && !tileObject.bigCraftable.Value
+      && (
+        tileObject.isForage()
+        || (
+          tileObject.IsSpawnedObject
+          && (
+            tileObject.Category == Object.GemCategory
+            || tileObject.Category == Object.mineralsCategory
+          )
+        )
+      )
+    )
     {
       return FromItemData(ItemRegistry.GetData(tileObject.QualifiedItemId));
     }

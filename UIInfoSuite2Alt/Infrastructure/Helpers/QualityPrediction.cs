@@ -1,6 +1,7 @@
 using System;
 using StardewValley;
 using StardewValley.TerrainFeatures;
+using UIInfoSuite2Alt.Compatibility;
 
 namespace UIInfoSuite2Alt.Infrastructure.Helpers;
 
@@ -14,7 +15,7 @@ internal static class QualityPrediction
   {
     if (farmer.professions.Contains(Farmer.botanist))
     {
-      return 4;
+      return GetBotanistForageQuality(farmer);
     }
 
     var random = Utility.CreateDaySaveRandom(tileX, tileY * 777f);
@@ -36,7 +37,7 @@ internal static class QualityPrediction
 
     if (farmer.professions.Contains(Farmer.botanist))
     {
-      return 4;
+      return GetBotanistForageQuality(farmer);
     }
 
     var random = Utility.CreateDaySaveRandom(tileX * 1000, tileY * 2000);
@@ -111,6 +112,31 @@ internal static class QualityPrediction
     }
 
     return PredictCropQuality(tileX, tileY, soil, crop);
+  }
+
+  /// <summary>WoL Ecologist quality if available, vanilla iridium otherwise.</summary>
+  private static int GetBotanistForageQuality(Farmer farmer)
+  {
+    if (ApiManager.GetApi<IWalkOfLifeApi>(ModCompat.WalkOfLife, out var wolApi))
+    {
+      return wolApi.GetEcologistForageQuality(farmer);
+    }
+
+    return 4;
+  }
+
+  /// <summary>WoL Gemologist mineral quality, or -1 if unavailable.</summary>
+  public static int GetGemologistMineralQuality(Farmer farmer)
+  {
+    if (
+      ApiManager.GetApi<IWalkOfLifeApi>(ModCompat.WalkOfLife, out var wolApi)
+      && farmer.professions.Contains(Farmer.gemologist)
+    )
+    {
+      return wolApi.GetGemologistMineralQuality(farmer);
+    }
+
+    return -1;
   }
 
   private static int RollForageQuality(Random random, int foragingLevel)
